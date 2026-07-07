@@ -1,70 +1,62 @@
-# Heartify MVP Audit & Upgrade Plan
+# Channel & Video Verification System
 
-This is a large, multi-area request. To do it well without breaking the working catalog (157k+ videos, ingestion, moderation, auth, PiP), I'll do it in reviewable phases instead of one giant change. Please confirm the phase order — I'll start with Phase 1 right after you approve.
+## Goal
+Add a durable moderation pipeline for YouTube channels/videos with an audit trail, YouTube-ID-based duplicate detection, a nightly re-check job, and an admin review page — end-to-end tested.
 
-## Audit Findings (current MVP)
+## Database (one migration)
 
-**Strengths**
-- Strong halal moderation pipeline (keyword + regex + vision + emoji + female-presenter rules) running server-side before `curated_videos`.
-- 1,325 trusted channels, dual YouTube API keys with rotation, uploads-playlist incremental fetch.
-- Auth, profiles, favorites, watch_history, user_roles with `has_role()` SECURITY DEFINER, RLS locked down.
-- Audit edge function + admin dashboard + Playwright sweep already exist.
+New tables in `public`:
 
-**Gaps blocking a "world-class intentional" feel**
-1. **No Daily Dose product.** Home is a Browse/For You/Listen tab trio — pure feed. No daily limit, no completion, no celebration, no streak surface.
-2. **Onboarding is missing** — no interest capture, so personalization can't be weighted 70/20/10.
-3. **Streaks/achievements** — not implemented end-to-end; no milestone cards, no share assets.
-4. **Saved page is flat** — just a favorites list, no Continue Watching / By Category / Most Beneficial.
-5. **Search is minimal** — single query box, no trending/recent/suggested/creators.
-6. **Trust badges** not surfaced on cards (Reviewed by Heartify, Educational, Halal-Friendly, etc.).
-7. **Empty states** are generic muted text.
-8. **Referral system** does not exist.
-9. **Premium scaffold** does not exist (entitlements table, feature flags).
-10. **Analytics** — moderation/ingestion logs exist, but no product analytics (DD completion, watch time, streak retention, referral conversion).
-11. **Design polish** — cards, spacing, typography are functional but not yet calm/premium. Heading font is Space Grotesk (fine), but hierarchy and whitespace need a pass.
-12. **Perf** — feed already cached 2min; no thumbnail CDN sizing, no route-level code splitting audit, no LCP preload.
+- **`channel_candidates`** — pending channels awaiting decision
+  - `youtube_channel_id` (unique), `handle`, `title`, `description`, `category`, `language`, `country`, `subscriber_count`, `source` (e.g. "gemini"), `submitted_by`, `status` (`pending|approved|rejected|flagged`)
+- **`approved_channels`** — canonical whitelist (source of truth for duplicate checks)
+  - `youtube_channel_id` (unique), `title`, `handle`, `category`, `owner_key` (normalized creator identity — lowercased handle/title stem — used to catch aliases/backups), `last_rechecked_at`, `consistency_score`
+- **`channel_audit_log`** — every decision, immutable
+  - `candidate_id`, `channel_id_ref` (nullable FK to approved_channels), `action` (`approved|rejected|flagged|rechecked`), `admin_id`, `confidence` (0-100), `evidence` jsonb (title, description, latest_video_titles[], thumbnail_urls[], category_scores{}, exclusion_hits[]), `reason`, `created_at`
+- **`video_candidates`** + **`video_audit_log`** — mirror structure for individual videos
 
-## Phased Implementation
+All tables: GRANT to authenticated + service_role, RLS enabled, admin-only write via `has_role(auth.uid(), 'admin')`, authenticated read on audit logs.
 
-### Phase 1 — Daily Dose (Hero Product) + Streaks
-- New tables: `daily_dose` (user_id, date, video_ids[], total_minutes, completed_count), `streaks` (user_id, current, longest, last_completed_date), `user_interests` (primary, secondary, exploration), `dose_completions`.
-- Edge function `generate-daily-dose`: picks 3 videos using 70/20/10 weighting from `user_interests`, capped at ~18min, dedup'd vs `watch_history`.
-- New `<DailyDoseHero>` component on `/` — top of page, shows 3-card stack, "X/3 completed", progress ring, estimated time.
-- Completion detection in `Watch.tsx` (≥85% watched) → mark dose item complete → if all 3 done → celebration modal ("Alhamdulillah 🌿") + streak bump + confetti-free calm animation.
-- Streak milestone modals (3/7/14/30/60/100/365) with shareable card (html2canvas).
+`owner_key` computed via a small SQL function that lowercases + strips "official/tv/hd/backup/2/archive" suffixes so `MuftiMenkOfficial` and `MuftiMenkTV` collide.
 
-### Phase 2 — Onboarding + Personalization
-- `/onboarding` route (gated after signup if `user_interests` missing).
-- 3-step flow: pick Primary, Secondary, Exploration from existing curated section taxonomy.
-- Wire into Daily Dose generator + For You ranking.
+Duplicate check function `public.check_channel_duplicate(_yt_id, _title, _handle)` returns match reason (`exact_id|owner_key|title_similarity`) using `pg_trgm`.
 
-### Phase 3 — Trust Badges + Card Polish
-- Add `trust_tags` text[] column to `curated_videos` (default derived from section: Islamic→["Reviewed","Halal-Friendly"], Science→["Educational","Science-Based"], etc.).
-- Backfill via SQL based on existing section_ids.
-- `<TrustBadges>` chip row on `YouTubeVideoCard` + Watch page.
+## Edge functions
 
-### Phase 4 — Saved Upgrade + Search Upgrade + Empty States
-- Profile/Saved page tabs: Continue Watching (from `watch_history` where progress 5–95%), Recently Saved, By Category, Most Beneficial (highest moderation score), Favorites.
-- Search page: Trending (aggregate from `search_queries` table), Recent (localStorage), Suggested (category chips), Popular Creators (top `channel_title` by `curated_videos` count).
-- Replace every empty state with a calm, copy-driven component.
+- **`verify-channel`** — takes a candidate, fetches YouTube channel via existing `YOUTUBE_API_KEY`, runs exclusion keyword scan on latest 10 uploads, computes confidence score, writes to `channel_candidates` + `channel_audit_log` with full evidence jsonb. Returns approve/reject verdict (auto-approve only if confidence ≥95 and duplicate-risk low).
+- **`recheck-approved-channels`** — iterates `approved_channels` ordered by `last_rechecked_at`, re-fetches YouTube data, detects: (a) 404/deleted, (b) title/handle rename, (c) recent uploads failing exclusions. Flags changes into `channel_audit_log` with action `flagged` and status `flagged`. Cron scheduled nightly via `pg_cron` (insert tool, not migration).
 
-### Phase 5 — Referral + Premium Scaffold + Analytics
-- `referrals` table (code, inviter_id, invitee_id, status), invite UI unlocked at 7-day & 30-day streaks.
-- `entitlements` table (user_id, plan, features jsonb) — schema only, no UI.
-- `analytics_events` table + `track()` helper; admin `/admin/analytics` dashboard with DD completion %, avg watch time, streak retention curve, referral conversion.
+## Admin review page (`/admin/review`)
 
-### Phase 6 — Design Polish + Performance
-- Tighten spacing scale, soften shadows (`--shadow-soft`), increase card radius consistency, refine typography hierarchy (display 32/24/18, body 14/13).
-- Preload LCP hero, lazy-load below-fold sections, add `loading="lazy"` + `decoding="async"` to thumbnails, code-split Audit/Moderation routes.
+Guarded by `has_role(admin)`. Three tabs:
+1. **Pending Candidates** — cards with title, thumbnail, category, evidence preview, Approve/Reject buttons (writes audit log with reason + confidence).
+2. **Approved vs Rejected** — split view, filter by category/date, click row → drawer showing full evidence jsonb + reasoning side-by-side.
+3. **Flagged for Recheck** — items where nightly job detected drift; approve keep / remove.
 
-## Technical Notes
-- All new tables follow project rules: `GRANT` block + RLS + `has_role()` for admin tables.
-- No client-side role checks; all admin endpoints re-verify via JWT + `has_role`.
-- Daily Dose generation runs on-demand (edge function) with a 24h cache row, plus a nightly cron pre-generates for active users.
-- Watch-progress tracking reuses existing `watch_history` table — add `progress_seconds` if missing.
-- No infinite-scroll changes to home in Phase 1 — Daily Dose sits *above* existing tabs; intentional consumption is reinforced by it being the first thing and the only thing the celebration congratulates.
+Same layout has a Videos tab that mirrors the Channels UI against `video_candidates`.
 
-## What I'd like confirmed
-1. Approve phased rollout (Phase 1 first this turn, others in follow-ups)?
-2. OK to add the listed new tables (`daily_dose`, `streaks`, `user_interests`, `dose_completions`, later `referrals`, `entitlements`, `analytics_events`, `search_queries`)?
-3. Keep existing Browse/Listen tabs intact below Daily Dose? (recommended — don't remove what works)
+## E2E tests (Playwright)
+
+- `tests/e2e/channel-verification.spec.ts` — submit candidate → verify → approve → confirm in approved list, audit log entry visible.
+- Duplicate detection: submit alias variant, expect rejected with `owner_key` match reason.
+- Recheck: seed an approved channel with a title that now fails exclusions, invoke recheck function, assert `flagged` status appears in admin page.
+- Admin RBAC: non-admin gets 403 on `/admin/review`.
+
+Run via existing `bunx vitest` for unit slices + `playwright test` for E2E.
+
+## Files
+
+- `supabase/migrations/<ts>_channel_verification.sql`
+- `supabase/functions/verify-channel/index.ts`
+- `supabase/functions/recheck-approved-channels/index.ts`
+- `src/pages/AdminReview.tsx` + route in `src/App.tsx`
+- `src/components/admin/CandidateCard.tsx`, `EvidenceDrawer.tsx`
+- `src/hooks/useAdminReview.ts`
+- `tests/e2e/channel-verification.spec.ts`
+- `tests/e2e/recheck-flag.spec.ts`
+
+## Out of scope
+- Migrating the existing static `channelCategories.ts` list into `approved_channels` (can seed later on request).
+- Automatic un-approval — nightly job only flags; humans decide.
+
+Approve to proceed and I'll ship the migration first, then functions + UI + tests.
