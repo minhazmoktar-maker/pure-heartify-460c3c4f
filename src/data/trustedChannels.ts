@@ -569,6 +569,49 @@ export const TRUSTED_CHANNELS: string[] = [
   "Dr. Iyad Qunaibi", "Iyad Qunaibi",
   "Arabic Seeds", "Studio Arabiya",
   "Learn Arabic with Bilal",
+
+  // XXX. Verified additions — Software Engineering, Arabic Sciences, History, Applied Sciences
+  // Software / CS (Confidence ≥95%)
+  "CodeOpinion", "Low Level Learning", "LowLevelTV",
+  "ByteByteGo", "Alex Xu", "Continuous Delivery", "Dave Farley",
+  "Mark Richards", "Developer To Architect", "Amigoscode",
+  "Jon Gjengset", "ArjanCodes", "Defog Tech", "Milan Jovanović",
+  "Milan Jovanovic", "Dave's Garage", "TechWorld with Nana",
+  "Vlad Mihalcea", "InfoQ", "Tsoding Daily", "Error Code",
+  "Traversy Media", "ThePrimeagen", "NDC Conferences",
+  "Kalle Hallden", "Derek Banas", "Jupiter Broadcasting",
+  "Linux Unplugged", "Devoxx", "Web Dev Simplified",
+  "Academind", "Guardian Cyber Security", "Sebastian Lague",
+  "Gaurav Sen", "Scaler Academy", "NetworkChuck",
+  // Classical Arabic pipelines
+  "Liquid Grammar", "Arabic with Tarek", "Shariah Program",
+  "Arabic Qalam", "Learn Arabic with Imran Alawiye", "Imran Alawiye",
+  "Fluent Arabic", "Arabiyyah Al-Mutakallim", "Arabic Daily",
+  "Lisan ul Quran", "Arabic With Imran", "Learn Quranic Arabic",
+  "Path to Arabic", "Arabic Pod Class", "Madinah Arabic",
+  "Al-Asas for Arabic", "Quran & Arabic Alignment",
+  "Learn Arabic with Khajah", "Arabic Linguistic Channel",
+  "Fusha Immersion Academy", "Arabic with Amina",
+  "Quran Academy English", "Mastering Arabic",
+  "Ease Arabic", "Speak Fusha", "Arabic Syntax Studio",
+  // History & Geopolitics
+  "The Cynical Historian", "Perun", "History Pod", "ToldInStone",
+  "Geopolitica", "World War Two", "TimeGhost History",
+  "The Historian's Craft", "Ancient Americas", "Geo-Economics & Trade",
+  "The Great War", "History Visualized", "Geopolitical Futures",
+  "Historical Documents Archive", "The French History Podcast",
+  "History Hit", "Geopolitics with Granieri", "Flashpoint Geopolitics",
+  "Prehistoric Planet", "Strategy & Tactics History",
+  "The History of Byzantium", "Geopolitical Horizon", "Epimetheus",
+  "Pacific Century", "Ancient History Guy",
+  // Applied Sciences, Math, Robotics
+  "Steve Brunton", "Domain of Science", "Looking Glass Universe",
+  "Zach Star", "Stand-up Maths", "Up and Atom", "PBS Eons",
+  "Eugene Khutoryansky", "Flammable Maths", "Chem Thug",
+  "Float Head Labs", "Science Asylum", "NileRed", "Kyle Hill",
+  "AlphaPhoenix", "MIT Mechanical Engineering",
+  "Institute of Physics", "The Earth Story",
+  "Mathematical Association of America",
 ];
 
 
