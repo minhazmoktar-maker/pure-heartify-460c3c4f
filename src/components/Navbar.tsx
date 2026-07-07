@@ -32,14 +32,6 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-[1800px] items-center justify-between gap-4 px-4 md:px-6">
         {/* Left */}
-        <div className="flex items-center gap-3">
-          <button className="rounded-lg p-2 hover:bg-secondary transition-colors">
-            <Menu className="h-5 w-5 text-foreground" />
-          </button>
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">H</span>
-            </div>
         {/* Left */}
         <div className="flex items-center gap-3">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
