@@ -527,6 +527,48 @@ export const TRUSTED_CHANNELS: string[] = [
   "IlmFeed", "IPSI Channel", "SCDawah Channel", "SCDawah",
   "Naseeha Sessions", "Islam Channel", "Quran Revolution TV",
   "One Message Foundation",
+
+  // XXIX. Verified educational additions (STEM, Business, History, Islamic — Confidence ≥95%)
+  // STEM & Computing
+  "Neso Academy", "3Blue1Brown", "StatQuest with Josh Starmer", "StatQuest",
+  "Ben Eater", "freeCodeCamp.org", "freeCodeCamp",
+  "Khan Academy Bangla", "The Organic Chemistry Tutor",
+  "Arvin Ash", "Welch Labs", "Corey Schafer", "LiveOverflow",
+  "Andreas Kretz", "Robert Niles", "Hussein Nasser", "TechWithTim",
+  "Tech With Tim", "MATLAB", "EEVblog",
+  // Business & Economics
+  "Marginal Revolution University", "MRUniversity",
+  "Economics Explained", "Wharton School", "LSE",
+  "London School of Economics", "Principles of Economics", "Antony Davies",
+  "Corporate Finance Institute", "CFI",
+  "Visual Economik EN", "Edspira", "INSEAD",
+  "Business Casual", "Columbia Business School",
+  "Farhat's Accounting Lectures", "New Economic Thinking",
+  "Patrick Boyle On Finance", "Academic Lesson",
+  "Asian Development Bank", "TalkMarkets", "World Economic Forum",
+  // History, Geography & Documentaries
+  "Caspian Report", "Useful Charts",
+  "Kings and Generals", "Epic History TV",
+  "Timeline - World History Documentaries", "Timeline World History",
+  "Flash Point History", "Kraut", "The History Chap",
+  "GeoHistory", "Voices of the Past", "Real Royalty",
+  "World History Encyclopedia", "HistoryMarche", "Absolute History",
+  "Invicta", "History Time", "The Armchair Historian",
+  "Feature History", "IT'S HISTORY", "Old World Podcast",
+  "WonderWhy", "Biographics",
+  // Islamic Intellectual / Arabic / Fiqh
+  "Muhammad Al-Andalusi", "Andalusi Institute",
+  "Sheikh Dr. Haitham al-Haddad", "Haitham al-Haddad",
+  "Dr. Omar Abdel Kafi", "Omar Abdel Kafi",
+  "Dr. Mohammad Rateb Al-Nabulsi",
+  "Al Fasaha",
+  "Quran Academy Bangladesh",
+  "Shariah Council of Halal Finance",
+  "AMAU", "AMAU Academy",
+  "Muslim Debate Initiative", "MDI",
+  "Dr. Iyad Qunaibi", "Iyad Qunaibi",
+  "Arabic Seeds", "Studio Arabiya",
+  "Learn Arabic with Bilal",
 ];
 
 
