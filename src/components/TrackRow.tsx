@@ -10,7 +10,7 @@ interface TrackRowProps {
 }
 
 const TrackRow = ({ track, index }: TrackRowProps) => {
-  const { play, isPremiumUser, currentTrack } = usePlayer();
+  const { play, isPremiumUser, currentTrack, isPlaying } = usePlayer();
   const isActive = currentTrack?.id === track.id;
   const isLocked = track.isPremium && !isPremiumUser;
 
@@ -20,6 +20,9 @@ const TrackRow = ({ track, index }: TrackRowProps) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.03 }}
       onClick={() => !isLocked && play(track)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => !isLocked && (e.key === "Enter" || e.key === " ") && play(track)}
       className={cn(
         "group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
         isActive ? "bg-primary/10" : "hover:bg-secondary",

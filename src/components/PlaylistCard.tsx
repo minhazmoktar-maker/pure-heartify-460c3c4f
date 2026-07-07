@@ -1,6 +1,7 @@
-import { Crown, Lock } from "lucide-react";
+import { Crown, Lock, Play } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Playlist } from "@/data/audio";
+import { tracks as allTracks } from "@/data/audio";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { cn } from "@/lib/utils";
 
@@ -10,29 +11,50 @@ interface PlaylistCardProps {
 }
 
 const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
-  const { isPremiumUser } = usePlayer();
+  const { isPremiumUser, playQueue } = usePlayer();
   const isLocked = playlist.isPremium && !isPremiumUser;
+
+  const queueForPlaylist = () => {
+    if (playlist.trackIds) {
+      return allTracks.filter((t) => playlist.trackIds!.includes(t.id));
+    }
+    if (playlist.category) {
+      return allTracks.filter((t) => t.category === playlist.category);
+    }
+    return allTracks;
+  };
+
+  const handlePlay = () => {
+    if (isLocked) return;
+    const q = queueForPlaylist().filter((t) => !t.isPremium || isPremiumUser);
+    if (q.length > 0) playQueue(q, 0);
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
+      onClick={handlePlay}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handlePlay()}
       className={cn(
         "group cursor-pointer overflow-hidden rounded-xl bg-card shadow-card transition-all hover:shadow-card-hover",
-        isLocked && "opacity-70"
+        isLocked && "opacity-70 cursor-not-allowed"
       )}
     >
       <div className="relative aspect-square overflow-hidden">
-        <img
-          src={playlist.cover}
-          alt={playlist.title}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        {isLocked && (
+        <img src={playlist.cover} alt={playlist.title} loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        {isLocked ? (
           <div className="absolute inset-0 flex items-center justify-center bg-foreground/40">
             <Lock className="h-8 w-8 text-background" />
+          </div>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-foreground/0 opacity-0 transition-all group-hover:bg-foreground/25 group-hover:opacity-100">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary shadow-lg">
+              <Play className="ml-0.5 h-5 w-5 fill-primary-foreground text-primary-foreground" />
+            </div>
           </div>
         )}
         {playlist.isPremium && (
