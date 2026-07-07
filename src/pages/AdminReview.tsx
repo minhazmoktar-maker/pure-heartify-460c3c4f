@@ -78,7 +78,7 @@ const AdminReview = () => {
     if (c.data) setCandidates(c.data as Candidate[]);
     if (a.data) setApproved(a.data as ApprovedRow[]);
     if (l.data) setAudit(l.data as AuditRow[]);
-    if (v.data) setVideoCandidates(v.data as Candidate[]);
+    if (v.data) setVideoCandidates(v.data as unknown as Candidate[]);
   };
 
   useEffect(() => { if (isAdmin) reload(); }, [isAdmin]);
