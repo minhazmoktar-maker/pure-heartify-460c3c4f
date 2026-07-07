@@ -66,6 +66,7 @@ const App = () => (
                 <Route path="/admin/moderation" element={<ModerationLog />} />
                 <Route path="/admin/audit" element={<Audit />} />
                 <Route path="/admin/console" element={<AdminConsole />} />
+                <Route path="/admin/review" element={<AdminReview />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
