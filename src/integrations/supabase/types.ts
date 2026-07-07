@@ -41,6 +41,51 @@ export type Database = {
         }
         Relationships: []
       }
+      approved_channels: {
+        Row: {
+          approved_by: string | null
+          category: string | null
+          consistency_score: number | null
+          created_at: string
+          handle: string | null
+          id: string
+          last_rechecked_at: string | null
+          owner_key: string
+          status: string
+          title: string
+          updated_at: string
+          youtube_channel_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          category?: string | null
+          consistency_score?: number | null
+          created_at?: string
+          handle?: string | null
+          id?: string
+          last_rechecked_at?: string | null
+          owner_key: string
+          status?: string
+          title: string
+          updated_at?: string
+          youtube_channel_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          category?: string | null
+          consistency_score?: number | null
+          created_at?: string
+          handle?: string | null
+          id?: string
+          last_rechecked_at?: string | null
+          owner_key?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          youtube_channel_id?: string
+        }
+        Relationships: []
+      }
       blocked_creators: {
         Row: {
           created_at: string
@@ -59,6 +104,123 @@ export type Database = {
           id?: string
           pattern?: string
           reason?: string | null
+        }
+        Relationships: []
+      }
+      channel_audit_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          candidate_id: string | null
+          channel_ref: string | null
+          confidence: number | null
+          created_at: string
+          duplicate_risk: string | null
+          evidence: Json
+          id: string
+          reason: string | null
+          youtube_channel_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          candidate_id?: string | null
+          channel_ref?: string | null
+          confidence?: number | null
+          created_at?: string
+          duplicate_risk?: string | null
+          evidence?: Json
+          id?: string
+          reason?: string | null
+          youtube_channel_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          candidate_id?: string | null
+          channel_ref?: string | null
+          confidence?: number | null
+          created_at?: string
+          duplicate_risk?: string | null
+          evidence?: Json
+          id?: string
+          reason?: string | null
+          youtube_channel_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_audit_log_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "channel_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_audit_log_channel_ref_fkey"
+            columns: ["channel_ref"]
+            isOneToOne: false
+            referencedRelation: "approved_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_candidates: {
+        Row: {
+          category: string | null
+          confidence: number | null
+          country: string | null
+          created_at: string
+          description: string | null
+          duplicate_risk: string | null
+          evidence: Json
+          handle: string | null
+          id: string
+          language: string | null
+          source: string
+          status: string
+          submitted_by: string | null
+          subscriber_count: number | null
+          title: string
+          updated_at: string
+          youtube_channel_id: string
+        }
+        Insert: {
+          category?: string | null
+          confidence?: number | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          duplicate_risk?: string | null
+          evidence?: Json
+          handle?: string | null
+          id?: string
+          language?: string | null
+          source?: string
+          status?: string
+          submitted_by?: string | null
+          subscriber_count?: number | null
+          title: string
+          updated_at?: string
+          youtube_channel_id: string
+        }
+        Update: {
+          category?: string | null
+          confidence?: number | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          duplicate_risk?: string | null
+          evidence?: Json
+          handle?: string | null
+          id?: string
+          language?: string | null
+          source?: string
+          status?: string
+          submitted_by?: string | null
+          subscriber_count?: number | null
+          title?: string
+          updated_at?: string
+          youtube_channel_id?: string
         }
         Relationships: []
       }
@@ -559,6 +721,98 @@ export type Database = {
         }
         Relationships: []
       }
+      video_audit_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          candidate_id: string | null
+          confidence: number | null
+          created_at: string
+          evidence: Json
+          id: string
+          reason: string | null
+          youtube_video_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          candidate_id?: string | null
+          confidence?: number | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          reason?: string | null
+          youtube_video_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          candidate_id?: string | null
+          confidence?: number | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          reason?: string | null
+          youtube_video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_audit_log_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "video_candidates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_candidates: {
+        Row: {
+          channel_title: string | null
+          confidence: number | null
+          created_at: string
+          description: string | null
+          evidence: Json
+          id: string
+          status: string
+          submitted_by: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          youtube_channel_id: string | null
+          youtube_video_id: string
+        }
+        Insert: {
+          channel_title?: string | null
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          evidence?: Json
+          id?: string
+          status?: string
+          submitted_by?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          youtube_channel_id?: string | null
+          youtube_video_id: string
+        }
+        Update: {
+          channel_title?: string | null
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          evidence?: Json
+          id?: string
+          status?: string
+          submitted_by?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          youtube_channel_id?: string | null
+          youtube_video_id?: string
+        }
+        Relationships: []
+      }
       watch_history: {
         Row: {
           completed: boolean
@@ -600,6 +854,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_channel_duplicate: {
+        Args: { _handle: string; _title: string; _yt_id: string }
+        Returns: {
+          match_type: string
+          matched_channel_id: string
+          matched_title: string
+          score: number
+        }[]
+      }
+      compute_owner_key: { Args: { _name: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
