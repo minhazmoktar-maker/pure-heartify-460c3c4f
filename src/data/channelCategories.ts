@@ -223,7 +223,26 @@ export const CHANNEL_CATEGORIES: ChannelCategory[] = [
       "The Daily Reminder", "Qalam Institute",
     ],
   },
+  {
+    id: "newly-vetted",
+    title: "Newly Vetted Halal Channels",
+    icon: "✅",
+    description: "Recently verified educational Islamic channels",
+    channels: [
+      "AlKauthar Institute", "AlKauthar Institute NY", "SeekersGuidance",
+      "One Message Foundation", "Basic Islam TV", "FreeQuranEducation",
+      "Quran & Science", "Halal or Halal", "Mufti Menk", "Yaqeen Institute",
+      "Bayyinah Institute", "Nouman Ali Khan", "MercifulServant",
+      "Assim Al Hakeem", "Yasir Qadhi", "OnePath Network", "Omar Suleiman",
+      "iLovUAllah", "The Deen Show", "Smile2Jannah", "One Islam Productions",
+      "Dawah Team", "Sense Islam", "Quran and Islam", "Alfalaah", "Huda TV",
+      "IlmFeed", "IPSI Channel", "SCDawah Channel", "The Daily Reminder",
+      "Digital Mimbar", "Naseeha Sessions", "Zaytuna College",
+      "Islam Channel", "Quran Revolution TV", "SeekersGuidance Global",
+    ],
+  },
 ];
+
 
 export const TOTAL_CHANNELS = CHANNEL_CATEGORIES.reduce(
   (sum, cat) => sum + cat.channels.length,
