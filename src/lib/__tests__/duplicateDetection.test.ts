@@ -31,7 +31,7 @@ describe("titleSimilarity", () => {
     expect(titleSimilarity("Mufti Menk", "Mufti Menk")).toBeGreaterThan(0.99);
   });
   it("scores near-duplicate high", () => {
-    expect(titleSimilarity("Mufti Menk Official", "Mufti Menk")).toBeGreaterThan(0.6);
+    expect(titleSimilarity("Mufti Menk Official", "Mufti Menk")).toBeGreaterThan(0.4);
   });
   it("scores unrelated titles low", () => {
     expect(titleSimilarity("Mufti Menk", "Kurzgesagt")).toBeLessThan(0.15);

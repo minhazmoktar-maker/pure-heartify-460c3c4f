@@ -55,7 +55,7 @@ export function detectDuplicate(
     const s = titleSimilarity(e.title, candidate.title);
     if (s > best) best = s;
   }
-  if (best > 0.7) return { matchType: "title_similarity", score: best };
+  if (best > 0.4) return { matchType: "title_similarity", score: best };
   return null;
 }
 
