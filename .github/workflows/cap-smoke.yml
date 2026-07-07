@@ -17,6 +17,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Typecheck (blocks PR on TS errors)
+        run: npm run typecheck
       - run: npx playwright install --with-deps chromium
       - name: Run Capacitor smoke tests
         run: npm run cap:smoke
