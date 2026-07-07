@@ -16,7 +16,30 @@ const FCM_SERVER_KEY = Deno.env.get("FCM_SERVER_KEY"); // optional
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Authorize: shared cron token or admin JWT
+  const cronToken = Deno.env.get("AUDIT_CRON_TOKEN");
+  const cronHeader = req.headers.get("x-cron-token") ?? "";
+  let allowed = !!cronToken && cronHeader === cronToken;
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE);
+  if (!allowed) {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (authHeader.startsWith("Bearer ")) {
+      const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
+      const sb = createClient(SUPABASE_URL, anon, { global: { headers: { Authorization: authHeader } } });
+      const { data: userData } = await sb.auth.getUser();
+      if (userData?.user) {
+        const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
+        allowed = !!isAdmin;
+      }
+    }
+  }
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
