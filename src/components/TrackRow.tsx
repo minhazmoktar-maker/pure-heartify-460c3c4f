@@ -7,22 +7,29 @@ import { cn } from "@/lib/utils";
 interface TrackRowProps {
   track: Track;
   index: number;
+  queue?: Track[];
 }
 
-const TrackRow = ({ track, index }: TrackRowProps) => {
+const TrackRow = ({ track, index, queue }: TrackRowProps) => {
   const { play, isPremiumUser, currentTrack, isPlaying } = usePlayer();
   const isActive = currentTrack?.id === track.id;
   const isLocked = track.isPremium && !isPremiumUser;
+
+  const handlePlay = () => {
+    if (isLocked) return;
+    const q = queue?.filter((t) => !t.isPremium || isPremiumUser);
+    play(track, q && q.length > 0 ? q : undefined);
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.03 }}
-      onClick={() => !isLocked && play(track)}
+      onClick={handlePlay}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => !isLocked && (e.key === "Enter" || e.key === " ") && play(track)}
+      onKeyDown={(e) => !isLocked && (e.key === "Enter" || e.key === " ") && handlePlay()}
       className={cn(
         "group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
         isActive ? "bg-primary/10" : "hover:bg-secondary",
