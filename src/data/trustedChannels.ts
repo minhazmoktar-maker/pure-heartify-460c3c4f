@@ -612,6 +612,47 @@ export const TRUSTED_CHANNELS: string[] = [
   "AlphaPhoenix", "MIT Mechanical Engineering",
   "Institute of Physics", "The Earth Story",
   "Mathematical Association of America",
+
+  // XXXI. Verified additions — Data/AI, Neuroscience, History, Arabic, Engineering (Confidence ≥95%)
+  // Data & AI
+  "Seattle Data Guy", "Kahan Data Solutions", "Arxiv Insights",
+  "The Cherno", "Alex The Analyst", "ritvikmath",
+  "Murtaza's Workshop", "Dr. Trefor Bazett", "NeuralNine",
+  "Code Emporium", "Data Professor", "Jay Alammar",
+  "Data Interview Pro", "Socratica", "Data Engineering Academy",
+  // Cognitive Neuroscience & Behavioral Systems
+  "Andrew Huberman", "Huberman Lab", "Neuro Transmissions",
+  "Neuroscience School", "Stanford Sapolsky Lectures", "Robert Sapolsky",
+  "Psychological Science", "APS", "The Brainwaves Video Anthology",
+  "The Cognitive Science Society", "The Neurophile", "Brainfacts.org",
+  "The Royal Society", "British Psychological Society", "BPS",
+  "Brain and Mind", "Noba Psychology", "CogSci Varsity",
+  "Neuroscientific Insights", "Psychology Unlocked",
+  "The Behavioral Scientist", "Mind & Brain Society",
+  "Emory University Neuroscience", "Neurocentrick",
+  "Institute of Cognitive Neuroscience", "Brain & Behavior Research Foundation",
+  "Cognition Archive",
+  // Additional history/archives
+  "Fall of Civilizations", "Bazan History", "The Histocrat",
+  "Real Time History", "SandRhoman History", "House of History",
+  "The Khan Academy History", "The Operational Room",
+  "Ancient History Encyclopedia",
+  // Classical Arabic & Islamic heritage
+  "The Arabic We Speak", "Sibawayh Society", "Arabic with Amaan",
+  "The Quranic Arabic Masterclass", "The Islamic Texts Society",
+  "Usul Academy", "Al-Mishkat Archive", "The Andalusian Legacy",
+  "Classical Wisdom Online", "Madinah Arabic Courses",
+  "The Manuscript Institute", "The Hadith Methodology Archive",
+  "Fountain of Knowledge", "The Shariah Files", "Arabic Lexicon",
+  "The Tazkiyah Framework", "Islamic Geometric Art Academy",
+  "The Hikmah Series", "Linguistic Miracles Archive",
+  "The Fiqh Council Seminars", "Traditional Science Preservations",
+  // Engineering, hardware, physics, economics
+  "The Engineering Mindset", "Lesics", "Learn Engineering",
+  "Branch Education", "ElectroBOOM", "mCoding",
+  "EconplusDal", "Institute for New Economic Thinking", "INET",
+  "The Plain Bagel", "Visual Capitalist",
+  "NileBlue", "Sabine Hossenfelder", "Science Without the Gobbledygook",
 ];
 
 
