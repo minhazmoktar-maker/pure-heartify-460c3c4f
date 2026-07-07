@@ -858,12 +858,33 @@ async function ingestDiscoveryQuery(sectionId: string, query: string): Promise<{
   return { added, quota: 100 };
 }
 
+async function isAuthorizedCaller(req: Request): Promise<boolean> {
+  const cronToken = Deno.env.get("AUDIT_CRON_TOKEN");
+  if (cronToken && req.headers.get("x-cron-token") === cronToken) return true;
+  const authHeader = req.headers.get("Authorization") ?? "";
+  if (!authHeader.startsWith("Bearer ") || !SUPABASE_URL) return false;
+  try {
+    const { createClient } = await import("npm:@supabase/supabase-js@2");
+    const anon = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!anon) return false;
+    const sb = createClient(SUPABASE_URL, anon, { global: { headers: { Authorization: authHeader } } });
+    const { data: userData } = await sb.auth.getUser();
+    if (!userData?.user) return false;
+    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY!);
+    const { data: isAdmin } = await admin.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
+    return !!isAdmin;
+  } catch { return false; }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
   if (!YOUTUBE_API_KEYS.length || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     return json({ error: "Missing configuration: at least one YOUTUBE_API_KEY required" }, 500);
+  }
+  if (!(await isAuthorizedCaller(req))) {
+    return json({ error: "unauthorized" }, 401);
   }
 
   try {

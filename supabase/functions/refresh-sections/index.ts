@@ -102,6 +102,29 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return json({ error: "Missing config" }, 500);
 
+  // Authorize: shared cron token or admin JWT
+  const cronToken = Deno.env.get("AUDIT_CRON_TOKEN");
+  const cronHeader = req.headers.get("x-cron-token") ?? "";
+  let allowed = !!cronToken && cronHeader === cronToken;
+  if (!allowed) {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (authHeader.startsWith("Bearer ")) {
+      try {
+        const { createClient } = await import("npm:@supabase/supabase-js@2");
+        const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
+        const sb = createClient(SUPABASE_URL, anon, { global: { headers: { Authorization: authHeader } } });
+        const { data: userData } = await sb.auth.getUser();
+        if (userData?.user) {
+          const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+          const { data: isAdmin } = await admin.rpc("has_role", { _user_id: userData.user.id, _role: "admin" });
+          allowed = !!isAdmin;
+        }
+      } catch { /* fallthrough */ }
+    }
+  }
+  if (!allowed) return json({ error: "unauthorized" }, 401);
+
+
   try {
     // Get all distinct section_ids currently in DB
     const res = await rest(`curated_videos?select=section_id&limit=10000`);
