@@ -28,6 +28,7 @@ const Channels = lazy(() => import("./pages/Channels.tsx"));
 const ModerationLog = lazy(() => import("./pages/ModerationLog.tsx"));
 const Audit = lazy(() => import("./pages/Audit.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
+const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 
 const queryClient = new QueryClient();
 
