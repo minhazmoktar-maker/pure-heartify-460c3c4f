@@ -87,11 +87,27 @@ const AdminReview = () => {
     if (!newChannelId.trim() || !user) return;
     setBusy(true);
     try {
-      const { data, error } = await supabase.functions.invoke("verify-channel", {
-        body: { youtube_channel_id: newChannelId.trim(), source: "admin_submit" },
-      });
-      if (error) throw error;
-      toast({ title: "Verification complete", description: `Status: ${data?.status} (confidence ${data?.confidence})` });
+      const ids = newChannelId
+        .split(/[\s,]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      if (ids.length === 1) {
+        const { data, error } = await supabase.functions.invoke("verify-channel", {
+          body: { youtube_channel_id: ids[0], source: "admin_submit" },
+        });
+        if (error) throw error;
+        toast({ title: "Verification complete", description: `Status: ${data?.status} (confidence ${data?.confidence})` });
+      } else {
+        const { data, error } = await supabase.functions.invoke("batch-verify-channels", {
+          body: { channels: ids.map((id) => ({ youtube_channel_id: id, source: "admin_batch" })) },
+        });
+        if (error) throw error;
+        toast({
+          title: "Batch verification complete",
+          description: `${data?.approved ?? 0} approved · ${data?.pending ?? 0} pending · ${data?.rejected ?? 0} rejected · ${data?.failed ?? 0} failed`,
+        });
+      }
       setNewChannelId("");
       await reload();
     } catch (e: any) {
@@ -188,12 +204,21 @@ const AdminReview = () => {
         </div>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-base">Submit channel for verification</CardTitle></CardHeader>
-          <CardContent className="flex gap-2">
-            <Input placeholder="YouTube channel ID (UCxxxx...)" value={newChannelId} onChange={(e) => setNewChannelId(e.target.value)} />
-            <Button onClick={submitForVerification} disabled={busy || !newChannelId.trim()}>
-              <Search className="mr-2 h-4 w-4" /> Verify
-            </Button>
+          <CardHeader className="pb-2"><CardTitle className="text-base">Submit channel(s) for verification</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex gap-2">
+              <Input
+                placeholder="One or more YouTube channel IDs (comma or newline separated)"
+                value={newChannelId}
+                onChange={(e) => setNewChannelId(e.target.value)}
+              />
+              <Button onClick={submitForVerification} disabled={busy || !newChannelId.trim()}>
+                <Search className="mr-2 h-4 w-4" /> Verify
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Single ID uses per-channel verify. Multiple IDs run through the batch verifier.
+            </p>
           </CardContent>
         </Card>
 

@@ -646,6 +646,30 @@ export type Database = {
         }
         Relationships: []
       }
+      removed_videos: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          removed_by: string | null
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          removed_by?: string | null
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          removed_by?: string | null
+          video_id?: string
+        }
+        Relationships: []
+      }
       streaks: {
         Row: {
           created_at: string
