@@ -1,0 +1,81 @@
+name: Nightly Re-audit + Cache Invalidation E2E
+
+# Runs shortly AFTER the DB-side pg_cron `nightly_reaudit_sweep` fires (03:00 UTC),
+# then verifies from the outside that CDN / browser caches don't serve stale content.
+on:
+  schedule:
+    - cron: "15 3 * * *"   # 03:15 UTC — 15 min after nightly_reaudit_sweep
+  workflow_dispatch:
+
+jobs:
+  cache-invalidation:
+    name: Verify sweep + cache invalidation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      - name: Trigger nightly_reaudit_sweep explicitly (defensive)
+        if: env.VITE_SUPABASE_URL != '' && env.VITE_SUPABASE_PUBLISHABLE_KEY != ''
+        run: |
+          curl -sS -X POST \
+            -H "apikey: $VITE_SUPABASE_PUBLISHABLE_KEY" \
+            -H "Authorization: Bearer $VITE_SUPABASE_PUBLISHABLE_KEY" \
+            -H "Content-Type: application/json" \
+            "$VITE_SUPABASE_URL/rest/v1/rpc/nightly_reaudit_sweep" \
+            -d '{}' | tee sweep.json
+          echo "sweep exit=$?"
+
+      - name: Run cache-invalidation e2e suite
+        run: npx playwright test tests/e2e/cache-invalidation.spec.ts --reporter=html,list
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-playwright-report
+          path: playwright-report
+          retention-days: 14
+      - name: Upload Playwright traces / screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-playwright-artifacts
+          path: |
+            test-results/**
+            **/trace.zip
+            **/*.png
+            **/*.webm
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Upload sweep RPC response
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-sweep-response
+          path: sweep.json
+          if-no-files-found: ignore
+
+      - name: Notify Slack on failure
+        if: failure() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            --data "{\"text\":\":rotating_light: *Nightly re-audit cache-invalidation FAILED* — <${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}|view run>\"}" \
+            "$SLACK_WEBHOOK_URL"
+      - name: Notify Slack on success (daily green report)
+        if: success() && env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            --data "{\"text\":\":white_check_mark: Nightly re-audit + cache invalidation passed.\"}" \
+            "$SLACK_WEBHOOK_URL"
