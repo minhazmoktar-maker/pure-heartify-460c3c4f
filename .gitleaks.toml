@@ -1,0 +1,25 @@
+# Gitleaks config for Heartify
+# Uses the default ruleset plus allowlisting for Supabase publishable/anon keys
+# (safe to commit — enforced by RLS).
+title = "Heartify secret-scan rules"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Non-secret publishable / anon keys and generated types"
+paths = [
+  '''src/integrations/supabase/types\.ts''',
+  '''\.lovable/.*''',
+  '''bun\.lock''',
+  '''package-lock\.json''',
+]
+
+# Supabase anon/publishable keys are public-by-design (JWT with role=anon).
+# The .env file and README may contain them; RLS is the real gate.
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSI[^"'\s]+''',
+  '''VITE_SUPABASE_PUBLISHABLE_KEY''',
+  '''VITE_SUPABASE_URL''',
+  '''VITE_SUPABASE_PROJECT_ID''',
+]
