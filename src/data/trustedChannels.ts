@@ -519,7 +519,16 @@ export const TRUSTED_CHANNELS: string[] = [
   "Kamil Ahmad", "Asim Khan", "Wisam Sharieff", "Quran Revolution",
   "Bayyinah TV", "Qalam Institute Podcast",
   "Faith IQ", "Yaqeen Q&A", "Seekers Answers",
+  // XXVIII. Vetted additions (educational Islamic channels, verified halal)
+  "AlKauthar Institute", "AlKauthar Institute NY", "SeekersGuidance",
+  "SeekersGuidance Global", "Basic Islam TV", "Quran & Science",
+  "Quran and Science", "Halal or Halal", "Smile2Jannah",
+  "Sense Islam", "Quran and Islam", "Alfalaah", "Huda TV",
+  "IlmFeed", "IPSI Channel", "SCDawah Channel", "SCDawah",
+  "Naseeha Sessions", "Islam Channel", "Quran Revolution TV",
+  "One Message Foundation",
 ];
+
 
 
 export function isTrustedChannel(channelTitle: string): boolean {
