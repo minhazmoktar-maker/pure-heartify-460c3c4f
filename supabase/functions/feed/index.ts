@@ -38,7 +38,10 @@ Deno.serve(async (req) => {
     const sectionId = body?.section_id as string | undefined;
     const cursor = body?.cursor as string | undefined; // ISO timestamp of last item's ingested_at
     const limit = Math.min(Math.max(body?.limit ?? 20, 1), 50);
-    const search = typeof body?.search === "string" ? body.search.trim() : "";
+    // Sanitize search: strip PostgREST-significant chars (, ( ) * . : & =)
+    // to prevent filter injection into the or=(...) clause.
+    const rawSearch = typeof body?.search === "string" ? body.search.trim() : "";
+    const search = rawSearch.replace(/[,()*.:&=%]/g, " ").replace(/\s+/g, " ").trim().slice(0, 100);
 
     // Build PostgREST query
     // Order: freshest content first (published_at), then halal_score, then ingested_at as tiebreaker.
