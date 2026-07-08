@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, Ban, Plus, Trash2, Sparkles, History } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { track } from "@/lib/analytics";
+import { useRequireAdminMfa } from "@/hooks/useRequireAdminMfa";
 
 interface BlockedRow { id: string; pattern: string; reason: string | null; created_at: string }
 interface OverrideRow {
@@ -22,6 +23,7 @@ interface OverrideRow {
 
 const AdminConsole = () => {
   const { user } = useAuth();
+  const mfaOk = useRequireAdminMfa();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [blocked, setBlocked] = useState<BlockedRow[]>([]);
   const [overrides, setOverrides] = useState<OverrideRow[]>([]);
