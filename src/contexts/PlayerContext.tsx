@@ -277,10 +277,12 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       });
     };
 
+    let lastPos = 0;
     const onTime = () => {
       // On some Android WebViews `currentTime` momentarily drops to 0 when the
       // buffer wraps. Ignore that spurious zero to keep the seek bar smooth.
-      if (a.currentTime === 0 && progress > 1 && !a.seeking) return;
+      if (a.currentTime === 0 && lastPos > 1 && !a.seeking) return;
+      lastPos = a.currentTime;
       setProgress(a.currentTime);
       saveLocal(a.currentTime);
       maybeSaveRemote(a.currentTime);
