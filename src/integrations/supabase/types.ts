@@ -1374,6 +1374,27 @@ export type Database = {
         }
         Relationships: []
       }
+      retention_policies: {
+        Row: {
+          retention_days: number
+          table_name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          retention_days: number
+          table_name: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          retention_days?: number
+          table_name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       search_queries: {
         Row: {
           clicked_video_id: string | null
@@ -1801,6 +1822,7 @@ export type Database = {
         }[]
       }
       compute_owner_key: { Args: { _name: string }; Returns: string }
+      enforce_retention_policies: { Args: never; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
       get_channel_trust_history: {
         Args: { _channel_id: string; _limit?: number }
