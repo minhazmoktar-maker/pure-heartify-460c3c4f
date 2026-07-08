@@ -56,6 +56,7 @@ interface PlayerState {
   toggleShuffle: () => void;
   cycleRepeat: () => void;
   setPlaybackRate: (rate: number) => void;
+  /** Deprecated no-op kept for backwards compatibility. Entitlements are now server-driven. */
   togglePremium: () => void;
   addToQueue: (track: Track) => void;
   clearQueue: () => void;
