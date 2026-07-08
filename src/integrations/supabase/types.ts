@@ -278,6 +278,17 @@ export type Database = {
           is_hidden: boolean
           is_pinned: boolean
           is_trusted_channel: boolean
+          last_decision_id: string | null
+          moderation_confidence: number | null
+          moderation_provider: string | null
+          moderation_reasoning: string | null
+          moderation_risk: number | null
+          moderation_signals: Json
+          moderation_stage:
+            | Database["public"]["Enums"]["moderation_stage"]
+            | null
+          moderation_state: Database["public"]["Enums"]["moderation_state"]
+          moderation_updated_at: string | null
           pinned_at: string | null
           published_at: string | null
           section_id: string | null
@@ -297,6 +308,17 @@ export type Database = {
           is_hidden?: boolean
           is_pinned?: boolean
           is_trusted_channel?: boolean
+          last_decision_id?: string | null
+          moderation_confidence?: number | null
+          moderation_provider?: string | null
+          moderation_reasoning?: string | null
+          moderation_risk?: number | null
+          moderation_signals?: Json
+          moderation_stage?:
+            | Database["public"]["Enums"]["moderation_stage"]
+            | null
+          moderation_state?: Database["public"]["Enums"]["moderation_state"]
+          moderation_updated_at?: string | null
           pinned_at?: string | null
           published_at?: string | null
           section_id?: string | null
@@ -316,6 +338,17 @@ export type Database = {
           is_hidden?: boolean
           is_pinned?: boolean
           is_trusted_channel?: boolean
+          last_decision_id?: string | null
+          moderation_confidence?: number | null
+          moderation_provider?: string | null
+          moderation_reasoning?: string | null
+          moderation_risk?: number | null
+          moderation_signals?: Json
+          moderation_stage?:
+            | Database["public"]["Enums"]["moderation_stage"]
+            | null
+          moderation_state?: Database["public"]["Enums"]["moderation_state"]
+          moderation_updated_at?: string | null
           pinned_at?: string | null
           published_at?: string | null
           section_id?: string | null
@@ -529,6 +562,61 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_decisions: {
+        Row: {
+          actor_id: string | null
+          actor_kind: string
+          confidence: number | null
+          created_at: string
+          id: string
+          previous_state: Database["public"]["Enums"]["moderation_state"] | null
+          provider: string | null
+          reasoning: string | null
+          risk: number | null
+          rule_hits: Json
+          signals: Json
+          stage: Database["public"]["Enums"]["moderation_stage"]
+          state: Database["public"]["Enums"]["moderation_state"]
+          video_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_kind?: string
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          previous_state?:
+            | Database["public"]["Enums"]["moderation_state"]
+            | null
+          provider?: string | null
+          reasoning?: string | null
+          risk?: number | null
+          rule_hits?: Json
+          signals?: Json
+          stage: Database["public"]["Enums"]["moderation_stage"]
+          state: Database["public"]["Enums"]["moderation_state"]
+          video_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_kind?: string
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          previous_state?:
+            | Database["public"]["Enums"]["moderation_state"]
+            | null
+          provider?: string | null
+          reasoning?: string | null
+          risk?: number | null
+          rule_hits?: Json
+          signals?: Json
+          stage?: Database["public"]["Enums"]["moderation_stage"]
+          state?: Database["public"]["Enums"]["moderation_state"]
+          video_id?: string
+        }
+        Relationships: []
+      }
       moderation_log: {
         Row: {
           channel_title: string
@@ -595,6 +683,93 @@ export type Database = {
           metadata?: Json | null
           reason?: string | null
           target?: string
+        }
+        Relationships: []
+      }
+      moderation_rules: {
+        Row: {
+          applies_to: string
+          created_at: string
+          created_by: string | null
+          enabled: boolean
+          id: string
+          kind: string
+          name: string
+          pattern: string
+          reason: string | null
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          applies_to?: string
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          kind: string
+          name: string
+          pattern: string
+          reason?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          applies_to?: string
+          created_at?: string
+          created_by?: string | null
+          enabled?: boolean
+          id?: string
+          kind?: string
+          name?: string
+          pattern?: string
+          reason?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      moderation_thresholds: {
+        Row: {
+          ai_review_min_confidence: number
+          auto_approve_max_risk: number
+          auto_approve_min_confidence: number
+          created_at: string
+          fallback_ai_provider: string
+          human_review_min_confidence: number
+          id: string
+          preferred_ai_provider: string
+          reject_below_confidence: number
+          singleton: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          ai_review_min_confidence?: number
+          auto_approve_max_risk?: number
+          auto_approve_min_confidence?: number
+          created_at?: string
+          fallback_ai_provider?: string
+          human_review_min_confidence?: number
+          id?: string
+          preferred_ai_provider?: string
+          reject_below_confidence?: number
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          ai_review_min_confidence?: number
+          auto_approve_max_risk?: number
+          auto_approve_min_confidence?: number
+          created_at?: string
+          fallback_ai_provider?: string
+          human_review_min_confidence?: number
+          id?: string
+          preferred_ai_provider?: string
+          reject_below_confidence?: number
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -999,6 +1174,24 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      moderation_stage:
+        | "ingest"
+        | "rule_engine"
+        | "channel_reputation"
+        | "metadata_analysis"
+        | "ai_reasoning"
+        | "human_review"
+        | "recheck"
+        | "manual_override"
+      moderation_state:
+        | "approved"
+        | "auto_approved"
+        | "pending_review"
+        | "ai_review_required"
+        | "human_review_required"
+        | "rejected"
+        | "blocked"
+        | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1127,6 +1320,26 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      moderation_stage: [
+        "ingest",
+        "rule_engine",
+        "channel_reputation",
+        "metadata_analysis",
+        "ai_reasoning",
+        "human_review",
+        "recheck",
+        "manual_override",
+      ],
+      moderation_state: [
+        "approved",
+        "auto_approved",
+        "pending_review",
+        "ai_review_required",
+        "human_review_required",
+        "rejected",
+        "blocked",
+        "archived",
+      ],
     },
   },
 } as const
