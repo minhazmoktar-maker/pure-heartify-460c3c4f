@@ -98,13 +98,13 @@ const mediaErrorCode = (a: HTMLAudioElement | null): string => {
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const { isPremium: isPremiumUser } = useEntitlement();
   useCrossDevicePlayback();
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.9);
