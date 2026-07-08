@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Search, ShieldCheck, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
