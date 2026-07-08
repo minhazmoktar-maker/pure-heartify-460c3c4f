@@ -64,6 +64,7 @@ const Watch = () => {
           // YouTube iframe API sends playerState: 0 when video ends
           if (data?.event === "onStateChange" && data?.info === 0) {
             setShowOverlay(true);
+            triggerIfDelightful();
             // Mark dose video complete (idempotent server-side)
             if (user && videoId && completedRef.current !== videoId) {
               completedRef.current = videoId;
@@ -93,7 +94,7 @@ const Watch = () => {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [videoId, user, completeDose]);
+  }, [videoId, user, completeDose, playerActivated]);
 
   const handleNext = () => {
     if (nextVideo) {
