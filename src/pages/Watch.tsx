@@ -121,7 +121,26 @@ const Watch = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {currentVideo && videoId && (
+        <SEO
+          title={`${currentVideo.title} · Heartify`}
+          description={`Watch "${currentVideo.title}" by ${currentVideo.channelTitle} — curated halal content on Heartify.`}
+          path={`/watch/${videoId}`}
+          image={currentVideo.thumbnailUrl}
+          type="video.other"
+          jsonLd={{
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            name: currentVideo.title,
+            description: currentVideo.title,
+            thumbnailUrl: currentVideo.thumbnailUrl,
+            uploadDate: currentVideo.publishedAt,
+            embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+          }}
+        />
+      )}
       <Navbar />
+
 
       <div className="mx-auto max-w-[1800px] px-4 py-4 md:px-6 lg:flex lg:gap-6">
         <div className="min-w-0 flex-1">
