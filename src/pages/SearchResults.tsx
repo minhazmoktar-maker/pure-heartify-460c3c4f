@@ -55,7 +55,17 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-background pb-12">
+      <SEO
+        title={query ? `${query} — Heartify search` : "Search Heartify"}
+        description={
+          query
+            ? `Halal-verified results for "${query}" on Heartify.`
+            : "Search Heartify for Quran recitations, Islamic lectures, and family-friendly halal video content."
+        }
+        path={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}
+      />
       <Navbar />
+
 
       <div className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">
         <button
