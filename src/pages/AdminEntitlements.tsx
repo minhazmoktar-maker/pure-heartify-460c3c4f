@@ -98,7 +98,7 @@ export default function AdminEntitlements() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Entitlements · Admin" description="Manage premium entitlements" noIndex />
+      <SEO title="Entitlements · Admin" description="Manage premium entitlements" />
       <div className="mx-auto max-w-6xl px-4 py-8">
         <Link to="/admin/console" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Admin console
