@@ -1245,6 +1245,92 @@ export type Database = {
         }
         Relationships: []
       }
+      reciter_aliases: {
+        Row: {
+          alias: string
+          alias_norm: string | null
+          alias_type: string
+          created_at: string
+          id: string
+          reciter_id: string
+        }
+        Insert: {
+          alias: string
+          alias_norm?: string | null
+          alias_type?: string
+          created_at?: string
+          id?: string
+          reciter_id: string
+        }
+        Update: {
+          alias?: string
+          alias_norm?: string | null
+          alias_type?: string
+          created_at?: string
+          id?: string
+          reciter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reciter_aliases_reciter_id_fkey"
+            columns: ["reciter_id"]
+            isOneToOne: false
+            referencedRelation: "reciters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reciters: {
+        Row: {
+          canonical_name_ar: string | null
+          canonical_name_en: string
+          category: string
+          country: string | null
+          created_at: string
+          era: string | null
+          gender: string
+          id: string
+          is_living: boolean | null
+          is_verified: boolean
+          notes: string | null
+          primary_riwayah: string | null
+          updated_at: string
+          voice_style: string | null
+        }
+        Insert: {
+          canonical_name_ar?: string | null
+          canonical_name_en: string
+          category?: string
+          country?: string | null
+          created_at?: string
+          era?: string | null
+          gender?: string
+          id?: string
+          is_living?: boolean | null
+          is_verified?: boolean
+          notes?: string | null
+          primary_riwayah?: string | null
+          updated_at?: string
+          voice_style?: string | null
+        }
+        Update: {
+          canonical_name_ar?: string | null
+          canonical_name_en?: string
+          category?: string
+          country?: string | null
+          created_at?: string
+          era?: string | null
+          gender?: string
+          id?: string
+          is_living?: boolean | null
+          is_verified?: boolean
+          notes?: string | null
+          primary_riwayah?: string | null
+          updated_at?: string
+          voice_style?: string | null
+        }
+        Relationships: []
+      }
       recommendation_events: {
         Row: {
           created_at: string
@@ -1392,6 +1478,45 @@ export type Database = {
           table_name?: string
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      retention_purge_runs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          purged: Json
+          started_at: string
+          status: string
+          total_rows: number
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          purged?: Json
+          started_at?: string
+          status: string
+          total_rows?: number
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          purged?: Json
+          started_at?: string
+          status?: string
+          total_rows?: number
+          triggered_by?: string | null
         }
         Relationships: []
       }
