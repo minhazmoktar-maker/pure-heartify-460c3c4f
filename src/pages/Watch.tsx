@@ -107,6 +107,12 @@ const Watch = () => {
 
   const liked = videoId ? isFavorite(videoId) : false;
 
+  const toAbsoluteUrl = (value: string) => {
+    if (!value) return "https://pure-heartify.lovable.app/placeholder.svg";
+    if (/^https?:\/\//i.test(value)) return value;
+    return `https://pure-heartify.lovable.app${value.startsWith("/") ? value : `/${value}`}`;
+  };
+
   const handleBookmark = () => {
     if (!user) {
       navigate("/login");
@@ -128,16 +134,24 @@ const Watch = () => {
           title={`${currentVideo.title} · Heartify`}
           description={`Watch "${currentVideo.title}" by ${currentVideo.channelTitle} — curated halal content on Heartify.`}
           path={`/watch/${videoId}`}
-          image={currentVideo.thumbnailUrl}
+          image={toAbsoluteUrl(currentVideo.thumbnailUrl)}
           type="video.other"
           jsonLd={{
             "@context": "https://schema.org",
             "@type": "VideoObject",
             name: currentVideo.title,
-            description: currentVideo.title,
-            thumbnailUrl: currentVideo.thumbnailUrl,
-            uploadDate: currentVideo.publishedAt,
-            embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+            description: `Curated halal video by ${currentVideo.channelTitle}.`,
+            thumbnailUrl: [toAbsoluteUrl(currentVideo.thumbnailUrl)],
+            uploadDate: currentVideo.publishedAt || new Date().toISOString(),
+            url: `https://pure-heartify.lovable.app/watch/${videoId}`,
+            ...(isEmbeddableVideo
+              ? { embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}` }
+              : { contentUrl: currentVideo.videoUrl }),
+            publisher: {
+              "@type": "Organization",
+              name: "Heartify",
+              url: "https://pure-heartify.lovable.app/",
+            },
           }}
         />
       )}
