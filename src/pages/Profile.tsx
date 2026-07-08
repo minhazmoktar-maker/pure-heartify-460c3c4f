@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
 import ReferralCard from "@/components/ReferralCard";
@@ -12,6 +12,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 type ProfileTab = "profile" | "continue" | "favorites" | "history";
