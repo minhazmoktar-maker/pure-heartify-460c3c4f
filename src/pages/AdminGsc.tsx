@@ -219,7 +219,7 @@ export default function AdminGsc() {
     return () => { mounted = false; supabase.removeChannel(ch); };
   }, [isOwner, pushAlert, refreshStatus]);
 
-  useEffect(() => { if (isOwner) refreshStatus(); }, [isOwner, refreshStatus]);
+  useEffect(() => { if (isOwner) { refreshStatus(); refreshSyncStatus(); refreshSitemapDiff(); } }, [isOwner, refreshStatus, refreshSyncStatus, refreshSitemapDiff]);
 
   const isVerified = !!status?.sites?.some(s => s.siteUrl === site);
   const lastSyncByKind = useMemo(() => ({
