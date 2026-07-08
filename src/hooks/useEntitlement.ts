@@ -47,18 +47,22 @@ export function useEntitlement() {
   }, [authLoading, refresh]);
 
   // Realtime — react instantly when an admin grants/revokes the caller.
+  // Ref indirection so re-creating `refresh` doesn't re-subscribe (which
+  // would throw "cannot add callbacks after subscribe()" on HMR).
+  const refreshRef = useRef(refresh);
+  useEffect(() => { refreshRef.current = refresh; }, [refresh]);
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel(`entitlements:${user.id}`)
+      .channel(`entitlements:${user.id}:${Math.random().toString(36).slice(2)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "entitlements", filter: `user_id=eq.${user.id}` },
-        () => { void refresh(); },
+        () => { void refreshRef.current(); },
       )
       .subscribe();
     return () => { void supabase.removeChannel(channel); };
-  }, [user, refresh]);
+  }, [user]);
 
   return { entitlement, isPremium: entitlement.isPremium, loading, refresh };
 }
