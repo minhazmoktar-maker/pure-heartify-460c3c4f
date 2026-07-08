@@ -50,6 +50,11 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <SEO
+        title="Sign in — Heartify"
+        description="Sign in to Heartify to continue your curated halal video and audio experience."
+        path="/login"
+      />
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center">

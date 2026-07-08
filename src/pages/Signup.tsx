@@ -79,6 +79,11 @@ const Signup = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <SEO
+        title="Create your Heartify account"
+        description="Join Heartify to save channels, follow curated halal content, and personalise your feed."
+        path="/signup"
+      />
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2">
