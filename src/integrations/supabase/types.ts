@@ -86,6 +86,57 @@ export type Database = {
         }
         Relationships: []
       }
+      attributions: {
+        Row: {
+          created_at: string
+          id: string
+          landing_url: string | null
+          ref_code: string | null
+          referrer: string | null
+          session_id: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          landing_url?: string | null
+          ref_code?: string | null
+          referrer?: string | null
+          session_id: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          landing_url?: string | null
+          ref_code?: string | null
+          referrer?: string | null
+          session_id?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+        }
+        Relationships: []
+      }
       audio_integrity_reports: {
         Row: {
           checked_at: string

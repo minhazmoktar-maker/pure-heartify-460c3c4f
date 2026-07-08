@@ -223,3 +223,45 @@ yes, via in-app Profile → Delete account, no email required.
 | App Review liaison  | `appreview@heartify.app`             |
 | Security disclosure | `security@heartify.app`              |
 | Support             | `support@heartify.app`               |
+
+---
+
+## 11. ASO metadata (frozen for v1 submission)
+
+| Field | Value | Char limit |
+| --- | --- | ---: |
+| App Store title | `Heartify: Halal Streaming` | 30 |
+| App Store subtitle | `Curated video for the soul` | 30 |
+| Play Store title | `Heartify — Halal Streaming` | 30 |
+| Play Store short description | `Halal-first video, calmly curated for focus, family, and faith.` | 80 |
+| iOS keywords (comma, no spaces) | `halal,islamic,quran,nasheed,muslim,family,kids,tafsir,seerah,ramadan,duas,mindful,adhkar,dhikr` | 100 |
+
+**Google Play does not use a keyword field** — instead, ensure the long
+description contains each keyword organically (2–3 times max).
+
+## 12. Screenshot copy (per device)
+
+Six screenshots per platform. Same order everywhere so metadata reads
+naturally:
+
+1. **"Every video, human-reviewed."** — home feed hero shot.
+2. **"Your Daily Dose of remembrance."** — Daily Dose card.
+3. **"Search the way you think."** — search results with suggestions.
+4. **"Listen to verified reciters."** — audio player screen.
+5. **"Streaks that build the habit."** — profile / streak.
+6. **"Curated collections for every moment."** — For You shelves.
+
+Preview video (30 s, portrait): open home → Daily Dose → play video →
+favorite → share. Silent, captioned in EN + AR.
+
+## 13. Review-request policy
+
+Handled in code by `src/lib/inAppReview.ts::triggerIfDelightful()`:
+
+- ≥ 3 days since first launch
+- ≥ 5 delight moments (Daily Dose completion, streak extension, favorite)
+- ≥ 90 days since last prompt
+- Uses `@capacitor-community/in-app-review` on native, soft toast on web
+
+Call sites: `useCompleteDoseVideo` on success, `useFavorites.toggle` on
+add, streak-extend hook.
