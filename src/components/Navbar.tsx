@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import NotificationsBell from "@/components/NotificationsBell";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
