@@ -68,14 +68,17 @@ const Navbar = () => {
                       { to: "/admin/entitlements", label: "Entitlements" },
                       { to: "/admin/audit", label: "Audit log" },
                       { to: "/admin/moderation", label: "Moderation" },
-                    ].map((l) => (
-                      <SheetClose asChild key={l.to}>
-                        <Link to={l.to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">
-                          {"icon" in l && l.icon ? <l.icon className="h-4 w-4 text-primary" /> : <ShieldAlert className="h-4 w-4 text-primary" />}
-                          {l.label}
-                        </Link>
-                      </SheetClose>
-                    ))}
+                    ].map((l) => {
+                      const Icon = "icon" in l && l.icon ? l.icon : ShieldAlert;
+                      return (
+                        <SheetClose asChild key={l.to}>
+                          <Link to={l.to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">
+                            <Icon className="h-4 w-4 text-primary" />
+                            {l.label}
+                          </Link>
+                        </SheetClose>
+                      );
+                    })}
                   </>
                 )}
               </nav>
