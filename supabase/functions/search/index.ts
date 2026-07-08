@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
           user_id: userId,
           query: q,
           normalized_query: NORMALIZE(q),
-          result_count: hits.length,
+          result_count: filteredHits.length,
           intent: intent ?? null,
         })
         .then(() => {})
@@ -117,11 +117,12 @@ Deno.serve(async (req) => {
     }
 
     return json({
-      hits,
+      hits: filteredHits,
       intent,
       trending: trending ?? [],
       related: related ?? [],
       provider: provider.name,
+      viewer: { isPremium: viewerIsPremium },
     });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
