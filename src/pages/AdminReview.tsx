@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "@/components/ui/use-toast";
 import { CheckCircle2, XCircle, AlertTriangle, Eye, Search } from "lucide-react";
+import { useRole } from "@/hooks/useRole";
 
 type Candidate = {
   id: string;
@@ -52,7 +53,7 @@ type AuditRow = {
 
 const AdminReview = () => {
   const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { isAdmin, loading: roleLoading } = useRole();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [approved, setApproved] = useState<ApprovedRow[]>([]);
   const [audit, setAudit] = useState<AuditRow[]>([]);
@@ -60,13 +61,6 @@ const AdminReview = () => {
   const [drawer, setDrawer] = useState<Candidate | AuditRow | null>(null);
   const [newChannelId, setNewChannelId] = useState("");
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
-      .then(({ data }) => setIsAdmin(!!data));
-  }, [user]);
 
   const reload = async () => {
     const [c, a, l, v] = await Promise.all([
@@ -173,7 +167,7 @@ const AdminReview = () => {
       </div>
     );
   }
-  if (isAdmin === false) {
+  if (!roleLoading && !isAdmin) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

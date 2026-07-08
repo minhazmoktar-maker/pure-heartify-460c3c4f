@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Crown, Loader2 } from "lucide-react";
+import { ArrowLeft, BarChart3, Crown, FileWarning, Gauge, Headphones, Loader2, ShieldAlert, ShieldCheck, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/useRole";
@@ -117,6 +117,33 @@ const OwnerDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        <section className="mb-8">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Owner controls
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { to: "/admin/console", label: "Admin console", icon: Gauge },
+              { to: "/admin/review", label: "Review pipeline", icon: ShieldCheck },
+              { to: "/admin/entitlements", label: "Entitlements", icon: Crown },
+              { to: "/admin/reports", label: "User reports", icon: FileWarning },
+              { to: "/admin/channel-trust", label: "Channel trust", icon: ShieldAlert },
+              { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+              { to: "/admin/audio-integrity", label: "Audio integrity", icon: Headphones },
+              { to: "/admin/moderation", label: "Moderation log", icon: Users },
+            ].map(({ to, label, icon: Icon }) => (
+              <Link
+                key={to}
+                to={to}
+                className="flex items-center gap-3 rounded-lg border border-border bg-card p-4 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              >
+                <Icon className="h-4 w-4 text-primary" />
+                {label}
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <Card>
           <CardHeader>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
@@ -30,6 +30,7 @@ type ProfileTab = "profile" | "continue" | "favorites" | "history";
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { favorites } = useFavorites();
 
@@ -76,6 +77,13 @@ const Profile = () => {
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
   }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    const requested = searchParams.get("tab");
+    if (["profile", "continue", "favorites", "history"].includes(requested ?? "")) {
+      setTab(requested as ProfileTab);
+    }
+  }, [searchParams]);
 
   // Load profile
   useEffect(() => {

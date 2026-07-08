@@ -10,6 +10,7 @@ import { ShieldCheck, Ban, Plus, Trash2, Sparkles, History } from "lucide-react"
 import { toast } from "@/components/ui/use-toast";
 import { track } from "@/lib/analytics";
 import { useRequireAdminMfa } from "@/hooks/useRequireAdminMfa";
+import { useRole } from "@/hooks/useRole";
 
 interface BlockedRow { id: string; pattern: string; reason: string | null; created_at: string }
 interface OverrideRow {
@@ -24,25 +25,12 @@ interface OverrideRow {
 const AdminConsole = () => {
   const { user } = useAuth();
   const mfaOk = useRequireAdminMfa();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { isAdmin, loading: roleLoading } = useRole();
   const [blocked, setBlocked] = useState<BlockedRow[]>([]);
   const [overrides, setOverrides] = useState<OverrideRow[]>([]);
   const [newPattern, setNewPattern] = useState("");
   const [newReason, setNewReason] = useState("");
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    (async () => {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      setIsAdmin(!!data);
-    })();
-  }, [user]);
 
   const reload = async () => {
     const [b, o] = await Promise.all([
@@ -54,8 +42,8 @@ const AdminConsole = () => {
   };
 
   useEffect(() => {
-    if (isAdmin) reload();
-  }, [isAdmin]);
+    if (isAdmin && mfaOk) reload();
+  }, [isAdmin, mfaOk]);
 
   const addPattern = async () => {
     const p = newPattern.trim().toLowerCase();
@@ -131,7 +119,7 @@ const AdminConsole = () => {
     );
   }
 
-  if (isAdmin === false) {
+  if (!roleLoading && !isAdmin) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
