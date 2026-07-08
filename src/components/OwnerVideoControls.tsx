@@ -113,7 +113,6 @@ export function OwnerVideoControls({
       const { error } = await supabase.from("blocked_creators").insert({
         pattern: channelTitle.toLowerCase(),
         reason: "Owner ban",
-        added_by: user!.id,
       });
       if (error && !error.message.includes("duplicate")) throw error;
     });
