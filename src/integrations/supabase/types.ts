@@ -660,6 +660,7 @@ export type Database = {
           is_featured: boolean
           is_hidden: boolean
           is_pinned: boolean
+          is_premium_only: boolean
           is_trusted_channel: boolean
           last_decision_id: string | null
           moderation_confidence: number | null
@@ -692,6 +693,7 @@ export type Database = {
           is_featured?: boolean
           is_hidden?: boolean
           is_pinned?: boolean
+          is_premium_only?: boolean
           is_trusted_channel?: boolean
           last_decision_id?: string | null
           moderation_confidence?: number | null
@@ -724,6 +726,7 @@ export type Database = {
           is_featured?: boolean
           is_hidden?: boolean
           is_pinned?: boolean
+          is_premium_only?: boolean
           is_trusted_channel?: boolean
           last_decision_id?: string | null
           moderation_confidence?: number | null
