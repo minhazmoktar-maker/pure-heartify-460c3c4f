@@ -156,3 +156,47 @@ Deno.test("failed RPC updates audit row to error and returns 500", async () => {
   assertEquals(rec.status, "error");
   assertStringIncludes(rec.error_message ?? "", "boom");
 });
+
+Deno.test("captures triggered_by from request headers", async () => {
+  resetState();
+  state.rpcResult = {};
+  const r = new Request("http://local/retention-purge", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-cron-token": "test-token",
+      "x-triggered-by": "github-actions-nightly",
+    },
+    body: JSON.stringify({}),
+  });
+  await handler(r);
+  assertEquals(state.runs[0].triggered_by, "github-actions-nightly");
+});
+
+Deno.test("truncates enormous error messages to <=2000 chars", async () => {
+  resetState();
+  state.rpcError = { message: "x".repeat(5000) };
+  await handler(req({}));
+  const rec = state.runs[0];
+  assert(rec.error_message);
+  assertEquals(rec.error_message!.length <= 2000, true);
+});
+
+Deno.test("finalised runs always carry finished_at and duration_ms", async () => {
+  resetState();
+  state.rpcResult = { analytics_events: 1 };
+  await handler(req({}));
+  const rec = state.runs[0];
+  assert(rec.finished_at, "finished_at must be set");
+  assert(typeof rec.duration_ms === "number", "duration_ms must be numeric");
+});
+
+Deno.test("returned totalRows equals sum of per-table counts", async () => {
+  resetState();
+  state.rpcResult = { a: 2, b: 3, c: 5, d: 0 };
+  const res = await handler(req({}));
+  const body = await res.json();
+  assertEquals(body.totalRows, 10);
+  assertEquals(state.runs[0].total_rows, 10);
+});
+
