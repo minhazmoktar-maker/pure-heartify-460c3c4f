@@ -63,6 +63,7 @@ const Navbar = () => {
                     <div className="mt-4 mb-1 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Admin</div>
                     {[
                       ...(isOwner ? [{ to: "/owner", label: "Owner control center", icon: Crown }] : []),
+                      ...(isOwner ? [{ to: "/admin/roles", label: "Roles & permissions", icon: Crown }] : []),
                       { to: "/admin/review", label: "Review candidates" },
                       { to: "/admin/console", label: "Admin console" },
                       { to: "/admin/entitlements", label: "Entitlements" },
