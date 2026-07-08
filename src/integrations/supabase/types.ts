@@ -291,6 +291,7 @@ export type Database = {
           moderation_updated_at: string | null
           pinned_at: string | null
           published_at: string | null
+          search_tsv: unknown
           section_id: string | null
           thumbnail_url: string
           title: string
@@ -321,6 +322,7 @@ export type Database = {
           moderation_updated_at?: string | null
           pinned_at?: string | null
           published_at?: string | null
+          search_tsv?: unknown
           section_id?: string | null
           thumbnail_url?: string
           title: string
@@ -351,6 +353,7 @@ export type Database = {
           moderation_updated_at?: string | null
           pinned_at?: string | null
           published_at?: string | null
+          search_tsv?: unknown
           section_id?: string | null
           thumbnail_url?: string
           title?: string
@@ -1156,6 +1159,7 @@ export type Database = {
         }[]
       }
       compute_owner_key: { Args: { _name: string }; Returns: string }
+      f_unaccent: { Args: { "": string }; Returns: string }
       has_min_role: {
         Args: { _min_tier: string; _user_id: string }
         Returns: boolean
@@ -1171,6 +1175,7 @@ export type Database = {
       nightly_reaudit_sweep: { Args: never; Returns: Json }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
