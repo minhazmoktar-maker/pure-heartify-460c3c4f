@@ -129,9 +129,7 @@ const Navbar = () => {
           </button>
           {user ? (
             <>
-              <button className="rounded-full p-2 hover:bg-secondary transition-colors">
-                <Bell className="h-5 w-5 text-foreground" />
-              </button>
+              <NotificationsBell isAdmin={isAdmin} />
               <button
                 onClick={signOut}
                 className="rounded-full p-2 hover:bg-secondary transition-colors"
