@@ -15,6 +15,7 @@ import Signup from "./pages/Signup.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { MobileBridge } from "./components/MobileBridge";
 import ReferralBridge from "./components/ReferralBridge";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 // Code-split everything else
 const Watch = lazy(() => import("./pages/Watch.tsx"));
@@ -23,6 +24,7 @@ const SectionAll = lazy(() => import("./pages/SectionAll.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 const Privacy = lazy(() => import("./pages/Privacy.tsx"));
+const Terms = lazy(() => import("./pages/Terms.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
 const Channels = lazy(() => import("./pages/Channels.tsx"));
