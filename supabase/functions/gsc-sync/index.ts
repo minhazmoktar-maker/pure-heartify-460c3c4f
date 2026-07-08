@@ -61,12 +61,18 @@ Deno.serve(async (req) => {
   if (!expectedSecret || providedSecret !== expectedSecret) {
     // Look up in DB so pg_cron can rotate without redeploy
     const cfg = await fetch(
-      `${SUPABASE_URL}/rest/v1/_internal_config?key=eq.gsc_cron_secret&select=value`,
-      { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } },
+      `${SUPABASE_URL}/rest/v1/rpc/get_internal_config`,
+      {
+        method: "POST",
+        headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ _key: "gsc_cron_secret" }),
+      },
     );
     if (cfg.ok) {
-      const rows = await cfg.json();
-      expectedSecret = rows?.[0]?.value ?? "";
+      const val = await cfg.json();
+      expectedSecret = typeof val === "string" ? val : (val?.value ?? "");
+    } else {
+      console.error("config lookup failed", cfg.status, await cfg.text());
     }
   }
   if (!expectedSecret || providedSecret !== expectedSecret) {
