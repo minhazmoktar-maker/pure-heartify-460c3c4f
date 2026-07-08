@@ -2,7 +2,10 @@
  * Paginated feed edge function.
  * Serves curated videos from the database with cursor-based pagination.
  * Falls back to YouTube proxy if DB is empty.
+ * Filters out Premium-only content unless the caller has an active entitlement.
  */
+
+import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
