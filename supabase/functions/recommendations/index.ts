@@ -18,6 +18,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { getRecommendationProvider } from "../_shared/recommendations/providers.ts";
 import { gatherSignals } from "../_shared/recommendations/signals.ts";
 import { fetchCandidates } from "../_shared/recommendations/candidates.ts";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
