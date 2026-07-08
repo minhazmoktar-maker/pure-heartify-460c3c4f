@@ -1908,6 +1908,10 @@ export type Database = {
     }
     Functions: {
       _analytics_assert_admin: { Args: never; Returns: undefined }
+      add_reciter_alias: {
+        Args: { _alias: string; _alias_type?: string; _reciter_id: string }
+        Returns: boolean
+      }
       analytics_active_users: {
         Args: { _from: string; _to: string }
         Returns: {
@@ -2008,6 +2012,7 @@ export type Database = {
         Args: { _from: string; _to: string }
         Returns: Json
       }
+      backfill_reciter_alias_variants: { Args: never; Returns: number }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
         Returns: {
@@ -2020,6 +2025,7 @@ export type Database = {
       compute_owner_key: { Args: { _name: string }; Returns: string }
       enforce_retention_policies: { Args: never; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
+      generate_alias_variants: { Args: { _name: string }; Returns: string[] }
       get_channel_trust_history: {
         Args: { _channel_id: string; _limit?: number }
         Returns: {
@@ -2129,6 +2135,24 @@ export type Database = {
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       unaccent: { Args: { "": string }; Returns: string }
+      upsert_reciter: {
+        Args: {
+          _active_years?: string
+          _biography?: string
+          _category?: string
+          _country?: string
+          _era?: string
+          _image_url?: string
+          _is_living?: boolean
+          _name_ar?: string
+          _name_en: string
+          _popularity_score?: number
+          _primary_riwayah?: string
+          _social_links?: Json
+          _voice_style?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
