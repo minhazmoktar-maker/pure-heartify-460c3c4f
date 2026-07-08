@@ -36,7 +36,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
     // 1. My recent reports (any status).
     const { data: mine } = await supabase
       .from("video_reports")
-      .select("id, video_id, status, created_at, updated_at, resolution_note")
+      .select("id, video_id, status, created_at, updated_at, resolution")
       .eq("user_id", user.id)
       .order("updated_at", { ascending: false, nullsFirst: false })
       .limit(10);
