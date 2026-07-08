@@ -6,6 +6,7 @@ import type { Track } from "@/data/audio";
 import { trackById } from "@/data/audio";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import {
   detectPlatform, isIOS, isAndroid,
   persistPositionRemote, useCrossDevicePlayback,
