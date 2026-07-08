@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRole } from "@/hooks/useRole";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -59,12 +59,28 @@ export function OwnerVideoControls({
   channelTitle?: string;
 }) {
   const { user } = useAuth();
-  const { isOwner, isAdmin, loading } = useRole();
+  const { can, canAny, principal, loading } = usePermissions();
+  const isOwner = principal.role === "owner";
   const [removed, setRemoved] = useState(false);
   const [state, setState] = useState<VideoState | null>(null);
 
+  // Any moderation surface — used to decide whether to render the trigger.
+  const CONTROL_PERMISSIONS = [
+    "delete_video",
+    "restore_video",
+    "hide_video",
+    "archive_video",
+    "feature_video",
+    "pin_video",
+    "edit_video_metadata",
+    "edit_halal_score",
+    "override_ai_decision",
+    "remove_from_surface",
+    "ban_channel",
+  ] as const;
+
   useEffect(() => {
-    if (!user || (!isOwner && !isAdmin)) return;
+    if (!user || !canAny(CONTROL_PERMISSIONS)) return;
     supabase
       .from("removed_videos")
       .select("id")
@@ -77,9 +93,10 @@ export function OwnerVideoControls({
       .eq("video_id", videoId)
       .maybeSingle()
       .then(({ data }) => data && setState(data as VideoState));
-  }, [user, videoId, isOwner, isAdmin]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, videoId, principal.role]);
 
-  if (loading || !user || (!isOwner && !isAdmin)) return null;
+  if (loading || !user || !canAny(CONTROL_PERMISSIONS)) return null;
 
   const run = async (
     label: string,
