@@ -179,7 +179,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
                         Your report was {r.status}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {r.resolution_note ?? `Video ${r.video_id}`}
+                        {r.resolution ?? `Video ${r.video_id}`}
                       </p>
                       <p className="text-[10px] text-muted-foreground">
                         {formatDistanceToNow(new Date(r.updated_at ?? r.created_at), { addSuffix: true })}
