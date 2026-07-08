@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { logPrivilegedAction } from "@/lib/auditLog";
+import type { Permission } from "@/lib/permissions";
 
 interface VideoState {
   is_hidden: boolean;
@@ -45,9 +46,25 @@ interface VideoState {
   halal_score: number | null;
 }
 
+const CONTROL_PERMISSIONS: readonly Permission[] = [
+  "delete_video",
+  "restore_video",
+  "hide_video",
+  "archive_video",
+  "feature_video",
+  "pin_video",
+  "edit_video_metadata",
+  "edit_halal_score",
+  "override_ai_decision",
+  "remove_from_surface",
+  "ban_channel",
+];
+
 /**
- * Owner-only moderation controls attached to a video.
- * Visibility is UI convenience only — RLS on the backend enforces authority.
+ * Video moderation controls, gated by the centralized permission matrix.
+ * Each menu item is rendered only if the current principal holds the
+ * corresponding permission. The backend (RLS + edge fn authorize) enforces
+ * the same rules — UI visibility is purely a UX convenience.
  */
 export function OwnerVideoControls({
   videoId,
@@ -63,21 +80,6 @@ export function OwnerVideoControls({
   const isOwner = principal.role === "owner";
   const [removed, setRemoved] = useState(false);
   const [state, setState] = useState<VideoState | null>(null);
-
-  // Any moderation surface — used to decide whether to render the trigger.
-  const CONTROL_PERMISSIONS = [
-    "delete_video",
-    "restore_video",
-    "hide_video",
-    "archive_video",
-    "feature_video",
-    "pin_video",
-    "edit_video_metadata",
-    "edit_halal_score",
-    "override_ai_decision",
-    "remove_from_surface",
-    "ban_channel",
-  ] as const;
 
   useEffect(() => {
     if (!user || !canAny(CONTROL_PERMISSIONS)) return;
@@ -214,117 +216,124 @@ export function OwnerVideoControls({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel>
-          {isOwner ? "Owner actions" : "Admin actions"}
+          {isOwner ? "Owner actions" : "Moderator actions"}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {removed ? (
-          can("restore_video") && (
-            <DropdownMenuItem onClick={restoreVideo}>
-              <RotateCcw className="mr-2 h-4 w-4" /> Restore video
-            </DropdownMenuItem>
-          )
-        ) : (
-          can("delete_video") && (
-            <DropdownMenuItem onClick={deleteVideo} className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" /> Delete video
-            </DropdownMenuItem>
-          )
-        )}
+        {removed
+          ? can("restore_video") && (
+              <DropdownMenuItem onClick={restoreVideo}>
+                <RotateCcw className="mr-2 h-4 w-4" /> Restore video
+              </DropdownMenuItem>
+            )
+          : can("delete_video") && (
+              <DropdownMenuItem
+                onClick={deleteVideo}
+                className="text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" /> Delete video
+              </DropdownMenuItem>
+            )}
 
-        {/* Visibility */}
+        {/* Hide / Unhide */}
         {can("hide_video") &&
           (state?.is_hidden ? (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Video unhidden", "video.unhide", () =>
-                    patchVideo({ is_hidden: false }),
-                  )
-                }
-              >
-                <Eye className="mr-2 h-4 w-4" /> Unhide
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Video hidden", "video.hide", () =>
-                    patchVideo({ is_hidden: true }),
-                  )
-                }
-              >
-                <EyeOff className="mr-2 h-4 w-4" /> Hide
-              </DropdownMenuItem>
-            )}
+            <DropdownMenuItem
+              onClick={() =>
+                run("Video unhidden", "video.unhide", () =>
+                  patchVideo({ is_hidden: false }),
+                )
+              }
+            >
+              <Eye className="mr-2 h-4 w-4" /> Unhide
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={() =>
+                run("Video hidden", "video.hide", () =>
+                  patchVideo({ is_hidden: true }),
+                )
+              }
+            >
+              <EyeOff className="mr-2 h-4 w-4" /> Hide
+            </DropdownMenuItem>
+          ))}
 
-            {state?.is_archived ? (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Video unarchived", "video.unarchive", () =>
-                    patchVideo({ is_archived: false }),
-                  )
-                }
-              >
-                <ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Video archived", "video.archive", () =>
-                    patchVideo({ is_archived: true }),
-                  )
-                }
-              >
-                <Archive className="mr-2 h-4 w-4" /> Archive
-              </DropdownMenuItem>
-            )}
+        {/* Archive / Unarchive */}
+        {can("archive_video") &&
+          (state?.is_archived ? (
+            <DropdownMenuItem
+              onClick={() =>
+                run("Video unarchived", "video.unarchive", () =>
+                  patchVideo({ is_archived: false }),
+                )
+              }
+            >
+              <ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={() =>
+                run("Video archived", "video.archive", () =>
+                  patchVideo({ is_archived: true }),
+                )
+              }
+            >
+              <Archive className="mr-2 h-4 w-4" /> Archive
+            </DropdownMenuItem>
+          ))}
 
-            {state?.is_featured ? (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Unfeatured", "video.unfeature", () =>
-                    patchVideo({ is_featured: false }),
-                  )
-                }
-              >
-                <StarOff className="mr-2 h-4 w-4" /> Unfeature
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Featured", "video.feature", () =>
-                    patchVideo({ is_featured: true }),
-                  )
-                }
-              >
-                <Star className="mr-2 h-4 w-4" /> Feature
-              </DropdownMenuItem>
-            )}
+        {/* Feature / Unfeature */}
+        {can("feature_video") &&
+          (state?.is_featured ? (
+            <DropdownMenuItem
+              onClick={() =>
+                run("Unfeatured", "video.unfeature", () =>
+                  patchVideo({ is_featured: false }),
+                )
+              }
+            >
+              <StarOff className="mr-2 h-4 w-4" /> Unfeature
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={() =>
+                run("Featured", "video.feature", () =>
+                  patchVideo({ is_featured: true }),
+                )
+              }
+            >
+              <Star className="mr-2 h-4 w-4" /> Feature
+            </DropdownMenuItem>
+          ))}
 
-            {state?.is_pinned ? (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Unpinned", "video.unpin", () =>
-                    patchVideo({ is_pinned: false }),
-                  )
-                }
-              >
-                <PinOff className="mr-2 h-4 w-4" /> Unpin
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                onClick={() =>
-                  run("Pinned", "video.pin", () =>
-                    patchVideo({ is_pinned: true }),
-                  )
-                }
-              >
-                <Pin className="mr-2 h-4 w-4" /> Pin
-              </DropdownMenuItem>
-            )}
+        {/* Pin / Unpin */}
+        {can("pin_video") &&
+          (state?.is_pinned ? (
+            <DropdownMenuItem
+              onClick={() =>
+                run("Unpinned", "video.unpin", () =>
+                  patchVideo({ is_pinned: false }),
+                )
+              }
+            >
+              <PinOff className="mr-2 h-4 w-4" /> Unpin
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem
+              onClick={() =>
+                run("Pinned", "video.pin", () =>
+                  patchVideo({ is_pinned: true }),
+                )
+              }
+            >
+              <Pin className="mr-2 h-4 w-4" /> Pin
+            </DropdownMenuItem>
+          ))}
 
+        {can("override_ai_decision") && (
+          <>
             <DropdownMenuSeparator />
-
-            {/* AI override */}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <ShieldCheck className="mr-2 h-4 w-4" /> Override AI
@@ -348,33 +357,40 @@ export function OwnerVideoControls({
                 >
                   <ShieldAlert className="mr-2 h-4 w-4" /> Mark unsafe
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={editHalalScore}>
-                  <Pencil className="mr-2 h-4 w-4" /> Set custom score
-                </DropdownMenuItem>
+                {can("edit_halal_score") && (
+                  <DropdownMenuItem onClick={editHalalScore}>
+                    <Pencil className="mr-2 h-4 w-4" /> Set custom score
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuSub>
+          </>
+        )}
 
-            {/* Metadata */}
-            <DropdownMenuItem onClick={editMetadata}>
-              <Pencil className="mr-2 h-4 w-4" /> Edit metadata
-            </DropdownMenuItem>
+        {can("edit_video_metadata") && (
+          <DropdownMenuItem onClick={editMetadata}>
+            <Pencil className="mr-2 h-4 w-4" /> Edit metadata
+          </DropdownMenuItem>
+        )}
 
+        {can("remove_from_surface") && (
+          <>
             <DropdownMenuSeparator />
-
-            {/* Removal from surfaces (hard delete from curated) */}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <ListX className="mr-2 h-4 w-4" /> Remove from surface
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                {[
-                  ["homepage", "Homepage"],
-                  ["recommendations", "Recommendations"],
-                  ["search", "Search"],
-                  ["trending", "Trending"],
-                  ["categories", "Categories"],
-                  ["channel_listings", "Channel listings"],
-                ].map(([key, label]) => (
+                {(
+                  [
+                    ["homepage", "Homepage"],
+                    ["recommendations", "Recommendations"],
+                    ["search", "Search"],
+                    ["trending", "Trending"],
+                    ["categories", "Categories"],
+                    ["channel_listings", "Channel listings"],
+                  ] as const
+                ).map(([key, label]) => (
                   <DropdownMenuItem
                     key={key}
                     onClick={() =>
@@ -395,21 +411,27 @@ export function OwnerVideoControls({
                 ))}
               </DropdownMenuSubContent>
             </DropdownMenuSub>
+          </>
+        )}
 
+        {can("ban_channel") && channelTitle && (
+          <>
             <DropdownMenuSeparator />
-
-            {channelTitle && (
-              <DropdownMenuItem onClick={banChannel} className="text-destructive">
-                <Ban className="mr-2 h-4 w-4" /> Ban channel platform-wide
-              </DropdownMenuItem>
-            )}
-
-            <DropdownMenuItem asChild>
-              <a href={`/owner?target=${videoId}`}>
-                <History className="mr-2 h-4 w-4" /> View moderation history
-              </a>
+            <DropdownMenuItem
+              onClick={banChannel}
+              className="text-destructive"
+            >
+              <Ban className="mr-2 h-4 w-4" /> Ban channel platform-wide
             </DropdownMenuItem>
           </>
+        )}
+
+        {can("view_moderation_history") && (
+          <DropdownMenuItem asChild>
+            <a href={`/owner?target=${videoId}`}>
+              <History className="mr-2 h-4 w-4" /> View moderation history
+            </a>
+          </DropdownMenuItem>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
