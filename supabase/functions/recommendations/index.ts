@@ -40,6 +40,21 @@ Deno.serve(async (req) => {
 
   try {
     const userId = await resolveUser(req);
+
+    // H2 mitigation: throttle abusive callers. Rec queries are expensive
+    // (candidate fetch + LLM signals) so we cap even authenticated users.
+    // Event ingestion gets a much higher ceiling since impressions batch.
+    const identity = getClientIdentity(req, userId);
+    const limited = await enforceRateLimit(admin, {
+      identity,
+      action: isEvent ? "rec_event" : "rec_query",
+      limit: isEvent ? 600 : 60,
+      windowSeconds: 60,
+    });
+    if (limited) {
+      return json({ error: "Rate limit exceeded" }, 429);
+    }
+
     const body = await req.json().catch(() => ({}));
 
     if (isEvent) {
