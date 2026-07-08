@@ -24,6 +24,7 @@ const Watch = () => {
   const completeDose = useCompleteDoseVideo();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [playerActivated, setPlayerActivated] = useState(false);
   const completedRef = useRef<string | null>(null);
 
   const currentVideo = videos?.find((v) => v.id === videoId);
