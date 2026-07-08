@@ -96,6 +96,12 @@ const TrackRow = ({ track, index, queue, showAlbum = false }: TrackRowProps) => 
       >
         <Plus className="h-3.5 w-3.5" />
       </button>
+      <span
+        className="hidden opacity-0 transition-opacity group-hover:opacity-100 md:inline-flex"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ReportAudioDialog track={track} compact />
+      </span>
       <span className="flex w-14 items-center justify-end gap-1 text-xs tabular-nums text-muted-foreground">
         <Clock className="h-3 w-3 opacity-60" />{track.duration}
       </span>
