@@ -69,6 +69,7 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/channels" element={<Channels />} />
@@ -90,6 +91,7 @@ const App = () => (
     </ThemeProvider>
   </TooltipProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
