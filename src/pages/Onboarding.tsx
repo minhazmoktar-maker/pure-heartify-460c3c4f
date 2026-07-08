@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { INTEREST_OPTIONS } from "@/data/interestOptions";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { growth } from "@/lib/growthEvents";
 
 const STEPS = [
   {
