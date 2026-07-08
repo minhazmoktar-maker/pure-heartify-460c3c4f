@@ -12,6 +12,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getSearchProvider } from "../_shared/search/providers.ts";
 import { detectIntent } from "../_shared/search/intent.ts";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 
 const NORMALIZE = (s: string) =>
   s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
