@@ -224,6 +224,211 @@ export type Database = {
         }
         Relationships: []
       }
+      channel_trust_events: {
+        Row: {
+          actor_id: string | null
+          channel_id: string
+          created_at: string
+          delta: number
+          id: string
+          metadata: Json
+          reason: string | null
+          score_after: number | null
+          score_before: number | null
+          source: Database["public"]["Enums"]["trust_event_source"]
+        }
+        Insert: {
+          actor_id?: string | null
+          channel_id: string
+          created_at?: string
+          delta?: number
+          id?: string
+          metadata?: Json
+          reason?: string | null
+          score_after?: number | null
+          score_before?: number | null
+          source: Database["public"]["Enums"]["trust_event_source"]
+        }
+        Update: {
+          actor_id?: string | null
+          channel_id?: string
+          created_at?: string
+          delta?: number
+          id?: string
+          metadata?: Json
+          reason?: string | null
+          score_after?: number | null
+          score_before?: number | null
+          source?: Database["public"]["Enums"]["trust_event_source"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_trust_events_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "approved_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_trust_profiles: {
+        Row: {
+          approved_videos: number
+          avg_ai_confidence: number | null
+          category_consistency: number | null
+          channel_id: string
+          created_at: string
+          false_negative_count: number
+          false_positive_count: number
+          historical_quality: number | null
+          id: string
+          last_recomputed_at: string | null
+          manual_approval_count: number
+          manual_rejection_count: number
+          notes: string | null
+          rejected_videos: number
+          review_frequency_days: number | null
+          risk_level: Database["public"]["Enums"]["channel_risk_level"]
+          strike_count: number
+          total_videos: number
+          trust_score: number
+          updated_at: string
+          upload_frequency_per_week: number | null
+          user_report_count: number
+          youtube_channel_id: string | null
+        }
+        Insert: {
+          approved_videos?: number
+          avg_ai_confidence?: number | null
+          category_consistency?: number | null
+          channel_id: string
+          created_at?: string
+          false_negative_count?: number
+          false_positive_count?: number
+          historical_quality?: number | null
+          id?: string
+          last_recomputed_at?: string | null
+          manual_approval_count?: number
+          manual_rejection_count?: number
+          notes?: string | null
+          rejected_videos?: number
+          review_frequency_days?: number | null
+          risk_level?: Database["public"]["Enums"]["channel_risk_level"]
+          strike_count?: number
+          total_videos?: number
+          trust_score?: number
+          updated_at?: string
+          upload_frequency_per_week?: number | null
+          user_report_count?: number
+          youtube_channel_id?: string | null
+        }
+        Update: {
+          approved_videos?: number
+          avg_ai_confidence?: number | null
+          category_consistency?: number | null
+          channel_id?: string
+          created_at?: string
+          false_negative_count?: number
+          false_positive_count?: number
+          historical_quality?: number | null
+          id?: string
+          last_recomputed_at?: string | null
+          manual_approval_count?: number
+          manual_rejection_count?: number
+          notes?: string | null
+          rejected_videos?: number
+          review_frequency_days?: number | null
+          risk_level?: Database["public"]["Enums"]["channel_risk_level"]
+          strike_count?: number
+          total_videos?: number
+          trust_score?: number
+          updated_at?: string
+          upload_frequency_per_week?: number | null
+          user_report_count?: number
+          youtube_channel_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_trust_profiles_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: true
+            referencedRelation: "approved_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_trust_weights: {
+        Row: {
+          baseline_score: number
+          created_at: string
+          created_by: string | null
+          decay_half_life_days: number
+          id: string
+          is_active: boolean
+          max_score: number
+          min_score: number
+          notes: string | null
+          updated_at: string
+          version: number
+          w_ai_confidence: number
+          w_category_consistency: number
+          w_false_negative: number
+          w_false_positive: number
+          w_historical_quality: number
+          w_manual_approval: number
+          w_manual_rejection: number
+          w_strike: number
+          w_upload_frequency: number
+          w_user_report: number
+        }
+        Insert: {
+          baseline_score?: number
+          created_at?: string
+          created_by?: string | null
+          decay_half_life_days?: number
+          id?: string
+          is_active?: boolean
+          max_score?: number
+          min_score?: number
+          notes?: string | null
+          updated_at?: string
+          version: number
+          w_ai_confidence?: number
+          w_category_consistency?: number
+          w_false_negative?: number
+          w_false_positive?: number
+          w_historical_quality?: number
+          w_manual_approval?: number
+          w_manual_rejection?: number
+          w_strike?: number
+          w_upload_frequency?: number
+          w_user_report?: number
+        }
+        Update: {
+          baseline_score?: number
+          created_at?: string
+          created_by?: string | null
+          decay_half_life_days?: number
+          id?: string
+          is_active?: boolean
+          max_score?: number
+          min_score?: number
+          notes?: string | null
+          updated_at?: string
+          version?: number
+          w_ai_confidence?: number
+          w_category_consistency?: number
+          w_false_negative?: number
+          w_false_positive?: number
+          w_historical_quality?: number
+          w_manual_approval?: number
+          w_manual_rejection?: number
+          w_strike?: number
+          w_upload_frequency?: number
+          w_user_report?: number
+        }
+        Relationships: []
+      }
       channels_state: {
         Row: {
           category: string | null
@@ -1262,6 +1467,19 @@ export type Database = {
       }
       compute_owner_key: { Args: { _name: string }; Returns: string }
       f_unaccent: { Args: { "": string }; Returns: string }
+      get_channel_trust_history: {
+        Args: { _channel_id: string; _limit?: number }
+        Returns: {
+          actor_id: string
+          created_at: string
+          delta: number
+          metadata: Json
+          reason: string
+          score_after: number
+          score_before: number
+          source: Database["public"]["Enums"]["trust_event_source"]
+        }[]
+      }
       get_related_searches: {
         Args: { _limit?: number; _query: string }
         Returns: {
@@ -1296,6 +1514,14 @@ export type Database = {
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
+      recompute_all_channel_trust: {
+        Args: { _limit?: number }
+        Returns: number
+      }
+      recompute_channel_trust: {
+        Args: { _channel_id: string }
+        Returns: number
+      }
       search_autocomplete: {
         Args: { _limit?: number; _prefix: string }
         Returns: {
@@ -1330,6 +1556,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      channel_risk_level: "low" | "medium" | "high" | "critical"
       moderation_stage:
         | "ingest"
         | "rule_engine"
@@ -1348,6 +1575,17 @@ export type Database = {
         | "rejected"
         | "blocked"
         | "archived"
+      trust_event_source:
+        | "moderation"
+        | "manual_approval"
+        | "manual_rejection"
+        | "user_report"
+        | "false_positive"
+        | "false_negative"
+        | "recompute"
+        | "strike"
+        | "decay"
+        | "note"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1476,6 +1714,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      channel_risk_level: ["low", "medium", "high", "critical"],
       moderation_stage: [
         "ingest",
         "rule_engine",
@@ -1495,6 +1734,18 @@ export const Constants = {
         "rejected",
         "blocked",
         "archived",
+      ],
+      trust_event_source: [
+        "moderation",
+        "manual_approval",
+        "manual_rejection",
+        "user_report",
+        "false_positive",
+        "false_negative",
+        "recompute",
+        "strike",
+        "decay",
+        "note",
       ],
     },
   },
