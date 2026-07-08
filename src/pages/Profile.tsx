@@ -39,6 +39,31 @@ const Profile = () => {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== "DELETE") return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-account", {
+        body: { confirm: "DELETE" },
+      });
+      if (error) throw error;
+      await supabase.auth.signOut();
+      toast({ title: "Account deleted", description: "Your account and personal data have been removed." });
+      navigate("/", { replace: true });
+    } catch (e: any) {
+      toast({
+        title: "Could not delete account",
+        description: e?.message ?? "Please try again or contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm("");
+    }
+  };
 
   // Watch history
   const [history, setHistory] = useState<any[]>([]);
