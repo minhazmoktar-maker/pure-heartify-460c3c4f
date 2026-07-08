@@ -99,7 +99,7 @@ const mediaErrorCode = (a: HTMLAudioElement | null): string => {
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
-  const { isPremium: isPremiumUser } = useEntitlement();
+  const { isPremium: isPremiumUser, loading: isPremiumLoading } = useEntitlement();
   useCrossDevicePlayback();
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
