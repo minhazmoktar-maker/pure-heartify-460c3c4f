@@ -145,13 +145,14 @@ export default function AdminReports() {
         .eq("id", report.id);
       if (upErr) throw upErr;
 
-      const { error: actErr } = await supabase.from("report_moderation_actions").insert({
+      const { error: actErr } = await supabase.from("report_moderation_actions").insert([{
         report_id: report.id,
         moderator_id: user.id,
         action,
         notes: note.trim() || null,
-        metadata,
-      });
+        metadata: metadata as never,
+      }]);
+
       if (actErr) throw actErr;
 
       toast.success(`Recorded: ${action.replace(/_/g, " ")}`);
