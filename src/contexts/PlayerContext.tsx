@@ -362,7 +362,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       document.removeEventListener("visibilitychange", onVisibility);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queue, currentTrack, repeat, shuffle, isPremiumUser, mobile, user, progress]);
+  }, [queue, currentTrack, repeat, shuffle, isPremiumUser, mobile, user]);
 
   const playableFrom = useCallback(
     (list: Track[]) => list.filter((t) => !t.comingSoon && t.url && (!t.isPremium || isPremiumUser)),
