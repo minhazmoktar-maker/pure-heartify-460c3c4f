@@ -10,6 +10,27 @@
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=()" />
     <link rel="icon" href="/favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/app-icon-1024.png" />
+
+    <!-- Perf: eager DNS + TCP + TLS to critical origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://tbgxtwgliumqqtuppztu.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://i.ytimg.com" />
+    <link rel="dns-prefetch" href="https://www.youtube.com" />
+
+    <!-- Perf: fonts as non-blocking <link> (was @import in CSS, blocks render) -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+
     <title>Heartify — Curated Halal Video &amp; Audio App</title>
     <meta name="description" content="Heartify is a clean, Islamic-friendly video and audio app with curated, distraction-free content for focused and mindful viewing." />
     <meta name="author" content="Heartify" />
