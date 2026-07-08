@@ -32,6 +32,7 @@ const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
 const ChannelTrust = lazy(() => import("./pages/ChannelTrust.tsx"));
 const Analytics = lazy(() => import("./pages/Analytics.tsx"));
+const AudioIntegrity = lazy(() => import("./pages/AudioIntegrity.tsx"));
 
 const queryClient = new QueryClient();
 
