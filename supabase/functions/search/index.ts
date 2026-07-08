@@ -12,6 +12,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { getSearchProvider } from "../_shared/search/providers.ts";
 import { detectIntent } from "../_shared/search/intent.ts";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 
 const NORMALIZE = (s: string) =>
   s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
@@ -32,6 +33,19 @@ Deno.serve(async (req) => {
   if (jwt) {
     const { data } = await admin.auth.getUser(jwt);
     userId = data?.user?.id ?? null;
+  }
+
+  // H2 mitigation: throttle abusive callers. Search is cheap but hits the
+  // DB with a full-text ranker so we cap both anonymous IPs and users.
+  const identity = getClientIdentity(req, userId);
+  const limited = await enforceRateLimit(admin, {
+    identity,
+    action: req.method === "GET" ? "search_autocomplete" : "search_query",
+    limit: req.method === "GET" ? 240 : 120,
+    windowSeconds: 60,
+  });
+  if (limited) {
+    return json({ error: "Rate limit exceeded" }, 429);
   }
 
   try {
