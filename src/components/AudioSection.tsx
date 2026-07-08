@@ -105,7 +105,7 @@ const CollectionRow = ({
 };
 
 const AudioSection = () => {
-  const { isPremiumUser, togglePremium, playQueue, recent, playCounts } = usePlayer();
+  const { isPremiumUser, isPremiumLoading, playQueue, recent, playCounts } = usePlayer();
 
   const [audioCat, setAudioCat] = useState<AudioCategory>("All");
   const [language, setLanguage] = useState<AudioLanguage | "Any">("Any");
@@ -171,7 +171,16 @@ const AudioSection = () => {
   return (
     <section className="mx-auto max-w-[1800px] px-4 py-8 md:px-6">
       {/* Premium banner */}
-      {!isPremiumUser ? (
+      {isPremiumLoading ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-10 flex items-center gap-3 rounded-3xl border border-dashed bg-card p-6 text-sm text-muted-foreground"
+        >
+          <span className="h-4 w-4 animate-pulse rounded-full bg-gold/40" />
+          Checking your Premium status…
+        </div>
+      ) : !isPremiumUser ? (
         <motion.div
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
           className="mb-10 overflow-hidden rounded-3xl bg-gradient-hero p-6 md:p-10 shadow-card-hover"
@@ -193,13 +202,13 @@ const AudioSection = () => {
                   Ad-free from the first āyah to the last.
                 </p>
               </div>
-              <button
-                onClick={togglePremium}
+              <a
+                href="mailto:premium@heartify.app?subject=Premium%20access%20request"
                 className="shrink-0 rounded-full bg-gold px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.02]"
               >
                 <Sparkles className="mr-1.5 inline h-4 w-4" />
                 Request Premium access
-              </button>
+              </a>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {PREMIUM_BENEFITS.map((b) => (
@@ -212,11 +221,18 @@ const AudioSection = () => {
                 </div>
               ))}
             </div>
+            <p className="text-[11px] text-cream/60">
+              Premium is granted server-side. Payment checkout is coming soon — until then, contact an admin.
+            </p>
           </div>
         </motion.div>
       ) : (
-        <div className="mb-6 flex items-center gap-2">
-          <Crown className="h-5 w-5 text-gold" />
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-6 flex items-center gap-2 rounded-full bg-gold/10 px-3 py-1.5"
+        >
+          <Crown className="h-4 w-4 text-gold" />
           <span className="text-sm font-semibold text-gold">Premium Active</span>
         </div>
       )}

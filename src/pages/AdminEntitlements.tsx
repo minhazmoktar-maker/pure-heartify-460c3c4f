@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Crown, ShieldOff, Search, ArrowLeft } from "lucide-react";
+import { Loader2, Crown, ShieldOff, Search, ArrowLeft, AlertTriangle } from "lucide-react";
 import SEO from "@/components/SEO";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Row {
   id: string;
@@ -11,9 +15,11 @@ interface Row {
   plan: string;
   expires_at: string | null;
   updated_at: string;
-  email?: string | null;
   display_name?: string | null;
 }
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const VALID_PLANS = ["premium", "premium_trial", "premium_lifetime", "free"] as const;
 
 export default function AdminEntitlements() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -21,15 +27,18 @@ export default function AdminEntitlements() {
   const [busy, setBusy] = useState<string | null>(null);
   const [q, setQ] = useState("");
 
-  // Grant form state
+  // Grant form
   const [targetId, setTargetId] = useState("");
-  const [plan, setPlan] = useState("premium");
+  const [plan, setPlan] = useState<(typeof VALID_PLANS)[number]>("premium");
   const [expiresAt, setExpiresAt] = useState("");
   const [reason, setReason] = useState("");
 
+  // Confirmation dialogs
+  const [grantConfirmOpen, setGrantConfirmOpen] = useState(false);
+  const [revokeTarget, setRevokeTarget] = useState<Row | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
-    // Join manually: entitlements + profiles for display context.
     const { data: ents, error } = await supabase
       .from("entitlements")
       .select("id, user_id, plan, expires_at, updated_at")
@@ -40,48 +49,93 @@ export default function AdminEntitlements() {
     let profiles: Record<string, { display_name?: string | null }> = {};
     if (ids.length > 0) {
       const { data: profs } = await supabase
-        .from("profiles")
-        .select("user_id, display_name")
-        .in("user_id", ids);
+        .from("profiles").select("user_id, display_name").in("user_id", ids);
       profiles = Object.fromEntries((profs ?? []).map((p) => [p.user_id, p]));
     }
-    setRows(
-      (ents ?? []).map((e) => ({
-        ...e,
-        display_name: profiles[e.user_id]?.display_name ?? null,
-      })),
-    );
+    setRows((ents ?? []).map((e) => ({ ...e, display_name: profiles[e.user_id]?.display_name ?? null })));
     setLoading(false);
   }, []);
 
   useEffect(() => { void load(); }, [load]);
 
+  // ----- Validation for grant form ---------------------------------------
+  const targetIdError = useMemo(() => {
+    const v = targetId.trim();
+    if (!v) return null;
+    if (!UUID_RE.test(v)) return "Not a valid user id (uuid).";
+    return null;
+  }, [targetId]);
+
+  const expiresAtError = useMemo(() => {
+    if (!expiresAt) return null;
+    const t = new Date(expiresAt).getTime();
+    if (Number.isNaN(t)) return "Invalid date.";
+    if (plan === "premium_lifetime") return "Lifetime plans must have no expiry.";
+    if (plan === "free") return "Free plans cannot have a future expiry.";
+    if (t <= Date.now()) return "Expiry must be in the future.";
+    return null;
+  }, [expiresAt, plan]);
+
+  const existingForTarget = useMemo(
+    () => rows.find((r) => r.user_id === targetId.trim()),
+    [rows, targetId],
+  );
+
+  const canGrant =
+    UUID_RE.test(targetId.trim()) &&
+    !expiresAtError &&
+    reason.trim().length >= 3;
+
+  // ----- Actions ---------------------------------------------------------
+  const openGrantConfirm = () => {
+    if (!canGrant) {
+      toast.error("Fix validation errors first", {
+        description: targetIdError || expiresAtError || "Reason must be at least 3 characters.",
+      });
+      return;
+    }
+    setGrantConfirmOpen(true);
+  };
+
   const grant = async () => {
-    if (!targetId.trim()) { toast.error("User ID required"); return; }
+    setGrantConfirmOpen(false);
     setBusy("grant");
+    const effectiveExpiry = plan === "premium_lifetime" ? null : (expiresAt ? new Date(expiresAt).toISOString() : null);
     const { error } = await supabase.rpc("grant_entitlement", {
       _user_id: targetId.trim(),
       _plan: plan,
-      _expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
+      _expires_at: effectiveExpiry,
       _features: {},
-      _reason: reason || null,
+      _reason: reason.trim(),
     });
     setBusy(null);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Entitlement granted");
+    if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("foreign key") || msg.includes("violates") || msg.includes("not present")) {
+        toast.error("Unknown user id", { description: "No auth user exists with that uuid." });
+      } else if (msg.includes("forbidden")) {
+        toast.error("Not authorised", { description: "Only owners and admins can grant entitlements." });
+      } else {
+        toast.error("Grant failed", { description: error.message });
+      }
+      return;
+    }
+    toast.success(existingForTarget ? "Entitlement updated" : "Entitlement granted");
     setTargetId(""); setReason(""); setExpiresAt("");
     void load();
   };
 
-  const revoke = async (userId: string) => {
-    if (!confirm("Revoke premium for this user?")) return;
-    setBusy(userId);
+  const revoke = async () => {
+    const target = revokeTarget;
+    if (!target) return;
+    setRevokeTarget(null);
+    setBusy(target.user_id);
     const { error } = await supabase.rpc("revoke_entitlement", {
-      _user_id: userId,
-      _reason: "Admin revocation from console",
+      _user_id: target.user_id,
+      _reason: `Revoked via admin console for ${target.display_name ?? target.user_id}`,
     });
     setBusy(null);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error("Revoke failed", { description: error.message }); return; }
     toast.success("Entitlement revoked");
     void load();
   };
@@ -89,11 +143,9 @@ export default function AdminEntitlements() {
   const visible = rows.filter((r) => {
     if (!q) return true;
     const needle = q.toLowerCase();
-    return (
-      r.user_id.toLowerCase().includes(needle) ||
-      (r.display_name ?? "").toLowerCase().includes(needle) ||
-      r.plan.toLowerCase().includes(needle)
-    );
+    return r.user_id.toLowerCase().includes(needle)
+      || (r.display_name ?? "").toLowerCase().includes(needle)
+      || r.plan.toLowerCase().includes(needle);
   });
 
   return (
@@ -114,46 +166,64 @@ export default function AdminEntitlements() {
             Grant / update entitlement
           </h2>
           <div className="grid gap-3 md:grid-cols-2">
-            <input
-              value={targetId}
-              onChange={(e) => setTargetId(e.target.value)}
-              placeholder="User ID (uuid)"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
-            />
+            <div>
+              <input
+                value={targetId}
+                onChange={(e) => setTargetId(e.target.value)}
+                placeholder="User ID (uuid)"
+                aria-invalid={!!targetIdError}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+              />
+              {targetIdError && <p className="mt-1 text-xs text-destructive">{targetIdError}</p>}
+              {!targetIdError && existingForTarget && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Existing plan: <span className="font-semibold">{existingForTarget.plan}</span>
+                  {existingForTarget.expires_at
+                    ? ` — expires ${new Date(existingForTarget.expires_at).toLocaleString()}`
+                    : " — no expiry"}
+                </p>
+              )}
+            </div>
             <select
               value={plan}
-              onChange={(e) => setPlan(e.target.value)}
+              onChange={(e) => setPlan(e.target.value as (typeof VALID_PLANS)[number])}
               className="rounded-lg border bg-background px-3 py-2 text-sm"
             >
-              <option value="premium">premium</option>
-              <option value="premium_trial">premium_trial</option>
-              <option value="premium_lifetime">premium_lifetime</option>
-              <option value="free">free (downgrade)</option>
+              {VALID_PLANS.map((p) => (
+                <option key={p} value={p}>{p}{p === "free" ? " (downgrade)" : ""}</option>
+              ))}
             </select>
-            <input
-              type="datetime-local"
-              value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
-              placeholder="Expires at (optional)"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
-            />
+            <div>
+              <input
+                type="datetime-local"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+                disabled={plan === "premium_lifetime" || plan === "free"}
+                aria-invalid={!!expiresAtError}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm disabled:opacity-50"
+              />
+              {expiresAtError
+                ? <p className="mt-1 text-xs text-destructive">{expiresAtError}</p>
+                : <p className="mt-1 text-xs text-muted-foreground">Leave empty for open-ended access.</p>}
+            </div>
             <input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Reason (audit log)"
+              placeholder="Reason (audit log, min 3 chars)"
               className="rounded-lg border bg-background px-3 py-2 text-sm"
+              maxLength={280}
             />
           </div>
           <button
-            onClick={grant}
-            disabled={busy === "grant"}
+            onClick={openGrantConfirm}
+            disabled={busy === "grant" || !canGrant}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
           >
             {busy === "grant" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
-            Grant entitlement
+            {existingForTarget ? "Update entitlement" : "Grant entitlement"}
           </button>
           <p className="mt-2 text-xs text-muted-foreground">
-            Leave expires-at empty for open-ended access. All grants and revocations are written to privileged_actions_log.
+            All grants and revocations are written to <code>privileged_actions_log</code>.
           </p>
         </div>
 
@@ -175,7 +245,9 @@ export default function AdminEntitlements() {
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : visible.length === 0 ? (
-            <div className="p-8 text-center text-sm text-muted-foreground">No entitlements match.</div>
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              {rows.length === 0 ? "No entitlements yet. Grant the first one above." : "No entitlements match your filter."}
+            </div>
           ) : (
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
@@ -213,7 +285,7 @@ export default function AdminEntitlements() {
                       <td className="px-4 py-3 text-right">
                         {active && (
                           <button
-                            onClick={() => revoke(r.user_id)}
+                            onClick={() => setRevokeTarget(r)}
                             disabled={busy === r.user_id}
                             className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50"
                           >
@@ -230,6 +302,62 @@ export default function AdminEntitlements() {
           )}
         </div>
       </div>
+
+      {/* Grant confirmation */}
+      <AlertDialog open={grantConfirmOpen} onOpenChange={setGrantConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {existingForTarget ? "Update this entitlement?" : "Grant this entitlement?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                <div><span className="text-muted-foreground">User:</span> <span className="font-mono">{targetId.trim()}</span></div>
+                <div><span className="text-muted-foreground">Plan:</span> <span className="font-semibold">{plan}</span></div>
+                <div>
+                  <span className="text-muted-foreground">Expires:</span>{" "}
+                  {plan === "premium_lifetime" || !expiresAt ? "never" : new Date(expiresAt).toLocaleString()}
+                </div>
+                {existingForTarget && (
+                  <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-2 text-xs">
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+                    <span>
+                      This overwrites the existing <strong>{existingForTarget.plan}</strong> entitlement
+                      {existingForTarget.expires_at
+                        ? ` (previously expiring ${new Date(existingForTarget.expires_at).toLocaleString()})`
+                        : " (previously with no expiry)"}.
+                    </span>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={grant}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Revoke confirmation */}
+      <AlertDialog open={!!revokeTarget} onOpenChange={(o) => !o && setRevokeTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke premium?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This immediately downgrades <strong>{revokeTarget?.display_name ?? revokeTarget?.user_id}</strong> to
+              the free plan. They will lose access to premium-only content on their next request. The action is
+              logged to <code>privileged_actions_log</code>.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={revoke} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Revoke
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
