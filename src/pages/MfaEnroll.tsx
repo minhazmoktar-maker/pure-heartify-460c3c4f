@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { ShieldCheck, KeyRound, Loader2 } from "lucide-react";
+import MfaEnrollmentHelp from "@/components/MfaEnrollmentHelp";
 
 /**
  * TOTP MFA enrollment + verification.
@@ -27,6 +28,7 @@ export default function MfaEnroll() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [enrolled, setEnrolled] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -40,7 +42,7 @@ export default function MfaEnroll() {
         await supabase.auth.mfa.unenroll({ factorId: factor.id });
       }
       const { data: enroll, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Heartify TOTP" });
-      if (error) { toast({ title: "Enrollment failed", description: error.message, variant: "destructive" }); setLoading(false); return; }
+      if (error) { setLastError(error.message); toast({ title: "Enrollment failed", description: error.message, variant: "destructive" }); setLoading(false); return; }
       setFactorId(enroll.id);
       setQr(enroll.totp.qr_code);
       setSecret(enroll.totp.secret);
@@ -52,10 +54,11 @@ export default function MfaEnroll() {
     if (!factorId || code.length < 6) return;
     setBusy(true);
     const { data: challenge, error: cErr } = await supabase.auth.mfa.challenge({ factorId });
-    if (cErr) { toast({ title: "Challenge failed", description: cErr.message, variant: "destructive" }); setBusy(false); return; }
+    if (cErr) { setLastError(cErr.message); toast({ title: "Challenge failed", description: cErr.message, variant: "destructive" }); setBusy(false); return; }
     const { error } = await supabase.auth.mfa.verify({ factorId, challengeId: challenge.id, code });
     setBusy(false);
-    if (error) { toast({ title: "Invalid code", description: error.message, variant: "destructive" }); return; }
+    if (error) { setLastError(error.message); toast({ title: "Invalid code", description: error.message, variant: "destructive" }); return; }
+    setLastError(null);
     toast({ title: "MFA enabled", description: "Two-factor authentication is now active." });
     setEnrolled(true);
   };
@@ -89,6 +92,12 @@ export default function MfaEnroll() {
               <Button onClick={verify} disabled={busy || code.length < 6}>{busy ? "Verifying..." : "Verify"}</Button>
             </div>
           </Card>
+        )}
+
+        {!enrolled && (
+          <div className="mt-4">
+            <MfaEnrollmentHelp error={lastError} />
+          </div>
         )}
       </main>
     </div>
