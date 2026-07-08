@@ -1220,6 +1220,20 @@ export type Database = {
       }
       compute_owner_key: { Args: { _name: string }; Returns: string }
       f_unaccent: { Args: { "": string }; Returns: string }
+      get_related_searches: {
+        Args: { _limit?: number; _query: string }
+        Returns: {
+          hits: number
+          query: string
+        }[]
+      }
+      get_trending_searches: {
+        Args: { _limit?: number; _window_hours?: number }
+        Returns: {
+          hits: number
+          query: string
+        }[]
+      }
       has_min_role: {
         Args: { _min_tier: string; _user_id: string }
         Returns: boolean
@@ -1233,6 +1247,34 @@ export type Database = {
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
+      search_autocomplete: {
+        Args: { _limit?: number; _prefix: string }
+        Returns: {
+          kind: string
+          suggestion: string
+        }[]
+      }
+      search_videos: {
+        Args: {
+          _category?: string
+          _channel?: string
+          _limit?: number
+          _offset?: number
+          _query: string
+        }
+        Returns: {
+          category: string
+          channel_title: string
+          halal_score: number
+          is_trusted_channel: boolean
+          match_type: string
+          published_at: string
+          rank: number
+          thumbnail_url: string
+          title: string
+          video_id: string
+        }[]
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       unaccent: { Args: { "": string }; Returns: string }
