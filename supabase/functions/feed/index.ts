@@ -36,6 +36,11 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Premium gating: identify caller (best-effort) and hide premium-only rows
+    // for non-premium/anon users. Never trust a client-supplied flag.
+    const callerId = await getCallerUserId(req);
+    const isPremium = await hasActivePremium(callerId);
+
     const body = await req.json().catch(() => ({}));
     const category = body?.category as string | undefined;
     const sectionId = body?.section_id as string | undefined;
