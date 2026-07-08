@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Search, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import SearchSuggestions from "@/components/SearchSuggestions";
@@ -9,6 +10,7 @@ import ReciterResults from "@/components/ReciterResults";
 import EmptyState from "@/components/EmptyState";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
+import { growth } from "@/lib/growthEvents";
 import type { YouTubeVideo } from "@/services/youtube";
 
 const SearchResults = () => {
@@ -25,6 +27,16 @@ const SearchResults = () => {
 
   const activeQuery = query || liveInput;
   const smart = useSmartSearch(activeQuery);
+
+  useEffect(() => {
+    if (!query || smart.isLoading) return;
+    const n = smart.results.length;
+    if (n === 0) growth.searchNoResults(query);
+    else growth.searchIssued(query, n);
+  }, [query, smart.isLoading, smart.results.length]);
+
+
+
 
   const smartVideos: YouTubeVideo[] = useMemo(
     () =>
@@ -43,7 +55,17 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-background pb-12">
+      <SEO
+        title={query ? `${query} — Heartify search` : "Search Heartify"}
+        description={
+          query
+            ? `Halal-verified results for "${query}" on Heartify.`
+            : "Search Heartify for Quran recitations, Islamic lectures, and family-friendly halal video content."
+        }
+        path={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}
+      />
       <Navbar />
+
 
       <div className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">
         <button

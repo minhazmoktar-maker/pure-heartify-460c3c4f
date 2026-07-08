@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Mail, Lock, Eye, EyeOff, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
+import { growth } from "@/lib/growthEvents";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const Signup = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      growth.signedUp("email");
       toast.success("Check your email to verify your account!");
       navigate("/login");
     }
@@ -48,6 +50,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
+    growth.signedUp("google");
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
@@ -63,6 +66,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
+    growth.signedUp("apple");
     const result = await lovable.auth.signInWithOAuth("apple", {
       redirect_uri: window.location.origin,
     });

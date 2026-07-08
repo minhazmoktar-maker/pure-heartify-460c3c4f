@@ -65,12 +65,7 @@ async function requestReview(): Promise<void> {
   // Prefer native review dialog on device.
   try {
     // Dynamic import so the web bundle never pays for the plugin.
-    // Dynamic import so the web bundle never pays for the plugin, and
-    // the module resolves at runtime on native builds where it is installed.
-    const mod: { InAppReview?: { requestReview: () => Promise<void> } } | null =
-      await import(
-        /* @vite-ignore */ "@capacitor-community/in-app-review" as string
-      ).catch(() => null);
+    const mod = await import("@capacitor-community/in-app-review").catch(() => null);
     if (mod?.InAppReview?.requestReview) {
       await mod.InAppReview.requestReview();
       return;

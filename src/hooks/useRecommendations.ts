@@ -6,6 +6,7 @@
  */
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { growth } from "@/lib/growthEvents";
 
 export interface RecommendationReason {
   code: string;
@@ -88,6 +89,9 @@ export async function logRecommendationEvent(input: {
   reasons?: RecommendationReason[];
   provider?: string;
 }) {
+  const surface = input.surface ?? "home";
+  if (input.eventType === "click") growth.recommendationClicked(input.videoId, surface, 0);
+  else if (input.eventType === "dismiss") growth.recommendationDismissed(input.videoId, surface);
   try {
     await supabase.functions.invoke("recommendations/event", {
       body: {

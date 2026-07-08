@@ -4,12 +4,22 @@ import App from "./App.tsx";
 import "./index.css";
 import { initSentry } from "./lib/sentry";
 import { captureAttributionOnce } from "./lib/attribution";
+import { growth } from "./lib/growthEvents";
 
 // Bootstrap error reporting FIRST so early crashes are captured.
 initSentry();
 
 // Fire-and-forget: capture first-touch UTM/referral on every fresh page load.
 void captureAttributionOnce();
+
+// Growth: acquisition.visited on cold boot (per session).
+try {
+  const key = "heartify-visited-fired";
+  if (!sessionStorage.getItem(key)) {
+    sessionStorage.setItem(key, "1");
+    growth.visited(window.location.pathname, document.referrer || null);
+  }
+} catch { /* noop */ }
 
 // Guard service worker: never run inside Lovable preview iframes.
 const isInIframe = (() => {

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 
 const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
   <section id={id} className="scroll-mt-24">
@@ -15,6 +16,11 @@ const Privacy = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Privacy Policy — Heartify"
+        description="How Heartify collects, uses, and protects your personal information."
+        path="/privacy"
+      />
       <Navbar />
       <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
         <Link

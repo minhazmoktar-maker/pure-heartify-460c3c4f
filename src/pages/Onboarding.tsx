@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { INTEREST_OPTIONS } from "@/data/interestOptions";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { growth } from "@/lib/growthEvents";
 
 const STEPS = [
   {
@@ -79,6 +80,7 @@ const Onboarding = () => {
     }
     await qc.invalidateQueries({ queryKey: ["user-interests", user.id] });
     await qc.invalidateQueries({ queryKey: ["daily-dose", user.id] });
+    growth.onboardingCompleted([picks.primary!, picks.secondary!, picks.exploration!]);
     toast({ title: "Alhamdulillah 🌿", description: "Your Daily Dose is being personalized." });
     navigate("/");
   };

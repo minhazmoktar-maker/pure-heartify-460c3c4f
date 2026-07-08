@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Search, ShieldCheck, ExternalLink } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,11 @@ const Channels = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <SEO
+        title="Trusted Halal Channels — Heartify"
+        description={`Browse ${TOTAL_CHANNELS}+ vetted halal YouTube channels across ${CHANNEL_CATEGORIES.length} categories on Heartify.`}
+        path="/channels"
+      />
       <Navbar />
 
       <header className="border-b border-border bg-card/40">

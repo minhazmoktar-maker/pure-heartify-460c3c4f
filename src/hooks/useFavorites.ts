@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { growth } from "@/lib/growthEvents";
 
 export interface FavoriteVideo {
   id: string;
@@ -52,6 +53,7 @@ export function useFavorites() {
       if (existing) {
         const { error } = await supabase.from("favorites").delete().eq("id", existing.id);
         if (error) throw error;
+        growth.favoriteRemoved(videoId);
         return { action: "removed" as const };
       } else {
         const { error } = await supabase.from("favorites").insert({
@@ -62,6 +64,7 @@ export function useFavorites() {
           thumbnail_url: thumbnail,
         });
         if (error) throw error;
+        growth.favoriteAdded(videoId);
         return { action: "added" as const };
       }
     },

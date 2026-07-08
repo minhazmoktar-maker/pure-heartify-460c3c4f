@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, Heart, Play } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
@@ -10,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useCompleteDoseVideo } from "@/hooks/useDailyDose";
+import { growth } from "@/lib/growthEvents";
+import { triggerIfDelightful } from "@/lib/inAppReview";
 import { toast } from "sonner";
 
 const Watch = () => {
@@ -21,6 +24,7 @@ const Watch = () => {
   const completeDose = useCompleteDoseVideo();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [playerActivated, setPlayerActivated] = useState(false);
   const completedRef = useRef<string | null>(null);
 
   const currentVideo = videos?.find((v) => v.id === videoId);
@@ -30,7 +34,14 @@ const Watch = () => {
   const currentIndex = videos?.findIndex((v) => v.id === videoId) ?? -1;
   const nextVideo = videos && currentIndex >= 0 ? videos[(currentIndex + 1) % videos.length] : null;
 
-  // Track watch history
+  // Reset facade when navigating between videos
+  useEffect(() => {
+    setPlayerActivated(false);
+    setShowOverlay(false);
+    completedRef.current = null;
+  }, [videoId]);
+
+  // Track watch history + first-play growth event
   useEffect(() => {
     if (!user || !videoId || !currentVideo) return;
     supabase.from("watch_history").insert({
@@ -39,12 +50,12 @@ const Watch = () => {
       video_title: currentVideo.title,
       thumbnail_url: currentVideo.thumbnailUrl,
     }).then(() => {});
+    growth.firstVideoPlayed(videoId);
   }, [user, videoId, currentVideo]);
 
   // Listen for YouTube iframe API messages to detect video end
   useEffect(() => {
-    setShowOverlay(false);
-    completedRef.current = null;
+    if (!playerActivated) return;
 
     const handleMessage = (event: MessageEvent) => {
       try {
@@ -53,6 +64,7 @@ const Watch = () => {
           // YouTube iframe API sends playerState: 0 when video ends
           if (data?.event === "onStateChange" && data?.info === 0) {
             setShowOverlay(true);
+            triggerIfDelightful();
             // Mark dose video complete (idempotent server-side)
             if (user && videoId && completedRef.current !== videoId) {
               completedRef.current = videoId;
@@ -82,7 +94,7 @@ const Watch = () => {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [videoId, user, completeDose]);
+  }, [videoId, user, completeDose, playerActivated]);
 
   const handleNext = () => {
     if (nextVideo) {
@@ -109,7 +121,26 @@ const Watch = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {currentVideo && videoId && (
+        <SEO
+          title={`${currentVideo.title} · Heartify`}
+          description={`Watch "${currentVideo.title}" by ${currentVideo.channelTitle} — curated halal content on Heartify.`}
+          path={`/watch/${videoId}`}
+          image={currentVideo.thumbnailUrl}
+          type="video.other"
+          jsonLd={{
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            name: currentVideo.title,
+            description: currentVideo.title,
+            thumbnailUrl: currentVideo.thumbnailUrl,
+            uploadDate: currentVideo.publishedAt,
+            embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+          }}
+        />
+      )}
       <Navbar />
+
 
       <div className="mx-auto max-w-[1800px] px-4 py-4 md:px-6 lg:flex lg:gap-6">
         <div className="min-w-0 flex-1">
@@ -123,14 +154,41 @@ const Watch = () => {
 
           {isEmbeddableVideo ? (
             <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
-              <iframe
-                ref={iframeRef}
-                src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1&origin=${window.location.origin}`}
-                title={currentVideo?.title ?? "Video"}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full border-0"
-              />
+              {playerActivated ? (
+                <iframe
+                  ref={iframeRef}
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1&origin=${window.location.origin}`}
+                  title={currentVideo?.title ?? "Video"}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="eager"
+                  className="absolute inset-0 h-full w-full border-0"
+                />
+              ) : (
+                // Lite-YouTube facade: defers ~1.5MB of player JS until user intent.
+                <button
+                  type="button"
+                  onClick={() => setPlayerActivated(true)}
+                  aria-label={`Play ${currentVideo?.title ?? "video"}`}
+                  className="group absolute inset-0 flex items-center justify-center overflow-hidden"
+                >
+                  {videoId && (
+                    <img
+                      src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+                      alt={currentVideo?.title ?? "Video thumbnail"}
+                      width={1280}
+                      height={720}
+                      fetchPriority="high"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="relative flex h-16 w-24 items-center justify-center rounded-2xl bg-red-600/90 shadow-2xl transition-transform group-hover:scale-110">
+                    <Play className="h-8 w-8 fill-white text-white" />
+                  </div>
+                </button>
+              )}
               {/* Overlay to block YouTube end-screen suggestions */}
               {showOverlay && nextVideo && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-background/95 backdrop-blur-sm">
