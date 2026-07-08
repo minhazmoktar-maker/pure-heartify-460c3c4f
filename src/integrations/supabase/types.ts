@@ -2248,6 +2248,7 @@ export type Database = {
           source: Database["public"]["Enums"]["trust_event_source"]
         }[]
       }
+      get_internal_config: { Args: { _key: string }; Returns: string }
       get_related_searches: {
         Args: { _limit?: number; _query: string }
         Returns: {
