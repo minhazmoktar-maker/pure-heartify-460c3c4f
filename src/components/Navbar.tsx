@@ -1,26 +1,20 @@
-import { Search, Menu, Bell, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert } from "lucide-react";
+import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
-import { supabase } from "@/integrations/supabase/client";
 import NotificationsBell from "@/components/NotificationsBell";
 import SuggestContentDialog from "@/components/SuggestContentDialog";
+import { useRole } from "@/hooks/useRole";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
-
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
-      .then(({ data }) => setIsAdmin(!!data));
-  }, [user]);
+  const { isAdmin, isOwner } = useRole();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,18 +62,23 @@ const Navbar = () => {
                   <>
                     <div className="mt-4 mb-1 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Admin</div>
                     {[
+                      ...(isOwner ? [{ to: "/owner", label: "Owner control center", icon: Crown }] : []),
                       { to: "/admin/review", label: "Review candidates" },
                       { to: "/admin/console", label: "Admin console" },
+                      { to: "/admin/entitlements", label: "Entitlements" },
                       { to: "/admin/audit", label: "Audit log" },
                       { to: "/admin/moderation", label: "Moderation" },
-                    ].map((l) => (
-                      <SheetClose asChild key={l.to}>
-                        <Link to={l.to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">
-                          <ShieldAlert className="h-4 w-4 text-primary" />
-                          {l.label}
-                        </Link>
-                      </SheetClose>
-                    ))}
+                    ].map((l) => {
+                      const Icon = "icon" in l && l.icon ? l.icon : ShieldAlert;
+                      return (
+                        <SheetClose asChild key={l.to}>
+                          <Link to={l.to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">
+                            <Icon className="h-4 w-4 text-primary" />
+                            {l.label}
+                          </Link>
+                        </SheetClose>
+                      );
+                    })}
                   </>
                 )}
               </nav>

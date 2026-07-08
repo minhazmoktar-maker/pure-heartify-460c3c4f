@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { ShieldCheck, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 /**
  * MFA challenge screen used mid-sign-in when the account has TOTP enrolled.
@@ -14,12 +15,15 @@ import { ShieldCheck, Loader2 } from "lucide-react";
  */
 export default function MfaVerify() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [factorId, setFactorId] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) { navigate("/login"); return; }
     (async () => {
       const { data } = await supabase.auth.mfa.listFactors();
       const verified = data?.totp?.find((f) => f.status === "verified");
@@ -27,7 +31,7 @@ export default function MfaVerify() {
       setFactorId(verified.id);
       setLoading(false);
     })();
-  }, [navigate]);
+  }, [user, authLoading, navigate]);
 
   const verify = async () => {
     if (!factorId || code.length < 6) return;
@@ -47,12 +51,12 @@ export default function MfaVerify() {
           <ShieldCheck className="h-6 w-6 text-primary" />
           <h1 className="font-heading text-xl font-bold">Verify it's you</h1>
         </div>
-        {loading ? (
+        {authLoading || loading ? (
           <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : (
           <>
             <p className="text-sm text-muted-foreground">Enter the 6-digit code from your authenticator app.</p>
-            <Input inputMode="numeric" pattern="[0-9]*" maxLength={6} placeholder="123456" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} />
+            <Input aria-label="Authenticator code" inputMode="numeric" pattern="[0-9]*" maxLength={6} placeholder="123456" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} />
             <Button className="w-full" onClick={verify} disabled={busy || code.length < 6}>{busy ? "Verifying..." : "Continue"}</Button>
           </>
         )}

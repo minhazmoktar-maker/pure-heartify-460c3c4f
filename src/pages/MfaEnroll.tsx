@@ -18,7 +18,7 @@ import { ShieldCheck, KeyRound, Loader2 } from "lucide-react";
  *   and server-side by RLS policies that gate on the `has_role`+`aal` claim).
  */
 export default function MfaEnroll() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [factorId, setFactorId] = useState<string | null>(null);
@@ -29,11 +29,16 @@ export default function MfaEnroll() {
   const [enrolled, setEnrolled] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) { navigate("/login"); return; }
     (async () => {
       const { data } = await supabase.auth.mfa.listFactors();
       const verified = data?.totp?.find((f) => f.status === "verified");
       if (verified) { setEnrolled(true); setLoading(false); return; }
+      const staleFactors = data?.totp?.filter((f) => f.status !== "verified") ?? [];
+      for (const factor of staleFactors) {
+        await supabase.auth.mfa.unenroll({ factorId: factor.id });
+      }
       const { data: enroll, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: "Heartify TOTP" });
       if (error) { toast({ title: "Enrollment failed", description: error.message, variant: "destructive" }); setLoading(false); return; }
       setFactorId(enroll.id);
@@ -41,7 +46,7 @@ export default function MfaEnroll() {
       setSecret(enroll.totp.secret);
       setLoading(false);
     })();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const verify = async () => {
     if (!factorId || code.length < 6) return;
@@ -64,7 +69,7 @@ export default function MfaEnroll() {
           <h1 className="font-heading text-2xl font-bold">Two-factor authentication</h1>
         </div>
 
-        {loading ? (
+        {authLoading || loading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : enrolled ? (
           <Card className="p-6">
@@ -80,7 +85,7 @@ export default function MfaEnroll() {
             )}
             <div className="flex items-center gap-2">
               <KeyRound className="h-4 w-4 text-muted-foreground" />
-              <Input inputMode="numeric" pattern="[0-9]*" maxLength={6} placeholder="123456" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} />
+              <Input aria-label="Authenticator code" inputMode="numeric" pattern="[0-9]*" maxLength={6} placeholder="123456" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} />
               <Button onClick={verify} disabled={busy || code.length < 6}>{busy ? "Verifying..." : "Verify"}</Button>
             </div>
           </Card>

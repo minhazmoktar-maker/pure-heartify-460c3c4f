@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,6 +26,7 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 const Privacy = lazy(() => import("./pages/Privacy.tsx"));
 const Terms = lazy(() => import("./pages/Terms.tsx"));
+const About = lazy(() => import("./pages/About.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
 const Channels = lazy(() => import("./pages/Channels.tsx"));
@@ -76,9 +77,12 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/channels" element={<Channels />} />
+                <Route path="/admin" element={<Navigate to="/admin/console" replace />} />
                 <Route path="/admin/moderation" element={<AdminRoute><ModerationLog /></AdminRoute>} />
                 <Route path="/admin/audit" element={<AdminRoute><Audit /></AdminRoute>} />
                 <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />
@@ -92,6 +96,8 @@ const App = () => (
                 <Route path="/admin/audio-integrity" element={<AdminRoute><AudioIntegrity /></AdminRoute>} />
                 <Route path="/security/mfa" element={<MfaEnroll />} />
                 <Route path="/security/mfa/verify" element={<MfaVerify />} />
+                <Route path="/mfa-enroll" element={<Navigate to="/security/mfa" replace />} />
+                <Route path="/mfa-verify" element={<Navigate to="/security/mfa/verify" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
