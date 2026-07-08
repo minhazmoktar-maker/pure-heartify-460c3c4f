@@ -55,6 +55,19 @@ type SnapshotRow = {
   error: string | null;
   created_at: string;
 };
+type SyncStatus = {
+  enabled: boolean;
+  cronSecretPresent: boolean;
+  latest: Record<string, { ok: boolean; error: string | null; created_at: string; data?: Record<string, unknown> }>;
+};
+type SitemapDiff = {
+  ok: boolean;
+  reason?: string;
+  current?: { at: string; count: number; ok: boolean; error: string | null };
+  previous?: { at: string; count: number; ok: boolean; error: string | null } | null;
+  added?: string[];
+  removed?: string[];
+};
 
 async function call<T>(action: string, params: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.functions.invoke("gsc", { body: { action, ...params } });
