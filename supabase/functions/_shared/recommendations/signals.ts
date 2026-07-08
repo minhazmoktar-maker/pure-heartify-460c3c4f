@@ -38,6 +38,8 @@ export async function gatherSignals(
     channelAffinity: new Map(),
     sessionChannelIds: new Set(),
     trendingIds: new Set(),
+    contentLanguages: [],
+    diversityLevel: 50,
   };
 
   const nowMs = Date.now();
@@ -154,6 +156,25 @@ export async function gatherSignals(
           for (const row of (data ?? []) as Array<{ video_id: string; completed_at: string }>) {
             signals.doseVideoIds.add(row.video_id);
             signals.watchedVideoIds.add(row.video_id);
+          }
+        })
+        .catch(() => {}),
+    );
+
+    // Locale preferences — language-aware ranking + diversity control.
+    jobs.push(
+      admin
+        .from("user_locale_preferences")
+        .select("content_languages, diversity_level, auto_personalize")
+        .eq("user_id", userId)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!data) return;
+          if (data.auto_personalize !== false && Array.isArray(data.content_languages)) {
+            signals.contentLanguages = data.content_languages as string[];
+          }
+          if (typeof data.diversity_level === "number") {
+            signals.diversityLevel = data.diversity_level;
           }
         })
         .catch(() => {}),

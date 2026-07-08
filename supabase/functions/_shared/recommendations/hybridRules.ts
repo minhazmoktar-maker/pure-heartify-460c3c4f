@@ -31,6 +31,7 @@ const W = {
   aiConfidence:    Number(Deno.env.get("REC_W_AI")       ?? 0.06),
   freshness:       Number(Deno.env.get("REC_W_FRESH")    ?? 0.08),
   session:         Number(Deno.env.get("REC_W_SESSION")  ?? 0.04),
+  language:        Number(Deno.env.get("REC_W_LANGUAGE") ?? 0.10),
 };
 
 const DIVERSITY_LAMBDA = Number(Deno.env.get("REC_DIVERSITY_LAMBDA") ?? 0.35);
@@ -102,6 +103,19 @@ function scoreCandidate(
 
   if (candidate.channel_title && s.sessionChannelIds.has(candidate.channel_title)) {
     score += push("session_continuity", 1, W.session, "continues current session");
+  }
+
+  // Language match — dampened by diversity level so users still discover
+  // valuable content outside their primary language.
+  if (candidate.content_language && s.contentLanguages.length > 0) {
+    const matches = s.contentLanguages.includes(candidate.content_language) ? 1 : 0;
+    const damping = 1 - Math.min(1, Math.max(0, s.diversityLevel) / 100) * 0.5;
+    score += push(
+      "language_match",
+      matches * damping,
+      W.language,
+      matches ? `content language "${candidate.content_language}"` : undefined,
+    );
   }
 
   // Cold-start fallback: signed-out or brand-new users get a light popularity nudge.
