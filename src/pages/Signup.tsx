@@ -66,6 +66,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
+    growth.signedUp("apple");
     const result = await lovable.auth.signInWithOAuth("apple", {
       redirect_uri: window.location.origin,
     });
