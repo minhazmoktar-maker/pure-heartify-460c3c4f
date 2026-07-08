@@ -474,10 +474,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   const setPlaybackRate = useCallback((rate: number) => setPlaybackRateState(rate), []);
   const togglePremium = useCallback(() => {
-    setIsPremiumUser((p) => {
-      const nxt = !p;
-      toast.success(nxt ? "Premium unlocked ✨" : "Switched to Free");
-      return nxt;
+    // Client-side premium toggling is gone. Entitlements are granted server-side
+    // by an admin (or, later, by a payment webhook). Keep the function so old
+    // call sites don't crash while we migrate the UI.
+    toast("Premium is now billing-based", {
+      description: "Ask an admin for access, or wait for the upgrade flow.",
     });
   }, []);
   const addToQueue = useCallback((track: Track) => {
