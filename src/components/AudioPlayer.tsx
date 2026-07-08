@@ -1,11 +1,12 @@
 import {
   Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
-  Crown, Shuffle, Repeat, Repeat1, Loader2, Gauge,
+  Crown, Shuffle, Repeat, Repeat1, Loader2, Gauge, Hand,
 } from "lucide-react";
 import { useState } from "react";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import ReportAudioDialog from "@/components/ReportAudioDialog";
 
 const fmt = (s: number) => {
   if (!isFinite(s) || s < 0) return "0:00";
@@ -24,6 +25,7 @@ const AudioPlayer = () => {
     progress, duration, seek, volume, setVolume, muted, toggleMute,
     shuffle, toggleShuffle, repeat, cycleRepeat,
     playbackRate, setPlaybackRate,
+    needsUserGesture, resumePlayback, lastError,
   } = usePlayer();
   const [speedOpen, setSpeedOpen] = useState(false);
 
