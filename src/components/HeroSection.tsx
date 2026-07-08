@@ -11,6 +11,9 @@ const HeroSection = () => {
           alt="HalalTube hero"
           width={1920}
           height={800}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-dark/90 via-emerald-dark/70 to-transparent" />

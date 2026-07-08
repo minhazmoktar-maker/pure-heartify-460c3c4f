@@ -53,8 +53,11 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         <img
           src={video.thumbnailUrl}
           alt={video.title}
-          loading="lazy"
+          loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
+          fetchPriority={index < 2 ? "high" : "low"}
+          width={480}
+          height={270}
           className="aspect-video w-full bg-muted object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute bottom-2 left-2 right-2">
