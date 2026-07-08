@@ -86,6 +86,132 @@ export type Database = {
         }
         Relationships: []
       }
+      audio_integrity_reports: {
+        Row: {
+          checked_at: string
+          content_length: number | null
+          content_type: string | null
+          error: string | null
+          http_status: number | null
+          id: string
+          latency_ms: number | null
+          run_id: string
+          status: string
+          track_id: string
+          track_title: string | null
+          url: string | null
+        }
+        Insert: {
+          checked_at?: string
+          content_length?: number | null
+          content_type?: string | null
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          latency_ms?: number | null
+          run_id: string
+          status: string
+          track_id: string
+          track_title?: string | null
+          url?: string | null
+        }
+        Update: {
+          checked_at?: string
+          content_length?: number | null
+          content_type?: string | null
+          error?: string | null
+          http_status?: number | null
+          id?: string
+          latency_ms?: number | null
+          run_id?: string
+          status?: string
+          track_id?: string
+          track_title?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      audio_playback_positions: {
+        Row: {
+          created_at: string
+          device: string | null
+          duration_seconds: number | null
+          id: string
+          position_seconds: number
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          duration_seconds?: number | null
+          id?: string
+          position_seconds?: number
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          duration_seconds?: number | null
+          id?: string
+          position_seconds?: number
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      audio_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          error_code: string | null
+          id: string
+          platform: string | null
+          reason: string
+          status: string
+          track_id: string
+          track_title: string | null
+          track_url: string | null
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          error_code?: string | null
+          id?: string
+          platform?: string | null
+          reason: string
+          status?: string
+          track_id: string
+          track_title?: string | null
+          track_url?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          error_code?: string | null
+          id?: string
+          platform?: string | null
+          reason?: string
+          status?: string
+          track_id?: string
+          track_title?: string | null
+          track_url?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blocked_creators: {
         Row: {
           created_at: string
