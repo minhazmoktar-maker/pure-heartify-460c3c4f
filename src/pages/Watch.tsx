@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, Heart, Play } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
@@ -9,6 +9,7 @@ import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
 import { ReportButton } from "@/components/ReportButton";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
+import type { YouTubeVideo } from "@/services/youtube";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -20,6 +21,8 @@ import { toast } from "sonner";
 const Watch = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const stateVideo = (location.state as { video?: YouTubeVideo } | null)?.video;
   const { data: videos } = useYouTubeVideos("All");
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -29,7 +32,7 @@ const Watch = () => {
   const [playerActivated, setPlayerActivated] = useState(false);
   const completedRef = useRef<string | null>(null);
 
-  const currentVideo = videos?.find((v) => v.id === videoId);
+  const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
   const relatedVideos = videos?.filter((v) => v.id !== videoId).slice(0, 8) ?? [];
   const isEmbeddableVideo = !!videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId);
 
