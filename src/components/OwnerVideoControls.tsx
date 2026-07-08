@@ -9,6 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -22,9 +25,25 @@ import {
   Sparkles,
   Ban,
   ListX,
+  Archive,
+  ArchiveRestore,
+  Star,
+  StarOff,
+  Pin,
+  PinOff,
+  Pencil,
+  History,
 } from "lucide-react";
 import { toast } from "sonner";
 import { logPrivilegedAction } from "@/lib/auditLog";
+
+interface VideoState {
+  is_hidden: boolean;
+  is_archived: boolean;
+  is_featured: boolean;
+  is_pinned: boolean;
+  halal_score: number | null;
+}
 
 /**
  * Owner-only moderation controls attached to a video.
@@ -42,6 +61,7 @@ export function OwnerVideoControls({
   const { user } = useAuth();
   const { isOwner, isAdmin, loading } = useRole();
   const [removed, setRemoved] = useState(false);
+  const [state, setState] = useState<VideoState | null>(null);
 
   useEffect(() => {
     if (!user || (!isOwner && !isAdmin)) return;
@@ -51,6 +71,12 @@ export function OwnerVideoControls({
       .eq("video_id", videoId)
       .maybeSingle()
       .then(({ data }) => setRemoved(!!data));
+    supabase
+      .from("curated_videos")
+      .select("is_hidden,is_archived,is_featured,is_pinned,halal_score")
+      .eq("video_id", videoId)
+      .maybeSingle()
+      .then(({ data }) => data && setState(data as VideoState));
   }, [user, videoId, isOwner, isAdmin]);
 
   if (loading || !user || (!isOwner && !isAdmin)) return null;
@@ -58,25 +84,45 @@ export function OwnerVideoControls({
   const run = async (
     label: string,
     action: string,
-    fn: () => Promise<void>,
+    fn: () => Promise<Partial<VideoState> | void>,
   ) => {
+    const previous = state;
     try {
-      await fn();
+      const patch = (await fn()) ?? {};
+      if (state) setState({ ...state, ...patch });
       await logPrivilegedAction({
         action,
         target_type: "video",
         target_id: videoId,
-        new_state: { title, channelTitle },
+        previous_state: previous,
+        new_state: { ...(previous ?? {}), ...patch, title, channelTitle },
+        success: true,
       });
       toast.success(label);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Action failed";
+      await logPrivilegedAction({
+        action,
+        target_type: "video",
+        target_id: videoId,
+        success: false,
+        failure_reason: msg,
+      });
       toast.error(msg);
     }
   };
 
+  const patchVideo = async (patch: Partial<VideoState>) => {
+    const { error } = await supabase
+      .from("curated_videos")
+      .update(patch)
+      .eq("video_id", videoId);
+    if (error) throw error;
+    return patch;
+  };
+
   const deleteVideo = () =>
-    run("Video deleted from platform", "video.delete", async () => {
+    run("Video deleted", "video.delete", async () => {
       const reason =
         window.prompt("Reason for removal?", "Inappropriate content") ??
         "Owner action";
@@ -100,11 +146,27 @@ export function OwnerVideoControls({
       setRemoved(false);
     });
 
-  const hideFromSurface = (surface: string) => () =>
-    run(`Removed from ${surface}`, `video.remove_from.${surface}`, async () => {
-      // Removal from curated feeds — the row is removed; ingest guard keeps
-      // it out until the blocklist entry is cleared.
-      await supabase.from("curated_videos").delete().eq("video_id", videoId);
+  const editHalalScore = () =>
+    run("Halal score updated", "video.edit_halal_score", async () => {
+      const raw = window.prompt(
+        "New halal score (0–100)?",
+        String(state?.halal_score ?? 85),
+      );
+      if (raw === null) throw new Error("cancelled");
+      const score = Math.max(0, Math.min(100, Number(raw)));
+      if (!Number.isFinite(score)) throw new Error("Invalid score");
+      return patchVideo({ halal_score: score });
+    });
+
+  const editMetadata = () =>
+    run("Title updated", "video.edit_metadata", async () => {
+      const nextTitle = window.prompt("New title?", title ?? "");
+      if (!nextTitle) throw new Error("cancelled");
+      const { error } = await supabase
+        .from("curated_videos")
+        .update({ title: nextTitle })
+        .eq("video_id", videoId);
+      if (error) throw error;
     });
 
   const banChannel = () =>
@@ -151,51 +213,182 @@ export function OwnerVideoControls({
 
         {isOwner && (
           <>
-            <DropdownMenuItem onClick={hideFromSurface("homepage")}>
-              <EyeOff className="mr-2 h-4 w-4" /> Remove from homepage
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={hideFromSurface("recommendations")}>
-              <Eye className="mr-2 h-4 w-4" /> Remove from recommendations
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={hideFromSurface("search")}>
-              <ListX className="mr-2 h-4 w-4" /> Remove from search
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={hideFromSurface("trending")}>
-              <Sparkles className="mr-2 h-4 w-4" /> Remove from trending
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() =>
-                run("Marked safe", "video.mark_safe", async () => {
-                  await supabase
-                    .from("curated_videos")
-                    .update({ halal_score: 95 })
-                    .eq("video_id", videoId);
-                })
-              }
-            >
-              <ShieldCheck className="mr-2 h-4 w-4" /> Mark safe (override AI)
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                run("Marked unsafe", "video.mark_unsafe", async () => {
-                  await supabase
-                    .from("curated_videos")
-                    .update({ halal_score: 10 })
-                    .eq("video_id", videoId);
-                })
-              }
-            >
-              <ShieldAlert className="mr-2 h-4 w-4" /> Mark unsafe (override AI)
-            </DropdownMenuItem>
-            {channelTitle && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={banChannel} className="text-destructive">
-                  <Ban className="mr-2 h-4 w-4" /> Ban channel platform-wide
-                </DropdownMenuItem>
-              </>
+            {/* Visibility */}
+            {state?.is_hidden ? (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Video unhidden", "video.unhide", () =>
+                    patchVideo({ is_hidden: false }),
+                  )
+                }
+              >
+                <Eye className="mr-2 h-4 w-4" /> Unhide
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Video hidden", "video.hide", () =>
+                    patchVideo({ is_hidden: true }),
+                  )
+                }
+              >
+                <EyeOff className="mr-2 h-4 w-4" /> Hide
+              </DropdownMenuItem>
             )}
+
+            {state?.is_archived ? (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Video unarchived", "video.unarchive", () =>
+                    patchVideo({ is_archived: false }),
+                  )
+                }
+              >
+                <ArchiveRestore className="mr-2 h-4 w-4" /> Unarchive
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Video archived", "video.archive", () =>
+                    patchVideo({ is_archived: true }),
+                  )
+                }
+              >
+                <Archive className="mr-2 h-4 w-4" /> Archive
+              </DropdownMenuItem>
+            )}
+
+            {state?.is_featured ? (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Unfeatured", "video.unfeature", () =>
+                    patchVideo({ is_featured: false }),
+                  )
+                }
+              >
+                <StarOff className="mr-2 h-4 w-4" /> Unfeature
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Featured", "video.feature", () =>
+                    patchVideo({ is_featured: true }),
+                  )
+                }
+              >
+                <Star className="mr-2 h-4 w-4" /> Feature
+              </DropdownMenuItem>
+            )}
+
+            {state?.is_pinned ? (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Unpinned", "video.unpin", () =>
+                    patchVideo({ is_pinned: false }),
+                  )
+                }
+              >
+                <PinOff className="mr-2 h-4 w-4" /> Unpin
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={() =>
+                  run("Pinned", "video.pin", () =>
+                    patchVideo({ is_pinned: true }),
+                  )
+                }
+              >
+                <Pin className="mr-2 h-4 w-4" /> Pin
+              </DropdownMenuItem>
+            )}
+
+            <DropdownMenuSeparator />
+
+            {/* AI override */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <ShieldCheck className="mr-2 h-4 w-4" /> Override AI
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem
+                  onClick={() =>
+                    run("Marked safe", "video.mark_safe", () =>
+                      patchVideo({ halal_score: 95 }),
+                    )
+                  }
+                >
+                  <ShieldCheck className="mr-2 h-4 w-4" /> Mark safe
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    run("Marked unsafe", "video.mark_unsafe", () =>
+                      patchVideo({ halal_score: 10 }),
+                    )
+                  }
+                >
+                  <ShieldAlert className="mr-2 h-4 w-4" /> Mark unsafe
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={editHalalScore}>
+                  <Pencil className="mr-2 h-4 w-4" /> Set custom score
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            {/* Metadata */}
+            <DropdownMenuItem onClick={editMetadata}>
+              <Pencil className="mr-2 h-4 w-4" /> Edit metadata
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            {/* Removal from surfaces (hard delete from curated) */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <ListX className="mr-2 h-4 w-4" /> Remove from surface
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {[
+                  ["homepage", "Homepage"],
+                  ["recommendations", "Recommendations"],
+                  ["search", "Search"],
+                  ["trending", "Trending"],
+                  ["categories", "Categories"],
+                  ["channel_listings", "Channel listings"],
+                ].map(([key, label]) => (
+                  <DropdownMenuItem
+                    key={key}
+                    onClick={() =>
+                      run(
+                        `Removed from ${label}`,
+                        `video.remove_from.${key}`,
+                        async () => {
+                          await supabase
+                            .from("curated_videos")
+                            .delete()
+                            .eq("video_id", videoId);
+                        },
+                      )
+                    }
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" /> {label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSeparator />
+
+            {channelTitle && (
+              <DropdownMenuItem onClick={banChannel} className="text-destructive">
+                <Ban className="mr-2 h-4 w-4" /> Ban channel platform-wide
+              </DropdownMenuItem>
+            )}
+
+            <DropdownMenuItem asChild>
+              <a href={`/owner?target=${videoId}`}>
+                <History className="mr-2 h-4 w-4" /> View moderation history
+              </a>
+            </DropdownMenuItem>
           </>
         )}
       </DropdownMenuContent>

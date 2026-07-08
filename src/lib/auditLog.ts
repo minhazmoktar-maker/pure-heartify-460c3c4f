@@ -1,14 +1,15 @@
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Best-effort client-side audit trail entry. RLS blocks non-service_role
- * writes to `privileged_actions_log`, so critical audit writes should happen
- * inside edge functions using the service role. This helper is a convenience
- * for owner-initiated UI actions where the backend has already granted the
- * mutation (RLS enforced) — we log a UI receipt for visibility.
+ * Immutable audit trail writer.
  *
- * The real security guarantee is on the database: RLS on the target table
- * decides whether the action succeeds. This log is supplementary.
+ * Calls the `log-privileged-action` edge function so that the caller's IP,
+ * user-agent, and session identifier are captured server-side (client-supplied
+ * headers would be spoofable). The edge function verifies the caller is
+ * Owner or Admin and attributes the entry to their auth uid.
+ *
+ * This helper is best-effort — failures never block the underlying action.
+ * The real authorization boundary is RLS on the target table.
  */
 export interface AuditEntry {
   action: string;
@@ -16,30 +17,14 @@ export interface AuditEntry {
   target_id?: string;
   previous_state?: unknown;
   new_state?: unknown;
+  success?: boolean;
+  failure_reason?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export async function logPrivilegedAction(entry: AuditEntry): Promise<void> {
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Owner-only insert path via an edge function would be ideal; for now
-    // we surface the audit via console + a lightweight table where allowed.
-    // If RLS rejects (non-owner), we swallow silently.
-    await supabase.from("privileged_actions_log" as never).insert({
-      user_id: user.id,
-      user_email: user.email ?? null,
-      actor_role: "owner",
-      action: entry.action,
-      target_type: entry.target_type ?? null,
-      target_id: entry.target_id ?? null,
-      previous_state: entry.previous_state ?? null,
-      new_state: entry.new_state ?? null,
-      user_agent:
-        typeof navigator !== "undefined" ? navigator.userAgent : null,
-    } as never);
+    await supabase.functions.invoke("log-privileged-action", { body: entry });
   } catch {
     /* audit log is best-effort */
   }
