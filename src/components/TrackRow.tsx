@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import type { Track } from "@/data/audio";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { cn } from "@/lib/utils";
+import ReportAudioDialog from "@/components/ReportAudioDialog";
 
 interface TrackRowProps {
   track: Track;
