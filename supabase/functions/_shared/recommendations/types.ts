@@ -19,6 +19,7 @@ export interface RecommendationCandidate {
   view_count: number | null;
   moderation_confidence: number | null;
   moderation_state: string | null;
+  content_language: string | null;
 }
 
 /** Aggregated per-user signals fed into every provider. */
@@ -34,6 +35,8 @@ export interface UserSignals {
   channelAffinity: Map<string, number>;      // normalized 0..1
   sessionChannelIds: Set<string>;            // channels seen in last hour
   trendingIds: Set<string>;                  // globally trending, last 14d
+  contentLanguages: string[];                // preferred content languages
+  diversityLevel: number;                    // 0..100, higher = more out-of-language content
 }
 
 export interface Recommendation {
@@ -56,7 +59,8 @@ export interface RecommendationReason {
     | "freshness"
     | "session_continuity"
     | "cold_start_popular"
-    | "diversity_boost";
+    | "diversity_boost"
+    | "language_match";
   weight: number;
   detail?: string;
 }

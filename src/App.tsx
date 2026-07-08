@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { PlayerProvider } from "@/contexts/PlayerContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LocaleProvider } from "@/contexts/LocaleContext";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
@@ -47,6 +48,7 @@ const App = () => (
     <TooltipProvider>
       <ThemeProvider>
         <AuthProvider>
+          <LocaleProvider>
           <PlayerProvider>
           <Toaster />
           <Sonner />
@@ -80,6 +82,7 @@ const App = () => (
             </Suspense>
           </BrowserRouter>
         </PlayerProvider>
+          </LocaleProvider>
       </AuthProvider>
     </ThemeProvider>
   </TooltipProvider>

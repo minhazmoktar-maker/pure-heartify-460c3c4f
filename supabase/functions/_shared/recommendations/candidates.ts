@@ -28,10 +28,11 @@ export async function fetchCandidates(
     view_count: (row.view_count as number) ?? null,
     moderation_confidence: (row.moderation_confidence as number) ?? null,
     moderation_state: (row.moderation_state as string) ?? null,
+    content_language: (row.content_language as string) ?? null,
   });
 
   const select =
-    "video_id,title,channel_title,category,thumbnail_url,halal_score,published_at,is_trusted_channel,view_count,moderation_confidence,moderation_state";
+    "video_id,title,channel_title,category,thumbnail_url,halal_score,published_at,is_trusted_channel,view_count,moderation_confidence,moderation_state,content_language";
 
   const jobs: Array<Promise<unknown>> = [];
 
