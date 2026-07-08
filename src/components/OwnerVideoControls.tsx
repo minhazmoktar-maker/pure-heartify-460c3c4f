@@ -219,19 +219,22 @@ export function OwnerVideoControls({
         <DropdownMenuSeparator />
 
         {removed ? (
-          <DropdownMenuItem onClick={restoreVideo}>
-            <RotateCcw className="mr-2 h-4 w-4" /> Restore video
-          </DropdownMenuItem>
+          can("restore_video") && (
+            <DropdownMenuItem onClick={restoreVideo}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Restore video
+            </DropdownMenuItem>
+          )
         ) : (
-          <DropdownMenuItem onClick={deleteVideo} className="text-destructive">
-            <Trash2 className="mr-2 h-4 w-4" /> Delete video
-          </DropdownMenuItem>
+          can("delete_video") && (
+            <DropdownMenuItem onClick={deleteVideo} className="text-destructive">
+              <Trash2 className="mr-2 h-4 w-4" /> Delete video
+            </DropdownMenuItem>
+          )
         )}
 
-        {isOwner && (
-          <>
-            {/* Visibility */}
-            {state?.is_hidden ? (
+        {/* Visibility */}
+        {can("hide_video") &&
+          (state?.is_hidden ? (
               <DropdownMenuItem
                 onClick={() =>
                   run("Video unhidden", "video.unhide", () =>
