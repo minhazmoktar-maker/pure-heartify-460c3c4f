@@ -44,6 +44,7 @@ const AudioIntegrity = lazy(() => import("./pages/AudioIntegrity.tsx"));
 const MfaEnroll = lazy(() => import("./pages/MfaEnroll.tsx"));
 const MfaVerify = lazy(() => import("./pages/MfaVerify.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
+const AdminGsc = lazy(() => import("./pages/AdminGsc.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -96,6 +97,7 @@ const App = () => (
                 <Route path="/admin/analytics" element={<AdminRoute><Analytics /></AdminRoute>} />
                 <Route path="/admin/audio-integrity" element={<AdminRoute><AudioIntegrity /></AdminRoute>} />
                 <Route path="/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
+                <Route path="/admin/gsc" element={<AdminRoute><AdminGsc /></AdminRoute>} />
                 <Route path="/security/mfa" element={<MfaEnroll />} />
                 <Route path="/security/mfa/verify" element={<MfaVerify />} />
                 <Route path="/mfa-enroll" element={<Navigate to="/security/mfa" replace />} />
