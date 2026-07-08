@@ -22,7 +22,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isEmbeddableVideo) return; // non-embeddable videos can't be played
-    navigate(`/watch/${video.id}`);
+    navigate(`/watch/${video.id}`, { state: { video } });
   };
 
   const handleBookmark = (e: React.MouseEvent) => {

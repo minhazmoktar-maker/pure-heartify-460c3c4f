@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, Heart, Play } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
@@ -9,6 +9,7 @@ import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
 import { ReportButton } from "@/components/ReportButton";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
+import type { YouTubeVideo } from "@/services/youtube";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -20,6 +21,8 @@ import { toast } from "sonner";
 const Watch = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const stateVideo = (location.state as { video?: YouTubeVideo } | null)?.video;
   const { data: videos } = useYouTubeVideos("All");
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -29,7 +32,7 @@ const Watch = () => {
   const [playerActivated, setPlayerActivated] = useState(false);
   const completedRef = useRef<string | null>(null);
 
-  const currentVideo = videos?.find((v) => v.id === videoId);
+  const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
   const relatedVideos = videos?.filter((v) => v.id !== videoId).slice(0, 8) ?? [];
   const isEmbeddableVideo = !!videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId);
 
@@ -107,6 +110,12 @@ const Watch = () => {
 
   const liked = videoId ? isFavorite(videoId) : false;
 
+  const toAbsoluteUrl = (value: string) => {
+    if (!value) return "https://pure-heartify.lovable.app/placeholder.svg";
+    if (/^https?:\/\//i.test(value)) return value;
+    return `https://pure-heartify.lovable.app${value.startsWith("/") ? value : `/${value}`}`;
+  };
+
   const handleBookmark = () => {
     if (!user) {
       navigate("/login");
@@ -128,16 +137,24 @@ const Watch = () => {
           title={`${currentVideo.title} · Heartify`}
           description={`Watch "${currentVideo.title}" by ${currentVideo.channelTitle} — curated halal content on Heartify.`}
           path={`/watch/${videoId}`}
-          image={currentVideo.thumbnailUrl}
+          image={toAbsoluteUrl(currentVideo.thumbnailUrl)}
           type="video.other"
           jsonLd={{
             "@context": "https://schema.org",
             "@type": "VideoObject",
             name: currentVideo.title,
-            description: currentVideo.title,
-            thumbnailUrl: currentVideo.thumbnailUrl,
-            uploadDate: currentVideo.publishedAt,
-            embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+            description: `Curated halal video by ${currentVideo.channelTitle}.`,
+            thumbnailUrl: [toAbsoluteUrl(currentVideo.thumbnailUrl)],
+            uploadDate: currentVideo.publishedAt || new Date().toISOString(),
+            url: `https://pure-heartify.lovable.app/watch/${videoId}`,
+            ...(isEmbeddableVideo
+              ? { embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}` }
+              : { contentUrl: currentVideo.videoUrl }),
+            publisher: {
+              "@type": "Organization",
+              name: "Heartify",
+              url: "https://pure-heartify.lovable.app/",
+            },
           }}
         />
       )}
