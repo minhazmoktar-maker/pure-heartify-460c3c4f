@@ -2,7 +2,10 @@
  * Paginated feed edge function.
  * Serves curated videos from the database with cursor-based pagination.
  * Falls back to YouTube proxy if DB is empty.
+ * Filters out Premium-only content unless the caller has an active entitlement.
  */
+
+import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,6 +36,11 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Premium gating: identify caller (best-effort) and hide premium-only rows
+    // for non-premium/anon users. Never trust a client-supplied flag.
+    const callerId = await getCallerUserId(req);
+    const isPremium = await hasActivePremium(callerId);
+
     const body = await req.json().catch(() => ({}));
     const category = body?.category as string | undefined;
     const sectionId = body?.section_id as string | undefined;
@@ -69,6 +77,13 @@ Deno.serve(async (req) => {
       url += `&title=not.ilike.*${encodeURIComponent(p)}*`;
     }
 
+    // Server-side premium gate — hide premium-only videos from non-premium.
+    if (!isPremium) {
+      url += `&is_premium_only=eq.false`;
+    }
+
+
+
 
     const res = await fetch(url, {
       headers: {
@@ -102,9 +117,11 @@ Deno.serve(async (req) => {
         halalScore: v.halal_score,
         publishedAt: v.published_at ?? v.ingested_at,
         isTrustedChannel: v.is_trusted_channel,
+        isPremiumOnly: v.is_premium_only ?? false,
       })),
       nextCursor,
       total: totalCount || items.length,
+      viewer: { isPremium },
     });
   } catch (error) {
     console.error("Feed error:", error);

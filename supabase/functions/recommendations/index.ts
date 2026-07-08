@@ -19,6 +19,7 @@ import { getRecommendationProvider } from "../_shared/recommendations/providers.
 import { gatherSignals } from "../_shared/recommendations/signals.ts";
 import { fetchCandidates } from "../_shared/recommendations/candidates.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { hasActivePremium } from "../_shared/entitlements.ts";
 
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -94,12 +95,26 @@ Deno.serve(async (req) => {
       excludeWatched,
     });
 
+    // Server-side premium gate for recommendations.
+    const viewerIsPremium = await hasActivePremium(userId);
+    let filteredRecs = recommendations;
+    if (!viewerIsPremium && recommendations.length > 0) {
+      const ids = recommendations.map((r) => r.video.video_id).filter(Boolean);
+      const { data: premiumRows } = await admin
+        .from("curated_videos")
+        .select("video_id")
+        .in("video_id", ids)
+        .eq("is_premium_only", true);
+      const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
+      filteredRecs = recommendations.filter((r) => !premiumSet.has(r.video.video_id));
+    }
+
     // Fire-and-forget impression logging (batched insert).
-    if (recommendations.length) {
+    if (filteredRecs.length) {
       admin
         .from("recommendation_events")
         .insert(
-          recommendations.map((r) => ({
+          filteredRecs.map((r) => ({
             user_id: userId,
             video_id: r.video.video_id,
             event_type: "impression",
@@ -116,9 +131,10 @@ Deno.serve(async (req) => {
     }
 
     return json({
-      recommendations,
+      recommendations: filteredRecs,
       provider: provider.name,
       generatedAt: new Date().toISOString(),
+      viewer: { isPremium: viewerIsPremium },
       signalsSummary: {
         interests: signals.interests.length,
         favorites: signals.favoriteVideoIds.size,

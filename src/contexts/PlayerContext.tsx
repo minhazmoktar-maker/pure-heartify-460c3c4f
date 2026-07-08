@@ -6,6 +6,7 @@ import type { Track } from "@/data/audio";
 import { trackById } from "@/data/audio";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEntitlement } from "@/hooks/useEntitlement";
 import {
   detectPlatform, isIOS, isAndroid,
   persistPositionRemote, useCrossDevicePlayback,
@@ -56,6 +57,7 @@ interface PlayerState {
   toggleShuffle: () => void;
   cycleRepeat: () => void;
   setPlaybackRate: (rate: number) => void;
+  /** Deprecated no-op kept for backwards compatibility. Entitlements are now server-driven. */
   togglePremium: () => void;
   addToQueue: (track: Track) => void;
   clearQueue: () => void;
@@ -96,13 +98,13 @@ const mediaErrorCode = (a: HTMLAudioElement | null): string => {
 
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const { isPremium: isPremiumUser } = useEntitlement();
   useCrossDevicePlayback();
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.9);
@@ -472,10 +474,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   const setPlaybackRate = useCallback((rate: number) => setPlaybackRateState(rate), []);
   const togglePremium = useCallback(() => {
-    setIsPremiumUser((p) => {
-      const nxt = !p;
-      toast.success(nxt ? "Premium unlocked ✨" : "Switched to Free");
-      return nxt;
+    // Client-side premium toggling is gone. Entitlements are granted server-side
+    // by an admin (or, later, by a payment webhook). Keep the function so old
+    // call sites don't crash while we migrate the UI.
+    toast("Premium is now billing-based", {
+      description: "Ask an admin for access, or wait for the upgrade flow.",
     });
   }, []);
   const addToQueue = useCallback((track: Track) => {

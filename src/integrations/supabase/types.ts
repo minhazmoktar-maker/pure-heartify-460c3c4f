@@ -660,6 +660,7 @@ export type Database = {
           is_featured: boolean
           is_hidden: boolean
           is_pinned: boolean
+          is_premium_only: boolean
           is_trusted_channel: boolean
           last_decision_id: string | null
           moderation_confidence: number | null
@@ -692,6 +693,7 @@ export type Database = {
           is_featured?: boolean
           is_hidden?: boolean
           is_pinned?: boolean
+          is_premium_only?: boolean
           is_trusted_channel?: boolean
           last_decision_id?: string | null
           moderation_confidence?: number | null
@@ -724,6 +726,7 @@ export type Database = {
           is_featured?: boolean
           is_hidden?: boolean
           is_pinned?: boolean
+          is_premium_only?: boolean
           is_trusted_channel?: boolean
           last_decision_id?: string | null
           moderation_confidence?: number | null
@@ -2218,6 +2221,31 @@ export type Database = {
           video_id: string
         }[]
       }
+      grant_entitlement: {
+        Args: {
+          _expires_at?: string
+          _features?: Json
+          _plan?: string
+          _reason?: string
+          _user_id: string
+        }
+        Returns: {
+          created_at: string
+          expires_at: string | null
+          features: Json
+          id: string
+          plan: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "entitlements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      has_active_premium: { Args: { _user_id: string }; Returns: boolean }
       has_min_role: {
         Args: { _min_tier: string; _user_id: string }
         Returns: boolean
@@ -2250,6 +2278,10 @@ export type Database = {
       recompute_channel_trust: {
         Args: { _channel_id: string }
         Returns: number
+      }
+      revoke_entitlement: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: boolean
       }
       search_autocomplete: {
         Args: { _limit?: number; _prefix: string }

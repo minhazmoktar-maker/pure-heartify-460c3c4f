@@ -13,6 +13,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { getSearchProvider } from "../_shared/search/providers.ts";
 import { detectIntent } from "../_shared/search/intent.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { hasActivePremium } from "../_shared/entitlements.ts";
 
 const NORMALIZE = (s: string) =>
   s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
@@ -78,7 +79,23 @@ Deno.serve(async (req) => {
       intent,
     });
 
-    // Trending + related run in parallel, tolerate failures.
+    // Server-side premium gate for search results.
+    const viewerIsPremium = await hasActivePremium(userId);
+    let filteredHits = hits;
+    if (!viewerIsPremium && hits.length > 0) {
+      const ids = hits.map((h: Record<string, unknown>) => h.video_id ?? h.id).filter(Boolean);
+      if (ids.length > 0) {
+        const { data: premiumRows } = await admin
+          .from("curated_videos")
+          .select("video_id")
+          .in("video_id", ids as string[])
+          .eq("is_premium_only", true);
+        const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
+        filteredHits = hits.filter((h: Record<string, unknown>) =>
+          !premiumSet.has((h.video_id ?? h.id) as string),
+        );
+      }
+    }
     const [{ data: trending }, { data: related }] = await Promise.all([
       admin.rpc("get_trending_searches", { _limit: 10, _window_hours: 168 }),
       q ? admin.rpc("get_related_searches", { _query: q, _limit: 6 }) : Promise.resolve({ data: [] }),
@@ -92,7 +109,7 @@ Deno.serve(async (req) => {
           user_id: userId,
           query: q,
           normalized_query: NORMALIZE(q),
-          result_count: hits.length,
+          result_count: filteredHits.length,
           intent: intent ?? null,
         })
         .then(() => {})
@@ -100,11 +117,12 @@ Deno.serve(async (req) => {
     }
 
     return json({
-      hits,
+      hits: filteredHits,
       intent,
       trending: trending ?? [],
       related: related ?? [],
       provider: provider.name,
+      viewer: { isPremium: viewerIsPremium },
     });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
