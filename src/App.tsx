@@ -30,6 +30,7 @@ const Audit = lazy(() => import("./pages/Audit.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
+const ChannelTrust = lazy(() => import("./pages/ChannelTrust.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
                 <Route path="/admin/console" element={<AdminConsole />} />
                 <Route path="/admin/review" element={<AdminReview />} />
                 <Route path="/owner" element={<OwnerDashboard />} />
+                <Route path="/admin/channel-trust" element={<ChannelTrust />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
