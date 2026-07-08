@@ -50,6 +50,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
+    growth.signedUp("google");
     const result = await lovable.auth.signInWithOAuth("google", {
       redirect_uri: window.location.origin,
     });
