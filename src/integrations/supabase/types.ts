@@ -1280,8 +1280,63 @@ export type Database = {
           },
         ]
       }
+      reciter_audio_sources: {
+        Row: {
+          attribution: string | null
+          base_url: string
+          created_at: string
+          id: string
+          is_active: boolean
+          license: string | null
+          metadata: Json
+          quality: string | null
+          reciter_id: string
+          riwayah: string | null
+          source_name: string
+          updated_at: string
+        }
+        Insert: {
+          attribution?: string | null
+          base_url: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          license?: string | null
+          metadata?: Json
+          quality?: string | null
+          reciter_id: string
+          riwayah?: string | null
+          source_name: string
+          updated_at?: string
+        }
+        Update: {
+          attribution?: string | null
+          base_url?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          license?: string | null
+          metadata?: Json
+          quality?: string | null
+          reciter_id?: string
+          riwayah?: string | null
+          source_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reciter_audio_sources_reciter_id_fkey"
+            columns: ["reciter_id"]
+            isOneToOne: false
+            referencedRelation: "reciters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reciters: {
         Row: {
+          active_years: string | null
+          biography: string | null
           canonical_name_ar: string | null
           canonical_name_en: string
           category: string
@@ -1290,14 +1345,20 @@ export type Database = {
           era: string | null
           gender: string
           id: string
+          image_url: string | null
           is_living: boolean | null
           is_verified: boolean
           notes: string | null
+          popularity_score: number
           primary_riwayah: string | null
+          search_tsv: unknown
+          social_links: Json
           updated_at: string
           voice_style: string | null
         }
         Insert: {
+          active_years?: string | null
+          biography?: string | null
           canonical_name_ar?: string | null
           canonical_name_en: string
           category?: string
@@ -1306,14 +1367,20 @@ export type Database = {
           era?: string | null
           gender?: string
           id?: string
+          image_url?: string | null
           is_living?: boolean | null
           is_verified?: boolean
           notes?: string | null
+          popularity_score?: number
           primary_riwayah?: string | null
+          search_tsv?: unknown
+          social_links?: Json
           updated_at?: string
           voice_style?: string | null
         }
         Update: {
+          active_years?: string | null
+          biography?: string | null
           canonical_name_ar?: string | null
           canonical_name_en?: string
           category?: string
@@ -1322,10 +1389,14 @@ export type Database = {
           era?: string | null
           gender?: string
           id?: string
+          image_url?: string | null
           is_living?: boolean | null
           is_verified?: boolean
           notes?: string | null
+          popularity_score?: number
           primary_riwayah?: string | null
+          search_tsv?: unknown
+          social_links?: Json
           updated_at?: string
           voice_style?: string | null
         }
@@ -2017,6 +2088,21 @@ export type Database = {
         Returns: {
           kind: string
           suggestion: string
+        }[]
+      }
+      search_reciters: {
+        Args: { _limit?: number; _query: string }
+        Returns: {
+          canonical_name_ar: string
+          canonical_name_en: string
+          country: string
+          id: string
+          image_url: string
+          is_living: boolean
+          match_type: string
+          popularity_score: number
+          primary_riwayah: string
+          rank: number
         }[]
       }
       search_videos: {
