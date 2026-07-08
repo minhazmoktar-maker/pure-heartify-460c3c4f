@@ -77,6 +77,13 @@ Deno.serve(async (req) => {
       url += `&title=not.ilike.*${encodeURIComponent(p)}*`;
     }
 
+    // Server-side premium gate — hide premium-only videos from non-premium.
+    if (!isPremium) {
+      url += `&is_premium_only=eq.false`;
+    }
+
+
+
 
     const res = await fetch(url, {
       headers: {
