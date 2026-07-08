@@ -583,6 +583,75 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_owners: {
+        Row: {
+          created_at: string
+          email: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      privileged_actions_log: {
+        Row: {
+          action: string
+          actor_role: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          new_state: Json | null
+          previous_state: Json | null
+          session_id: string | null
+          target_id: string | null
+          target_type: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_role: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_state?: Json | null
+          previous_state?: Json | null
+          session_id?: string | null
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_role?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_state?: Json | null
+          previous_state?: Json | null
+          session_id?: string | null
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -888,6 +957,10 @@ export type Database = {
         }[]
       }
       compute_owner_key: { Args: { _name: string }; Returns: string }
+      has_min_role: {
+        Args: { _min_tier: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -895,6 +968,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_owner: { Args: { _user_id: string }; Returns: boolean }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
