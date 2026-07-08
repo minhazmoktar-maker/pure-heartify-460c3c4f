@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { linkAttributionToUser } from "@/lib/attribution";
 
 const STORAGE_KEY = "heartify-pending-ref";
 const DONE_KEY = "heartify-ref-redeemed";
 
 /**
  * Captures ?ref=CODE from the URL into localStorage and, once the user signs in,
- * calls the redeem-referral edge function exactly once.
+ * (a) calls the redeem-referral edge function exactly once, and
+ * (b) links the session's first-touch attribution row to the user id.
+ *
+ * UTM capture happens at boot via `captureAttributionOnce` in main.tsx —
+ * this component only handles the referral-redemption side effect.
  */
 const ReferralBridge = () => {
   const { user } = useAuth();
@@ -25,9 +30,11 @@ const ReferralBridge = () => {
     }
   }, []);
 
-  // Redeem when authenticated
+  // Redeem + link attribution when authenticated
   useEffect(() => {
     if (!user) return;
+    void linkAttributionToUser(user.id);
+
     if (localStorage.getItem(DONE_KEY)) return;
     const code = localStorage.getItem(STORAGE_KEY);
     if (!code) return;
