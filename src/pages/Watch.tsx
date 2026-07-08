@@ -248,7 +248,15 @@ const Watch = () => {
                     <Heart className={`h-3.5 w-3.5 ${liked ? "fill-red-500 text-red-500" : ""}`} />
                     {liked ? "Bookmarked" : "Bookmark"}
                   </button>
+                  {videoId && (
+                    <ReportButton
+                      videoId={videoId}
+                      videoTitle={currentVideo.title}
+                      channelTitle={currentVideo.channelTitle}
+                    />
+                  )}
                   {videoId && <AdminVideoRemoveButton videoId={videoId} title={currentVideo.title} />}
+
                 </>
               )}
             </div>
