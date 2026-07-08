@@ -1,0 +1,23 @@
+{
+  "app.name": "Heartify",
+  "nav.home": "Startseite",
+  "nav.browse": "Entdecken",
+  "nav.listen": "Anhören",
+  "nav.profile": "Profil",
+  "nav.search": "Suche",
+  "common.save": "Speichern",
+  "common.cancel": "Abbrechen",
+  "common.loading": "Wird geladen…",
+  "common.error": "Etwas ist schiefgelaufen",
+  "language.title": "Sprache & Region",
+  "language.ui": "App-Sprache",
+  "language.content": "Inhaltssprachen",
+  "language.country": "Land oder Region",
+  "language.auto": "Automatisch nach Region personalisieren",
+  "language.autoHint": "Empfiehlt Inhalte anhand deiner Sprache und deines Landes. Du kannst alles ändern.",
+  "language.diversity": "Inhaltsvielfalt",
+  "language.diversityHint": "Höhere Werte zeigen mehr Inhalte außerhalb deiner Hauptsprache.",
+  "language.detected": "Erkannt: {value}",
+  "language.saved": "Einstellungen gespeichert",
+  "language.rtl": "Rechts-nach-links-Layout"
+}
