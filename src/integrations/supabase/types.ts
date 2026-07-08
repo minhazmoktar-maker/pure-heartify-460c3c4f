@@ -1221,6 +1221,30 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_counters: {
+        Row: {
+          action: string
+          bucket_at: string
+          count: number
+          identity: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          bucket_at: string
+          count?: number
+          identity: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          bucket_at?: string
+          count?: number
+          identity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       recommendation_events: {
         Row: {
           created_at: string
@@ -1825,6 +1849,14 @@ export type Database = {
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
+      rate_limit_cleanup: {
+        Args: { _older_than_minutes?: number }
+        Returns: number
+      }
+      rate_limit_increment: {
+        Args: { _action: string; _bucket: string; _identity: string }
+        Returns: number
+      }
       recompute_all_channel_trust: {
         Args: { _limit?: number }
         Returns: number
