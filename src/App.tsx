@@ -74,6 +74,7 @@ const App = () => (
                 <Route path="/owner" element={<OwnerDashboard />} />
                 <Route path="/admin/channel-trust" element={<ChannelTrust />} />
                 <Route path="/admin/analytics" element={<Analytics />} />
+                <Route path="/admin/audio-integrity" element={<AudioIntegrity />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
