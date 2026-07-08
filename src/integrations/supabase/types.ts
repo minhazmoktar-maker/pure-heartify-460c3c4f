@@ -1582,6 +1582,44 @@ export type Database = {
         }
         Relationships: []
       }
+      report_moderation_actions: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          metadata: Json
+          moderator_id: string
+          notes: string | null
+          report_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          moderator_id: string
+          notes?: string | null
+          report_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          moderator_id?: string
+          notes?: string | null
+          report_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_moderation_actions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "video_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       retention_policies: {
         Row: {
           retention_days: number
@@ -1917,6 +1955,75 @@ export type Database = {
         }
         Relationships: []
       }
+      video_reports: {
+        Row: {
+          channel_id: string | null
+          channel_title: string | null
+          created_at: string
+          details: string | null
+          id: string
+          moderator_id: string | null
+          moderator_notes: string | null
+          notify_reporter: boolean
+          platform: string | null
+          reason: string
+          reporter_notified_at: string | null
+          resolution: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string | null
+          video_id: string | null
+          video_title: string | null
+        }
+        Insert: {
+          channel_id?: string | null
+          channel_title?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          moderator_id?: string | null
+          moderator_notes?: string | null
+          notify_reporter?: boolean
+          platform?: string | null
+          reason: string
+          reporter_notified_at?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+          video_id?: string | null
+          video_title?: string | null
+        }
+        Update: {
+          channel_id?: string | null
+          channel_title?: string | null
+          created_at?: string
+          details?: string | null
+          id?: string
+          moderator_id?: string | null
+          moderator_notes?: string | null
+          notify_reporter?: boolean
+          platform?: string | null
+          reason?: string
+          reporter_notified_at?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string | null
+          video_id?: string | null
+          video_title?: string | null
+        }
+        Relationships: []
+      }
       watch_history: {
         Row: {
           completed: boolean
@@ -2132,6 +2239,10 @@ export type Database = {
         Args: { _action: string; _bucket: string; _identity: string }
         Returns: number
       }
+      recent_video_report_count: {
+        Args: { _user_id: string; _window_minutes?: number }
+        Returns: number
+      }
       recompute_all_channel_trust: {
         Args: { _limit?: number }
         Returns: number
@@ -2203,6 +2314,13 @@ export type Database = {
           _voice_style?: string
         }
         Returns: string
+      }
+      video_report_queue_summary: {
+        Args: never
+        Returns: {
+          status: string
+          total: number
+        }[]
       }
     }
     Enums: {

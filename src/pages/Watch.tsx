@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
+import { ReportButton } from "@/components/ReportButton";
+
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -246,7 +248,15 @@ const Watch = () => {
                     <Heart className={`h-3.5 w-3.5 ${liked ? "fill-red-500 text-red-500" : ""}`} />
                     {liked ? "Bookmarked" : "Bookmark"}
                   </button>
+                  {videoId && (
+                    <ReportButton
+                      videoId={videoId}
+                      videoTitle={currentVideo.title}
+                      channelTitle={currentVideo.channelTitle}
+                    />
+                  )}
                   {videoId && <AdminVideoRemoveButton videoId={videoId} title={currentVideo.title} />}
+
                 </>
               )}
             </div>

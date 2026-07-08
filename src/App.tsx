@@ -33,6 +33,8 @@ const ModerationLog = lazy(() => import("./pages/ModerationLog.tsx"));
 const Audit = lazy(() => import("./pages/Audit.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
+const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
+
 const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
 const ChannelTrust = lazy(() => import("./pages/ChannelTrust.tsx"));
 const Analytics = lazy(() => import("./pages/Analytics.tsx"));
@@ -80,6 +82,8 @@ const App = () => (
                 <Route path="/admin/audit" element={<AdminRoute><Audit /></AdminRoute>} />
                 <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />
                 <Route path="/admin/review" element={<AdminRoute><AdminReview /></AdminRoute>} />
+                <Route path="/admin/reports" element={<AdminRoute><AdminReports /></AdminRoute>} />
+
                 <Route path="/owner" element={<AdminRoute><OwnerDashboard /></AdminRoute>} />
                 <Route path="/admin/channel-trust" element={<AdminRoute><ChannelTrust /></AdminRoute>} />
                 <Route path="/admin/analytics" element={<AdminRoute><Analytics /></AdminRoute>} />
