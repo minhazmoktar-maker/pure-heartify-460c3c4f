@@ -887,6 +887,48 @@ export type Database = {
         }
         Relationships: []
       }
+      recommendation_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          provider: string | null
+          reasons: Json | null
+          score: number | null
+          session_id: string | null
+          signals: Json | null
+          surface: string | null
+          user_id: string | null
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          provider?: string | null
+          reasons?: Json | null
+          score?: number | null
+          session_id?: string | null
+          signals?: Json | null
+          surface?: string | null
+          user_id?: string | null
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          provider?: string | null
+          reasons?: Json | null
+          score?: number | null
+          session_id?: string | null
+          signals?: Json | null
+          surface?: string | null
+          user_id?: string | null
+          video_id?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           code: string
@@ -1232,6 +1274,13 @@ export type Database = {
         Returns: {
           hits: number
           query: string
+        }[]
+      }
+      get_trending_video_ids: {
+        Args: { _limit?: number; _window_hours?: number }
+        Returns: {
+          hits: number
+          video_id: string
         }[]
       }
       has_min_role: {
