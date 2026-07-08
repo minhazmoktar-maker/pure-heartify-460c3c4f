@@ -1,0 +1,40 @@
+name: retention-purge staging e2e
+
+# End-to-end test: seeds throwaway rows into analytics_events / search_queries /
+# recommendation_events on STAGING with created_at older than the retention
+# window, runs the purge for real (not dry), then asserts:
+#   - the seeded rows are gone
+#   - retention_purge_runs has a new status='ok' row with matching counts
+#
+# Requires GitHub Actions secrets:
+#   STAGING_SUPABASE_URL
+#   STAGING_SUPABASE_SERVICE_ROLE_KEY
+#   AUDIT_CRON_TOKEN
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 5 * * 1"   # weekly Monday 05:00 UTC — cheap safety net
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - name: Run staging e2e
+        env:
+          STAGING_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          STAGING_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.STAGING_SUPABASE_SERVICE_ROLE_KEY }}
+          AUDIT_CRON_TOKEN: ${{ secrets.AUDIT_CRON_TOKEN }}
+        run: |
+          if [ -z "${STAGING_SUPABASE_URL:-}" ] || \
+             [ -z "${STAGING_SUPABASE_SERVICE_ROLE_KEY:-}" ] || \
+             [ -z "${AUDIT_CRON_TOKEN:-}" ]; then
+            echo "Missing one or more required staging secrets — skipping." >&2
+            exit 78   # neutral (skipped)
+          fi
+          deno test --allow-net --allow-env \
+            supabase/functions/retention-purge/staging_e2e_test.ts

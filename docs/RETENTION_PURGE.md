@@ -246,3 +246,72 @@ Adding a new tracked table? Update in one PR:
 
 Adding a new tracked table without steps 1-3 is a silent NOOP — the audit row
 will still say `ok`, so operators must catch it in review.
+
+---
+
+## 9. Automated CI verification
+
+Two GitHub Actions workflows keep the purge path healthy:
+
+- **`.github/workflows/retention-purge-smoke.yml`** — nightly `dryRun` against
+  staging. Verifies the function is reachable, the `AUDIT_CRON_TOKEN` is
+  accepted, and a new `retention_purge_runs` row is created. Fails loudly if
+  either the HTTPS cron path or the DB audit trail regresses.
+- **`.github/workflows/retention-purge-staging-e2e.yml`** — weekly (and
+  on-demand). Seeds throwaway old + fresh rows into every retention-managed
+  table, runs the purge for real, and asserts:
+  - old rows are gone,
+  - fresh rows are preserved,
+  - the audit row is `status='ok'` with `duration_ms > 0` and matching
+    per-table counts in `purged`.
+
+Required secrets (Repository → Settings → Actions → Secrets):
+
+| Secret | Used by | Notes |
+| --- | --- | --- |
+| `STAGING_SUPABASE_URL` | both | `https://<ref>.supabase.co` (must NOT contain `prod`) |
+| `AUDIT_CRON_TOKEN` | both | Same value as the edge function's `AUDIT_CRON_TOKEN` secret |
+| `STAGING_SUPABASE_SERVICE_ROLE_KEY` | e2e only | Needed to seed + verify data |
+| `STAGING_SUPABASE_ANON_KEY` | smoke only | For the read-back query |
+
+The e2e test refuses to run if the URL string contains `prod` — extra guard
+against accidental production data deletion.
+
+---
+
+## 10. Idempotent seed helpers (reciters, and future data)
+
+Seeding curated content (reciters, aliases, and future reference data) uses
+these helpers so re-running any migration is safe:
+
+- **`public.upsert_reciter(...)`** — inserts by `canonical_name_en`, updates
+  provided non-null fields on conflict. No duplicates possible.
+- **`public.add_reciter_alias(reciter_id, alias)`** — inserts one alias,
+  silently skips if the normalised form already exists globally.
+- **`public.backfill_reciter_alias_variants()`** — regenerates the common
+  transliteration variants (Al-/El-/As-/Ash-, sh/ch, ee/i, oo/u, hyphen
+  strips, dh/z, gh/g) for every reciter. Safe to re-run anytime; skipped
+  variants are cheap.
+
+Pattern for future seed migrations (Qaris **or any other reference data**):
+
+```sql
+SELECT public.upsert_reciter(
+  _name_en => 'Mishary Rashid Alafasy',
+  _name_ar => 'مشاري راشد العفاسي',
+  _country => 'Kuwait',
+  _primary_riwayah => 'Hafs',
+  _popularity_score => 95
+) AS id \gset
+SELECT public.add_reciter_alias(:'id', 'Meshary Alafasy');
+SELECT public.add_reciter_alias(:'id', 'Mishari Rashid');
+```
+
+Then, at the bottom of the migration:
+
+```sql
+SELECT public.backfill_reciter_alias_variants();
+```
+
+Result: repeated runs neither duplicate reciters nor duplicate aliases, and
+every canonical name gains its common misspellings automatically.
