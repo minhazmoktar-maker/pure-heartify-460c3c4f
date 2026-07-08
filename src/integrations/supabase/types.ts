@@ -601,6 +601,7 @@ export type Database = {
         Row: {
           category: string
           channel_title: string
+          content_language: string | null
           halal_score: number
           id: string
           ingested_at: string
@@ -632,6 +633,7 @@ export type Database = {
         Insert: {
           category?: string
           channel_title: string
+          content_language?: string | null
           halal_score?: number
           id?: string
           ingested_at?: string
@@ -663,6 +665,7 @@ export type Database = {
         Update: {
           category?: string
           channel_title?: string
+          content_language?: string | null
           halal_score?: number
           id?: string
           ingested_at?: string
@@ -1290,6 +1293,39 @@ export type Database = {
         }
         Relationships: []
       }
+      regional_language_mix: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          default_ui_language: string
+          id: string
+          is_active: boolean
+          language_mix: Json
+          updated_at: string
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          default_ui_language?: string
+          id?: string
+          is_active?: boolean
+          language_mix: Json
+          updated_at?: string
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          default_ui_language?: string
+          id?: string
+          is_active?: boolean
+          language_mix?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       removed_videos: {
         Row: {
           created_at: string
@@ -1426,6 +1462,54 @@ export type Database = {
           exploration_interest?: string | null
           primary_interest?: string
           secondary_interest?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_locale_preferences: {
+        Row: {
+          auto_personalize: boolean
+          content_languages: string[]
+          country_code: string | null
+          created_at: string
+          detected_country: string | null
+          detected_language: string | null
+          diversity_level: number
+          id: string
+          region: string | null
+          rtl_override: boolean | null
+          ui_language: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_personalize?: boolean
+          content_languages?: string[]
+          country_code?: string | null
+          created_at?: string
+          detected_country?: string | null
+          detected_language?: string | null
+          diversity_level?: number
+          id?: string
+          region?: string | null
+          rtl_override?: boolean | null
+          ui_language?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_personalize?: boolean
+          content_languages?: string[]
+          country_code?: string | null
+          created_at?: string
+          detected_country?: string | null
+          detected_language?: string | null
+          diversity_level?: number
+          id?: string
+          region?: string | null
+          rtl_override?: boolean | null
+          ui_language?: string
           updated_at?: string
           user_id?: string
         }
