@@ -46,6 +46,7 @@ const RouteFallback = () => (
 );
 
 const App = () => (
+  <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ThemeProvider>
