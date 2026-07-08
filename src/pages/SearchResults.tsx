@@ -35,8 +35,8 @@ const SearchResults = () => {
     else growth.searchIssued(query, n);
   }, [query, smart.isLoading, smart.results.length]);
 
-  const activeQuery = query || liveInput;
-  const smart = useSmartSearch(activeQuery);
+
+
 
   const smartVideos: YouTubeVideo[] = useMemo(
     () =>
