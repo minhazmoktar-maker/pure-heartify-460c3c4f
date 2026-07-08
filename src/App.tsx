@@ -36,6 +36,8 @@ const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
 const ChannelTrust = lazy(() => import("./pages/ChannelTrust.tsx"));
 const Analytics = lazy(() => import("./pages/Analytics.tsx"));
 const AudioIntegrity = lazy(() => import("./pages/AudioIntegrity.tsx"));
+const MfaEnroll = lazy(() => import("./pages/MfaEnroll.tsx"));
+const MfaVerify = lazy(() => import("./pages/MfaVerify.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -81,6 +83,8 @@ const App = () => (
                 <Route path="/admin/channel-trust" element={<ChannelTrust />} />
                 <Route path="/admin/analytics" element={<Analytics />} />
                 <Route path="/admin/audio-integrity" element={<AudioIntegrity />} />
+                <Route path="/security/mfa" element={<MfaEnroll />} />
+                <Route path="/security/mfa/verify" element={<MfaVerify />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
