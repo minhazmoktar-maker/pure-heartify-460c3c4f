@@ -17,7 +17,37 @@ import { authorize, CORS_HEADERS } from "../_shared/authz.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const GSC_KEY = Deno.env.get("GOOGLE_SEARCH_CONSOLE_API_KEY")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
+
+async function svc(path: string, init: RequestInit = {}) {
+  return fetch(`${SUPABASE_URL}${path}`, {
+    ...init,
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      "Content-Type": "application/json",
+      ...(init.headers || {}),
+    },
+  });
+}
+
+async function getConfig(key: string): Promise<string | null> {
+  const r = await svc(`/rest/v1/rpc/get_internal_config`, { method: "POST", body: JSON.stringify({ _key: key }) });
+  if (!r.ok) return null;
+  const v = await r.json();
+  return typeof v === "string" ? v : (v?.value ?? null);
+}
+
+async function setConfig(key: string, value: string): Promise<boolean> {
+  const r = await svc(`/rest/v1/_internal_config?on_conflict=key`, {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ key, value, updated_at: new Date().toISOString() }),
+  });
+  return r.ok;
+}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
