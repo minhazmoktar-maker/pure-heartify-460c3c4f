@@ -5,6 +5,7 @@ import { lovable } from "@/integrations/lovable";
 import { Mail, Lock, Eye, EyeOff, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
 import { growth } from "@/lib/growthEvents";
+import SEO from "@/components/SEO";
 
 const Signup = () => {
   const navigate = useNavigate();
