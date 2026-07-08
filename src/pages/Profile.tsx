@@ -230,6 +230,62 @@ const Profile = () => {
             <div className="pt-4">
               <ReferralCard />
             </div>
+
+            {/* Danger zone — required by Apple App Store guideline 5.1.1(v). */}
+            <div className="mt-8 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-foreground">Delete account</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Permanently removes your profile, favorites, watch history, playback progress,
+                    device tokens, and search history. This cannot be undone.
+                  </p>
+                  <AlertDialog onOpenChange={(open) => !open && setDeleteConfirm("")}>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm" className="mt-3">
+                        Delete my account
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete your Heartify account and all associated
+                          personal data. Aggregated, anonymised analytics may be retained per our
+                          privacy policy. This action cannot be reversed.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-foreground">
+                          Type <span className="font-mono">DELETE</span> to confirm
+                        </label>
+                        <Input
+                          value={deleteConfirm}
+                          onChange={(e) => setDeleteConfirm(e.target.value)}
+                          placeholder="DELETE"
+                          autoComplete="off"
+                        />
+                      </div>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          disabled={deleteConfirm !== "DELETE" || deleting}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDeleteAccount();
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                          Permanently delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
