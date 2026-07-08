@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import {
   Loader2, Search, CheckCircle2, XCircle, RefreshCw, ExternalLink,
-  AlertTriangle, Radio,
+  AlertTriangle, Radio, Clock, Play, Plus, Minus,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -54,6 +55,19 @@ type SnapshotRow = {
   error: string | null;
   created_at: string;
 };
+type SyncStatus = {
+  enabled: boolean;
+  cronSecretPresent: boolean;
+  latest: Record<string, { ok: boolean; error: string | null; created_at: string; data?: Record<string, unknown> }>;
+};
+type SitemapDiff = {
+  ok: boolean;
+  reason?: string;
+  current?: { at: string; count: number; ok: boolean; error: string | null };
+  previous?: { at: string; count: number; ok: boolean; error: string | null } | null;
+  added?: string[];
+  removed?: string[];
+};
 
 async function call<T>(action: string, params: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.functions.invoke("gsc", { body: { action, ...params } });
@@ -74,13 +88,50 @@ export default function AdminGsc() {
   const [inspectUrl, setInspectUrl] = useState(DEFAULT_SITE);
   const [inspectResult, setInspectResult] = useState<unknown>(null);
 
-  // Latest scheduled-sync snapshot per kind (status/sitemaps/performance)
+  // Latest scheduled-sync snapshot per kind (status/sitemaps/performance/sitemap_urls)
   const [snapshots, setSnapshots] = useState<Record<string, SnapshotRow>>({});
   const [alerts, setAlerts] = useState<Array<{ id: string; level: "error" | "warn" | "info"; text: string; at: string }>>([]);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
+  const [sitemapDiff, setSitemapDiff] = useState<SitemapDiff | null>(null);
 
   const pushAlert = useCallback((level: "error" | "warn" | "info", text: string) => {
     setAlerts(prev => [{ id: crypto.randomUUID(), level, text, at: new Date().toISOString() }, ...prev].slice(0, 20));
   }, []);
+
+  const refreshSyncStatus = useCallback(async () => {
+    try { setSyncStatus(await call<SyncStatus>("sync_status")); }
+    catch (e) { pushAlert("error", `sync_status: ${(e as Error).message}`); }
+  }, [pushAlert]);
+
+  const refreshSitemapDiff = useCallback(async () => {
+    try { setSitemapDiff(await call<SitemapDiff>("sitemap_diff")); }
+    catch (e) { pushAlert("error", `sitemap_diff: ${(e as Error).message}`); }
+  }, [pushAlert]);
+
+  const toggleSync = async (enabled: boolean) => {
+    setBusy("toggle");
+    try {
+      await call("sync_toggle", { enabled });
+      pushAlert("info", `Hourly sync ${enabled ? "enabled" : "disabled"}`);
+      await refreshSyncStatus();
+    } catch (e) { pushAlert("error", `toggle: ${(e as Error).message}`); }
+    finally { setBusy(null); }
+  };
+
+  const runSyncNow = async () => {
+    setBusy("run");
+    try {
+      const r = await call<{ ok: boolean; status: number; data: unknown }>("sync_run");
+      if (!r.ok) throw new Error(`HTTP ${r.status}: ${JSON.stringify(r.data)}`);
+      pushAlert("info", "Manual sync completed");
+      toast({ title: "Sync complete", description: "Snapshots refreshed" });
+      await Promise.all([refreshSyncStatus(), refreshSitemapDiff()]);
+    } catch (e) {
+      pushAlert("error", `run: ${(e as Error).message}`);
+      toast({ title: "Sync failed", description: (e as Error).message, variant: "destructive" });
+    } finally { setBusy(null); }
+  };
+
 
   const refreshStatus = useCallback(async () => {
     setBusy("status");
@@ -168,7 +219,7 @@ export default function AdminGsc() {
     return () => { mounted = false; supabase.removeChannel(ch); };
   }, [isOwner, pushAlert, refreshStatus]);
 
-  useEffect(() => { if (isOwner) refreshStatus(); }, [isOwner, refreshStatus]);
+  useEffect(() => { if (isOwner) { refreshStatus(); refreshSyncStatus(); refreshSitemapDiff(); } }, [isOwner, refreshStatus, refreshSyncStatus, refreshSitemapDiff]);
 
   const isVerified = !!status?.sites?.some(s => s.siteUrl === site);
   const lastSyncByKind = useMemo(() => ({
@@ -310,12 +361,72 @@ export default function AdminGsc() {
 
         <Tabs defaultValue="verify">
           <TabsList>
+            <TabsTrigger value="sync">Sync</TabsTrigger>
             <TabsTrigger value="verify">Verification</TabsTrigger>
             <TabsTrigger value="sitemap">Sitemap</TabsTrigger>
             <TabsTrigger value="perf">Performance</TabsTrigger>
             <TabsTrigger value="inspect">URL Inspector</TabsTrigger>
             <TabsTrigger value="alerts">Alerts ({alerts.length})</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="sync" className="mt-4 space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2"><Clock className="h-4 w-4 text-primary" />Hourly sync job</CardTitle>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground">Enabled</span>
+                    <Switch
+                      checked={syncStatus?.enabled ?? true}
+                      disabled={busy === "toggle" || !syncStatus}
+                      onCheckedChange={toggleSync}
+                    />
+                  </div>
+                  <Button size="sm" onClick={runSyncNow} disabled={!!busy}>
+                    {busy === "run" ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Play className="h-4 w-4 mr-1" />Run now</>}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={refreshSyncStatus} disabled={!!busy}><RefreshCw className="h-4 w-4" /></Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {!syncStatus && <p className="text-muted-foreground">Loading…</p>}
+                {syncStatus && (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {syncStatus.enabled
+                        ? <Badge className="gap-1"><CheckCircle2 className="h-3 w-3" />Job enabled</Badge>
+                        : <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" />Job disabled</Badge>}
+                      {syncStatus.cronSecretPresent
+                        ? <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" />Cron secret set</Badge>
+                        : <Badge variant="destructive">Cron secret missing</Badge>}
+                    </div>
+                    <div className="rounded border overflow-auto">
+                      <table className="w-full text-xs">
+                        <thead className="bg-muted/40 text-left">
+                          <tr><th className="px-2 py-1">Kind</th><th className="px-2 py-1">Status</th><th className="px-2 py-1">Last run</th><th className="px-2 py-1">Error</th></tr>
+                        </thead>
+                        <tbody>
+                          {["status","sitemaps","sitemap_urls","performance"].map(k => {
+                            const row = syncStatus.latest[k];
+                            return (
+                              <tr key={k} className="border-t">
+                                <td className="px-2 py-1 font-mono">{k}</td>
+                                <td className="px-2 py-1">{!row ? "—" : row.ok ? <Badge variant="secondary">ok</Badge> : <Badge variant="destructive">failed</Badge>}</td>
+                                <td className="px-2 py-1">{row ? new Date(row.created_at).toLocaleString() : "—"}</td>
+                                <td className="px-2 py-1 text-destructive">{row?.error ?? ""}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Cron runs every hour. Toggling off skips the job without deleting the schedule; toggling on resumes on the next tick. "Run now" forces an immediate sync regardless of the toggle.</p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
 
           <TabsContent value="verify" className="mt-4">
             <Card>
@@ -401,7 +512,51 @@ export default function AdminGsc() {
                 </CardContent>
               </Card>
             )}
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-base">Sitemap diff (last two snapshots)</CardTitle>
+                <Button size="sm" variant="outline" onClick={refreshSitemapDiff}><RefreshCw className="h-4 w-4" /></Button>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {!sitemapDiff && <p className="text-muted-foreground">Loading…</p>}
+                {sitemapDiff && !sitemapDiff.ok && <p className="text-muted-foreground">{sitemapDiff.reason ?? "Not enough snapshots yet — run the sync twice."}</p>}
+                {sitemapDiff?.ok && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="rounded border p-2">
+                        <div className="text-muted-foreground">Current</div>
+                        <div>{sitemapDiff.current && new Date(sitemapDiff.current.at).toLocaleString()}</div>
+                        <div className="font-mono">{sitemapDiff.current?.count ?? 0} URLs</div>
+                      </div>
+                      <div className="rounded border p-2">
+                        <div className="text-muted-foreground">Previous</div>
+                        <div>{sitemapDiff.previous ? new Date(sitemapDiff.previous.at).toLocaleString() : "—"}</div>
+                        <div className="font-mono">{sitemapDiff.previous?.count ?? 0} URLs</div>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div>
+                        <div className="text-xs font-medium mb-1 flex items-center gap-1"><Plus className="h-3 w-3 text-primary" />Added ({sitemapDiff.added?.length ?? 0})</div>
+                        <ul className="max-h-56 overflow-auto rounded border p-2 space-y-1">
+                          {(sitemapDiff.added ?? []).map(u => <li key={u} className="font-mono text-xs truncate text-primary">{u}</li>)}
+                          {(sitemapDiff.added?.length ?? 0) === 0 && <li className="text-xs text-muted-foreground">No additions.</li>}
+                        </ul>
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium mb-1 flex items-center gap-1"><Minus className="h-3 w-3 text-destructive" />Removed ({sitemapDiff.removed?.length ?? 0})</div>
+                        <ul className="max-h-56 overflow-auto rounded border p-2 space-y-1">
+                          {(sitemapDiff.removed ?? []).map(u => <li key={u} className="font-mono text-xs truncate text-destructive">{u}</li>)}
+                          {(sitemapDiff.removed?.length ?? 0) === 0 && <li className="text-xs text-muted-foreground">No removals.</li>}
+                        </ul>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
+
 
           <TabsContent value="perf" className="mt-4">
             <Card>

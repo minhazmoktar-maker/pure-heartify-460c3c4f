@@ -17,7 +17,37 @@ import { authorize, CORS_HEADERS } from "../_shared/authz.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const GSC_KEY = Deno.env.get("GOOGLE_SEARCH_CONSOLE_API_KEY")!;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
+
+async function svc(path: string, init: RequestInit = {}) {
+  return fetch(`${SUPABASE_URL}${path}`, {
+    ...init,
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      "Content-Type": "application/json",
+      ...(init.headers || {}),
+    },
+  });
+}
+
+async function getConfig(key: string): Promise<string | null> {
+  const r = await svc(`/rest/v1/rpc/get_internal_config`, { method: "POST", body: JSON.stringify({ _key: key }) });
+  if (!r.ok) return null;
+  const v = await r.json();
+  return typeof v === "string" ? v : (v?.value ?? null);
+}
+
+async function setConfig(key: string, value: string): Promise<boolean> {
+  const r = await svc(`/rest/v1/_internal_config?on_conflict=key`, {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ key, value, updated_at: new Date().toISOString() }),
+  });
+  return r.ok;
+}
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -184,6 +214,52 @@ Deno.serve(async (req) => {
           urls: urls.slice(0, 200),
           googleSitemaps,
           problems,
+        });
+      }
+      case "sync_status": {
+        const enabled = ((await getConfig("gsc_hourly_sync_enabled")) ?? "true").toLowerCase() !== "false";
+        // Latest snapshot per kind
+        const r = await svc(`/rest/v1/gsc_sync_snapshots?select=kind,ok,error,created_at,data&order=created_at.desc&limit=40`);
+        const rows = r.ok ? await r.json() as Array<Record<string, unknown>> : [];
+        const latest: Record<string, unknown> = {};
+        for (const row of rows) {
+          const k = String(row.kind);
+          if (!latest[k]) latest[k] = row;
+        }
+        return json({ enabled, latest, cronSecretPresent: !!(await getConfig("gsc_cron_secret")) });
+      }
+      case "sync_toggle": {
+        const enabled = body.enabled !== false;
+        const ok = await setConfig("gsc_hourly_sync_enabled", enabled ? "true" : "false");
+        return json({ ok, enabled });
+      }
+      case "sync_run": {
+        const secret = await getConfig("gsc_cron_secret");
+        if (!secret) return json({ ok: false, error: "cron secret not configured" }, 400);
+        const r = await fetch(`${SUPABASE_URL}/functions/v1/gsc-sync?force=1`, {
+          method: "POST",
+          headers: { "x-cron-secret": secret, "Content-Type": "application/json" },
+          body: "{}",
+        });
+        const text = await r.text();
+        let data: unknown = text;
+        try { data = JSON.parse(text); } catch { /* keep text */ }
+        return json({ ok: r.ok, status: r.status, data });
+      }
+      case "sitemap_diff": {
+        const r = await svc(`/rest/v1/gsc_sync_snapshots?select=id,ok,error,data,created_at&kind=eq.sitemap_urls&order=created_at.desc&limit=2`);
+        const rows = r.ok ? await r.json() as Array<{ data: { urls?: string[] }; created_at: string; ok: boolean; error: string | null }> : [];
+        if (rows.length === 0) return json({ ok: false, reason: "no snapshots yet" });
+        const [current, previous] = rows;
+        const cur = new Set(current.data?.urls ?? []);
+        const prev = new Set(previous?.data?.urls ?? []);
+        const added = [...cur].filter(u => !prev.has(u));
+        const removed = [...prev].filter(u => !cur.has(u));
+        return json({
+          ok: true,
+          current: { at: current.created_at, count: cur.size, ok: current.ok, error: current.error },
+          previous: previous ? { at: previous.created_at, count: prev.size, ok: previous.ok, error: previous.error } : null,
+          added, removed,
         });
       }
       default:
