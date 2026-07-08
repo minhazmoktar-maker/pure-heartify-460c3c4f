@@ -93,15 +93,28 @@ const Profile = () => {
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(async ({ data, error }) => {
+        if (error) {
+          toast({ title: "Could not load profile", description: error.message, variant: "destructive" });
+        }
         if (data) {
           setDisplayName(data.display_name ?? "");
           setBio(data.bio ?? "");
           setAvatarUrl(data.avatar_url ?? "");
+        } else if (!error) {
+          const fallbackName = user.user_metadata?.full_name ?? user.email ?? "";
+          const { error: createError } = await supabase
+            .from("profiles")
+            .upsert({ user_id: user.id, display_name: fallbackName }, { onConflict: "user_id" });
+          if (createError) {
+            toast({ title: "Profile not found", description: createError.message, variant: "destructive" });
+          } else {
+            setDisplayName(fallbackName);
+          }
         }
         setProfileLoaded(true);
       });
-  }, [user]);
+  }, [user, toast]);
 
   // Load history when tab changes
   useEffect(() => {
@@ -142,8 +155,7 @@ const Profile = () => {
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ display_name: displayName, bio, avatar_url: avatarUrl })
-      .eq("user_id", user.id);
+      .upsert({ user_id: user.id, display_name: displayName, bio, avatar_url: avatarUrl }, { onConflict: "user_id" });
     setSaving(false);
     if (error) {
       toast({ title: "Failed to save", variant: "destructive" });
