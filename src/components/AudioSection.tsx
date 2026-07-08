@@ -218,9 +218,6 @@ const AudioSection = () => {
         <div className="mb-6 flex items-center gap-2">
           <Crown className="h-5 w-5 text-gold" />
           <span className="text-sm font-semibold text-gold">Premium Active</span>
-          <button onClick={togglePremium} className="ml-2 text-xs text-muted-foreground underline">
-            Switch to Free
-          </button>
         </div>
       )}
 
