@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Search, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import SearchSuggestions from "@/components/SearchSuggestions";
@@ -9,6 +10,7 @@ import ReciterResults from "@/components/ReciterResults";
 import EmptyState from "@/components/EmptyState";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
+import { growth } from "@/lib/growthEvents";
 import type { YouTubeVideo } from "@/services/youtube";
 
 const SearchResults = () => {
