@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound.tsx";
 import { MobileBridge } from "./components/MobileBridge";
 import ReferralBridge from "./components/ReferralBridge";
 import ErrorBoundary from "./components/ErrorBoundary";
+import AdminRoute from "./components/AdminRoute";
 
 // Code-split everything else
 const Watch = lazy(() => import("./pages/Watch.tsx"));
@@ -75,14 +76,14 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/channels" element={<Channels />} />
-                <Route path="/admin/moderation" element={<ModerationLog />} />
-                <Route path="/admin/audit" element={<Audit />} />
-                <Route path="/admin/console" element={<AdminConsole />} />
-                <Route path="/admin/review" element={<AdminReview />} />
-                <Route path="/owner" element={<OwnerDashboard />} />
-                <Route path="/admin/channel-trust" element={<ChannelTrust />} />
-                <Route path="/admin/analytics" element={<Analytics />} />
-                <Route path="/admin/audio-integrity" element={<AudioIntegrity />} />
+                <Route path="/admin/moderation" element={<AdminRoute><ModerationLog /></AdminRoute>} />
+                <Route path="/admin/audit" element={<AdminRoute><Audit /></AdminRoute>} />
+                <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />
+                <Route path="/admin/review" element={<AdminRoute><AdminReview /></AdminRoute>} />
+                <Route path="/owner" element={<AdminRoute><OwnerDashboard /></AdminRoute>} />
+                <Route path="/admin/channel-trust" element={<AdminRoute><ChannelTrust /></AdminRoute>} />
+                <Route path="/admin/analytics" element={<AdminRoute><Analytics /></AdminRoute>} />
+                <Route path="/admin/audio-integrity" element={<AdminRoute><AudioIntegrity /></AdminRoute>} />
                 <Route path="/security/mfa" element={<MfaEnroll />} />
                 <Route path="/security/mfa/verify" element={<MfaVerify />} />
                 <Route path="*" element={<NotFound />} />
