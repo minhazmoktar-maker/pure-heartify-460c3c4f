@@ -34,6 +34,7 @@ interface PlayerState {
   isPlaying: boolean;
   isBuffering: boolean;
   isPremiumUser: boolean;
+  isPremiumLoading: boolean;
   progress: number;
   duration: number;
   volume: number;
