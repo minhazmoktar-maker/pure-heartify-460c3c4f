@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, Heart, Play } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
@@ -10,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useCompleteDoseVideo } from "@/hooks/useDailyDose";
+import { growth } from "@/lib/growthEvents";
+import { triggerIfDelightful } from "@/lib/inAppReview";
 import { toast } from "sonner";
 
 const Watch = () => {
