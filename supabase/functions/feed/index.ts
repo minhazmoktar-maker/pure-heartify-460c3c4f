@@ -117,9 +117,11 @@ Deno.serve(async (req) => {
         halalScore: v.halal_score,
         publishedAt: v.published_at ?? v.ingested_at,
         isTrustedChannel: v.is_trusted_channel,
+        isPremiumOnly: v.is_premium_only ?? false,
       })),
       nextCursor,
       total: totalCount || items.length,
+      viewer: { isPremium },
     });
   } catch (error) {
     console.error("Feed error:", error);
