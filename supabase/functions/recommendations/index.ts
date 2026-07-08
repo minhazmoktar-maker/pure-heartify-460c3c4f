@@ -95,6 +95,20 @@ Deno.serve(async (req) => {
       excludeWatched,
     });
 
+    // Server-side premium gate for recommendations.
+    const viewerIsPremium = await hasActivePremium(userId);
+    let filteredRecs = recommendations;
+    if (!viewerIsPremium && recommendations.length > 0) {
+      const ids = recommendations.map((r) => r.video.video_id).filter(Boolean);
+      const { data: premiumRows } = await admin
+        .from("curated_videos")
+        .select("video_id")
+        .in("video_id", ids)
+        .eq("is_premium_only", true);
+      const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
+      filteredRecs = recommendations.filter((r) => !premiumSet.has(r.video.video_id));
+    }
+
     // Fire-and-forget impression logging (batched insert).
     if (recommendations.length) {
       admin
