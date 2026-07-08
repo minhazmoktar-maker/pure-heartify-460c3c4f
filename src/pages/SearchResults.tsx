@@ -28,6 +28,16 @@ const SearchResults = () => {
   const activeQuery = query || liveInput;
   const smart = useSmartSearch(activeQuery);
 
+  useEffect(() => {
+    if (!query || smart.isLoading) return;
+    const n = smart.results.length;
+    if (n === 0) growth.searchNoResults(query);
+    else growth.searchIssued(query, n);
+  }, [query, smart.isLoading, smart.results.length]);
+
+  const activeQuery = query || liveInput;
+  const smart = useSmartSearch(activeQuery);
+
   const smartVideos: YouTubeVideo[] = useMemo(
     () =>
       smart.results.map((r) => ({
