@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import SearchSuggestions from "@/components/SearchSuggestions";
+import ReciterResults from "@/components/ReciterResults";
 import EmptyState from "@/components/EmptyState";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
@@ -80,6 +81,8 @@ const SearchResults = () => {
                 <span className="text-muted-foreground">?</span>
               </div>
             )}
+
+            <ReciterResults query={query} />
 
             {smartVideos.length > 0 ? (
               <>
