@@ -34,6 +34,7 @@ const Audit = lazy(() => import("./pages/Audit.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
+const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
 
 const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
 const ChannelTrust = lazy(() => import("./pages/ChannelTrust.tsx"));
