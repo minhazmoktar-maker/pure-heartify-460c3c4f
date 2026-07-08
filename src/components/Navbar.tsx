@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import NotificationsBell from "@/components/NotificationsBell";
+import SuggestContentDialog from "@/components/SuggestContentDialog";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
