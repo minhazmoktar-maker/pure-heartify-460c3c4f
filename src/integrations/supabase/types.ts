@@ -1456,6 +1456,107 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _analytics_assert_admin: { Args: never; Returns: undefined }
+      analytics_active_users: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          dau: number
+          day: string
+          mau: number
+          wau: number
+        }[]
+      }
+      analytics_ai_confidence_histogram: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          bucket: number
+          count: number
+        }[]
+      }
+      analytics_category_popularity: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          category: string
+          searches: number
+          watches: number
+        }[]
+      }
+      analytics_channel_growth: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_device_stats: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_dose_stats: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          completion_rate: number
+          completions: number
+          day: string
+          dose_users: number
+        }[]
+      }
+      analytics_engagement: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_favorites_stats: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          cumulative: number
+          day: string
+          new_favorites: number
+        }[]
+      }
+      analytics_geo_distribution: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          country: string
+          sessions: number
+          users: number
+        }[]
+      }
+      analytics_moderation_stats: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_performance: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_recommendation_stats: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_retention: {
+        Args: { _cohort_from: string; _weeks?: number }
+        Returns: {
+          cohort_size: number
+          cohort_week: string
+          retained: number
+          retention_pct: number
+          week_offset: number
+        }[]
+      }
+      analytics_search_stats: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      analytics_session_stats: {
+        Args: { _from: string; _to: string }
+        Returns: {
+          avg_seconds: number
+          day: string
+          median_seconds: number
+          sessions: number
+        }[]
+      }
+      analytics_watch_stats: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
         Returns: {
