@@ -130,6 +130,7 @@ const Navbar = () => {
           </button>
           {user ? (
             <>
+              <div className="hidden md:block"><SuggestContentDialog /></div>
               <NotificationsBell isAdmin={isAdmin} />
               <button
                 onClick={signOut}
