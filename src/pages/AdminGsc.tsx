@@ -512,7 +512,51 @@ export default function AdminGsc() {
                 </CardContent>
               </Card>
             )}
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-base">Sitemap diff (last two snapshots)</CardTitle>
+                <Button size="sm" variant="outline" onClick={refreshSitemapDiff}><RefreshCw className="h-4 w-4" /></Button>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {!sitemapDiff && <p className="text-muted-foreground">Loading…</p>}
+                {sitemapDiff && !sitemapDiff.ok && <p className="text-muted-foreground">{sitemapDiff.reason ?? "Not enough snapshots yet — run the sync twice."}</p>}
+                {sitemapDiff?.ok && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="rounded border p-2">
+                        <div className="text-muted-foreground">Current</div>
+                        <div>{sitemapDiff.current && new Date(sitemapDiff.current.at).toLocaleString()}</div>
+                        <div className="font-mono">{sitemapDiff.current?.count ?? 0} URLs</div>
+                      </div>
+                      <div className="rounded border p-2">
+                        <div className="text-muted-foreground">Previous</div>
+                        <div>{sitemapDiff.previous ? new Date(sitemapDiff.previous.at).toLocaleString() : "—"}</div>
+                        <div className="font-mono">{sitemapDiff.previous?.count ?? 0} URLs</div>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div>
+                        <div className="text-xs font-medium mb-1 flex items-center gap-1"><Plus className="h-3 w-3 text-primary" />Added ({sitemapDiff.added?.length ?? 0})</div>
+                        <ul className="max-h-56 overflow-auto rounded border p-2 space-y-1">
+                          {(sitemapDiff.added ?? []).map(u => <li key={u} className="font-mono text-xs truncate text-primary">{u}</li>)}
+                          {(sitemapDiff.added?.length ?? 0) === 0 && <li className="text-xs text-muted-foreground">No additions.</li>}
+                        </ul>
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium mb-1 flex items-center gap-1"><Minus className="h-3 w-3 text-destructive" />Removed ({sitemapDiff.removed?.length ?? 0})</div>
+                        <ul className="max-h-56 overflow-auto rounded border p-2 space-y-1">
+                          {(sitemapDiff.removed ?? []).map(u => <li key={u} className="font-mono text-xs truncate text-destructive">{u}</li>)}
+                          {(sitemapDiff.removed?.length ?? 0) === 0 && <li className="text-xs text-muted-foreground">No removals.</li>}
+                        </ul>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
+
 
           <TabsContent value="perf" className="mt-4">
             <Card>
