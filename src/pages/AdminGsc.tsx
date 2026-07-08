@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import {
   Loader2, Search, CheckCircle2, XCircle, RefreshCw, ExternalLink,
-  AlertTriangle, Radio,
+  AlertTriangle, Radio, Clock, Play, Plus, Minus,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
