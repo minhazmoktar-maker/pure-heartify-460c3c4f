@@ -12,7 +12,7 @@ const HeroSection = () => {
           width={1920}
           height={800}
           loading="eager"
-          fetchPriority="high"
+          {...({ fetchpriority: "high" } as { fetchpriority: string })}
           decoding="async"
           className="h-full w-full object-cover"
         />

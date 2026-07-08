@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import NotificationsBell from "@/components/NotificationsBell";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -128,9 +129,7 @@ const Navbar = () => {
           </button>
           {user ? (
             <>
-              <button className="rounded-full p-2 hover:bg-secondary transition-colors">
-                <Bell className="h-5 w-5 text-foreground" />
-              </button>
+              <NotificationsBell isAdmin={isAdmin} />
               <button
                 onClick={signOut}
                 className="rounded-full p-2 hover:bg-secondary transition-colors"
