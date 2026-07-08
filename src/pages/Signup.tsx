@@ -38,6 +38,7 @@ const Signup = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      growth.signedUp("email");
       toast.success("Check your email to verify your account!");
       navigate("/login");
     }
