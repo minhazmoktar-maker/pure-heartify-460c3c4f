@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
 import ReferralCard from "@/components/ReferralCard";
 import LanguageSettings from "@/components/LanguageSettings";
+import MfaStatusCard from "@/components/MfaStatusCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -242,6 +243,10 @@ const Profile = () => {
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Save Changes
             </Button>
+
+            <div className="pt-4">
+              <MfaStatusCard />
+            </div>
 
             <div className="pt-4">
               <LanguageSettings />
