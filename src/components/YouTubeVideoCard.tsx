@@ -69,6 +69,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         <div className="absolute left-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={handleBookmark}
+            aria-label={liked ? "Remove bookmark" : "Bookmark video"}
             className="rounded-full bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-background"
             title={liked ? "Remove bookmark" : "Bookmark"}
           >
