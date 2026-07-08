@@ -60,7 +60,11 @@ const AudioPlayer = () => {
                   {currentTrack.artist} · {currentTrack.language}
                 </p>
               </div>
+              <span className="ml-1 hidden md:inline">
+                <ReportAudioDialog track={currentTrack} errorCode={lastError?.code} compact />
+              </span>
             </div>
+
 
             {/* Center — transport + progress */}
             <div className="flex w-[min(560px,60vw)] flex-col items-center gap-1.5">
