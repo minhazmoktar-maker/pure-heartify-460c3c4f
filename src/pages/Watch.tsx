@@ -34,7 +34,14 @@ const Watch = () => {
   const currentIndex = videos?.findIndex((v) => v.id === videoId) ?? -1;
   const nextVideo = videos && currentIndex >= 0 ? videos[(currentIndex + 1) % videos.length] : null;
 
-  // Track watch history
+  // Reset facade when navigating between videos
+  useEffect(() => {
+    setPlayerActivated(false);
+    setShowOverlay(false);
+    completedRef.current = null;
+  }, [videoId]);
+
+  // Track watch history + first-play growth event
   useEffect(() => {
     if (!user || !videoId || !currentVideo) return;
     supabase.from("watch_history").insert({
@@ -43,12 +50,12 @@ const Watch = () => {
       video_title: currentVideo.title,
       thumbnail_url: currentVideo.thumbnailUrl,
     }).then(() => {});
+    growth.firstVideoPlayed(videoId);
   }, [user, videoId, currentVideo]);
 
   // Listen for YouTube iframe API messages to detect video end
   useEffect(() => {
-    setShowOverlay(false);
-    completedRef.current = null;
+    if (!playerActivated) return;
 
     const handleMessage = (event: MessageEvent) => {
       try {
