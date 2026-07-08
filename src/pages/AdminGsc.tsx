@@ -88,13 +88,50 @@ export default function AdminGsc() {
   const [inspectUrl, setInspectUrl] = useState(DEFAULT_SITE);
   const [inspectResult, setInspectResult] = useState<unknown>(null);
 
-  // Latest scheduled-sync snapshot per kind (status/sitemaps/performance)
+  // Latest scheduled-sync snapshot per kind (status/sitemaps/performance/sitemap_urls)
   const [snapshots, setSnapshots] = useState<Record<string, SnapshotRow>>({});
   const [alerts, setAlerts] = useState<Array<{ id: string; level: "error" | "warn" | "info"; text: string; at: string }>>([]);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null);
+  const [sitemapDiff, setSitemapDiff] = useState<SitemapDiff | null>(null);
 
   const pushAlert = useCallback((level: "error" | "warn" | "info", text: string) => {
     setAlerts(prev => [{ id: crypto.randomUUID(), level, text, at: new Date().toISOString() }, ...prev].slice(0, 20));
   }, []);
+
+  const refreshSyncStatus = useCallback(async () => {
+    try { setSyncStatus(await call<SyncStatus>("sync_status")); }
+    catch (e) { pushAlert("error", `sync_status: ${(e as Error).message}`); }
+  }, [pushAlert]);
+
+  const refreshSitemapDiff = useCallback(async () => {
+    try { setSitemapDiff(await call<SitemapDiff>("sitemap_diff")); }
+    catch (e) { pushAlert("error", `sitemap_diff: ${(e as Error).message}`); }
+  }, [pushAlert]);
+
+  const toggleSync = async (enabled: boolean) => {
+    setBusy("toggle");
+    try {
+      await call("sync_toggle", { enabled });
+      pushAlert("info", `Hourly sync ${enabled ? "enabled" : "disabled"}`);
+      await refreshSyncStatus();
+    } catch (e) { pushAlert("error", `toggle: ${(e as Error).message}`); }
+    finally { setBusy(null); }
+  };
+
+  const runSyncNow = async () => {
+    setBusy("run");
+    try {
+      const r = await call<{ ok: boolean; status: number; data: unknown }>("sync_run");
+      if (!r.ok) throw new Error(`HTTP ${r.status}: ${JSON.stringify(r.data)}`);
+      pushAlert("info", "Manual sync completed");
+      toast({ title: "Sync complete", description: "Snapshots refreshed" });
+      await Promise.all([refreshSyncStatus(), refreshSitemapDiff()]);
+    } catch (e) {
+      pushAlert("error", `run: ${(e as Error).message}`);
+      toast({ title: "Sync failed", description: (e as Error).message, variant: "destructive" });
+    } finally { setBusy(null); }
+  };
+
 
   const refreshStatus = useCallback(async () => {
     setBusy("status");
