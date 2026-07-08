@@ -94,7 +94,8 @@ const Signup = () => {
               Halal<span className="text-[hsl(var(--gold))]">Tube</span>
             </span>
           </Link>
-          <p className="mt-2 text-sm text-muted-foreground">Create your account — join the Ummah</p>
+          <h1 className="mt-2 text-xl font-semibold text-foreground">Create your Heartify account</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Create your account — join the Ummah</p>
         </div>
 
         {/* Social */}

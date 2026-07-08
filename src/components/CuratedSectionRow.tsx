@@ -103,10 +103,10 @@ const CuratedSectionRow = ({ section }: Props) => {
           >
             Show All
           </button>
-          <button onClick={() => scroll("left")} className="rounded-full border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
+          <button onClick={() => scroll("left")} aria-label={`Scroll ${section.title} left`} className="rounded-full border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <button onClick={() => scroll("right")} className="rounded-full border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
+          <button onClick={() => scroll("right")} aria-label={`Scroll ${section.title} right`} className="rounded-full border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>

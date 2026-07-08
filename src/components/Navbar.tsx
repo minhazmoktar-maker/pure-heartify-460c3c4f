@@ -105,7 +105,7 @@ const Navbar = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-10 w-full rounded-l-full border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
             />
-            <button type="submit" className="flex h-10 items-center justify-center rounded-r-full border border-l-0 border-border bg-secondary px-5 hover:bg-muted transition-colors">
+            <button type="submit" aria-label="Search" className="flex h-10 items-center justify-center rounded-r-full border border-l-0 border-border bg-secondary px-5 hover:bg-muted transition-colors">
               <Search className="h-4 w-4 text-foreground" />
             </button>
           </form>
@@ -123,6 +123,7 @@ const Navbar = () => {
           </Link>
           <button
             onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             className="rounded-full p-2 hover:bg-secondary transition-colors"
             title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
@@ -134,6 +135,7 @@ const Navbar = () => {
               <NotificationsBell isAdmin={isAdmin} />
               <button
                 onClick={signOut}
+                aria-label="Sign out"
                 className="rounded-full p-2 hover:bg-secondary transition-colors"
                 title="Sign out"
               >
@@ -141,6 +143,7 @@ const Navbar = () => {
               </button>
               <Link
                 to="/profile"
+                aria-label="Open profile"
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-primary transition-colors hover:opacity-90"
                 title="Profile"
               >

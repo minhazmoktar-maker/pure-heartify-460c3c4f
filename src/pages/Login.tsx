@@ -66,7 +66,8 @@ const Login = () => {
               Halal<span className="text-[hsl(var(--gold))]">Tube</span>
             </span>
           </Link>
-          <p className="mt-2 text-sm text-muted-foreground">Welcome back — sign in to continue</p>
+          <h1 className="mt-2 text-xl font-semibold text-foreground">Sign in to Heartify</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Welcome back — sign in to continue</p>
         </div>
 
         {/* Social logins */}
