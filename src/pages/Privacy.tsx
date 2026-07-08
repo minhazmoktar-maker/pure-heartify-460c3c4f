@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import SEO from "@/components/SEO";
 
 const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
   <section id={id} className="scroll-mt-24">
