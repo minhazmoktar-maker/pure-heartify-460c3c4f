@@ -105,7 +105,7 @@ const CollectionRow = ({
 };
 
 const AudioSection = () => {
-  const { isPremiumUser, togglePremium, playQueue, recent, playCounts } = usePlayer();
+  const { isPremiumUser, isPremiumLoading, playQueue, recent, playCounts } = usePlayer();
 
   const [audioCat, setAudioCat] = useState<AudioCategory>("All");
   const [language, setLanguage] = useState<AudioLanguage | "Any">("Any");
