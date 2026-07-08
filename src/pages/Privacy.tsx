@@ -16,6 +16,11 @@ const Privacy = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Privacy Policy — Heartify"
+        description="How Heartify collects, uses, and protects your personal information."
+        path="/privacy"
+      />
       <Navbar />
       <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
         <Link
