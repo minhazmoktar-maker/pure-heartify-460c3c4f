@@ -15,6 +15,11 @@ const Terms = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Terms of Service — Heartify"
+        description="The terms that govern your use of Heartify's halal-first video curation service."
+        path="/terms"
+      />
       <Navbar />
       <div className="mx-auto max-w-3xl px-4 py-10 md:px-6">
         <Link
