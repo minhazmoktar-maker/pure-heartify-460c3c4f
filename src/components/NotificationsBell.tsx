@@ -13,7 +13,7 @@ interface UserReport {
   status: string;
   created_at: string;
   updated_at: string | null;
-  resolution_note: string | null;
+  resolution: string | null;
 }
 
 interface Props { isAdmin: boolean }
