@@ -941,6 +941,66 @@ export type Database = {
         }
         Relationships: []
       }
+      search_queries: {
+        Row: {
+          clicked_video_id: string | null
+          created_at: string
+          id: string
+          intent: Json | null
+          normalized_query: string
+          query: string
+          result_count: number
+          user_id: string | null
+        }
+        Insert: {
+          clicked_video_id?: string | null
+          created_at?: string
+          id?: string
+          intent?: Json | null
+          normalized_query: string
+          query: string
+          result_count?: number
+          user_id?: string | null
+        }
+        Update: {
+          clicked_video_id?: string | null
+          created_at?: string
+          id?: string
+          intent?: Json | null
+          normalized_query?: string
+          query?: string
+          result_count?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      search_synonyms: {
+        Row: {
+          alternates: string[]
+          created_at: string
+          created_by: string | null
+          id: string
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          alternates?: string[]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          alternates?: string[]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       streaks: {
         Row: {
           created_at: string
