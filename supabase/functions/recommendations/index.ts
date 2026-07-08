@@ -110,11 +110,11 @@ Deno.serve(async (req) => {
     }
 
     // Fire-and-forget impression logging (batched insert).
-    if (recommendations.length) {
+    if (filteredRecs.length) {
       admin
         .from("recommendation_events")
         .insert(
-          recommendations.map((r) => ({
+          filteredRecs.map((r) => ({
             user_id: userId,
             video_id: r.video.video_id,
             event_type: "impression",
@@ -131,9 +131,10 @@ Deno.serve(async (req) => {
     }
 
     return json({
-      recommendations,
+      recommendations: filteredRecs,
       provider: provider.name,
       generatedAt: new Date().toISOString(),
+      viewer: { isPremium: viewerIsPremium },
       signalsSummary: {
         interests: signals.interests.length,
         favorites: signals.favoriteVideoIds.size,
