@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Mail, Lock, Eye, EyeOff, Loader2, User } from "lucide-react";
 import { toast } from "sonner";
+import { growth } from "@/lib/growthEvents";
 
 const Signup = () => {
   const navigate = useNavigate();
