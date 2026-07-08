@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      _internal_config: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -920,6 +938,36 @@ export type Database = {
           user_id?: string
           video_id?: string
           video_title?: string | null
+        }
+        Relationships: []
+      }
+      gsc_sync_snapshots: {
+        Row: {
+          created_at: string
+          data: Json
+          error: string | null
+          id: string
+          kind: string
+          ok: boolean
+          site_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          error?: string | null
+          id?: string
+          kind: string
+          ok?: boolean
+          site_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          error?: string | null
+          id?: string
+          kind?: string
+          ok?: boolean
+          site_url?: string | null
         }
         Relationships: []
       }

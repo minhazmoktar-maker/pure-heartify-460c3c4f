@@ -157,6 +157,35 @@ Deno.serve(async (req) => {
         });
         return json({ status: r.status, ok: r.ok, data: r.data });
       }
+      case "validate_sitemap": {
+        // Fetches the deployed sitemap.xml and validates URLs against Google's list.
+        const site = String(body.siteUrl);
+        const sitemapUrl = `${site}sitemap.xml`;
+        const sitemapRes = await fetch(sitemapUrl);
+        const xml = await sitemapRes.text();
+        const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1].trim());
+        const google = await gsc(`/webmasters/v3/sites/${enc(site)}/sitemaps`);
+        const googleSitemaps = (google.data as { sitemap?: Array<Record<string, unknown>> })?.sitemap ?? [];
+        const problems: string[] = [];
+        if (!sitemapRes.ok) problems.push(`sitemap.xml returned HTTP ${sitemapRes.status}`);
+        if (urls.length === 0) problems.push("no <loc> entries found");
+        urls.forEach(u => { if (!u.startsWith(site.replace(/\/$/, ""))) problems.push(`URL outside site scope: ${u}`); });
+        googleSitemaps.forEach((sm) => {
+          const errors = Number((sm as { errors?: string | number }).errors ?? 0);
+          const warnings = Number((sm as { warnings?: string | number }).warnings ?? 0);
+          if (errors) problems.push(`Google reports ${errors} error(s) on ${(sm as {path?: string}).path}`);
+          if (warnings) problems.push(`Google reports ${warnings} warning(s) on ${(sm as {path?: string}).path}`);
+        });
+        return json({
+          ok: problems.length === 0,
+          sitemapUrl,
+          fetchStatus: sitemapRes.status,
+          urlCount: urls.length,
+          urls: urls.slice(0, 200),
+          googleSitemaps,
+          problems,
+        });
+      }
       default:
         return json({ error: "unknown action" }, 400);
     }
