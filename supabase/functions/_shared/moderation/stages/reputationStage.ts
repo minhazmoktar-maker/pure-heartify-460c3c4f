@@ -50,13 +50,54 @@ export function reputationStage(supabaseUrl: string, serviceKey: string): Stage 
       }
 
       if (approved.length > 0 && approved[0].status === "active") {
+        // Layer channel trust profile on top of whitelist membership.
+        const trustRes = await fetch(
+          `${supabaseUrl}/rest/v1/channel_trust_profiles?youtube_channel_id=eq.${ctx.channel_id}&select=trust_score,risk_level`,
+          { headers },
+        );
+        const trust = trustRes.ok
+          ? ((await trustRes.json()) as Array<{ trust_score: number; risk_level: string }>)[0]
+          : undefined;
+        const score = trust?.trust_score ?? approved[0].consistency_score ?? 60;
+        const risk = trust?.risk_level ?? "medium";
+
+        // Critical-risk channels are never trusted, whitelist or not.
+        if (risk === "critical") {
+          return {
+            stage: "channel_reputation",
+            state: "human_review_required",
+            confidence: 20,
+            risk: 90,
+            reasoning: `Channel is on whitelist but trust is critical (${score.toFixed(0)})`,
+            signals: { reputation: "whitelist_but_critical", trust_score: score, risk_level: risk },
+          };
+        }
         return {
           stage: "channel_reputation",
           state: "pending_review",
-          confidence: Math.min(95, approved[0].consistency_score ?? 90),
-          risk: 5,
-          reasoning: "Channel is on the approved whitelist",
-          signals: { reputation: "approved", score: approved[0].consistency_score },
+          confidence: Math.min(97, Math.max(50, score)),
+          risk: risk === "high" ? 40 : risk === "medium" ? 15 : 5,
+          reasoning: `Channel whitelisted (trust ${score.toFixed(0)}, risk ${risk})`,
+          signals: { reputation: "approved", trust_score: score, risk_level: risk },
+        };
+      }
+
+      // Non-whitelisted: still consult trust profile if we have one.
+      const trustRes = await fetch(
+        `${supabaseUrl}/rest/v1/channel_trust_profiles?youtube_channel_id=eq.${ctx.channel_id}&select=trust_score,risk_level`,
+        { headers },
+      );
+      const trust = trustRes.ok
+        ? ((await trustRes.json()) as Array<{ trust_score: number; risk_level: string }>)[0]
+        : undefined;
+      if (trust) {
+        return {
+          stage: "channel_reputation",
+          state: trust.risk_level === "critical" ? "human_review_required" : "pending_review",
+          confidence: Math.max(20, Math.min(80, trust.trust_score)),
+          risk: trust.risk_level === "critical" ? 85 : trust.risk_level === "high" ? 55 : 30,
+          reasoning: `Off-whitelist trust score ${trust.trust_score.toFixed(0)} (${trust.risk_level})`,
+          signals: { reputation: "off_whitelist", trust_score: trust.trust_score, risk_level: trust.risk_level },
         };
       }
 

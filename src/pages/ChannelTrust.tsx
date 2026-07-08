@@ -74,13 +74,12 @@ const ChannelTrust = () => {
   }, [user]);
 
   const loadProfiles = async () => {
-    const [{ data: profs }, { data: chs }] = await Promise.all([
-      supabase.from("channel_trust_profiles" as never).select("*").order("trust_score", { ascending: true }).limit(500),
-      supabase.from("approved_channels").select("id,title,youtube_channel_id").limit(1000),
-    ]);
-    setProfiles((profs as unknown as Profile[]) ?? []);
+    const db = supabase as unknown as { from: (t: string) => { select: (c: string) => { order?: (col: string, o: { ascending: boolean }) => { limit: (n: number) => Promise<{ data: unknown }> }; limit?: (n: number) => Promise<{ data: unknown }> } } };
+    const profsRes = await (db.from("channel_trust_profiles").select("*") as { order: (col: string, o: { ascending: boolean }) => { limit: (n: number) => Promise<{ data: unknown }> } }).order("trust_score", { ascending: true }).limit(500);
+    const chsRes = await supabase.from("approved_channels").select("id,title,youtube_channel_id").limit(1000);
+    setProfiles((profsRes.data as Profile[]) ?? []);
     const idx: Record<string, Channel> = {};
-    for (const c of (chs as unknown as Channel[]) ?? []) idx[c.id] = c;
+    for (const c of (chsRes.data as unknown as Channel[]) ?? []) idx[c.id] = c;
     setChannels(idx);
   };
 
@@ -88,8 +87,9 @@ const ChannelTrust = () => {
 
   const loadHistory = async (id: string) => {
     setSelectedId(id);
-    const { data } = await supabase.rpc("get_channel_trust_history" as never, { _channel_id: id, _limit: 100 });
-    setHistory((data as unknown as TrustEvent[]) ?? []);
+    const rpc = (supabase as unknown as { rpc: (name: string, args: Record<string, unknown>) => Promise<{ data: unknown }> }).rpc;
+    const { data } = await rpc("get_channel_trust_history", { _channel_id: id, _limit: 100 });
+    setHistory((data as TrustEvent[]) ?? []);
   };
 
   const recomputeOne = async (id: string) => {
@@ -234,7 +234,7 @@ const ChannelTrust = () => {
                 {history.map((ev, i) => (
                   <div key={i} className="text-xs border rounded p-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium capitalize">{ev.source.replaceAll("_", " ")}</span>
+                      <span className="font-medium capitalize">{ev.source.replace(/_/g, " ")}</span>
                       <span className={ev.delta >= 0 ? "text-emerald-500" : "text-red-500"}>
                         {ev.delta >= 0 ? "+" : ""}{Number(ev.delta).toFixed(2)}
                       </span>
