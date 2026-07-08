@@ -273,7 +273,12 @@ export type Database = {
           halal_score: number
           id: string
           ingested_at: string
+          is_archived: boolean
+          is_featured: boolean
+          is_hidden: boolean
+          is_pinned: boolean
           is_trusted_channel: boolean
+          pinned_at: string | null
           published_at: string | null
           section_id: string | null
           thumbnail_url: string
@@ -287,7 +292,12 @@ export type Database = {
           halal_score?: number
           id?: string
           ingested_at?: string
+          is_archived?: boolean
+          is_featured?: boolean
+          is_hidden?: boolean
+          is_pinned?: boolean
           is_trusted_channel?: boolean
+          pinned_at?: string | null
           published_at?: string | null
           section_id?: string | null
           thumbnail_url?: string
@@ -301,7 +311,12 @@ export type Database = {
           halal_score?: number
           id?: string
           ingested_at?: string
+          is_archived?: boolean
+          is_featured?: boolean
+          is_hidden?: boolean
+          is_pinned?: boolean
           is_trusted_channel?: boolean
+          pinned_at?: string | null
           published_at?: string | null
           section_id?: string | null
           thumbnail_url?: string
@@ -609,11 +624,14 @@ export type Database = {
           action: string
           actor_role: string
           created_at: string
+          failure_reason: string | null
           id: string
           ip_address: string | null
+          metadata: Json | null
           new_state: Json | null
           previous_state: Json | null
           session_id: string | null
+          success: boolean
           target_id: string | null
           target_type: string | null
           user_agent: string | null
@@ -624,11 +642,14 @@ export type Database = {
           action: string
           actor_role: string
           created_at?: string
+          failure_reason?: string | null
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           new_state?: Json | null
           previous_state?: Json | null
           session_id?: string | null
+          success?: boolean
           target_id?: string | null
           target_type?: string | null
           user_agent?: string | null
@@ -639,11 +660,14 @@ export type Database = {
           action?: string
           actor_role?: string
           created_at?: string
+          failure_reason?: string | null
           id?: string
           ip_address?: string | null
+          metadata?: Json | null
           new_state?: Json | null
           previous_state?: Json | null
           session_id?: string | null
+          success?: boolean
           target_id?: string | null
           target_type?: string | null
           user_agent?: string | null
