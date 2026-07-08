@@ -8,6 +8,7 @@ import AudioPlayer from "@/components/AudioPlayer";
 import CuratedSectionRow from "@/components/CuratedSectionRow";
 import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import DailyDoseHero from "@/components/DailyDoseHero";
+import SEO from "@/components/SEO";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { FeedDiversityProvider, useFeedDiversity } from "@/contexts/FeedDiversityContext";
@@ -39,6 +40,25 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <SEO
+        title="Heartify — Curated Halal Video & Audio App"
+        description="Discover curated halal videos and audio from trusted creators. Distraction-free, family-friendly, and moderated for a mindful experience."
+        path="/"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Heartify",
+          url: "https://pure-heartify.lovable.app/",
+          description:
+            "Curated halal video and audio app with trusted creators and moderated content.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target:
+              "https://pure-heartify.lovable.app/search?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }}
+      />
       <Navbar />
       <HeroSection />
 

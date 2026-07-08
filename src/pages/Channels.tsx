@@ -31,6 +31,13 @@ const Channels = () => {
         title="Trusted Halal Channels — Heartify"
         description={`Browse ${TOTAL_CHANNELS}+ vetted halal YouTube channels across ${CHANNEL_CATEGORIES.length} categories on Heartify.`}
         path="/channels"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Trusted Halal Channels",
+          description: `Curated list of ${TOTAL_CHANNELS}+ vetted halal YouTube channels across ${CHANNEL_CATEGORIES.length} categories.`,
+          url: "https://pure-heartify.lovable.app/channels",
+        }}
       />
       <Navbar />
 
