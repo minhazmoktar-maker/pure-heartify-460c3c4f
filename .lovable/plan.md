@@ -1,62 +1,42 @@
-# Channel & Video Verification System
+# Step-by-step delivery plan
 
-## Goal
-Add a durable moderation pipeline for YouTube channels/videos with an audit trail, YouTube-ID-based duplicate detection, a nightly re-check job, and an admin review page — end-to-end tested.
+You asked for everything "step by step." Here's the order I'll ship in. Each step is one turn — you confirm/see the result before I move on.
 
-## Database (one migration)
+## Step 1 — GSC sync settings panel + sitemap diff
+- Add `/admin/gsc/sync` section (or extend `/admin/gsc`) with:
+  - Enable/disable toggle for `gsc-hourly-sync` (writes to `_internal_config`, cron function reads flag).
+  - "Run now" button → invokes `gsc-sync` edge function.
+  - Last run: timestamp, duration, status, error text (from `gsc_sync_snapshots`).
+- Sitemap diff:
+  - Store parsed sitemap URL list in each snapshot.
+  - Diff view: added URLs (green), removed URLs (red), warning-count delta vs previous snapshot.
 
-New tables in `public`:
+## Step 2 — Permission tester upgrades
+- For each permission in `src/lib/permissions.ts`, add a registry mapping permission → routes + component files it gates.
+- Show that mapping in `/admin/permissions`.
+- "Simulate missing permission" toggle: overrides `usePermissions` via a dev-only context so I can preview the UI as a lower role without logging out.
 
-- **`channel_candidates`** — pending channels awaiting decision
-  - `youtube_channel_id` (unique), `handle`, `title`, `description`, `category`, `language`, `country`, `subscriber_count`, `source` (e.g. "gemini"), `submitted_by`, `status` (`pending|approved|rejected|flagged`)
-- **`approved_channels`** — canonical whitelist (source of truth for duplicate checks)
-  - `youtube_channel_id` (unique), `title`, `handle`, `category`, `owner_key` (normalized creator identity — lowercased handle/title stem — used to catch aliases/backups), `last_rechecked_at`, `consistency_score`
-- **`channel_audit_log`** — every decision, immutable
-  - `candidate_id`, `channel_id_ref` (nullable FK to approved_channels), `action` (`approved|rejected|flagged|rechecked`), `admin_id`, `confidence` (0-100), `evidence` jsonb (title, description, latest_video_titles[], thumbnail_urls[], category_scores{}, exclusion_hits[]), `reason`, `created_at`
-- **`video_candidates`** + **`video_audit_log`** — mirror structure for individual videos
+## Step 3 — MFA status widget + enrollment help
+- New `MfaStatusCard` on `/profile`:
+  - Lists every factor (`supabase.auth.mfa.listFactors()`): type (TOTP/Phone/WebAuthn), friendly name, verified status, created/updated timestamps.
+  - Unenroll button per factor.
+- On `/mfa-enroll`, add an "Enrollment help" panel that maps Supabase error strings to plain-English causes + next steps (AAL2 required, factor already exists, session expired, rate limited, etc.).
+- Reproduce your enrollment failure with Playwright, capture the exact error, and add a targeted fix.
 
-All tables: GRANT to authenticated + service_role, RLS enabled, admin-only write via `has_role(auth.uid(), 'admin')`, authenticated read on audit logs.
+## Step 4 — Security review + fixes
+- Run `supabase--linter`, `security--get_scan_results`, `code--dependency_scan`.
+- Fix real issues (missing RLS, GRANTs, function search_path, dep vulns). Mark intentional-public findings as accepted with rationale in `security-memory`.
 
-`owner_key` computed via a small SQL function that lowercases + strips "official/tv/hd/backup/2/archive" suffixes so `MuftiMenkOfficial` and `MuftiMenkTV` collide.
+## Step 5 — Performance pass
+- Analyze bundle (`vite build`), enable route-level code splitting on admin pages, preload LCP image on `/`, convert large PNGs to WebP/AVIF via `vite-imagetools`.
+- Report before/after bundle size and reasoning.
 
-Duplicate check function `public.check_channel_duplicate(_yt_id, _title, _handle)` returns match reason (`exact_id|owner_key|title_similarity`) using `pg_trgm`.
+## Step 6 — A–Z app documentation
+- Write `docs/APP_GUIDE.md` covering: product overview, tech stack, routing map, roles/permissions, every table + purpose, every edge function + trigger, cron jobs, connectors, deployment, ops runbook, troubleshooting.
 
-## Edge functions
+## Step 7 — End-to-end smoke
+- Playwright smoke of `/`, `/about`, `/mfa-enroll`, `/admin/*`, `/owner`, `/profile`, `/admin/gsc`, `/admin/permissions`. Report any 4xx/5xx or console errors.
 
-- **`verify-channel`** — takes a candidate, fetches YouTube channel via existing `YOUTUBE_API_KEY`, runs exclusion keyword scan on latest 10 uploads, computes confidence score, writes to `channel_candidates` + `channel_audit_log` with full evidence jsonb. Returns approve/reject verdict (auto-approve only if confidence ≥95 and duplicate-risk low).
-- **`recheck-approved-channels`** — iterates `approved_channels` ordered by `last_rechecked_at`, re-fetches YouTube data, detects: (a) 404/deleted, (b) title/handle rename, (c) recent uploads failing exclusions. Flags changes into `channel_audit_log` with action `flagged` and status `flagged`. Cron scheduled nightly via `pg_cron` (insert tool, not migration).
+---
 
-## Admin review page (`/admin/review`)
-
-Guarded by `has_role(admin)`. Three tabs:
-1. **Pending Candidates** — cards with title, thumbnail, category, evidence preview, Approve/Reject buttons (writes audit log with reason + confidence).
-2. **Approved vs Rejected** — split view, filter by category/date, click row → drawer showing full evidence jsonb + reasoning side-by-side.
-3. **Flagged for Recheck** — items where nightly job detected drift; approve keep / remove.
-
-Same layout has a Videos tab that mirrors the Channels UI against `video_candidates`.
-
-## E2E tests (Playwright)
-
-- `tests/e2e/channel-verification.spec.ts` — submit candidate → verify → approve → confirm in approved list, audit log entry visible.
-- Duplicate detection: submit alias variant, expect rejected with `owner_key` match reason.
-- Recheck: seed an approved channel with a title that now fails exclusions, invoke recheck function, assert `flagged` status appears in admin page.
-- Admin RBAC: non-admin gets 403 on `/admin/review`.
-
-Run via existing `bunx vitest` for unit slices + `playwright test` for E2E.
-
-## Files
-
-- `supabase/migrations/<ts>_channel_verification.sql`
-- `supabase/functions/verify-channel/index.ts`
-- `supabase/functions/recheck-approved-channels/index.ts`
-- `src/pages/AdminReview.tsx` + route in `src/App.tsx`
-- `src/components/admin/CandidateCard.tsx`, `EvidenceDrawer.tsx`
-- `src/hooks/useAdminReview.ts`
-- `tests/e2e/channel-verification.spec.ts`
-- `tests/e2e/recheck-flag.spec.ts`
-
-## Out of scope
-- Migrating the existing static `channelCategories.ts` list into `approved_channels` (can seed later on request).
-- Automatic un-approval — nightly job only flags; humans decide.
-
-Approve to proceed and I'll ship the migration first, then functions + UI + tests.
+Reply "go" (or "start with step N") and I'll execute Step 1. If you'd rather I collapse a couple of steps into one turn, tell me which.
