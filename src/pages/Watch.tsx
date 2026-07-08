@@ -135,14 +135,41 @@ const Watch = () => {
 
           {isEmbeddableVideo ? (
             <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
-              <iframe
-                ref={iframeRef}
-                src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1&origin=${window.location.origin}`}
-                title={currentVideo?.title ?? "Video"}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full border-0"
-              />
+              {playerActivated ? (
+                <iframe
+                  ref={iframeRef}
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1&origin=${window.location.origin}`}
+                  title={currentVideo?.title ?? "Video"}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="eager"
+                  className="absolute inset-0 h-full w-full border-0"
+                />
+              ) : (
+                // Lite-YouTube facade: defers ~1.5MB of player JS until user intent.
+                <button
+                  type="button"
+                  onClick={() => setPlayerActivated(true)}
+                  aria-label={`Play ${currentVideo?.title ?? "video"}`}
+                  className="group absolute inset-0 flex items-center justify-center overflow-hidden"
+                >
+                  {videoId && (
+                    <img
+                      src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+                      alt={currentVideo?.title ?? "Video thumbnail"}
+                      width={1280}
+                      height={720}
+                      fetchPriority="high"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="relative flex h-16 w-24 items-center justify-center rounded-2xl bg-red-600/90 shadow-2xl transition-transform group-hover:scale-110">
+                    <Play className="h-8 w-8 fill-white text-white" />
+                  </div>
+                </button>
+              )}
               {/* Overlay to block YouTube end-screen suggestions */}
               {showOverlay && nextVideo && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-background/95 backdrop-blur-sm">
