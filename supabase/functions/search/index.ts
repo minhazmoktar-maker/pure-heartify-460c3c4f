@@ -35,6 +35,19 @@ Deno.serve(async (req) => {
     userId = data?.user?.id ?? null;
   }
 
+  // H2 mitigation: throttle abusive callers. Search is cheap but hits the
+  // DB with a full-text ranker so we cap both anonymous IPs and users.
+  const identity = getClientIdentity(req, userId);
+  const limited = await enforceRateLimit(admin, {
+    identity,
+    action: req.method === "GET" ? "search_autocomplete" : "search_query",
+    limit: req.method === "GET" ? 240 : 120,
+    windowSeconds: 60,
+  });
+  if (limited) {
+    return json({ error: "Rate limit exceeded" }, 429);
+  }
+
   try {
     if (req.method === "GET") {
       const url = new URL(req.url);
