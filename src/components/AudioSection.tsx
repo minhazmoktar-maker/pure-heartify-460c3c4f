@@ -198,7 +198,7 @@ const AudioSection = () => {
                 className="shrink-0 rounded-full bg-gold px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.02]"
               >
                 <Sparkles className="mr-1.5 inline h-4 w-4" />
-                Try Premium free
+                Request Premium access
               </button>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
