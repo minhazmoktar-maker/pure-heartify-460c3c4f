@@ -361,12 +361,72 @@ export default function AdminGsc() {
 
         <Tabs defaultValue="verify">
           <TabsList>
+            <TabsTrigger value="sync">Sync</TabsTrigger>
             <TabsTrigger value="verify">Verification</TabsTrigger>
             <TabsTrigger value="sitemap">Sitemap</TabsTrigger>
             <TabsTrigger value="perf">Performance</TabsTrigger>
             <TabsTrigger value="inspect">URL Inspector</TabsTrigger>
             <TabsTrigger value="alerts">Alerts ({alerts.length})</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="sync" className="mt-4 space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2"><Clock className="h-4 w-4 text-primary" />Hourly sync job</CardTitle>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-muted-foreground">Enabled</span>
+                    <Switch
+                      checked={syncStatus?.enabled ?? true}
+                      disabled={busy === "toggle" || !syncStatus}
+                      onCheckedChange={toggleSync}
+                    />
+                  </div>
+                  <Button size="sm" onClick={runSyncNow} disabled={!!busy}>
+                    {busy === "run" ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Play className="h-4 w-4 mr-1" />Run now</>}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={refreshSyncStatus} disabled={!!busy}><RefreshCw className="h-4 w-4" /></Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {!syncStatus && <p className="text-muted-foreground">Loading…</p>}
+                {syncStatus && (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {syncStatus.enabled
+                        ? <Badge className="gap-1"><CheckCircle2 className="h-3 w-3" />Job enabled</Badge>
+                        : <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" />Job disabled</Badge>}
+                      {syncStatus.cronSecretPresent
+                        ? <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" />Cron secret set</Badge>
+                        : <Badge variant="destructive">Cron secret missing</Badge>}
+                    </div>
+                    <div className="rounded border overflow-auto">
+                      <table className="w-full text-xs">
+                        <thead className="bg-muted/40 text-left">
+                          <tr><th className="px-2 py-1">Kind</th><th className="px-2 py-1">Status</th><th className="px-2 py-1">Last run</th><th className="px-2 py-1">Error</th></tr>
+                        </thead>
+                        <tbody>
+                          {["status","sitemaps","sitemap_urls","performance"].map(k => {
+                            const row = syncStatus.latest[k];
+                            return (
+                              <tr key={k} className="border-t">
+                                <td className="px-2 py-1 font-mono">{k}</td>
+                                <td className="px-2 py-1">{!row ? "—" : row.ok ? <Badge variant="secondary">ok</Badge> : <Badge variant="destructive">failed</Badge>}</td>
+                                <td className="px-2 py-1">{row ? new Date(row.created_at).toLocaleString() : "—"}</td>
+                                <td className="px-2 py-1 text-destructive">{row?.error ?? ""}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Cron runs every hour. Toggling off skips the job without deleting the schedule; toggling on resumes on the next tick. "Run now" forces an immediate sync regardless of the toggle.</p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
 
           <TabsContent value="verify" className="mt-4">
             <Card>
