@@ -554,7 +554,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   void platform;
 
   const value: PlayerState = {
-    currentTrack, queue, isPlaying, isBuffering, isPremiumUser,
+    currentTrack, queue, isPlaying, isBuffering, isPremiumUser, isPremiumLoading,
     progress, duration, volume, muted, shuffle, repeat, playbackRate,
     recent, playCounts, lastError, needsUserGesture, resumePlayback,
     play, playQueue, togglePlay,
