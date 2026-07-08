@@ -29,6 +29,7 @@ const ModerationLog = lazy(() => import("./pages/ModerationLog.tsx"));
 const Audit = lazy(() => import("./pages/Audit.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
+const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const App = () => (
                 <Route path="/admin/audit" element={<Audit />} />
                 <Route path="/admin/console" element={<AdminConsole />} />
                 <Route path="/admin/review" element={<AdminReview />} />
+                <Route path="/owner" element={<OwnerDashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
