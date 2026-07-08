@@ -39,7 +39,17 @@ const AudioPlayer = () => {
           role="region"
           aria-label="Now playing"
         >
+          {needsUserGesture && (
+            <button
+              onClick={resumePlayback}
+              className="flex w-full items-center justify-center gap-2 bg-primary/95 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary"
+            >
+              <Hand className="h-3.5 w-3.5" />
+              Tap to start playback — your browser blocked autoplay.
+            </button>
+          )}
           <div className="mx-auto grid h-[88px] max-w-[1800px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 md:px-6">
+
             {/* Left — track meta */}
             <div className="flex min-w-0 items-center gap-3">
               <div className="relative h-14 w-14 shrink-0">
