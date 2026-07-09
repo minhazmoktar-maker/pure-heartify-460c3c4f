@@ -796,6 +796,11 @@ const App = () => (
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/matrimony-trends" element={<MatrimonyTrends />} />
                 <Route path="/muslim-travel-guides" element={<MuslimTravelGuides />} />
+                <Route path="/global-ulema-council" element={<GlobalUlemaCouncil />} />
+                <Route path="/creator-program" element={<CreatorProgram />} />
+                <Route path="/live-halaqat" element={<LiveHalaqat />} />
+                <Route path="/offline-quran-audio" element={<OfflineQuranAudio />} />
+                <Route path="/masjid-partnerships" element={<MasjidPartnerships />} />
                 <Route path="/hajj-logistics" element={<HajjLogistics />} />
                 <Route path="/umrah-planning" element={<UmrahPlanning />} />
                 <Route path="/zamzam-rulings" element={<ZamzamRulings />} />
