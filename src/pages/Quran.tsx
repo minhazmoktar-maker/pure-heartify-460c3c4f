@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { BookOpen, Play, Pause, Loader2, ChevronRight, Search } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { SEO } from "@/components/SEO";
+import SEO from "@/components/SEO";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
