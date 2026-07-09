@@ -378,6 +378,11 @@ const EveningRoutine = lazy(() => import("./pages/EveningRoutine.tsx"));
 const HalalRelationships = lazy(() => import("./pages/HalalRelationships.tsx"));
 const MuslimDating = lazy(() => import("./pages/MuslimDating.tsx"));
 
+const GlobalUlemaCouncil = lazy(() => import("./pages/GlobalUlemaCouncil.tsx"));
+const CreatorProgram = lazy(() => import("./pages/CreatorProgram.tsx"));
+const LiveHalaqat = lazy(() => import("./pages/LiveHalaqat.tsx"));
+const OfflineQuranAudio = lazy(() => import("./pages/OfflineQuranAudio.tsx"));
+const MasjidPartnerships = lazy(() => import("./pages/MasjidPartnerships.tsx"));
 const MuslimTravelGuides = lazy(() => import("./pages/MuslimTravelGuides.tsx"));
 const HajjLogistics = lazy(() => import("./pages/HajjLogistics.tsx"));
 const UmrahPlanning = lazy(() => import("./pages/UmrahPlanning.tsx"));
@@ -791,6 +796,11 @@ const App = () => (
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/matrimony-trends" element={<MatrimonyTrends />} />
                 <Route path="/muslim-travel-guides" element={<MuslimTravelGuides />} />
+                <Route path="/global-ulema-council" element={<GlobalUlemaCouncil />} />
+                <Route path="/creator-program" element={<CreatorProgram />} />
+                <Route path="/live-halaqat" element={<LiveHalaqat />} />
+                <Route path="/offline-quran-audio" element={<OfflineQuranAudio />} />
+                <Route path="/masjid-partnerships" element={<MasjidPartnerships />} />
                 <Route path="/hajj-logistics" element={<HajjLogistics />} />
                 <Route path="/umrah-planning" element={<UmrahPlanning />} />
                 <Route path="/zamzam-rulings" element={<ZamzamRulings />} />
