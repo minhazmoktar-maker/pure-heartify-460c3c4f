@@ -860,6 +860,59 @@ export type Database = {
           },
         ]
       }
+      dua_ameens: {
+        Row: {
+          created_at: string
+          dua_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dua_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dua_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dua_ameens_dua_id_fkey"
+            columns: ["dua_id"]
+            isOneToOne: false
+            referencedRelation: "dua_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dua_requests: {
+        Row: {
+          ameen_count: number
+          body: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          user_id: string
+        }
+        Insert: {
+          ameen_count?: number
+          body: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          user_id: string
+        }
+        Update: {
+          ameen_count?: number
+          body?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       entitlements: {
         Row: {
           created_at: string
