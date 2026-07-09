@@ -121,32 +121,22 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className={embedded ? "flex justify-center py-10" : "min-h-screen bg-background flex items-center justify-center"}>
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
   }
   if (!isOwner) return <Navigate to="/" replace />;
 
-  return (
-    <div className="min-h-screen bg-background">
-      <SEO title="Roles & Permissions · Heartify" description="Owner control panel for roles, MFA, and audit events." path="/admin/roles" />
-      <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <header className="mb-6 flex items-center gap-3">
-          <Shield className="h-6 w-6 text-primary" />
-          <div>
-            <h1 className="text-2xl font-semibold">Roles & Permissions</h1>
-            <p className="text-sm text-muted-foreground">Owner-only control panel for admin, owner, and MFA access.</p>
-          </div>
-        </header>
-
+  const body = (
+    <>
         <Tabs defaultValue="users">
           <TabsList>
             <TabsTrigger value="users"><Users className="mr-2 h-4 w-4" />Users & Roles</TabsTrigger>
             <TabsTrigger value="mfa"><ShieldCheck className="mr-2 h-4 w-4" />MFA</TabsTrigger>
             <TabsTrigger value="audit"><ScrollText className="mr-2 h-4 w-4" />Audit</TabsTrigger>
           </TabsList>
+
 
           <TabsContent value="users" className="mt-4 space-y-4">
             <Card>
