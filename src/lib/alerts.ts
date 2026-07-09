@@ -39,7 +39,7 @@ export async function reportAlert(opts: ReportAlertOptions): Promise<void> {
       kind: opts.kind,
       severity: opts.severity ?? "warn",
       message: opts.message.slice(0, 2000),
-      context: opts.context ?? {},
+      context: (opts.context ?? {}) as never,
       route: opts.route ?? (typeof window !== "undefined" ? window.location.pathname : null),
       user_id: userRes?.user?.id ?? null,
     });
