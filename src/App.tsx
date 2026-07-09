@@ -118,6 +118,7 @@ const App = () => (
                 <Route path="/recap" element={<Recap />} />
                 <Route path="/journal" element={<Journal />} />
                 <Route path="/khatm" element={<Khatm />} />
+                <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
