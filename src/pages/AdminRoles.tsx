@@ -31,7 +31,7 @@ async function call<T>(action: string, params: Record<string, unknown> = {}): Pr
   return data as T;
 }
 
-export default function AdminRoles() {
+export default function AdminRoles({ embedded = false }: { embedded?: boolean } = {}) {
   const { loading, isOwner } = useRole();
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<AppUser[]>([]);
