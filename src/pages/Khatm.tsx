@@ -117,7 +117,7 @@ const Khatm = () => {
       <SEO
         title="Khatm Tracker — Quran completion goal"
         description="Track your Quran completion with pacing, daily goals, and khatm milestones."
-        canonicalPath="/khatm"
+        path="/khatm"
       />
       <Navbar />
 
