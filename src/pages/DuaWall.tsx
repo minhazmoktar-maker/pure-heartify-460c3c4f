@@ -40,10 +40,16 @@ export default function DuaWall() {
     if (user) {
       const ids = ((data ?? []) as Dua[]).map((d) => d.id);
       if (ids.length) {
-        const { data: mine } = await supabase
-          .from("dua_ameens").select("dua_id").eq("user_id", user.id).in("dua_id", ids);
+        const [{ data: mine }, { data: own }] = await Promise.all([
+          supabase.from("dua_ameens").select("dua_id").eq("user_id", user.id).in("dua_id", ids),
+          supabase.from("dua_requests").select("id").eq("user_id", user.id).in("id", ids),
+        ]);
         setMyAmeens(new Set((mine ?? []).map((r) => r.dua_id)));
+        setMyOwnIds(new Set((own ?? []).map((r) => r.id)));
       }
+    } else {
+      setMyAmeens(new Set());
+      setMyOwnIds(new Set());
     }
     setLoading(false);
   };
