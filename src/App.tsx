@@ -87,6 +87,7 @@ const Alphabet = lazy(() => import("./pages/Alphabet.tsx"));
 const Tajweed = lazy(() => import("./pages/Tajweed.tsx"));
 const Glossary = lazy(() => import("./pages/Glossary.tsx"));
 const IslamicEvents = lazy(() => import("./pages/IslamicEvents.tsx"));
+const Inheritance = lazy(() => import("./pages/Inheritance.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -163,6 +164,7 @@ const App = () => (
                 <Route path="/tajweed" element={<Tajweed />} />
                 <Route path="/glossary" element={<Glossary />} />
                 <Route path="/events" element={<IslamicEvents />} />
+                <Route path="/inheritance" element={<Inheritance />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
