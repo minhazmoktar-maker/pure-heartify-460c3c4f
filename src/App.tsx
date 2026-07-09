@@ -48,6 +48,7 @@ const AdminGsc = lazy(() => import("./pages/AdminGsc.tsx"));
 const AdminPermissions = lazy(() => import("./pages/AdminPermissions.tsx"));
 const AdminAlerts = lazy(() => import("./pages/AdminAlerts.tsx"));
 const Prayer = lazy(() => import("./pages/Prayer.tsx"));
+const Quran = lazy(() => import("./pages/Quran.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,8 @@ const App = () => (
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/prayer" element={<Prayer />} />
+                <Route path="/quran" element={<Quran />} />
+                <Route path="/quran/:surah" element={<Quran />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
