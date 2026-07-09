@@ -77,6 +77,7 @@ const Sahaba = () => {
       <SEO
         title="Companions of the Prophet ﷺ — Heartify"
         description="Learn from the lives of 20 leading Sahaba: bios, roles, and enduring lessons."
+        path="/sahaba"
         
       />
       <div className="mx-auto max-w-4xl px-4 py-6">
