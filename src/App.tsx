@@ -378,6 +378,11 @@ const EveningRoutine = lazy(() => import("./pages/EveningRoutine.tsx"));
 const HalalRelationships = lazy(() => import("./pages/HalalRelationships.tsx"));
 const MuslimDating = lazy(() => import("./pages/MuslimDating.tsx"));
 
+const GlobalUlemaCouncil = lazy(() => import("./pages/GlobalUlemaCouncil.tsx"));
+const CreatorProgram = lazy(() => import("./pages/CreatorProgram.tsx"));
+const LiveHalaqat = lazy(() => import("./pages/LiveHalaqat.tsx"));
+const OfflineQuranAudio = lazy(() => import("./pages/OfflineQuranAudio.tsx"));
+const MasjidPartnerships = lazy(() => import("./pages/MasjidPartnerships.tsx"));
 const MuslimTravelGuides = lazy(() => import("./pages/MuslimTravelGuides.tsx"));
 const HajjLogistics = lazy(() => import("./pages/HajjLogistics.tsx"));
 const UmrahPlanning = lazy(() => import("./pages/UmrahPlanning.tsx"));
