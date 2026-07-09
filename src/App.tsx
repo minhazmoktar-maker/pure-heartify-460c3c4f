@@ -81,6 +81,7 @@ const Nikah = lazy(() => import("./pages/Nikah.tsx"));
 const Quiz = lazy(() => import("./pages/Quiz.tsx"));
 const Stories = lazy(() => import("./pages/Stories.tsx"));
 const NewMuslim = lazy(() => import("./pages/NewMuslim.tsx"));
+const Hifz = lazy(() => import("./pages/Hifz.tsx"));
 
 const queryClient = new QueryClient();
 
