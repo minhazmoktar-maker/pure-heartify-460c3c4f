@@ -80,6 +80,7 @@ const BabyNames = lazy(() => import("./pages/BabyNames.tsx"));
 const Nikah = lazy(() => import("./pages/Nikah.tsx"));
 const Quiz = lazy(() => import("./pages/Quiz.tsx"));
 const Stories = lazy(() => import("./pages/Stories.tsx"));
+const NewMuslim = lazy(() => import("./pages/NewMuslim.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -149,6 +150,7 @@ const App = () => (
                 <Route path="/nikah" element={<Nikah />} />
                 <Route path="/quiz" element={<Quiz />} />
                 <Route path="/stories" element={<Stories />} />
+                <Route path="/new-muslim" element={<NewMuslim />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
