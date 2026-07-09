@@ -21,7 +21,7 @@ interface Row {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_PLANS = ["premium", "premium_trial", "premium_lifetime", "free"] as const;
 
-export default function AdminEntitlements() {
+export default function AdminEntitlements({ embedded = false }: { embedded?: boolean } = {}) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
@@ -148,17 +148,23 @@ export default function AdminEntitlements() {
       || r.plan.toLowerCase().includes(needle);
   });
 
+  const shell = embedded ? "" : "min-h-screen bg-background";
   return (
-    <div className="min-h-screen bg-background">
-      <SEO title="Entitlements · Admin" description="Manage premium entitlements" path="/admin/entitlements" />
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        <Link to="/admin/console" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Admin console
-        </Link>
-        <div className="mb-6 flex items-center gap-3">
-          <Crown className="h-6 w-6 text-gold" />
-          <h1 className="font-heading text-2xl font-bold">Entitlements</h1>
-        </div>
+    <div className={shell}>
+      {!embedded && <SEO title="Entitlements · Admin" description="Manage premium entitlements" path="/admin/entitlements" />}
+      <div className={embedded ? "" : "mx-auto max-w-6xl px-4 py-8"}>
+        {!embedded && (
+          <>
+            <Link to="/admin/console" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="h-4 w-4" /> Admin console
+            </Link>
+            <div className="mb-6 flex items-center gap-3">
+              <Crown className="h-6 w-6 text-gold" />
+              <h1 className="font-heading text-2xl font-bold">Entitlements</h1>
+            </div>
+          </>
+        )}
+
 
         {/* Grant form */}
         <div className="mb-8 rounded-2xl border bg-card p-5 shadow-sm">

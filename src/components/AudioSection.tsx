@@ -12,6 +12,7 @@ import {
   type AudioCategory, type Track, type AudioLanguage,
 } from "@/data/audio";
 import { cn } from "@/lib/utils";
+import { FEATURE_FLAGS } from "@/lib/featureFlags";
 
 const PREMIUM_BENEFITS = [
   { icon: Radio, title: "Ad-free listening", desc: "Uninterrupted Qur'an, nasheeds and lectures." },
@@ -181,51 +182,53 @@ const AudioSection = () => {
           Checking your Premium status…
         </div>
       ) : !isPremiumUser ? (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="mb-10 overflow-hidden rounded-3xl bg-gradient-hero p-6 md:p-10 shadow-card-hover"
-        >
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Crown className="h-5 w-5 text-gold" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold/80">
-                    Heartify Premium
-                  </span>
-                </div>
-                <h2 className="mt-2 font-heading text-2xl font-bold text-cream md:text-3xl">
-                  A quieter, richer way to listen.
-                </h2>
-                <p className="mt-2 max-w-xl text-sm text-cream/70">
-                  Verified halal audio. Studio-grade streaming. Offline downloads.
-                  Ad-free from the first āyah to the last.
-                </p>
-              </div>
-              <a
-                href="mailto:premium@heartify.app?subject=Premium%20access%20request"
-                className="shrink-0 rounded-full bg-gold px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.02]"
-              >
-                <Sparkles className="mr-1.5 inline h-4 w-4" />
-                Request Premium access
-              </a>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {PREMIUM_BENEFITS.map((b) => (
-                <div key={b.title} className="flex items-start gap-2.5 rounded-xl bg-background/10 p-3 backdrop-blur-sm ring-1 ring-cream/10">
-                  <b.icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
-                  <div>
-                    <p className="text-xs font-semibold text-cream">{b.title}</p>
-                    <p className="text-[11px] text-cream/70">{b.desc}</p>
+        FEATURE_FLAGS.PREMIUM_UPGRADE_CTA ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            className="mb-10 overflow-hidden rounded-3xl bg-gradient-hero p-6 md:p-10 shadow-card-hover"
+          >
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Crown className="h-5 w-5 text-gold" />
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold/80">
+                      Heartify Premium
+                    </span>
                   </div>
+                  <h2 className="mt-2 font-heading text-2xl font-bold text-cream md:text-3xl">
+                    A quieter, richer way to listen.
+                  </h2>
+                  <p className="mt-2 max-w-xl text-sm text-cream/70">
+                    Verified halal audio. Studio-grade streaming. Offline downloads.
+                    Ad-free from the first āyah to the last.
+                  </p>
                 </div>
-              ))}
+                <a
+                  href="mailto:premium@heartify.app?subject=Premium%20access%20request"
+                  className="shrink-0 rounded-full bg-gold px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.02]"
+                >
+                  <Sparkles className="mr-1.5 inline h-4 w-4" />
+                  Request Premium access
+                </a>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {PREMIUM_BENEFITS.map((b) => (
+                  <div key={b.title} className="flex items-start gap-2.5 rounded-xl bg-background/10 p-3 backdrop-blur-sm ring-1 ring-cream/10">
+                    <b.icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                    <div>
+                      <p className="text-xs font-semibold text-cream">{b.title}</p>
+                      <p className="text-[11px] text-cream/70">{b.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-cream/60">
+                Premium is granted server-side. Payment checkout is coming soon — until then, contact an admin.
+              </p>
             </div>
-            <p className="text-[11px] text-cream/60">
-              Premium is granted server-side. Payment checkout is coming soon — until then, contact an admin.
-            </p>
-          </div>
-        </motion.div>
+          </motion.div>
+        ) : null
       ) : (
         <div
           role="status"
@@ -236,6 +239,7 @@ const AudioSection = () => {
           <span className="text-sm font-semibold text-gold">Premium Active</span>
         </div>
       )}
+
 
       {/* Featured playlists */}
       <div className="mb-3 flex items-end justify-between">

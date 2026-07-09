@@ -23,14 +23,13 @@ const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const AdabPage = lazy(() => import("./pages/AdabPage.tsx"));
 const AdhanIqamah = lazy(() => import("./pages/AdhanIqamah.tsx"));
 const Adhkar = lazy(() => import("./pages/Adhkar.tsx"));
-const AdminAlerts = lazy(() => import("./pages/AdminAlerts.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
-const AdminGsc = lazy(() => import("./pages/AdminGsc.tsx"));
-const AdminPermissions = lazy(() => import("./pages/AdminPermissions.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers.tsx"));
+
 const AhlulBayt = lazy(() => import("./pages/AhlulBayt.tsx"));
 const Akhlaq = lazy(() => import("./pages/Akhlaq.tsx"));
 const Alphabet = lazy(() => import("./pages/Alphabet.tsx"));
@@ -90,7 +89,7 @@ const Nawawi40 = lazy(() => import("./pages/Nawawi40.tsx"));
 const NewMuslim = lazy(() => import("./pages/NewMuslim.tsx"));
 const Nikah = lazy(() => import("./pages/Nikah.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
-const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
+
 const Parenting = lazy(() => import("./pages/Parenting.tsx"));
 const ParentsRights = lazy(() => import("./pages/ParentsRights.tsx"));
 const Pillars = lazy(() => import("./pages/Pillars.tsx"));
@@ -274,16 +273,18 @@ const App = () => (
                 <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />
                 <Route path="/admin/review" element={<AdminRoute><AdminReview /></AdminRoute>} />
                 <Route path="/admin/reports" element={<AdminRoute><AdminReports /></AdminRoute>} />
-                <Route path="/admin/entitlements" element={<AdminRoute><AdminEntitlements /></AdminRoute>} />
-                <Route path="/owner" element={<AdminRoute><OwnerDashboard /></AdminRoute>} />
+                <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+                <Route path="/admin/entitlements" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/admin/roles" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/owner" element={<Navigate to="/admin/users" replace />} />
                 <Route path="/admin/channel-trust" element={<AdminRoute><ChannelTrust /></AdminRoute>} />
                 <Route path="/admin/analytics" element={<AdminRoute><Analytics /></AdminRoute>} />
                 <Route path="/admin/audio-integrity" element={<AdminRoute><AudioIntegrity /></AdminRoute>} />
-                <Route path="/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
-                <Route path="/admin/gsc" element={<AdminRoute><AdminGsc /></AdminRoute>} />
-                <Route path="/admin/permissions" element={<AdminRoute><AdminPermissions /></AdminRoute>} />
-                <Route path="/admin/alerts" element={<AdminRoute><AdminAlerts /></AdminRoute>} />
-                <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
+                <Route path="/admin/gsc" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/admin/permissions" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/admin/alerts" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/owner-profile" element={<Navigate to="/admin/users" replace />} />
+
                 <Route path="/mfa-enroll" element={<Navigate to="/security/mfa" replace />} />
                 <Route path="/mfa-verify" element={<Navigate to="/security/mfa/verify" replace />} />
                 <Route path="/security/mfa" element={<MfaEnroll />} />
