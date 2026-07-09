@@ -790,6 +790,26 @@ const App = () => (
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/matrimony-trends" element={<MatrimonyTrends />} />
+                <Route path="/muslim-travel-guides" element={<MuslimTravelGuides />} />
+                <Route path="/hajj-logistics" element={<HajjLogistics />} />
+                <Route path="/umrah-planning" element={<UmrahPlanning />} />
+                <Route path="/zamzam-rulings" element={<ZamzamRulings />} />
+                <Route path="/raudha-etiquette" element={<RaudhaEtiquette />} />
+                <Route path="/muslim-burial" element={<MuslimBurial />} />
+                <Route path="/inheritance-calculator" element={<InheritanceCalculator />} />
+                <Route path="/will-writing" element={<WillWriting />} />
+                <Route path="/sadaqah-jariyah-guide" element={<SadaqahJariyah />} />
+                <Route path="/kaffarah-guide" element={<KaffarahGuide />} />
+                <Route path="/halal-careers" element={<HalalCareers />} />
+                <Route path="/muslim-homeschool" element={<MuslimHomeschool />} />
+                <Route path="/arabic-learning" element={<ArabicLearning />} />
+                <Route path="/tajwid-basics" element={<TajwidBasics />} />
+                <Route path="/quran-reflection" element={<QuranReflection />} />
+                <Route path="/muslim-fitness" element={<MuslimFitness />} />
+                <Route path="/hijama-cupping" element={<HijamaCupping />} />
+                <Route path="/prophetic-diet" element={<PropheticDiet />} />
+                <Route path="/muslim-sleep-science" element={<MuslimSleepScience />} />
+                <Route path="/heartify-roadmap" element={<HeartifyRoadmap />} />
                 <Route path="/youth-mentorship" element={<YouthMentorship />} />
                 <Route path="/halal-restaurants" element={<HalalRestaurants />} />
                 <Route path="/muslim-entrepreneurs" element={<MuslimEntrepreneurs />} />
