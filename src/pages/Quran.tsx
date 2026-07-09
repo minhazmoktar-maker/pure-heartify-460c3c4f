@@ -303,6 +303,7 @@ const Quran = () => {
       <SEO
         title={surahNum ? `Surah ${surahNum} · Quran · Heartify` : "Quran Reader · Heartify"}
         description="Read the Quran in Uthmani script with verse-by-verse audio and translations in English, Urdu, French, Indonesian, Turkish and Bengali."
+        path={surahNum ? `/quran/${surahNum}` : "/quran"}
       />
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
