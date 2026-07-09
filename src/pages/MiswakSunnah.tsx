@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Toothbrush } from "lucide-react";
+import { ArrowLeft, Brush } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import SEO from "@/components/SEO";
@@ -10,7 +10,7 @@ export default function MiswakSunnah() {
       <SEO title="Miswāk — Prophetic Toothstick" description="Cleaning the mouth as an act of worship" path="/miswak-sunnah" />
       <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3">
         <Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link>
-        <Toothbrush className="w-6 h-6 text-primary" />
+        <Brush className="w-6 h-6 text-primary" />
         <h1 className="text-2xl font-bold">Miswāk — Prophetic Toothstick</h1>
       </div></div>
       <div className="container mx-auto px-4 py-6 max-w-3xl space-y-4">
