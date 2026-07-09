@@ -12,6 +12,7 @@ import {
   type AudioCategory, type Track, type AudioLanguage,
 } from "@/data/audio";
 import { cn } from "@/lib/utils";
+import { FEATURE_FLAGS } from "@/lib/featureFlags";
 
 const PREMIUM_BENEFITS = [
   { icon: Radio, title: "Ad-free listening", desc: "Uninterrupted Qur'an, nasheeds and lectures." },
