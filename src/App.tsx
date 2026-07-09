@@ -52,6 +52,7 @@ const Quran = lazy(() => import("./pages/Quran.tsx"));
 const Dhikr = lazy(() => import("./pages/Dhikr.tsx"));
 const Adhkar = lazy(() => import("./pages/Adhkar.tsx"));
 const Zakat = lazy(() => import("./pages/Zakat.tsx"));
+const HijriCalendar = lazy(() => import("./pages/HijriCalendar.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,7 @@ const App = () => (
                 <Route path="/dhikr" element={<Dhikr />} />
                 <Route path="/adhkar" element={<Adhkar />} />
                 <Route path="/zakat" element={<Zakat />} />
+                <Route path="/hijri" element={<HijriCalendar />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
