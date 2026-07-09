@@ -237,6 +237,26 @@ const SunnahOfClothing = lazy(() => import("./pages/SunnahOfClothing.tsx"));
 const AdabOfMasjid = lazy(() => import("./pages/AdabOfMasjid.tsx"));
 const VisitingSick = lazy(() => import("./pages/VisitingSick.tsx"));
 const FuneralRites = lazy(() => import("./pages/FuneralRites.tsx"));
+const SunnahOfEating = lazy(() => import("./pages/SunnahOfEating.tsx"));
+const SunnahOfDrinking = lazy(() => import("./pages/SunnahOfDrinking.tsx"));
+const SunnahOfTravel = lazy(() => import("./pages/SunnahOfTravel.tsx"));
+const SunnahOfGreeting = lazy(() => import("./pages/SunnahOfGreeting.tsx"));
+const SunnahOfGifts = lazy(() => import("./pages/SunnahOfGifts.tsx"));
+const HijraLessons = lazy(() => import("./pages/HijraLessons.tsx"));
+const MakkahPeriod = lazy(() => import("./pages/MakkahPeriod.tsx"));
+const MadinahPeriod = lazy(() => import("./pages/MadinahPeriod.tsx"));
+const BadrLessons = lazy(() => import("./pages/BadrLessons.tsx"));
+const UhudLessons = lazy(() => import("./pages/UhudLessons.tsx"));
+const KhandaqLessons = lazy(() => import("./pages/KhandaqLessons.tsx"));
+const HudaybiyahLessons = lazy(() => import("./pages/HudaybiyahLessons.tsx"));
+const FathMakkah = lazy(() => import("./pages/FathMakkah.tsx"));
+const TabukLessons = lazy(() => import("./pages/TabukLessons.tsx"));
+const KhilafahRashida = lazy(() => import("./pages/KhilafahRashida.tsx"));
+const UmayyadEra = lazy(() => import("./pages/UmayyadEra.tsx"));
+const AbbasidEra = lazy(() => import("./pages/AbbasidEra.tsx"));
+const OttomanEra = lazy(() => import("./pages/OttomanEra.tsx"));
+const AndalusHeritage = lazy(() => import("./pages/AndalusHeritage.tsx"));
+const ContemporaryIslam = lazy(() => import("./pages/ContemporaryIslam.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -463,6 +483,26 @@ const App = () => (
                 <Route path="/adab-of-masjid" element={<AdabOfMasjid />} />
                 <Route path="/visiting-the-sick" element={<VisitingSick />} />
                 <Route path="/funeral-rites" element={<FuneralRites />} />
+                <Route path="/sunnah-of-eating" element={<SunnahOfEating />} />
+                <Route path="/sunnah-of-drinking" element={<SunnahOfDrinking />} />
+                <Route path="/sunnah-of-travel" element={<SunnahOfTravel />} />
+                <Route path="/sunnah-of-greeting" element={<SunnahOfGreeting />} />
+                <Route path="/sunnah-of-gifts" element={<SunnahOfGifts />} />
+                <Route path="/hijra-lessons" element={<HijraLessons />} />
+                <Route path="/makkah-period" element={<MakkahPeriod />} />
+                <Route path="/madinah-period" element={<MadinahPeriod />} />
+                <Route path="/badr-lessons" element={<BadrLessons />} />
+                <Route path="/uhud-lessons" element={<UhudLessons />} />
+                <Route path="/khandaq-lessons" element={<KhandaqLessons />} />
+                <Route path="/hudaybiyah-lessons" element={<HudaybiyahLessons />} />
+                <Route path="/fath-makkah" element={<FathMakkah />} />
+                <Route path="/tabuk-lessons" element={<TabukLessons />} />
+                <Route path="/khilafah-rashida" element={<KhilafahRashida />} />
+                <Route path="/umayyad-era" element={<UmayyadEra />} />
+                <Route path="/abbasid-era" element={<AbbasidEra />} />
+                <Route path="/ottoman-era" element={<OttomanEra />} />
+                <Route path="/andalus-heritage" element={<AndalusHeritage />} />
+                <Route path="/contemporary-islam" element={<ContemporaryIslam />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
