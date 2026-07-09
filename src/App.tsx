@@ -363,6 +363,26 @@ const App = () => (
                 <Route path="/rights-of-poor" element={<RightsOfPoor />} />
                 <Route path="/silat-rahm" element={<SilaturRahm />} />
                 <Route path="/hasad-evil-eye" element={<HasadEvilEye />} />
+                <Route path="/ghibah" element={<Ghibah />} />
+                <Route path="/anger" element={<AngerControl />} />
+                <Route path="/fitrah" element={<Fitrah />} />
+                <Route path="/hira" element={<HiraKhalwa />} />
+                <Route path="/tafakkur" element={<TafakkurTadabbur />} />
+                <Route path="/ilm-amal" element={<IlmVsAmal />} />
+                <Route path="/tahajjud" element={<NightPrayer />} />
+                <Route path="/witr" element={<Witr />} />
+                <Route path="/duha" element={<Duha />} />
+                <Route path="/tahiyat-al-masjid" element={<Tahiyatul />} />
+                <Route path="/awwabin" element={<AwwabinPrayer />} />
+                <Route path="/kaffarat-al-majlis" element={<KaffaratMajlis />} />
+                <Route path="/salawat" element={<SalatOnProphet />} />
+                <Route path="/forbidden-prayer-times" element={<ForbiddenTimes />} />
+                <Route path="/missed-sunnah" element={<MissedSunnah />} />
+                <Route path="/eid-prayers" element={<IdPrayers />} />
+                <Route path="/kusuf-khusuf" element={<KusufKhusuf />} />
+                <Route path="/istisqa" element={<Istisqa />} />
+                <Route path="/ghusl" element={<Ghusl />} />
+                <Route path="/tayammum" element={<Tayammum />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
