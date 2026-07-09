@@ -47,6 +47,7 @@ const Navbar = () => {
                   { to: "/today", label: "Today (Daily Dose)", icon: Sunrise },
                   { to: "/prayer", label: "Prayer & Qibla", icon: Compass },
                   { to: "/quran", label: "Quran reader", icon: BookOpen },
+                  { to: "/khatm", label: "Khatm tracker", icon: BookMarked },
                   { to: "/dhikr", label: "Dhikr & Tasbih", icon: CircleDot },
                   { to: "/adhkar", label: "Adhkar & Duas", icon: Sunrise },
                   { to: "/zakat", label: "Zakat calculator", icon: Calculator },
