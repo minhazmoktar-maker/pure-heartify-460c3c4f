@@ -100,7 +100,7 @@ const Reminders = () => {
       <SEO
         title="Habit reminders — Heartify"
         description="Configure daily reminders for prayer, Quran, dhikr, and adhkar so consistency becomes effortless."
-        canonical="/reminders"
+        path="/reminders"
       />
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8 md:py-10">
