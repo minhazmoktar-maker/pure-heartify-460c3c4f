@@ -83,6 +83,7 @@ const Stories = lazy(() => import("./pages/Stories.tsx"));
 const NewMuslim = lazy(() => import("./pages/NewMuslim.tsx"));
 const Hifz = lazy(() => import("./pages/Hifz.tsx"));
 const Dreams = lazy(() => import("./pages/Dreams.tsx"));
+const Alphabet = lazy(() => import("./pages/Alphabet.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -155,6 +156,7 @@ const App = () => (
                 <Route path="/new-muslim" element={<NewMuslim />} />
                 <Route path="/hifz" element={<Hifz />} />
                 <Route path="/dreams" element={<Dreams />} />
+                <Route path="/alphabet" element={<Alphabet />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
