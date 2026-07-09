@@ -65,9 +65,9 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-16 text-center">
+      <div className={embedded ? "" : "min-h-screen bg-background"}>
+        {!embedded && <Navbar />}
+        <main className={embedded ? "py-4 text-center" : "container mx-auto px-4 py-16 text-center"}>
           <h1 className="text-2xl font-bold">Sign in required</h1>
           <p className="mt-2 text-muted-foreground">
             <Link to="/login" className="text-primary underline">Log in</Link> as an admin to view the moderation log.
@@ -91,18 +91,20 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const reasons = Array.from(new Set(rows.map((r) => r.reject_reason)));
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center gap-3">
-          <ShieldAlert className="h-7 w-7 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold">Moderation Log</h1>
-            <p className="text-sm text-muted-foreground">
-              Videos rejected by the halal filter, with the exact rule that triggered each block.
-            </p>
+    <div className={embedded ? "" : "min-h-screen bg-background"}>
+      {!embedded && <Navbar />}
+      <main className={embedded ? "" : "container mx-auto px-4 py-8"}>
+        {!embedded && (
+          <div className="mb-6 flex items-center gap-3">
+            <ShieldAlert className="h-7 w-7 text-primary" />
+            <div>
+              <h1 className="text-2xl font-bold">Moderation Log</h1>
+              <p className="text-sm text-muted-foreground">
+                Videos rejected by the halal filter, with the exact rule that triggered each block.
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         {forbidden && (
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
