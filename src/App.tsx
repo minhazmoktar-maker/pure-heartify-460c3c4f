@@ -113,6 +113,11 @@ const Kalimahs = lazy(() => import("./pages/Kalimahs.tsx"));
 const MasnoonDuas = lazy(() => import("./pages/MasnoonDuas.tsx"));
 const Purification = lazy(() => import("./pages/Purification.tsx"));
 const TravelAdab = lazy(() => import("./pages/TravelAdab.tsx"));
+const EatingSunnah = lazy(() => import("./pages/EatingSunnah.tsx"));
+const MeansOfReward = lazy(() => import("./pages/MeansOfReward.tsx"));
+const MajorSins = lazy(() => import("./pages/MajorSins.tsx"));
+const Tawbah = lazy(() => import("./pages/Tawbah.tsx"));
+const JannahDescriptions = lazy(() => import("./pages/JannahDescriptions.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -215,6 +220,11 @@ const App = () => (
                 <Route path="/masnoon-duas" element={<MasnoonDuas />} />
                 <Route path="/purification" element={<Purification />} />
                 <Route path="/travel-adab" element={<TravelAdab />} />
+                <Route path="/eating-sunnah" element={<EatingSunnah />} />
+                <Route path="/means-of-reward" element={<MeansOfReward />} />
+                <Route path="/major-sins" element={<MajorSins />} />
+                <Route path="/tawbah" element={<Tawbah />} />
+                <Route path="/jannah" element={<JannahDescriptions />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
