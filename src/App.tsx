@@ -257,6 +257,26 @@ const AbbasidEra = lazy(() => import("./pages/AbbasidEra.tsx"));
 const OttomanEra = lazy(() => import("./pages/OttomanEra.tsx"));
 const AndalusHeritage = lazy(() => import("./pages/AndalusHeritage.tsx"));
 const ContemporaryIslam = lazy(() => import("./pages/ContemporaryIslam.tsx"));
+const SahabaWomen = lazy(() => import("./pages/SahabaWomen.tsx"));
+const SahabaMen = lazy(() => import("./pages/SahabaMen.tsx"));
+const TabiunEra = lazy(() => import("./pages/TabiunEra.tsx"));
+const ImamAbuHanifa = lazy(() => import("./pages/ImamAbuHanifa.tsx"));
+const ImamMalik = lazy(() => import("./pages/ImamMalik.tsx"));
+const ImamShafii = lazy(() => import("./pages/ImamShafii.tsx"));
+const ImamAhmad = lazy(() => import("./pages/ImamAhmad.tsx"));
+const ImamBukhari = lazy(() => import("./pages/ImamBukhari.tsx"));
+const ImamMuslim = lazy(() => import("./pages/ImamMuslim.tsx"));
+const IbnTaymiyyah = lazy(() => import("./pages/IbnTaymiyyah.tsx"));
+const IbnQayyim = lazy(() => import("./pages/IbnQayyim.tsx"));
+const ImamGhazali = lazy(() => import("./pages/ImamGhazali.tsx"));
+const ImamNawawi = lazy(() => import("./pages/ImamNawawi.tsx"));
+const IbnKathir = lazy(() => import("./pages/IbnKathir.tsx"));
+const IbnHajar = lazy(() => import("./pages/IbnHajar.tsx"));
+const SalafiManhaj = lazy(() => import("./pages/SalafiManhaj.tsx"));
+const AqidahTahawiyyah = lazy(() => import("./pages/AqidahTahawiyyah.tsx"));
+const AsmaWaSifat = lazy(() => import("./pages/AsmaWaSifat.tsx"));
+const ShirkTypes = lazy(() => import("./pages/ShirkTypes.tsx"));
+const KufrNifaq = lazy(() => import("./pages/KufrNifaq.tsx"));
 
 const queryClient = new QueryClient();
 
