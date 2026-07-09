@@ -126,6 +126,7 @@ const Nikah = () => {
       <SEO
         title="Nikah Planner — Heartify"
         description="Plan a halal nikah: mahr, witnesses, walimah checklist, guest list with RSVP, and budget tracker."
+        path="/nikah"
       />
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">
