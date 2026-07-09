@@ -110,6 +110,7 @@ const App = () => (
                 <Route path="/achievements" element={<Achievements />} />
                 <Route path="/challenges" element={<Challenges />} />
                 <Route path="/today" element={<Today />} />
+                <Route path="/reminders" element={<Reminders />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
