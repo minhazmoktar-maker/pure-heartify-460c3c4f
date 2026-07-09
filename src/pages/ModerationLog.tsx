@@ -32,7 +32,7 @@ const reasonColors: Record<string, string> = {
   thumbnail_unsafe: "bg-purple-500/15 text-purple-700 dark:text-purple-300",
 };
 
-const ModerationLog = () => {
+const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { user } = useAuth();
   const [rows, setRows] = useState<ModerationRow[]>([]);
   const [loading, setLoading] = useState(true);
