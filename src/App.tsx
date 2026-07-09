@@ -177,6 +177,26 @@ const EldersRights = lazy(() => import("./pages/EldersRights.tsx"));
 const RightsOfPoor = lazy(() => import("./pages/RightsOfPoor.tsx"));
 const SilaturRahm = lazy(() => import("./pages/SilaturRahm.tsx"));
 const HasadEvilEye = lazy(() => import("./pages/HasadEvilEye.tsx"));
+const Ghibah = lazy(() => import("./pages/Ghibah.tsx"));
+const AngerControl = lazy(() => import("./pages/AngerControl.tsx"));
+const Fitrah = lazy(() => import("./pages/Fitrah.tsx"));
+const HiraKhalwa = lazy(() => import("./pages/HiraKhalwa.tsx"));
+const TafakkurTadabbur = lazy(() => import("./pages/TafakkurTadabbur.tsx"));
+const IlmVsAmal = lazy(() => import("./pages/IlmVsAmal.tsx"));
+const NightPrayer = lazy(() => import("./pages/NightPrayer.tsx"));
+const Witr = lazy(() => import("./pages/Witr.tsx"));
+const Duha = lazy(() => import("./pages/Duha.tsx"));
+const Tahiyatul = lazy(() => import("./pages/Tahiyatul.tsx"));
+const AwwabinPrayer = lazy(() => import("./pages/AwwabinPrayer.tsx"));
+const KaffaratMajlis = lazy(() => import("./pages/KaffaratMajlis.tsx"));
+const SalatOnProphet = lazy(() => import("./pages/SalatOnProphet.tsx"));
+const ForbiddenTimes = lazy(() => import("./pages/ForbiddenTimes.tsx"));
+const MissedSunnah = lazy(() => import("./pages/MissedSunnah.tsx"));
+const IdPrayers = lazy(() => import("./pages/IdPrayers.tsx"));
+const KusufKhusuf = lazy(() => import("./pages/KusufKhusuf.tsx"));
+const Istisqa = lazy(() => import("./pages/Istisqa.tsx"));
+const Ghusl = lazy(() => import("./pages/Ghusl.tsx"));
+const Tayammum = lazy(() => import("./pages/Tayammum.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -343,6 +363,26 @@ const App = () => (
                 <Route path="/rights-of-poor" element={<RightsOfPoor />} />
                 <Route path="/silat-rahm" element={<SilaturRahm />} />
                 <Route path="/hasad-evil-eye" element={<HasadEvilEye />} />
+                <Route path="/ghibah" element={<Ghibah />} />
+                <Route path="/anger" element={<AngerControl />} />
+                <Route path="/fitrah" element={<Fitrah />} />
+                <Route path="/hira" element={<HiraKhalwa />} />
+                <Route path="/tafakkur" element={<TafakkurTadabbur />} />
+                <Route path="/ilm-amal" element={<IlmVsAmal />} />
+                <Route path="/tahajjud" element={<NightPrayer />} />
+                <Route path="/witr" element={<Witr />} />
+                <Route path="/duha" element={<Duha />} />
+                <Route path="/tahiyat-al-masjid" element={<Tahiyatul />} />
+                <Route path="/awwabin" element={<AwwabinPrayer />} />
+                <Route path="/kaffarat-al-majlis" element={<KaffaratMajlis />} />
+                <Route path="/salawat" element={<SalatOnProphet />} />
+                <Route path="/forbidden-prayer-times" element={<ForbiddenTimes />} />
+                <Route path="/missed-sunnah" element={<MissedSunnah />} />
+                <Route path="/eid-prayers" element={<IdPrayers />} />
+                <Route path="/kusuf-khusuf" element={<KusufKhusuf />} />
+                <Route path="/istisqa" element={<Istisqa />} />
+                <Route path="/ghusl" element={<Ghusl />} />
+                <Route path="/tayammum" element={<Tayammum />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
