@@ -443,6 +443,26 @@ const App = () => (
                 <Route path="/khula-annulment" element={<KhulaAnnulment />} />
                 <Route path="/breastfeeding-fiqh" element={<BreastfeedingFiqh />} />
                 <Route path="/halal-haram-food" element={<HalalHaramFood />} />
+                <Route path="/qurbani-rules" element={<QurbaniRules />} />
+                <Route path="/aqiqah-rules" element={<AqiqahRules />} />
+                <Route path="/hijamah-rules" element={<HijamahRules />} />
+                <Route path="/miswak-sunnah" element={<MiswakSunnah />} />
+                <Route path="/ruqyah-shariah" element={<RuqyahSharia />} />
+                <Route path="/evil-eye-protection" element={<EvilEyeProtection />} />
+                <Route path="/jinn-shaytan" element={<JinnAndShaytan />} />
+                <Route path="/barzakh-afterlife" element={<BarzakhAfterlife />} />
+                <Route path="/yawm-al-qiyamah" element={<YawmAlQiyamah />} />
+                <Route path="/major-signs-hour" element={<MajorSignsHour />} />
+                <Route path="/messengers-of-allah" element={<MessengersOfAllah />} />
+                <Route path="/books-of-allah" element={<BooksOfAllah />} />
+                <Route path="/angels-in-islam" element={<AngelsInIslam />} />
+                <Route path="/qadr-divine-decree" element={<QadrDivineDecree />} />
+                <Route path="/al-wala-wal-bara" element={<AlWalaWalBara />} />
+                <Route path="/sunnah-of-sleep" element={<SunnahOfSleep />} />
+                <Route path="/sunnah-of-clothing" element={<SunnahOfClothing />} />
+                <Route path="/adab-of-masjid" element={<AdabOfMasjid />} />
+                <Route path="/visiting-the-sick" element={<VisitingSick />} />
+                <Route path="/funeral-rites" element={<FuneralRites />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
