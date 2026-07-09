@@ -378,6 +378,28 @@ const EveningRoutine = lazy(() => import("./pages/EveningRoutine.tsx"));
 const HalalRelationships = lazy(() => import("./pages/HalalRelationships.tsx"));
 const MuslimDating = lazy(() => import("./pages/MuslimDating.tsx"));
 
+const MatrimonyTrends = lazy(() => import("./pages/MatrimonyTrends.tsx"));
+const YouthMentorship = lazy(() => import("./pages/YouthMentorship.tsx"));
+const HalalRestaurants = lazy(() => import("./pages/HalalRestaurants.tsx"));
+const MuslimEntrepreneurs = lazy(() => import("./pages/MuslimEntrepreneurs.tsx"));
+const CharityDiscovery = lazy(() => import("./pages/CharityDiscovery.tsx"));
+const DisasterRelief = lazy(() => import("./pages/DisasterRelief.tsx"));
+const RefugeeSupport = lazy(() => import("./pages/RefugeeSupport.tsx"));
+const OrphanSponsorship = lazy(() => import("./pages/OrphanSponsorship.tsx"));
+const IftarApps = lazy(() => import("./pages/IftarApps.tsx"));
+const MasjidDiscovery = lazy(() => import("./pages/MasjidDiscovery.tsx"));
+const IslamicSchools = lazy(() => import("./pages/IslamicSchools.tsx"));
+const HalalKidsGames = lazy(() => import("./pages/HalalKidsGames.tsx"));
+const BedtimeStories = lazy(() => import("./pages/BedtimeStories.tsx"));
+const IslamicPodcasts = lazy(() => import("./pages/IslamicPodcasts.tsx"));
+const StreamingEthics = lazy(() => import("./pages/StreamingEthics.tsx"));
+const ModerationEthics = lazy(() => import("./pages/ModerationEthics.tsx"));
+const DigitalWellbeing = lazy(() => import("./pages/DigitalWellbeing.tsx"));
+const InfluencerEthics = lazy(() => import("./pages/InfluencerEthics.tsx"));
+const AIInIslam = lazy(() => import("./pages/AIInIslam.tsx"));
+const HalalGaming = lazy(() => import("./pages/HalalGaming.tsx"));
+
+
 const queryClient = new QueryClient();
 
 const RouteFallback = () => (
