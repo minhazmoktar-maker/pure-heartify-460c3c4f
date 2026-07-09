@@ -39,9 +39,9 @@ const Navbar = () => {
                 <Menu className="h-5 w-5 text-foreground" />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72">
-              <SheetHeader><SheetTitle>Menu</SheetTitle></SheetHeader>
-              <nav className="mt-6 flex flex-col gap-1">
+            <SheetContent side="left" className="w-72 flex flex-col p-0">
+              <SheetHeader className="px-6 pt-6 pb-2 shrink-0"><SheetTitle>Menu</SheetTitle></SheetHeader>
+              <nav className="flex-1 overflow-y-auto overscroll-contain px-6 pb-6 flex flex-col gap-1">
                 {[
                   { to: "/", label: "Home", icon: Home },
                   { to: "/today", label: "Today (Daily Dose)", icon: Sunrise },
