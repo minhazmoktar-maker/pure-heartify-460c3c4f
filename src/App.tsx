@@ -603,6 +603,26 @@ const App = () => (
                 <Route path="/hijab-rulings" element={<HijabRulings />} />
                 <Route path="/mahram-nonmahram" element={<MahramNonMahram />} />
                 <Route path="/free-mixing" element={<FreeMixing />} />
+                <Route path="/lgbtq-islamic-view" element={<LgbtqIslamicView />} />
+                <Route path="/music-rulings" element={<MusicRulings />} />
+                <Route path="/photography-rulings" element={<PhotographyRulings />} />
+                <Route path="/sports-islam" element={<SportsIslam />} />
+                <Route path="/alcohol-rulings" element={<AlcoholRulings />} />
+                <Route path="/gambling-rulings" element={<GamblingRulings />} />
+                <Route path="/halal-slaughter" element={<HalalSlaughter />} />
+                <Route path="/halal-cosmetics" element={<HalalCosmetics />} />
+                <Route path="/halal-certification" element={<HalalCertification />} />
+                <Route path="/muslim-minorities" element={<MuslimMinorities />} />
+                <Route path="/political-islam" element={<PoliticalIslam />} />
+                <Route path="/khilafah-concept" element={<KhilafahConcept />} />
+                <Route path="/jihad-types" element={<JihadTypes />} />
+                <Route path="/war-ethics" element={<WarEthics />} />
+                <Route path="/prisoners-of-war" element={<PrisonersOfWar />} />
+                <Route path="/treaties" element={<Treaties />} />
+                <Route path="/interfaith-dialogue" element={<InterfaithDialogue />} />
+                <Route path="/christianity-compared" element={<ChristianityCompared />} />
+                <Route path="/judaism-compared" element={<JudaismCompared />} />
+                <Route path="/hinduism-buddhism" element={<HinduismBuddhism />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
