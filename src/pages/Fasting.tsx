@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { computePrayerTimes } from "@/lib/prayerTimes";
+import { computePrayerTimes, formatTime } from "@/lib/prayerTimes";
 
 type FastType = "ramadan" | "monday" | "thursday" | "ayyam_al_bid" | "ashura" | "arafah" | "voluntary";
 
@@ -62,17 +62,17 @@ const Fasting = () => {
     }
   }, []);
 
-  const times = useMemo(() => {
+  const slots = useMemo(() => {
     if (!coords) return null;
     try {
-      return computePrayerTimes(new Date(), coords.lat, coords.lng);
+      return computePrayerTimes({ latitude: coords.lat, longitude: coords.lng }, new Date());
     } catch {
       return null;
     }
   }, [coords]);
 
-  const suhoorEnd = times?.fajr;
-  const iftar = times?.maghrib;
+  const suhoorEnd = slots ? formatTime(slots.find((s) => s.name === "fajr")!.time) : null;
+  const iftar = slots ? formatTime(slots.find((s) => s.name === "maghrib")!.time) : null;
 
   const todaysEntry = log.find((e) => e.date === todayKey());
 
