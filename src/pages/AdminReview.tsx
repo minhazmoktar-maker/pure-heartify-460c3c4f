@@ -51,7 +51,7 @@ type AuditRow = {
   created_at: string;
 };
 
-const AdminReview = () => {
+const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { user } = useAuth();
   const { isAdmin, loading: roleLoading } = useRole();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
