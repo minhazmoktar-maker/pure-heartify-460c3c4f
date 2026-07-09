@@ -83,7 +83,7 @@ function severityColor(s: string) {
   return "bg-secondary text-secondary-foreground";
 }
 
-export default function AdminReports() {
+export default function AdminReports({ embedded = false }: { embedded?: boolean } = {}) {
   const { user } = useAuth();
   const [rows, setRows] = useState<ReportRow[]>([]);
   const [loading, setLoading] = useState(true);
