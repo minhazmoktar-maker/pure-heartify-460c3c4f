@@ -91,6 +91,7 @@ const Inheritance = lazy(() => import("./pages/Inheritance.tsx"));
 const WuduGuide = lazy(() => import("./pages/WuduGuide.tsx"));
 const SalahGuide = lazy(() => import("./pages/SalahGuide.tsx"));
 const Fatwa = lazy(() => import("./pages/Fatwa.tsx"));
+const Ruqya = lazy(() => import("./pages/Ruqya.tsx"));
 
 const queryClient = new QueryClient();
 
