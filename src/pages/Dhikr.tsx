@@ -105,7 +105,7 @@ const Dhikr = () => {
       <SEO
         title="Dhikr & Tasbih counter — daily remembrance"
         description="Tap-to-count digital tasbih with SubhanAllah, Alhamdulillah, Allahu Akbar, salawat, istighfar, daily goals and streaks."
-        canonicalPath="/dhikr"
+        path="/dhikr"
       />
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
