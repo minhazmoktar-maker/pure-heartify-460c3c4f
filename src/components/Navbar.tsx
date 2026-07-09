@@ -1,4 +1,4 @@
-import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays } from "lucide-react";
+import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -50,6 +50,7 @@ const Navbar = () => {
                   { to: "/adhkar", label: "Adhkar & Duas", icon: Sunrise },
                   { to: "/zakat", label: "Zakat calculator", icon: Calculator },
                   { to: "/hijri", label: "Hijri calendar", icon: CalendarDays },
+                  { to: "/names", label: "99 Names of Allah", icon: Sparkles },
                   { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
                   { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
                   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
