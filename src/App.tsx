@@ -73,6 +73,7 @@ const Sadaqah = lazy(() => import("./pages/Sadaqah.tsx"));
 const Wasiyyah = lazy(() => import("./pages/Wasiyyah.tsx"));
 const Ramadan = lazy(() => import("./pages/Ramadan.tsx"));
 const Hajj = lazy(() => import("./pages/Hajj.tsx"));
+const Qibla = lazy(() => import("./pages/Qibla.tsx"));
 
 const queryClient = new QueryClient();
 
