@@ -25,6 +25,7 @@ const AdhanIqamah = lazy(() => import("./pages/AdhanIqamah.tsx"));
 const Adhkar = lazy(() => import("./pages/Adhkar.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
+const AdminModeration = lazy(() => import("./pages/AdminModeration.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
@@ -268,11 +269,12 @@ const App = () => (
                 <Route path="/shared-economy" element={<SharedEconomy />} />
 
                 <Route path="/admin" element={<Navigate to="/admin/console" replace />} />
-                <Route path="/admin/moderation" element={<AdminRoute><ModerationLog /></AdminRoute>} />
+                <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
+                <Route path="/admin/moderation-log" element={<Navigate to="/admin/moderation" replace />} />
                 <Route path="/admin/audit" element={<AdminRoute><Audit /></AdminRoute>} />
                 <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />
-                <Route path="/admin/review" element={<AdminRoute><AdminReview /></AdminRoute>} />
-                <Route path="/admin/reports" element={<AdminRoute><AdminReports /></AdminRoute>} />
+                <Route path="/admin/review" element={<Navigate to="/admin/moderation" replace />} />
+                <Route path="/admin/reports" element={<Navigate to="/admin/moderation" replace />} />
                 <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
                 <Route path="/admin/entitlements" element={<Navigate to="/admin/users" replace />} />
                 <Route path="/admin/roles" element={<Navigate to="/admin/users" replace />} />

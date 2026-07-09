@@ -88,10 +88,9 @@ const Navbar = () => {
                     <div className="mt-4 mb-1 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Admin</div>
                     {[
                       ...(isOwner ? [{ to: "/admin/users", label: "Users, roles & entitlements", icon: Crown }] : []),
-                      { to: "/admin/review", label: "Review candidates" },
+                      { to: "/admin/moderation", label: "Moderation" },
                       { to: "/admin/console", label: "Admin console" },
                       { to: "/admin/audit", label: "Audit log" },
-                      { to: "/admin/moderation", label: "Moderation" },
                     ].map((l) => {
                       const Icon = "icon" in l && l.icon ? l.icon : ShieldAlert;
                       return (

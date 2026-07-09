@@ -51,7 +51,7 @@ type AuditRow = {
   created_at: string;
 };
 
-const AdminReview = () => {
+const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const { user } = useAuth();
   const { isAdmin, loading: roleLoading } = useRole();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -161,16 +161,16 @@ const AdminReview = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className={embedded ? "" : "min-h-screen bg-background"}>
+        {!embedded && <Navbar />}
         <div className="p-8 text-center">Please <Link className="underline" to="/login">sign in</Link>.</div>
       </div>
     );
   }
   if (!roleLoading && !isAdmin) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
+      <div className={embedded ? "" : "min-h-screen bg-background"}>
+        {!embedded && <Navbar />}
         <div className="p-8 text-center text-destructive">Forbidden — admin access required.</div>
       </div>
     );
@@ -182,12 +182,12 @@ const AdminReview = () => {
   const flaggedCh = approved.filter((c) => c.status === "flagged");
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <div className="mx-auto max-w-6xl p-4 space-y-6">
+    <div className={embedded ? "" : "min-h-screen bg-background"}>
+      {!embedded && <Navbar />}
+      <div className={embedded ? "space-y-6" : "mx-auto max-w-6xl p-4 space-y-6"}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Channel & Video Review</h1>
+            <h1 className={embedded ? "text-lg font-semibold" : "text-2xl font-bold"}>Channel & Video Review</h1>
             <p className="text-sm text-muted-foreground">
               {pending.length} pending · {approved.length} approved · {flaggedCh.length} flagged
             </p>
@@ -196,6 +196,7 @@ const AdminReview = () => {
             <AlertTriangle className="mr-2 h-4 w-4" /> Run recheck now
           </Button>
         </div>
+
 
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-base">Submit channel(s) for verification</CardTitle></CardHeader>
