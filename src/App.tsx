@@ -217,6 +217,26 @@ const IddahRules = lazy(() => import("./pages/IddahRules.tsx"));
 const KhulaAnnulment = lazy(() => import("./pages/KhulaAnnulment.tsx"));
 const BreastfeedingFiqh = lazy(() => import("./pages/BreastfeedingFiqh.tsx"));
 const HalalHaramFood = lazy(() => import("./pages/HalalHaramFood.tsx"));
+const QurbaniRules = lazy(() => import("./pages/QurbaniRules.tsx"));
+const AqiqahRules = lazy(() => import("./pages/AqiqahRules.tsx"));
+const HijamahRules = lazy(() => import("./pages/HijamahRules.tsx"));
+const MiswakSunnah = lazy(() => import("./pages/MiswakSunnah.tsx"));
+const RuqyahSharia = lazy(() => import("./pages/RuqyahSharia.tsx"));
+const EvilEyeProtection = lazy(() => import("./pages/EvilEyeProtection.tsx"));
+const JinnAndShaytan = lazy(() => import("./pages/JinnAndShaytan.tsx"));
+const BarzakhAfterlife = lazy(() => import("./pages/BarzakhAfterlife.tsx"));
+const YawmAlQiyamah = lazy(() => import("./pages/YawmAlQiyamah.tsx"));
+const MajorSignsHour = lazy(() => import("./pages/MajorSignsHour.tsx"));
+const MessengersOfAllah = lazy(() => import("./pages/MessengersOfAllah.tsx"));
+const BooksOfAllah = lazy(() => import("./pages/BooksOfAllah.tsx"));
+const AngelsInIslam = lazy(() => import("./pages/AngelsInIslam.tsx"));
+const QadrDivineDecree = lazy(() => import("./pages/QadrDivineDecree.tsx"));
+const AlWalaWalBara = lazy(() => import("./pages/AlWalaWalBara.tsx"));
+const SunnahOfSleep = lazy(() => import("./pages/SunnahOfSleep.tsx"));
+const SunnahOfClothing = lazy(() => import("./pages/SunnahOfClothing.tsx"));
+const AdabOfMasjid = lazy(() => import("./pages/AdabOfMasjid.tsx"));
+const VisitingSick = lazy(() => import("./pages/VisitingSick.tsx"));
+const FuneralRites = lazy(() => import("./pages/FuneralRites.tsx"));
 
 const queryClient = new QueryClient();
 
