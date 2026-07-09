@@ -257,6 +257,26 @@ const AbbasidEra = lazy(() => import("./pages/AbbasidEra.tsx"));
 const OttomanEra = lazy(() => import("./pages/OttomanEra.tsx"));
 const AndalusHeritage = lazy(() => import("./pages/AndalusHeritage.tsx"));
 const ContemporaryIslam = lazy(() => import("./pages/ContemporaryIslam.tsx"));
+const SahabaWomen = lazy(() => import("./pages/SahabaWomen.tsx"));
+const SahabaMen = lazy(() => import("./pages/SahabaMen.tsx"));
+const TabiunEra = lazy(() => import("./pages/TabiunEra.tsx"));
+const ImamAbuHanifa = lazy(() => import("./pages/ImamAbuHanifa.tsx"));
+const ImamMalik = lazy(() => import("./pages/ImamMalik.tsx"));
+const ImamShafii = lazy(() => import("./pages/ImamShafii.tsx"));
+const ImamAhmad = lazy(() => import("./pages/ImamAhmad.tsx"));
+const ImamBukhari = lazy(() => import("./pages/ImamBukhari.tsx"));
+const ImamMuslim = lazy(() => import("./pages/ImamMuslim.tsx"));
+const IbnTaymiyyah = lazy(() => import("./pages/IbnTaymiyyah.tsx"));
+const IbnQayyim = lazy(() => import("./pages/IbnQayyim.tsx"));
+const ImamGhazali = lazy(() => import("./pages/ImamGhazali.tsx"));
+const ImamNawawi = lazy(() => import("./pages/ImamNawawi.tsx"));
+const IbnKathir = lazy(() => import("./pages/IbnKathir.tsx"));
+const IbnHajar = lazy(() => import("./pages/IbnHajar.tsx"));
+const SalafiManhaj = lazy(() => import("./pages/SalafiManhaj.tsx"));
+const AqidahTahawiyyah = lazy(() => import("./pages/AqidahTahawiyyah.tsx"));
+const AsmaWaSifat = lazy(() => import("./pages/AsmaWaSifat.tsx"));
+const ShirkTypes = lazy(() => import("./pages/ShirkTypes.tsx"));
+const KufrNifaq = lazy(() => import("./pages/KufrNifaq.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -503,6 +523,26 @@ const App = () => (
                 <Route path="/ottoman-era" element={<OttomanEra />} />
                 <Route path="/andalus-heritage" element={<AndalusHeritage />} />
                 <Route path="/contemporary-islam" element={<ContemporaryIslam />} />
+                <Route path="/sahaba-women" element={<SahabaWomen />} />
+                <Route path="/sahaba-men" element={<SahabaMen />} />
+                <Route path="/tabiun-era" element={<TabiunEra />} />
+                <Route path="/imam-abu-hanifa" element={<ImamAbuHanifa />} />
+                <Route path="/imam-malik" element={<ImamMalik />} />
+                <Route path="/imam-shafii" element={<ImamShafii />} />
+                <Route path="/imam-ahmad" element={<ImamAhmad />} />
+                <Route path="/imam-bukhari" element={<ImamBukhari />} />
+                <Route path="/imam-muslim" element={<ImamMuslim />} />
+                <Route path="/ibn-taymiyyah" element={<IbnTaymiyyah />} />
+                <Route path="/ibn-qayyim" element={<IbnQayyim />} />
+                <Route path="/imam-ghazali" element={<ImamGhazali />} />
+                <Route path="/imam-nawawi" element={<ImamNawawi />} />
+                <Route path="/ibn-kathir" element={<IbnKathir />} />
+                <Route path="/ibn-hajar" element={<IbnHajar />} />
+                <Route path="/salafi-manhaj" element={<SalafiManhaj />} />
+                <Route path="/aqidah-tahawiyyah" element={<AqidahTahawiyyah />} />
+                <Route path="/asma-wa-sifat" element={<AsmaWaSifat />} />
+                <Route path="/shirk-types" element={<ShirkTypes />} />
+                <Route path="/kufr-nifaq" element={<KufrNifaq />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
