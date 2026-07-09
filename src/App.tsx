@@ -297,6 +297,26 @@ const GenderRoles = lazy(() => import("./pages/GenderRoles.tsx"));
 const HijabRulings = lazy(() => import("./pages/HijabRulings.tsx"));
 const MahramNonMahram = lazy(() => import("./pages/MahramNonMahram.tsx"));
 const FreeMixing = lazy(() => import("./pages/FreeMixing.tsx"));
+const LgbtqIslamicView = lazy(() => import("./pages/LgbtqIslamicView.tsx"));
+const MusicRulings = lazy(() => import("./pages/MusicRulings.tsx"));
+const PhotographyRulings = lazy(() => import("./pages/PhotographyRulings.tsx"));
+const SportsIslam = lazy(() => import("./pages/SportsIslam.tsx"));
+const AlcoholRulings = lazy(() => import("./pages/AlcoholRulings.tsx"));
+const GamblingRulings = lazy(() => import("./pages/GamblingRulings.tsx"));
+const HalalSlaughter = lazy(() => import("./pages/HalalSlaughter.tsx"));
+const HalalCosmetics = lazy(() => import("./pages/HalalCosmetics.tsx"));
+const HalalCertification = lazy(() => import("./pages/HalalCertification.tsx"));
+const MuslimMinorities = lazy(() => import("./pages/MuslimMinorities.tsx"));
+const PoliticalIslam = lazy(() => import("./pages/PoliticalIslam.tsx"));
+const KhilafahConcept = lazy(() => import("./pages/KhilafahConcept.tsx"));
+const JihadTypes = lazy(() => import("./pages/JihadTypes.tsx"));
+const WarEthics = lazy(() => import("./pages/WarEthics.tsx"));
+const PrisonersOfWar = lazy(() => import("./pages/PrisonersOfWar.tsx"));
+const Treaties = lazy(() => import("./pages/Treaties.tsx"));
+const InterfaithDialogue = lazy(() => import("./pages/InterfaithDialogue.tsx"));
+const ChristianityCompared = lazy(() => import("./pages/ChristianityCompared.tsx"));
+const JudaismCompared = lazy(() => import("./pages/JudaismCompared.tsx"));
+const HinduismBuddhism = lazy(() => import("./pages/HinduismBuddhism.tsx"));
 
 const queryClient = new QueryClient();
 
