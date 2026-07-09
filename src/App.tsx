@@ -92,6 +92,7 @@ const WuduGuide = lazy(() => import("./pages/WuduGuide.tsx"));
 const SalahGuide = lazy(() => import("./pages/SalahGuide.tsx"));
 const Fatwa = lazy(() => import("./pages/Fatwa.tsx"));
 const Ruqya = lazy(() => import("./pages/Ruqya.tsx"));
+const Nawawi40 = lazy(() => import("./pages/Nawawi40.tsx"));
 
 const queryClient = new QueryClient();
 
