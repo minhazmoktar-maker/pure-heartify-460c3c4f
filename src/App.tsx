@@ -98,6 +98,11 @@ const Sahaba = lazy(() => import("./pages/Sahaba.tsx"));
 const IslamicFinance = lazy(() => import("./pages/IslamicFinance.tsx"));
 const AdabPage = lazy(() => import("./pages/AdabPage.tsx"));
 const Parenting = lazy(() => import("./pages/Parenting.tsx"));
+const MarriageRights = lazy(() => import("./pages/MarriageRights.tsx"));
+const Janazah = lazy(() => import("./pages/Janazah.tsx"));
+const TibbNabawi = lazy(() => import("./pages/TibbNabawi.tsx"));
+const UmrahGuide = lazy(() => import("./pages/UmrahGuide.tsx"));
+const WomensFiqh = lazy(() => import("./pages/WomensFiqh.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -185,6 +190,11 @@ const App = () => (
                 <Route path="/islamic-finance" element={<IslamicFinance />} />
                 <Route path="/adab" element={<AdabPage />} />
                 <Route path="/parenting" element={<Parenting />} />
+                <Route path="/marriage-rights" element={<MarriageRights />} />
+                <Route path="/janazah" element={<Janazah />} />
+                <Route path="/tibb" element={<TibbNabawi />} />
+                <Route path="/umrah" element={<UmrahGuide />} />
+                <Route path="/womens-fiqh" element={<WomensFiqh />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
