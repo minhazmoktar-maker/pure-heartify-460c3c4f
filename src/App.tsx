@@ -378,6 +378,26 @@ const EveningRoutine = lazy(() => import("./pages/EveningRoutine.tsx"));
 const HalalRelationships = lazy(() => import("./pages/HalalRelationships.tsx"));
 const MuslimDating = lazy(() => import("./pages/MuslimDating.tsx"));
 
+const MuslimTravelGuides = lazy(() => import("./pages/MuslimTravelGuides.tsx"));
+const HajjLogistics = lazy(() => import("./pages/HajjLogistics.tsx"));
+const UmrahPlanning = lazy(() => import("./pages/UmrahPlanning.tsx"));
+const ZamzamRulings = lazy(() => import("./pages/ZamzamRulings.tsx"));
+const RaudhaEtiquette = lazy(() => import("./pages/RaudhaEtiquette.tsx"));
+const MuslimBurial = lazy(() => import("./pages/MuslimBurial.tsx"));
+const InheritanceCalculator = lazy(() => import("./pages/InheritanceCalculator.tsx"));
+const WillWriting = lazy(() => import("./pages/WillWriting.tsx"));
+const SadaqahJariyah = lazy(() => import("./pages/SadaqahJariyah.tsx"));
+const KaffarahGuide = lazy(() => import("./pages/KaffarahGuide.tsx"));
+const HalalCareers = lazy(() => import("./pages/HalalCareers.tsx"));
+const MuslimHomeschool = lazy(() => import("./pages/MuslimHomeschool.tsx"));
+const ArabicLearning = lazy(() => import("./pages/ArabicLearning.tsx"));
+const TajwidBasics = lazy(() => import("./pages/TajwidBasics.tsx"));
+const QuranReflection = lazy(() => import("./pages/QuranReflection.tsx"));
+const MuslimFitness = lazy(() => import("./pages/MuslimFitness.tsx"));
+const HijamaCupping = lazy(() => import("./pages/HijamaCupping.tsx"));
+const PropheticDiet = lazy(() => import("./pages/PropheticDiet.tsx"));
+const MuslimSleepScience = lazy(() => import("./pages/MuslimSleepScience.tsx"));
+const HeartifyRoadmap = lazy(() => import("./pages/HeartifyRoadmap.tsx"));
 const MatrimonyTrends = lazy(() => import("./pages/MatrimonyTrends.tsx"));
 const YouthMentorship = lazy(() => import("./pages/YouthMentorship.tsx"));
 const HalalRestaurants = lazy(() => import("./pages/HalalRestaurants.tsx"));
@@ -770,6 +790,26 @@ const App = () => (
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/matrimony-trends" element={<MatrimonyTrends />} />
+                <Route path="/muslim-travel-guides" element={<MuslimTravelGuides />} />
+                <Route path="/hajj-logistics" element={<HajjLogistics />} />
+                <Route path="/umrah-planning" element={<UmrahPlanning />} />
+                <Route path="/zamzam-rulings" element={<ZamzamRulings />} />
+                <Route path="/raudha-etiquette" element={<RaudhaEtiquette />} />
+                <Route path="/muslim-burial" element={<MuslimBurial />} />
+                <Route path="/inheritance-calculator" element={<InheritanceCalculator />} />
+                <Route path="/will-writing" element={<WillWriting />} />
+                <Route path="/sadaqah-jariyah-guide" element={<SadaqahJariyah />} />
+                <Route path="/kaffarah-guide" element={<KaffarahGuide />} />
+                <Route path="/halal-careers" element={<HalalCareers />} />
+                <Route path="/muslim-homeschool" element={<MuslimHomeschool />} />
+                <Route path="/arabic-learning" element={<ArabicLearning />} />
+                <Route path="/tajwid-basics" element={<TajwidBasics />} />
+                <Route path="/quran-reflection" element={<QuranReflection />} />
+                <Route path="/muslim-fitness" element={<MuslimFitness />} />
+                <Route path="/hijama-cupping" element={<HijamaCupping />} />
+                <Route path="/prophetic-diet" element={<PropheticDiet />} />
+                <Route path="/muslim-sleep-science" element={<MuslimSleepScience />} />
+                <Route path="/heartify-roadmap" element={<HeartifyRoadmap />} />
                 <Route path="/youth-mentorship" element={<YouthMentorship />} />
                 <Route path="/halal-restaurants" element={<HalalRestaurants />} />
                 <Route path="/muslim-entrepreneurs" element={<MuslimEntrepreneurs />} />
