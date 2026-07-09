@@ -111,7 +111,6 @@ export default function Dreams() {
       <SEO
         title="Islamic Dream Journal | Heartify"
         description="Record dreams, mark them good, bad, or neutral, and consult a library of classical dream symbols and their meanings."
-        canonical="/dreams"
       />
       <header className="sticky top-0 z-10 border-b border-border/60 bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
