@@ -44,6 +44,7 @@ const Navbar = () => {
               <nav className="mt-6 flex flex-col gap-1">
                 {[
                   { to: "/", label: "Home", icon: Home },
+                  { to: "/today", label: "Today (Daily Dose)", icon: Sunrise },
                   { to: "/prayer", label: "Prayer & Qibla", icon: Compass },
                   { to: "/quran", label: "Quran reader", icon: BookOpen },
                   { to: "/dhikr", label: "Dhikr & Tasbih", icon: CircleDot },
