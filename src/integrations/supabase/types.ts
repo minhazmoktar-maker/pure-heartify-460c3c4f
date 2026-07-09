@@ -804,6 +804,45 @@ export type Database = {
         }
         Relationships: []
       }
+      device_registrations: {
+        Row: {
+          app_version: string | null
+          capabilities: Json
+          created_at: string
+          device_id: string
+          id: string
+          last_seen_at: string
+          os_version: string | null
+          platform: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_version?: string | null
+          capabilities?: Json
+          created_at?: string
+          device_id: string
+          id?: string
+          last_seen_at?: string
+          os_version?: string | null
+          platform: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_version?: string | null
+          capabilities?: Json
+          created_at?: string
+          device_id?: string
+          id?: string
+          last_seen_at?: string
+          os_version?: string | null
+          platform?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       device_tokens: {
         Row: {
           created_at: string
@@ -824,6 +863,42 @@ export type Database = {
           id?: string
           platform?: string
           token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      dhikr_sessions: {
+        Row: {
+          completed_at: string | null
+          count: number
+          created_at: string
+          dhikr_key: string
+          id: string
+          source: string | null
+          target: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          count?: number
+          created_at?: string
+          dhikr_key: string
+          id?: string
+          source?: string | null
+          target?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          count?: number
+          created_at?: string
+          dhikr_key?: string
+          id?: string
+          source?: string | null
+          target?: number | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -1439,6 +1514,39 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_progress: {
+        Row: {
+          created_at: string
+          id: string
+          percent: number | null
+          position: Json
+          resource_id: string
+          resource_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          percent?: number | null
+          position?: Json
+          resource_id: string
+          resource_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          percent?: number | null
+          position?: Json
+          resource_id?: string
+          resource_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reciter_aliases: {
         Row: {
           alias: string
@@ -1823,6 +1931,45 @@ export type Database = {
         }
         Relationships: []
       }
+      salah_log: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          on_time: boolean | null
+          prayed_at: string | null
+          prayer: string
+          prayer_date: string
+          source: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          on_time?: boolean | null
+          prayed_at?: string | null
+          prayer: string
+          prayer_date: string
+          source?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          on_time?: boolean | null
+          prayed_at?: string | null
+          prayer?: string
+          prayer_date?: string
+          source?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       search_queries: {
         Row: {
           clicked_video_id: string | null
@@ -1985,6 +2132,33 @@ export type Database = {
           ui_language?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences_v2: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          user_id: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          user_id: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          user_id?: string
+          value?: Json
         }
         Relationships: []
       }

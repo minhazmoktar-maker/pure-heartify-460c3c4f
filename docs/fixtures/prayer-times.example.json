@@ -1,0 +1,13 @@
+{
+  "date": "2026-07-09",
+  "method": "MWL",
+  "coordinates": { "lat": 23.8103, "lng": 90.4125 },
+  "times_utc": {
+    "fajr": "22:45",
+    "sunrise": "00:12",
+    "dhuhr": "06:03",
+    "asr": "09:35",
+    "maghrib": "11:53",
+    "isha": "13:19"
+  }
+}
