@@ -1,4 +1,4 @@
-import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap } from "lucide-react";
+import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -59,6 +59,7 @@ const Navbar = () => {
                   { to: "/seerah", label: "Seerah timeline", icon: Milestone },
                   { to: "/learn", label: "Learning paths", icon: GraduationCap },
                   { to: "/wird", label: "Wird builder", icon: CircleDot },
+                  { to: "/sadaqah", label: "Sadaqah tracker", icon: HandCoins },
                   { to: "/salah", label: "Salah tracker", icon: ListChecks },
                   { to: "/fasting", label: "Fasting tracker", icon: MoonStar },
                   { to: "/achievements", label: "Achievements", icon: Award },
