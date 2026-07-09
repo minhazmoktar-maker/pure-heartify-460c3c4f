@@ -141,7 +141,7 @@ export default function DuaWall() {
         ) : (
           <ul className="space-y-3">
             {duas.map((d) => {
-              const mine = user?.id === d.user_id;
+              const mine = myOwnIds.has(d.id);
               const said = myAmeens.has(d.id);
               return (
                 <li key={d.id}>
