@@ -136,6 +136,7 @@ const App = () => (
                 <Route path="/wasiyyah" element={<Wasiyyah />} />
                 <Route path="/ramadan" element={<Ramadan />} />
                 <Route path="/hajj" element={<Hajj />} />
+                <Route path="/qibla" element={<Qibla />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
