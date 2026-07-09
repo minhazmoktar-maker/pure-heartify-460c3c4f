@@ -337,6 +337,26 @@ const Mudarabah = lazy(() => import("./pages/Mudarabah.tsx"));
 const QardHasan = lazy(() => import("./pages/QardHasan.tsx"));
 const WaqfModern = lazy(() => import("./pages/WaqfModern.tsx"));
 const ZakatCalculators = lazy(() => import("./pages/ZakatCalculators.tsx"));
+const QuranMemorizationTips = lazy(() => import("./pages/QuranMemorizationTips.tsx"));
+const QuranTafsirBasics = lazy(() => import("./pages/QuranTafsirBasics.tsx"));
+const QuranAsbabAnNuzul = lazy(() => import("./pages/QuranAsbabAnNuzul.tsx"));
+const QuranMakkiMadani = lazy(() => import("./pages/QuranMakkiMadani.tsx"));
+const QuranAbrogation = lazy(() => import("./pages/QuranAbrogation.tsx"));
+const QuranQiraat = lazy(() => import("./pages/QuranQiraat.tsx"));
+const HadithGrading = lazy(() => import("./pages/HadithGrading.tsx"));
+const HadithSixBooks = lazy(() => import("./pages/HadithSixBooks.tsx"));
+const FiqhUsul = lazy(() => import("./pages/FiqhUsul.tsx"));
+const MaqasidShariah = lazy(() => import("./pages/MaqasidShariah.tsx"));
+const IjtihadTaqlid = lazy(() => import("./pages/IjtihadTaqlid.tsx"));
+const IslamicCalligraphy = lazy(() => import("./pages/IslamicCalligraphy.tsx"));
+const IslamicArchitecture = lazy(() => import("./pages/IslamicArchitecture.tsx"));
+const IslamicScience = lazy(() => import("./pages/IslamicScience.tsx"));
+const IslamicMedicine = lazy(() => import("./pages/IslamicMedicine.tsx"));
+const IslamicPsychology = lazy(() => import("./pages/IslamicPsychology.tsx"));
+const IslamicEducation = lazy(() => import("./pages/IslamicEducation.tsx"));
+const IslamicParenting = lazy(() => import("./pages/IslamicParenting.tsx"));
+const MarriageProposal = lazy(() => import("./pages/MarriageProposal.tsx"));
+const IslamicWedding = lazy(() => import("./pages/IslamicWedding.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -663,6 +683,26 @@ const App = () => (
                 <Route path="/qard-hasan" element={<QardHasan />} />
                 <Route path="/waqf-modern" element={<WaqfModern />} />
                 <Route path="/zakat-calculators" element={<ZakatCalculators />} />
+                <Route path="/hifz-tips" element={<QuranMemorizationTips />} />
+                <Route path="/tafsir-basics" element={<QuranTafsirBasics />} />
+                <Route path="/asbab-nuzul" element={<QuranAsbabAnNuzul />} />
+                <Route path="/makki-madani" element={<QuranMakkiMadani />} />
+                <Route path="/naskh" element={<QuranAbrogation />} />
+                <Route path="/qiraat" element={<QuranQiraat />} />
+                <Route path="/hadith-grading" element={<HadithGrading />} />
+                <Route path="/kutub-sittah" element={<HadithSixBooks />} />
+                <Route path="/usul-fiqh" element={<FiqhUsul />} />
+                <Route path="/maqasid" element={<MaqasidShariah />} />
+                <Route path="/ijtihad-taqlid" element={<IjtihadTaqlid />} />
+                <Route path="/islamic-calligraphy" element={<IslamicCalligraphy />} />
+                <Route path="/islamic-architecture" element={<IslamicArchitecture />} />
+                <Route path="/islamic-science" element={<IslamicScience />} />
+                <Route path="/islamic-medicine" element={<IslamicMedicine />} />
+                <Route path="/islamic-psychology" element={<IslamicPsychology />} />
+                <Route path="/islamic-education" element={<IslamicEducation />} />
+                <Route path="/islamic-parenting" element={<IslamicParenting />} />
+                <Route path="/marriage-proposal" element={<MarriageProposal />} />
+                <Route path="/islamic-wedding" element={<IslamicWedding />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
