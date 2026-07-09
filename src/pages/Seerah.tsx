@@ -49,10 +49,12 @@ const Seerah = () => {
 
   const bookmark = (e: SeerahEvent) => {
     const added = toggleBookmark({
-      kind: "seerah" as any,
-      refId: e.id,
+      id: `seerah:${e.id}`,
+      kind: "dua",
       title: e.title,
-      subtitle: `${e.year}${e.hijri ? ` · ${e.hijri}` : ""} · ${e.place}`,
+      reference: `${e.year}${e.hijri ? ` · ${e.hijri}` : ""} · ${e.place}`,
+      translation: e.summary,
+      href: "/seerah",
     });
     toast.success(added ? "Bookmarked" : "Removed from bookmarks");
   };
@@ -62,7 +64,7 @@ const Seerah = () => {
       <SEO
         title="Seerah Timeline — Life of the Prophet ﷺ | Heartify"
         description="Interactive timeline of the life of Prophet Muhammad ﷺ, from birth in Makkah through the Farewell Ḥajj — with progress tracking and bookmarks."
-        canonical="/seerah"
+        path="/seerah"
       />
       <Navbar />
 
