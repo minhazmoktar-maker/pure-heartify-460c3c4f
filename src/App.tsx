@@ -79,6 +79,7 @@ const DuaWall = lazy(() => import("./pages/DuaWall.tsx"));
 const BabyNames = lazy(() => import("./pages/BabyNames.tsx"));
 const Nikah = lazy(() => import("./pages/Nikah.tsx"));
 const Quiz = lazy(() => import("./pages/Quiz.tsx"));
+const Stories = lazy(() => import("./pages/Stories.tsx"));
 
 const queryClient = new QueryClient();
 
