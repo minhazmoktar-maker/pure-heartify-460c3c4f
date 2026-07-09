@@ -150,6 +150,7 @@ const App = () => (
                 <Route path="/nikah" element={<Nikah />} />
                 <Route path="/quiz" element={<Quiz />} />
                 <Route path="/stories" element={<Stories />} />
+                <Route path="/new-muslim" element={<NewMuslim />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
