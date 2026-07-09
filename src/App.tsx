@@ -79,6 +79,7 @@ const DuaWall = lazy(() => import("./pages/DuaWall.tsx"));
 const BabyNames = lazy(() => import("./pages/BabyNames.tsx"));
 const Nikah = lazy(() => import("./pages/Nikah.tsx"));
 const Quiz = lazy(() => import("./pages/Quiz.tsx"));
+const Stories = lazy(() => import("./pages/Stories.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -147,6 +148,7 @@ const App = () => (
                 <Route path="/baby-names" element={<BabyNames />} />
                 <Route path="/nikah" element={<Nikah />} />
                 <Route path="/quiz" element={<Quiz />} />
+                <Route path="/stories" element={<Stories />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
