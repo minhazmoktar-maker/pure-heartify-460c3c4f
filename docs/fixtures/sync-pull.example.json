@@ -1,0 +1,14 @@
+{
+  "server_time": "2026-07-09T12:00:00Z",
+  "since": "2026-07-09T11:00:00Z",
+  "dhikr_sessions": [
+    { "dhikr_key": "subhanallah", "count": 33, "target": 33, "completed_at": "2026-07-09T11:30:00Z", "updated_at": "2026-07-09T11:30:00Z" }
+  ],
+  "salah_log": [
+    { "prayer_date": "2026-07-09", "prayer": "fajr", "prayed_at": "2026-07-09T00:30:00Z", "on_time": true, "source": "watchos" }
+  ],
+  "reading_progress": [],
+  "favorites": [],
+  "preferences": [{ "key": "dhikr_haptics", "value": true }],
+  "streaks": [{ "current": 12, "longest": 30 }]
+}

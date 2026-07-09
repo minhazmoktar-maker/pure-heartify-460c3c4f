@@ -1,0 +1,16 @@
+{
+  "server_time": "2026-07-09T12:00:00Z",
+  "user_id": "00000000-0000-0000-0000-000000000000",
+  "profile": { "display_name": "Ahmed", "avatar_url": null, "locale": "en" },
+  "entitlement": { "plan": "free", "expires_at": null },
+  "preferences": { "prayer_method": "MWL", "dhikr_haptics": true },
+  "feature_flags": {
+    "premium_ui_enabled": false,
+    "moderation_reporting": true,
+    "dhikr_counter": true,
+    "salah_tracker": true,
+    "prayer_times": true,
+    "qibla": true
+  },
+  "capabilities": { "platforms": ["web","ios","android","watchos","wearos","tvos","carplay","androidauto"] }
+}
