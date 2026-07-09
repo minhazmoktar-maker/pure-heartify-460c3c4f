@@ -21,7 +21,7 @@ interface Row {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_PLANS = ["premium", "premium_trial", "premium_lifetime", "free"] as const;
 
-export default function AdminEntitlements() {
+export default function AdminEntitlements({ embedded = false }: { embedded?: boolean } = {}) {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
