@@ -92,6 +92,7 @@ const App = () => (
                 <Route path="/quran/:surah" element={<Quran />} />
                 <Route path="/dhikr" element={<Dhikr />} />
                 <Route path="/adhkar" element={<Adhkar />} />
+                <Route path="/zakat" element={<Zakat />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
