@@ -214,22 +214,24 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
   const currentList = grouped[tab] ?? [];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-6">
-        <header className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-              <ShieldAlert className="h-6 w-6 text-primary" /> Community reports
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Reports never auto-remove content. Every action here is logged for audit.
-            </p>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/admin/console">Back to console</Link>
-          </Button>
-        </header>
+    <div className={embedded ? "" : "min-h-screen bg-background"}>
+      {!embedded && <Navbar />}
+      <main className={embedded ? "" : "mx-auto max-w-6xl px-4 py-6"}>
+        {!embedded && (
+          <header className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+                <ShieldAlert className="h-6 w-6 text-primary" /> Community reports
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Reports never auto-remove content. Every action here is logged for audit.
+              </p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/moderation">Back to moderation</Link>
+            </Button>
+          </header>
+        )}
 
         <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
           {STATUS_TABS.map((s) => (
