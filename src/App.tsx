@@ -50,6 +50,7 @@ const AdminAlerts = lazy(() => import("./pages/AdminAlerts.tsx"));
 const Prayer = lazy(() => import("./pages/Prayer.tsx"));
 const Quran = lazy(() => import("./pages/Quran.tsx"));
 const Dhikr = lazy(() => import("./pages/Dhikr.tsx"));
+const Adhkar = lazy(() => import("./pages/Adhkar.tsx"));
 
 const queryClient = new QueryClient();
 
