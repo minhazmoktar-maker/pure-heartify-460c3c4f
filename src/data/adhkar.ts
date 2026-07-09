@@ -1,0 +1,192 @@
+export interface Dhikr {
+  id: string;
+  arabic: string;
+  translit: string;
+  meaning: string;
+  repeat: number;
+  reference?: string;
+}
+
+export interface AdhkarCollection {
+  id: string;
+  title: string;
+  description: string;
+  items: Dhikr[];
+}
+
+export const ADHKAR: AdhkarCollection[] = [
+  {
+    id: "morning",
+    title: "Morning Adhkar",
+    description: "Recite after Fajr until sunrise for protection and reward through the day.",
+    items: [
+      {
+        id: "m-ayatul-kursi",
+        arabic:
+          "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌ وَلَا نَوْمٌ ...",
+        translit: "Ayat al-Kursi (2:255)",
+        meaning:
+          "Whoever recites this in the morning is protected from jinn until evening.",
+        repeat: 1,
+        reference: "Al-Hakim",
+      },
+      {
+        id: "m-ikhlas-falaq-nas",
+        arabic: "قُلْ هُوَ ٱللَّهُ أَحَدٌ ... قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ ... قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ ...",
+        translit: "Al-Ikhlas, Al-Falaq, An-Nas",
+        meaning: "Will suffice you from everything.",
+        repeat: 3,
+        reference: "Abu Dawud, Tirmidhi",
+      },
+      {
+        id: "m-asbahna",
+        arabic:
+          "أَصْبَحْنَا وَأَصْبَحَ ٱلْمُلْكُ لِلَّهِ، وَٱلْحَمْدُ لِلَّهِ، لَا إِلَـٰهَ إِلَّا ٱللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+        translit: "Asbahna wa asbahal-mulku lillah…",
+        meaning:
+          "We have entered the morning and the dominion belongs to Allah. All praise is due to Allah…",
+        repeat: 1,
+        reference: "Muslim",
+      },
+      {
+        id: "m-sayyidul-istighfar",
+        arabic:
+          "ٱللَّهُمَّ أَنْتَ رَبِّي لَا إِلَـٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ ...",
+        translit: "Sayyid al-Istighfar",
+        meaning:
+          "Whoever says it with certainty in the day and dies before evening will be from the people of Paradise.",
+        repeat: 1,
+        reference: "Bukhari",
+      },
+      {
+        id: "m-hasbi",
+        arabic: "حَسْبِيَ ٱللَّهُ لَا إِلَـٰهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ ٱلْعَرْشِ ٱلْعَظِيمِ",
+        translit: "HasbiyAllahu la ilaha illa huwa…",
+        meaning: "Allah will suffice him of whatever worries him.",
+        repeat: 7,
+        reference: "Abu Dawud",
+      },
+      {
+        id: "m-subhanallah-100",
+        arabic: "سُبْحَانَ ٱللَّهِ وَبِحَمْدِهِ",
+        translit: "SubhanAllahi wa bihamdih",
+        meaning: "Sins are forgiven though they be like the foam of the sea.",
+        repeat: 100,
+        reference: "Bukhari, Muslim",
+      },
+    ],
+  },
+  {
+    id: "evening",
+    title: "Evening Adhkar",
+    description: "Recite after Asr until Maghrib for protection through the night.",
+    items: [
+      {
+        id: "e-ayatul-kursi",
+        arabic: "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ...",
+        translit: "Ayat al-Kursi (2:255)",
+        meaning: "Protection from jinn until morning.",
+        repeat: 1,
+        reference: "Al-Hakim",
+      },
+      {
+        id: "e-ikhlas-falaq-nas",
+        arabic: "قُلْ هُوَ ٱللَّهُ أَحَدٌ ... قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ ... قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ",
+        translit: "Al-Ikhlas, Al-Falaq, An-Nas",
+        meaning: "Will suffice you from everything.",
+        repeat: 3,
+      },
+      {
+        id: "e-amsayna",
+        arabic:
+          "أَمْسَيْنَا وَأَمْسَى ٱلْمُلْكُ لِلَّهِ، وَٱلْحَمْدُ لِلَّهِ، لَا إِلَـٰهَ إِلَّا ٱللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+        translit: "Amsayna wa amsal-mulku lillah…",
+        meaning: "We have entered the evening and the dominion belongs to Allah…",
+        repeat: 1,
+      },
+      {
+        id: "e-audhu-kalimat",
+        arabic:
+          "أَعُوذُ بِكَلِمَاتِ ٱللَّهِ ٱلتَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+        translit: "A'udhu bi kalimatillahit-tammati min sharri ma khalaq",
+        meaning:
+          "Whoever says this three times in the evening, nothing will harm him that night.",
+        repeat: 3,
+        reference: "Ahmad, Tirmidhi",
+      },
+      {
+        id: "e-radeetu",
+        arabic:
+          "رَضِيتُ بِٱللَّهِ رَبًّا، وَبِٱلْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا",
+        translit: "Radeetu billahi Rabban…",
+        meaning:
+          "Allah has promised to please whoever says this three times in morning and evening.",
+        repeat: 3,
+        reference: "Ahmad",
+      },
+    ],
+  },
+  {
+    id: "sleep",
+    title: "Before Sleep",
+    description: "Sunnah remembrances to close the day.",
+    items: [
+      {
+        id: "s-ayatul-kursi",
+        arabic: "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ...",
+        translit: "Ayat al-Kursi",
+        meaning: "A guardian from Allah stays with you and no devil comes near until morning.",
+        repeat: 1,
+        reference: "Bukhari",
+      },
+      {
+        id: "s-tasbih",
+        arabic: "سُبْحَانَ ٱللَّهِ (33) ٱلْحَمْدُ لِلَّهِ (33) ٱللَّهُ أَكْبَرُ (34)",
+        translit: "SubhanAllah 33, Alhamdulillah 33, Allahu Akbar 34",
+        meaning: "Better than a servant to help with your work.",
+        repeat: 1,
+        reference: "Bukhari, Muslim",
+      },
+      {
+        id: "s-bismika",
+        arabic: "بِٱسْمِكَ ٱللَّهُمَّ أَمُوتُ وَأَحْيَا",
+        translit: "Bismika Allahumma amutu wa ahya",
+        meaning: "In Your name O Allah I die and I live.",
+        repeat: 1,
+        reference: "Bukhari",
+      },
+    ],
+  },
+  {
+    id: "after-salah",
+    title: "After Salah",
+    description: "What the Prophet ﷺ said after each obligatory prayer.",
+    items: [
+      {
+        id: "a-istighfar",
+        arabic: "أَسْتَغْفِرُ ٱللَّهَ",
+        translit: "Astaghfirullah",
+        meaning: "I seek Allah's forgiveness.",
+        repeat: 3,
+        reference: "Muslim",
+      },
+      {
+        id: "a-allahumma-antas-salam",
+        arabic:
+          "ٱللَّهُمَّ أَنْتَ ٱلسَّلَامُ وَمِنْكَ ٱلسَّلَامُ، تَبَارَكْتَ يَا ذَا ٱلْجَلَالِ وَٱلْإِكْرَامِ",
+        translit: "Allahumma antas-Salam wa minkas-Salam…",
+        meaning: "O Allah, You are peace and from You is peace…",
+        repeat: 1,
+        reference: "Muslim",
+      },
+      {
+        id: "a-tasbih",
+        arabic: "سُبْحَانَ ٱللَّهِ (33) ٱلْحَمْدُ لِلَّهِ (33) ٱللَّهُ أَكْبَرُ (33) — لَا إِلَـٰهَ إِلَّا ٱللَّهُ (1)",
+        translit: "Tasbih Fatimah + tahlil",
+        meaning: "Sins are forgiven though they be as the foam of the sea.",
+        repeat: 1,
+        reference: "Muslim",
+      },
+    ],
+  },
+];
