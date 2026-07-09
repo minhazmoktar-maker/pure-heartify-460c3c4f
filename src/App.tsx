@@ -357,6 +357,26 @@ const IslamicEducation = lazy(() => import("./pages/IslamicEducation.tsx"));
 const IslamicParenting = lazy(() => import("./pages/IslamicParenting.tsx"));
 const MarriageProposal = lazy(() => import("./pages/MarriageProposal.tsx"));
 const IslamicWedding = lazy(() => import("./pages/IslamicWedding.tsx"));
+const PolygamyRulings = lazy(() => import("./pages/PolygamyRulings.tsx"));
+const MahrRulings = lazy(() => import("./pages/MahrRulings.tsx"));
+const DivorceProcedure = lazy(() => import("./pages/DivorceProcedure.tsx"));
+const CustodyRules = lazy(() => import("./pages/CustodyRules.tsx"));
+const AdoptionKafalah = lazy(() => import("./pages/AdoptionKafalah.tsx"));
+const OrphanCare = lazy(() => import("./pages/OrphanCare.tsx"));
+const ElderCare = lazy(() => import("./pages/ElderCare.tsx"));
+const DisabilityIslam = lazy(() => import("./pages/DisabilityIslam.tsx"));
+const MartyrdomVirtues = lazy(() => import("./pages/MartyrdomVirtues.tsx"));
+const SuicidePrevention = lazy(() => import("./pages/SuicidePrevention.tsx"));
+const MentalHealthImams = lazy(() => import("./pages/MentalHealthImams.tsx"));
+const MuslimTherapists = lazy(() => import("./pages/MuslimTherapists.tsx"));
+const IslamicMeditation = lazy(() => import("./pages/IslamicMeditation.tsx"));
+const DhikrBenefits = lazy(() => import("./pages/DhikrBenefits.tsx"));
+const StressAnxietyRelief = lazy(() => import("./pages/StressAnxietyRelief.tsx"));
+const SleepSunnah = lazy(() => import("./pages/SleepSunnah.tsx"));
+const MorningRoutine = lazy(() => import("./pages/MorningRoutine.tsx"));
+const EveningRoutine = lazy(() => import("./pages/EveningRoutine.tsx"));
+const HalalRelationships = lazy(() => import("./pages/HalalRelationships.tsx"));
+const MuslimDating = lazy(() => import("./pages/MuslimDating.tsx"));
 
 const queryClient = new QueryClient();
 
