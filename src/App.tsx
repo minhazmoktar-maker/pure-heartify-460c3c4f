@@ -273,16 +273,18 @@ const App = () => (
                 <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />
                 <Route path="/admin/review" element={<AdminRoute><AdminReview /></AdminRoute>} />
                 <Route path="/admin/reports" element={<AdminRoute><AdminReports /></AdminRoute>} />
-                <Route path="/admin/entitlements" element={<AdminRoute><AdminEntitlements /></AdminRoute>} />
-                <Route path="/owner" element={<AdminRoute><OwnerDashboard /></AdminRoute>} />
+                <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+                <Route path="/admin/entitlements" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/admin/roles" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/owner" element={<Navigate to="/admin/users" replace />} />
                 <Route path="/admin/channel-trust" element={<AdminRoute><ChannelTrust /></AdminRoute>} />
                 <Route path="/admin/analytics" element={<AdminRoute><Analytics /></AdminRoute>} />
                 <Route path="/admin/audio-integrity" element={<AdminRoute><AudioIntegrity /></AdminRoute>} />
-                <Route path="/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
-                <Route path="/admin/gsc" element={<AdminRoute><AdminGsc /></AdminRoute>} />
-                <Route path="/admin/permissions" element={<AdminRoute><AdminPermissions /></AdminRoute>} />
-                <Route path="/admin/alerts" element={<AdminRoute><AdminAlerts /></AdminRoute>} />
-                <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
+                <Route path="/admin/gsc" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/admin/permissions" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/admin/alerts" element={<Navigate to="/admin/users" replace />} />
+                <Route path="/owner-profile" element={<Navigate to="/admin/users" replace />} />
+
                 <Route path="/mfa-enroll" element={<Navigate to="/security/mfa" replace />} />
                 <Route path="/mfa-verify" element={<Navigate to="/security/mfa/verify" replace />} />
                 <Route path="/security/mfa" element={<MfaEnroll />} />
