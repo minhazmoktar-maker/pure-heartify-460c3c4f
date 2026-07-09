@@ -319,6 +319,31 @@ const App = () => (
                 <Route path="/ashura" element={<Ashura />} />
                 <Route path="/dhul-hijjah" element={<DhulHijjah />} />
                 <Route path="/jumuah" element={<Jumuah />} />
+                <Route path="/rizq" element={<Rizq />} />
+                <Route path="/muhasabah" element={<Muhasabah />} />
+                <Route path="/dawah" element={<Dawah />} />
+                <Route path="/dua-etiquette" element={<DuaEtiquette />} />
+                <Route path="/istikhara" element={<Istikhara />} />
+                <Route path="/ihsan" element={<Ihsan />} />
+                <Route path="/muraqabah" element={<Muraqabah />} />
+                <Route path="/zuhd" element={<Zuhd />} />
+                <Route path="/ummah-unity" element={<UmmahUnity />} />
+                <Route path="/aqiqah" element={<Aqiqah />} />
+                <Route path="/adhan-iqamah" element={<AdhanIqamah />} />
+                <Route path="/sujood-sahw" element={<SujoodSahw />} />
+                <Route path="/sujood-tilawah" element={<SujoodTilawah />} />
+                <Route path="/qada-prayers" element={<QadaPrayers />} />
+                <Route path="/qasr-jam" element={<QasrJam />} />
+                <Route path="/mash-khuffain" element={<MashKhuffain />} />
+                <Route path="/wealth-management" element={<WealthManagement />} />
+                <Route path="/ziyarah-adab" element={<ZiyarahAdab />} />
+                <Route path="/halal-investing" element={<HalalInvesting />} />
+                <Route path="/quran-manners" element={<MannersWithQuran />} />
+                <Route path="/elders-rights" element={<EldersRights />} />
+                <Route path="/rights-of-poor" element={<RightsOfPoor />} />
+                <Route path="/silat-rahm" element={<SilaturRahm />} />
+                <Route path="/hasad-evil-eye" element={<HasadEvilEye />} />
+
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
