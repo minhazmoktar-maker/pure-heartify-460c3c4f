@@ -84,7 +84,7 @@ export default function HijriCalendar() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Hijri Calendar — Heartify" description="Islamic Hijri calendar with today's date, upcoming events, Ramadan, Hajj, and Eid observances." />
+      <SEO title="Hijri Calendar — Heartify" description="Islamic Hijri calendar with today's date, upcoming events, Ramadan, Hajj, and Eid observances." path="/hijri" />
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6">
