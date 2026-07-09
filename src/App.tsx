@@ -197,6 +197,26 @@ const KusufKhusuf = lazy(() => import("./pages/KusufKhusuf.tsx"));
 const Istisqa = lazy(() => import("./pages/Istisqa.tsx"));
 const Ghusl = lazy(() => import("./pages/Ghusl.tsx"));
 const Tayammum = lazy(() => import("./pages/Tayammum.tsx"));
+const NajasahImpurities = lazy(() => import("./pages/NajasahImpurities.tsx"));
+const HaydFiqh = lazy(() => import("./pages/HaydFiqh.tsx"));
+const NifasFiqh = lazy(() => import("./pages/NifasFiqh.tsx"));
+const IstihadaFiqh = lazy(() => import("./pages/IstihadaFiqh.tsx"));
+const JanabahFiqh = lazy(() => import("./pages/JanabahFiqh.tsx"));
+const FidyahKaffarah = lazy(() => import("./pages/FidyahKaffarah.tsx"));
+const IftarSuhoorAdab = lazy(() => import("./pages/IftarSuhoorAdab.tsx"));
+const FastingRulings = lazy(() => import("./pages/FastingRulings.tsx"));
+const ZakatFitr = lazy(() => import("./pages/ZakatFitr.tsx"));
+const ZakatOnGold = lazy(() => import("./pages/ZakatOnGold.tsx"));
+const ZakatOnBusiness = lazy(() => import("./pages/ZakatOnBusiness.tsx"));
+const WaqfEndowment = lazy(() => import("./pages/WaqfEndowment.tsx"));
+const MirathBasics = lazy(() => import("./pages/MirathBasics.tsx"));
+const MarriageContract = lazy(() => import("./pages/MarriageContract.tsx"));
+const WalimahSunnahs = lazy(() => import("./pages/WalimahSunnahs.tsx"));
+const TalaqRules = lazy(() => import("./pages/TalaqRules.tsx"));
+const IddahRules = lazy(() => import("./pages/IddahRules.tsx"));
+const KhulaAnnulment = lazy(() => import("./pages/KhulaAnnulment.tsx"));
+const BreastfeedingFiqh = lazy(() => import("./pages/BreastfeedingFiqh.tsx"));
+const HalalHaramFood = lazy(() => import("./pages/HalalHaramFood.tsx"));
 
 const queryClient = new QueryClient();
 
