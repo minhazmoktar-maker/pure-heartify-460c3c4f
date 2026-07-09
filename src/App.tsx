@@ -88,6 +88,7 @@ const App = () => (
                 <Route path="/prayer" element={<Prayer />} />
                 <Route path="/quran" element={<Quran />} />
                 <Route path="/quran/:surah" element={<Quran />} />
+                <Route path="/dhikr" element={<Dhikr />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
