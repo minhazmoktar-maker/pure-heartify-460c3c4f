@@ -68,6 +68,7 @@ const Bookmarks = lazy(() => import("./pages/Bookmarks.tsx"));
 const Fasting = lazy(() => import("./pages/Fasting.tsx"));
 const Seerah = lazy(() => import("./pages/Seerah.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
+const Wird = lazy(() => import("./pages/Wird.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -125,6 +126,7 @@ const App = () => (
                 <Route path="/fasting" element={<Fasting />} />
                 <Route path="/seerah" element={<Seerah />} />
                 <Route path="/learn" element={<Learn />} />
+                <Route path="/wird" element={<Wird />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
