@@ -61,6 +61,7 @@ const Navbar = () => {
                   { to: "/wird", label: "Wird builder", icon: CircleDot },
                   { to: "/sadaqah", label: "Sadaqah tracker", icon: HandCoins },
                   { to: "/wasiyyah", label: "Wasiyyah (will)", icon: Scroll },
+                  { to: "/ramadan", label: "Ramadan planner", icon: Moon },
                   { to: "/salah", label: "Salah tracker", icon: ListChecks },
                   { to: "/fasting", label: "Fasting tracker", icon: MoonStar },
                   { to: "/achievements", label: "Achievements", icon: Award },
