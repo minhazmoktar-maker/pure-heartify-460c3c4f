@@ -62,6 +62,7 @@ const Challenges = lazy(() => import("./pages/Challenges.tsx"));
 const Today = lazy(() => import("./pages/Today.tsx"));
 const Reminders = lazy(() => import("./pages/Reminders.tsx"));
 const Recap = lazy(() => import("./pages/Recap.tsx"));
+const Journal = lazy(() => import("./pages/Journal.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -113,6 +114,7 @@ const App = () => (
                 <Route path="/today" element={<Today />} />
                 <Route path="/reminders" element={<Reminders />} />
                 <Route path="/recap" element={<Recap />} />
+                <Route path="/journal" element={<Journal />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
