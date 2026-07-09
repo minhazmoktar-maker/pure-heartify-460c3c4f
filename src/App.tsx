@@ -174,6 +174,7 @@ const App = () => (
                 <Route path="/salah-guide" element={<SalahGuide />} />
                 <Route path="/fatwa" element={<Fatwa />} />
                 <Route path="/ruqya" element={<Ruqya />} />
+                <Route path="/nawawi-40" element={<Nawawi40 />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
