@@ -97,6 +97,7 @@ const Prophets = lazy(() => import("./pages/Prophets.tsx"));
 const Sahaba = lazy(() => import("./pages/Sahaba.tsx"));
 const IslamicFinance = lazy(() => import("./pages/IslamicFinance.tsx"));
 const AdabPage = lazy(() => import("./pages/AdabPage.tsx"));
+const Parenting = lazy(() => import("./pages/Parenting.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -183,6 +184,7 @@ const App = () => (
                 <Route path="/sahaba" element={<Sahaba />} />
                 <Route path="/islamic-finance" element={<IslamicFinance />} />
                 <Route path="/adab" element={<AdabPage />} />
+                <Route path="/parenting" element={<Parenting />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
