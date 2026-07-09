@@ -82,7 +82,7 @@ export default function DuaWall() {
   };
 
   const remove = async (d: Dua) => {
-    if (!user || user.id !== d.user_id) return;
+    if (!user || !myOwnIds.has(d.id)) return;
     const { error } = await supabase.from("dua_requests").delete().eq("id", d.id);
     if (error) return toast.error(error.message);
     setDuas((arr) => arr.filter((x) => x.id !== d.id));
