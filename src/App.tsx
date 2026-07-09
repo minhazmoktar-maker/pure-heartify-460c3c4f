@@ -403,6 +403,26 @@ const App = () => (
                 <Route path="/istisqa" element={<Istisqa />} />
                 <Route path="/ghusl" element={<Ghusl />} />
                 <Route path="/tayammum" element={<Tayammum />} />
+                <Route path="/najasah-impurities" element={<NajasahImpurities />} />
+                <Route path="/hayd-fiqh" element={<HaydFiqh />} />
+                <Route path="/nifas-fiqh" element={<NifasFiqh />} />
+                <Route path="/istihada-fiqh" element={<IstihadaFiqh />} />
+                <Route path="/janabah-fiqh" element={<JanabahFiqh />} />
+                <Route path="/fidyah-kaffarah" element={<FidyahKaffarah />} />
+                <Route path="/iftar-suhoor-adab" element={<IftarSuhoorAdab />} />
+                <Route path="/fasting-rulings" element={<FastingRulings />} />
+                <Route path="/zakat-fitr" element={<ZakatFitr />} />
+                <Route path="/zakat-on-gold" element={<ZakatOnGold />} />
+                <Route path="/zakat-on-business" element={<ZakatOnBusiness />} />
+                <Route path="/waqf-endowment" element={<WaqfEndowment />} />
+                <Route path="/mirath-basics" element={<MirathBasics />} />
+                <Route path="/nikah-contract" element={<MarriageContract />} />
+                <Route path="/walimah-sunnahs" element={<WalimahSunnahs />} />
+                <Route path="/talaq-rules" element={<TalaqRules />} />
+                <Route path="/iddah-rules" element={<IddahRules />} />
+                <Route path="/khula-annulment" element={<KhulaAnnulment />} />
+                <Route path="/breastfeeding-fiqh" element={<BreastfeedingFiqh />} />
+                <Route path="/halal-haram-food" element={<HalalHaramFood />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
