@@ -58,6 +58,7 @@ const MosqueFinder = lazy(() => import("./pages/MosqueFinder.tsx"));
 const HadithLibrary = lazy(() => import("./pages/HadithLibrary.tsx"));
 const SalahTracker = lazy(() => import("./pages/SalahTracker.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
+const Challenges = lazy(() => import("./pages/Challenges.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,7 @@ const App = () => (
                 <Route path="/hadith" element={<HadithLibrary />} />
                 <Route path="/salah" element={<SalahTracker />} />
                 <Route path="/achievements" element={<Achievements />} />
+                <Route path="/challenges" element={<Challenges />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
