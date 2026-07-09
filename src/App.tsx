@@ -643,6 +643,26 @@ const App = () => (
                 <Route path="/christianity-compared" element={<ChristianityCompared />} />
                 <Route path="/judaism-compared" element={<JudaismCompared />} />
                 <Route path="/hinduism-buddhism" element={<HinduismBuddhism />} />
+                <Route path="/atheism-response" element={<AtheismResponse />} />
+                <Route path="/secularism-islam" element={<SecularismIslam />} />
+                <Route path="/feminism-islam" element={<FeminismIslam />} />
+                <Route path="/liberalism-islam" element={<LiberalismIslam />} />
+                <Route path="/nationalism-islam" element={<NationalismIslam />} />
+                <Route path="/environment-islam" element={<EnvironmentIslam />} />
+                <Route path="/animal-rights" element={<AnimalRights />} />
+                <Route path="/vegetarianism-islam" element={<VegetarianismIslam />} />
+                <Route path="/halal-travel" element={<HalalTravel />} />
+                <Route path="/shared-economy" element={<SharedEconomy />} />
+                <Route path="/ethical-investing" element={<EthicalInvesting />} />
+                <Route path="/sukuk" element={<Sukuk />} />
+                <Route path="/takaful" element={<Takaful />} />
+                <Route path="/murabaha-finance" element={<MurabahaFinance />} />
+                <Route path="/ijarah" element={<Ijarah />} />
+                <Route path="/musharakah" element={<Musharakah />} />
+                <Route path="/mudarabah" element={<Mudarabah />} />
+                <Route path="/qard-hasan" element={<QardHasan />} />
+                <Route path="/waqf-modern" element={<WaqfModern />} />
+                <Route path="/zakat-calculators" element={<ZakatCalculators />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
