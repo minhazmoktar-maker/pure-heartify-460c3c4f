@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 type Dua = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   body: string;
   is_anonymous: boolean;
   ameen_count: number;
@@ -33,15 +33,11 @@ export default function DuaWall() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("dua_requests")
-      .select("id,user_id,body,is_anonymous,ameen_count,created_at")
-      .order("created_at", { ascending: false })
-      .limit(100);
+    const { data, error } = await supabase.rpc("list_dua_wall", { _limit: 100 });
     if (error) toast.error(error.message);
-    setDuas(data ?? []);
+    setDuas((data ?? []) as Dua[]);
     if (user) {
-      const ids = (data ?? []).map((d) => d.id);
+      const ids = ((data ?? []) as Dua[]).map((d) => d.id);
       if (ids.length) {
         const { data: mine } = await supabase
           .from("dua_ameens").select("dua_id").eq("user_id", user.id).in("dua_id", ids);
