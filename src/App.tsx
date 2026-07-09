@@ -723,6 +723,26 @@ const App = () => (
                 <Route path="/islamic-parenting" element={<IslamicParenting />} />
                 <Route path="/marriage-proposal" element={<MarriageProposal />} />
                 <Route path="/islamic-wedding" element={<IslamicWedding />} />
+                <Route path="/polygamy-rulings" element={<PolygamyRulings />} />
+                <Route path="/mahr-rulings" element={<MahrRulings />} />
+                <Route path="/divorce-procedure" element={<DivorceProcedure />} />
+                <Route path="/custody-rules" element={<CustodyRules />} />
+                <Route path="/adoption-kafalah" element={<AdoptionKafalah />} />
+                <Route path="/orphan-care" element={<OrphanCare />} />
+                <Route path="/elder-care" element={<ElderCare />} />
+                <Route path="/disability-islam" element={<DisabilityIslam />} />
+                <Route path="/martyrdom" element={<MartyrdomVirtues />} />
+                <Route path="/suicide-prevention" element={<SuicidePrevention />} />
+                <Route path="/imam-mental-health" element={<MentalHealthImams />} />
+                <Route path="/muslim-therapists" element={<MuslimTherapists />} />
+                <Route path="/islamic-meditation" element={<IslamicMeditation />} />
+                <Route path="/dhikr-benefits" element={<DhikrBenefits />} />
+                <Route path="/stress-anxiety" element={<StressAnxietyRelief />} />
+                <Route path="/sleep-sunnah" element={<SleepSunnah />} />
+                <Route path="/morning-routine" element={<MorningRoutine />} />
+                <Route path="/evening-routine" element={<EveningRoutine />} />
+                <Route path="/halal-relationships" element={<HalalRelationships />} />
+                <Route path="/muslim-dating" element={<MuslimDating />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
