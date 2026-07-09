@@ -15,7 +15,7 @@ import { Link } from "react-router-dom";
 
 type Dua = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   body: string;
   is_anonymous: boolean;
   ameen_count: number;
@@ -26,6 +26,7 @@ export default function DuaWall() {
   const { user } = useAuth();
   const [duas, setDuas] = useState<Dua[]>([]);
   const [myAmeens, setMyAmeens] = useState<Set<string>>(new Set());
+  const [myOwnIds, setMyOwnIds] = useState<Set<string>>(new Set());
   const [body, setBody] = useState("");
   const [anon, setAnon] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -33,20 +34,22 @@ export default function DuaWall() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("dua_requests")
-      .select("id,user_id,body,is_anonymous,ameen_count,created_at")
-      .order("created_at", { ascending: false })
-      .limit(100);
+    const { data, error } = await supabase.rpc("list_dua_wall", { _limit: 100 });
     if (error) toast.error(error.message);
-    setDuas(data ?? []);
+    setDuas((data ?? []) as Dua[]);
     if (user) {
-      const ids = (data ?? []).map((d) => d.id);
+      const ids = ((data ?? []) as Dua[]).map((d) => d.id);
       if (ids.length) {
-        const { data: mine } = await supabase
-          .from("dua_ameens").select("dua_id").eq("user_id", user.id).in("dua_id", ids);
+        const [{ data: mine }, { data: own }] = await Promise.all([
+          supabase.from("dua_ameens").select("dua_id").eq("user_id", user.id).in("dua_id", ids),
+          supabase.from("dua_requests").select("id").eq("user_id", user.id).in("id", ids),
+        ]);
         setMyAmeens(new Set((mine ?? []).map((r) => r.dua_id)));
+        setMyOwnIds(new Set((own ?? []).map((r) => r.id)));
       }
+    } else {
+      setMyAmeens(new Set());
+      setMyOwnIds(new Set());
     }
     setLoading(false);
   };
@@ -79,7 +82,7 @@ export default function DuaWall() {
   };
 
   const remove = async (d: Dua) => {
-    if (!user || user.id !== d.user_id) return;
+    if (!user || !myOwnIds.has(d.id)) return;
     const { error } = await supabase.from("dua_requests").delete().eq("id", d.id);
     if (error) return toast.error(error.message);
     setDuas((arr) => arr.filter((x) => x.id !== d.id));
@@ -138,7 +141,7 @@ export default function DuaWall() {
         ) : (
           <ul className="space-y-3">
             {duas.map((d) => {
-              const mine = user?.id === d.user_id;
+              const mine = myOwnIds.has(d.id);
               const said = myAmeens.has(d.id);
               return (
                 <li key={d.id}>

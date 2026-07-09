@@ -217,6 +217,26 @@ const IddahRules = lazy(() => import("./pages/IddahRules.tsx"));
 const KhulaAnnulment = lazy(() => import("./pages/KhulaAnnulment.tsx"));
 const BreastfeedingFiqh = lazy(() => import("./pages/BreastfeedingFiqh.tsx"));
 const HalalHaramFood = lazy(() => import("./pages/HalalHaramFood.tsx"));
+const QurbaniRules = lazy(() => import("./pages/QurbaniRules.tsx"));
+const AqiqahRules = lazy(() => import("./pages/AqiqahRules.tsx"));
+const HijamahRules = lazy(() => import("./pages/HijamahRules.tsx"));
+const MiswakSunnah = lazy(() => import("./pages/MiswakSunnah.tsx"));
+const RuqyahSharia = lazy(() => import("./pages/RuqyahSharia.tsx"));
+const EvilEyeProtection = lazy(() => import("./pages/EvilEyeProtection.tsx"));
+const JinnAndShaytan = lazy(() => import("./pages/JinnAndShaytan.tsx"));
+const BarzakhAfterlife = lazy(() => import("./pages/BarzakhAfterlife.tsx"));
+const YawmAlQiyamah = lazy(() => import("./pages/YawmAlQiyamah.tsx"));
+const MajorSignsHour = lazy(() => import("./pages/MajorSignsHour.tsx"));
+const MessengersOfAllah = lazy(() => import("./pages/MessengersOfAllah.tsx"));
+const BooksOfAllah = lazy(() => import("./pages/BooksOfAllah.tsx"));
+const AngelsInIslam = lazy(() => import("./pages/AngelsInIslam.tsx"));
+const QadrDivineDecree = lazy(() => import("./pages/QadrDivineDecree.tsx"));
+const AlWalaWalBara = lazy(() => import("./pages/AlWalaWalBara.tsx"));
+const SunnahOfSleep = lazy(() => import("./pages/SunnahOfSleep.tsx"));
+const SunnahOfClothing = lazy(() => import("./pages/SunnahOfClothing.tsx"));
+const AdabOfMasjid = lazy(() => import("./pages/AdabOfMasjid.tsx"));
+const VisitingSick = lazy(() => import("./pages/VisitingSick.tsx"));
+const FuneralRites = lazy(() => import("./pages/FuneralRites.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -423,6 +443,26 @@ const App = () => (
                 <Route path="/khula-annulment" element={<KhulaAnnulment />} />
                 <Route path="/breastfeeding-fiqh" element={<BreastfeedingFiqh />} />
                 <Route path="/halal-haram-food" element={<HalalHaramFood />} />
+                <Route path="/qurbani-rules" element={<QurbaniRules />} />
+                <Route path="/aqiqah-rules" element={<AqiqahRules />} />
+                <Route path="/hijamah-rules" element={<HijamahRules />} />
+                <Route path="/miswak-sunnah" element={<MiswakSunnah />} />
+                <Route path="/ruqyah-shariah" element={<RuqyahSharia />} />
+                <Route path="/evil-eye-protection" element={<EvilEyeProtection />} />
+                <Route path="/jinn-shaytan" element={<JinnAndShaytan />} />
+                <Route path="/barzakh-afterlife" element={<BarzakhAfterlife />} />
+                <Route path="/yawm-al-qiyamah" element={<YawmAlQiyamah />} />
+                <Route path="/major-signs-hour" element={<MajorSignsHour />} />
+                <Route path="/messengers-of-allah" element={<MessengersOfAllah />} />
+                <Route path="/books-of-allah" element={<BooksOfAllah />} />
+                <Route path="/angels-in-islam" element={<AngelsInIslam />} />
+                <Route path="/qadr-divine-decree" element={<QadrDivineDecree />} />
+                <Route path="/al-wala-wal-bara" element={<AlWalaWalBara />} />
+                <Route path="/sunnah-of-sleep" element={<SunnahOfSleep />} />
+                <Route path="/sunnah-of-clothing" element={<SunnahOfClothing />} />
+                <Route path="/adab-of-masjid" element={<AdabOfMasjid />} />
+                <Route path="/visiting-the-sick" element={<VisitingSick />} />
+                <Route path="/funeral-rites" element={<FuneralRites />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
