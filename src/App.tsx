@@ -85,6 +85,7 @@ const Hifz = lazy(() => import("./pages/Hifz.tsx"));
 const Dreams = lazy(() => import("./pages/Dreams.tsx"));
 const Alphabet = lazy(() => import("./pages/Alphabet.tsx"));
 const Tajweed = lazy(() => import("./pages/Tajweed.tsx"));
+const Glossary = lazy(() => import("./pages/Glossary.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -159,6 +160,7 @@ const App = () => (
                 <Route path="/dreams" element={<Dreams />} />
                 <Route path="/alphabet" element={<Alphabet />} />
                 <Route path="/tajweed" element={<Tajweed />} />
+                <Route path="/glossary" element={<Glossary />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
