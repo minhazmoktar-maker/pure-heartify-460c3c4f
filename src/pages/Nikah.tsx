@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { SEO } from "@/components/SEO";
+import SEO from "@/components/SEO";
 
 type Guest = { id: string; name: string; side: "bride" | "groom"; rsvp: "pending" | "yes" | "no" };
 type Task = { id: string; label: string; done: boolean };
