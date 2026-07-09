@@ -197,6 +197,26 @@ const KusufKhusuf = lazy(() => import("./pages/KusufKhusuf.tsx"));
 const Istisqa = lazy(() => import("./pages/Istisqa.tsx"));
 const Ghusl = lazy(() => import("./pages/Ghusl.tsx"));
 const Tayammum = lazy(() => import("./pages/Tayammum.tsx"));
+const NajasahImpurities = lazy(() => import("./pages/NajasahImpurities.tsx"));
+const HaydFiqh = lazy(() => import("./pages/HaydFiqh.tsx"));
+const NifasFiqh = lazy(() => import("./pages/NifasFiqh.tsx"));
+const IstihadaFiqh = lazy(() => import("./pages/IstihadaFiqh.tsx"));
+const JanabahFiqh = lazy(() => import("./pages/JanabahFiqh.tsx"));
+const FidyahKaffarah = lazy(() => import("./pages/FidyahKaffarah.tsx"));
+const IftarSuhoorAdab = lazy(() => import("./pages/IftarSuhoorAdab.tsx"));
+const FastingRulings = lazy(() => import("./pages/FastingRulings.tsx"));
+const ZakatFitr = lazy(() => import("./pages/ZakatFitr.tsx"));
+const ZakatOnGold = lazy(() => import("./pages/ZakatOnGold.tsx"));
+const ZakatOnBusiness = lazy(() => import("./pages/ZakatOnBusiness.tsx"));
+const WaqfEndowment = lazy(() => import("./pages/WaqfEndowment.tsx"));
+const MirathBasics = lazy(() => import("./pages/MirathBasics.tsx"));
+const MarriageContract = lazy(() => import("./pages/MarriageContract.tsx"));
+const WalimahSunnahs = lazy(() => import("./pages/WalimahSunnahs.tsx"));
+const TalaqRules = lazy(() => import("./pages/TalaqRules.tsx"));
+const IddahRules = lazy(() => import("./pages/IddahRules.tsx"));
+const KhulaAnnulment = lazy(() => import("./pages/KhulaAnnulment.tsx"));
+const BreastfeedingFiqh = lazy(() => import("./pages/BreastfeedingFiqh.tsx"));
+const HalalHaramFood = lazy(() => import("./pages/HalalHaramFood.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -383,6 +403,26 @@ const App = () => (
                 <Route path="/istisqa" element={<Istisqa />} />
                 <Route path="/ghusl" element={<Ghusl />} />
                 <Route path="/tayammum" element={<Tayammum />} />
+                <Route path="/najasah-impurities" element={<NajasahImpurities />} />
+                <Route path="/hayd-fiqh" element={<HaydFiqh />} />
+                <Route path="/nifas-fiqh" element={<NifasFiqh />} />
+                <Route path="/istihada-fiqh" element={<IstihadaFiqh />} />
+                <Route path="/janabah-fiqh" element={<JanabahFiqh />} />
+                <Route path="/fidyah-kaffarah" element={<FidyahKaffarah />} />
+                <Route path="/iftar-suhoor-adab" element={<IftarSuhoorAdab />} />
+                <Route path="/fasting-rulings" element={<FastingRulings />} />
+                <Route path="/zakat-fitr" element={<ZakatFitr />} />
+                <Route path="/zakat-on-gold" element={<ZakatOnGold />} />
+                <Route path="/zakat-on-business" element={<ZakatOnBusiness />} />
+                <Route path="/waqf-endowment" element={<WaqfEndowment />} />
+                <Route path="/mirath-basics" element={<MirathBasics />} />
+                <Route path="/nikah-contract" element={<MarriageContract />} />
+                <Route path="/walimah-sunnahs" element={<WalimahSunnahs />} />
+                <Route path="/talaq-rules" element={<TalaqRules />} />
+                <Route path="/iddah-rules" element={<IddahRules />} />
+                <Route path="/khula-annulment" element={<KhulaAnnulment />} />
+                <Route path="/breastfeeding-fiqh" element={<BreastfeedingFiqh />} />
+                <Route path="/halal-haram-food" element={<HalalHaramFood />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
