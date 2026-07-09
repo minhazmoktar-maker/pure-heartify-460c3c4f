@@ -58,6 +58,7 @@ const Navbar = () => {
                   { to: "/hadith", label: "Hadith library", icon: BookText },
                   { to: "/seerah", label: "Seerah timeline", icon: Milestone },
                   { to: "/learn", label: "Learning paths", icon: GraduationCap },
+                  { to: "/wird", label: "Wird builder", icon: CircleDot },
                   { to: "/salah", label: "Salah tracker", icon: ListChecks },
                   { to: "/fasting", label: "Fasting tracker", icon: MoonStar },
                   { to: "/achievements", label: "Achievements", icon: Award },
