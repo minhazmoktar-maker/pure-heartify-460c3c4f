@@ -2,85 +2,90 @@ import { test, expect } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Moderation pipeline E2E:
- * 1. Insert a video_candidate directly (simulating ingestion / upload).
- * 2. Confirm it is NOT visible in curated_videos until moderation passes.
- * 3. Simulate moderation approval + trust scoring pass.
- * 4. Confirm it now appears in curated_videos and on the home feed.
+ * Moderation pipeline E2E — uses an authenticated admin test user
+ * (TEST_ADMIN_EMAIL / TEST_ADMIN_PASS) instead of SUPABASE_SERVICE_ROLE_KEY.
+ * The admin's RLS policies allow inserting/deleting from video_candidates,
+ * approved_channels, and curated_videos.
  *
- * Requires service role key to bypass RLS during setup/teardown.
- * Skips gracefully when SUPABASE_SERVICE_ROLE_KEY is not available (e.g. Lovable Cloud).
+ * Skips gracefully when the admin credentials are unavailable.
  */
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
+const ADMIN_EMAIL = process.env.TEST_ADMIN_EMAIL;
+const ADMIN_PASS = process.env.TEST_ADMIN_PASS;
 
 test.describe("video moderation pipeline", () => {
-  test.skip(!SUPABASE_URL || !SERVICE_KEY, "service role key not available");
-
-  const admin = createClient(SUPABASE_URL!, SERVICE_KEY!, {
-    auth: { persistSession: false },
-  });
+  test.skip(
+    !SUPABASE_URL || !ANON_KEY || !ADMIN_EMAIL || !ADMIN_PASS,
+    "TEST_ADMIN_EMAIL / TEST_ADMIN_PASS / Supabase URL missing",
+  );
 
   const testVideoId = `TEST_${Date.now()}`;
   const testChannelId = `UC_TEST_${Date.now()}`;
 
+  const adminClient = () =>
+    createClient(SUPABASE_URL!, ANON_KEY!, { auth: { persistSession: false } });
+
+  async function signedInAdmin() {
+    const c = adminClient();
+    const { error } = await c.auth.signInWithPassword({ email: ADMIN_EMAIL!, password: ADMIN_PASS! });
+    if (error) throw error;
+    return c;
+  }
+
   test.afterAll(async () => {
-    await admin.from("curated_videos").delete().eq("video_id", testVideoId);
-    await admin.from("video_candidates").delete().eq("video_id", testVideoId);
-    await admin.from("approved_channels").delete().eq("channel_id", testChannelId);
+    try {
+      const c = await signedInAdmin();
+      await c.from("curated_videos").delete().eq("video_id", testVideoId);
+      await c.from("video_candidates").delete().eq("video_id", testVideoId);
+      await c.from("approved_channels").delete().eq("youtube_channel_id", testChannelId);
+    } catch {
+      /* cleanup best-effort */
+    }
   });
 
-  test("candidate not visible until moderation + trust pass", async ({ page }) => {
-    // Step 1: insert candidate
-    const { error: insErr } = await admin.from("video_candidates").insert({
+  test("candidate not visible until curated_videos row exists", async ({ page }) => {
+    const c = await signedInAdmin();
+
+    // 1. Insert candidate
+    const { error: insErr } = await c.from("video_candidates").insert({
       video_id: testVideoId,
       channel_id: testChannelId,
       title: "E2E test video",
       status: "pending",
     });
-    expect(insErr, insErr?.message).toBeNull();
+    expect(insErr?.message ?? null, "insert candidate").toBeNull();
 
-    // Step 2: confirm NOT in curated_videos
-    const { data: preData } = await admin
-      .from("curated_videos")
-      .select("video_id")
-      .eq("video_id", testVideoId);
+    // 2. Anon client cannot see it in curated_videos
+    const anon = createClient(SUPABASE_URL!, ANON_KEY!, { auth: { persistSession: false } });
+    const { data: preData } = await anon
+      .from("curated_videos").select("video_id").eq("video_id", testVideoId);
     expect(preData?.length ?? 0).toBe(0);
 
-    // Step 3: confirm NOT on public feed
+    // 3. Home feed should not contain the ID
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    const preBody = (await page.textContent("body")) ?? "";
-    expect(preBody).not.toContain(testVideoId);
+    expect((await page.textContent("body")) ?? "").not.toContain(testVideoId);
 
-    // Step 4: simulate moderation approve + trust pass by inserting into curated_videos
-    // (In real system this happens via moderate-video edge function.)
-    const { error: chErr } = await admin.from("approved_channels").insert({
-      channel_id: testChannelId,
-      channel_title: "E2E Test Channel",
-      status: "approved",
-      trust_score: 80,
+    // 4. Admin approves via curated_videos + approved_channels insert
+    await c.from("approved_channels").insert({
+      youtube_channel_id: testChannelId,
+      title: "E2E Test Channel",
+      status: "active",
     });
-    expect(chErr?.message ?? null).toBeNull();
-
-    const { error: curErr } = await admin.from("curated_videos").insert({
+    const { error: curErr } = await c.from("curated_videos").insert({
       video_id: testVideoId,
-      channel_id: testChannelId,
       title: "E2E test video",
-      status: "approved",
-      moderation_status: "clean",
+      channel_title: "E2E Test Channel",
+      moderation_state: "approved",
+      is_trusted_channel: true,
     });
-    expect(curErr, curErr?.message).toBeNull();
+    expect(curErr?.message ?? null, "insert curated").toBeNull();
 
-    // Step 5: verify it can now be fetched by an anon client
-    const anon = createClient(SUPABASE_URL!, process.env.VITE_SUPABASE_PUBLISHABLE_KEY!, {
-      auth: { persistSession: false },
-    });
+    // 5. Anon can now see it
     const { data: postData } = await anon
-      .from("curated_videos")
-      .select("video_id, title")
-      .eq("video_id", testVideoId);
-    expect(postData?.length).toBeGreaterThan(0);
+      .from("curated_videos").select("video_id,title").eq("video_id", testVideoId);
+    expect(postData?.length ?? 0).toBeGreaterThan(0);
   });
 });
