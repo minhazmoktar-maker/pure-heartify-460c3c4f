@@ -240,6 +240,11 @@ const App = () => (
                 <Route path="/madhabs" element={<Madhabs />} />
                 <Route path="/quran-sciences" element={<QuranSciences />} />
                 <Route path="/hadith-sciences" element={<HadithSciences />} />
+                <Route path="/battles" element={<Battles />} />
+                <Route path="/miracles" element={<Miracles />} />
+                <Route path="/farewell-sermon" element={<FarewellSermon />} />
+                <Route path="/ahlul-bayt" element={<AhlulBayt />} />
+                <Route path="/kids-duas" element={<KidsDuas />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
