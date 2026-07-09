@@ -146,6 +146,7 @@ const App = () => (
                 <Route path="/dua-wall" element={<DuaWall />} />
                 <Route path="/baby-names" element={<BabyNames />} />
                 <Route path="/nikah" element={<Nikah />} />
+                <Route path="/quiz" element={<Quiz />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
