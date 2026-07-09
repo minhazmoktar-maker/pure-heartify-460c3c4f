@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, RotateCcw, Kaaba } from "lucide-react";
+import { ArrowLeft, Search, RotateCcw, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +36,7 @@ const UmrahGuide = () => {
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>
         <header className="mt-4 mb-6">
-          <div className="flex items-center gap-3"><Kaaba className="h-7 w-7 text-primary" /><h1 className="text-3xl font-bold">Umrah Step-by-Step</h1></div>
+          <div className="flex items-center gap-3"><MapPin className="h-7 w-7 text-primary" /><h1 className="text-3xl font-bold">Umrah Step-by-Step</h1></div>
           <p className="mt-2 text-muted-foreground">Follow along and tap each step as you complete it, insha'Allah.</p>
         </header>
         <Card className="p-4 mb-6">
