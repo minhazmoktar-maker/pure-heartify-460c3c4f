@@ -297,6 +297,26 @@ const GenderRoles = lazy(() => import("./pages/GenderRoles.tsx"));
 const HijabRulings = lazy(() => import("./pages/HijabRulings.tsx"));
 const MahramNonMahram = lazy(() => import("./pages/MahramNonMahram.tsx"));
 const FreeMixing = lazy(() => import("./pages/FreeMixing.tsx"));
+const LgbtqIslamicView = lazy(() => import("./pages/LgbtqIslamicView.tsx"));
+const MusicRulings = lazy(() => import("./pages/MusicRulings.tsx"));
+const PhotographyRulings = lazy(() => import("./pages/PhotographyRulings.tsx"));
+const SportsIslam = lazy(() => import("./pages/SportsIslam.tsx"));
+const AlcoholRulings = lazy(() => import("./pages/AlcoholRulings.tsx"));
+const GamblingRulings = lazy(() => import("./pages/GamblingRulings.tsx"));
+const HalalSlaughter = lazy(() => import("./pages/HalalSlaughter.tsx"));
+const HalalCosmetics = lazy(() => import("./pages/HalalCosmetics.tsx"));
+const HalalCertification = lazy(() => import("./pages/HalalCertification.tsx"));
+const MuslimMinorities = lazy(() => import("./pages/MuslimMinorities.tsx"));
+const PoliticalIslam = lazy(() => import("./pages/PoliticalIslam.tsx"));
+const KhilafahConcept = lazy(() => import("./pages/KhilafahConcept.tsx"));
+const JihadTypes = lazy(() => import("./pages/JihadTypes.tsx"));
+const WarEthics = lazy(() => import("./pages/WarEthics.tsx"));
+const PrisonersOfWar = lazy(() => import("./pages/PrisonersOfWar.tsx"));
+const Treaties = lazy(() => import("./pages/Treaties.tsx"));
+const InterfaithDialogue = lazy(() => import("./pages/InterfaithDialogue.tsx"));
+const ChristianityCompared = lazy(() => import("./pages/ChristianityCompared.tsx"));
+const JudaismCompared = lazy(() => import("./pages/JudaismCompared.tsx"));
+const HinduismBuddhism = lazy(() => import("./pages/HinduismBuddhism.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -583,6 +603,26 @@ const App = () => (
                 <Route path="/hijab-rulings" element={<HijabRulings />} />
                 <Route path="/mahram-nonmahram" element={<MahramNonMahram />} />
                 <Route path="/free-mixing" element={<FreeMixing />} />
+                <Route path="/lgbtq-islamic-view" element={<LgbtqIslamicView />} />
+                <Route path="/music-rulings" element={<MusicRulings />} />
+                <Route path="/photography-rulings" element={<PhotographyRulings />} />
+                <Route path="/sports-islam" element={<SportsIslam />} />
+                <Route path="/alcohol-rulings" element={<AlcoholRulings />} />
+                <Route path="/gambling-rulings" element={<GamblingRulings />} />
+                <Route path="/halal-slaughter" element={<HalalSlaughter />} />
+                <Route path="/halal-cosmetics" element={<HalalCosmetics />} />
+                <Route path="/halal-certification" element={<HalalCertification />} />
+                <Route path="/muslim-minorities" element={<MuslimMinorities />} />
+                <Route path="/political-islam" element={<PoliticalIslam />} />
+                <Route path="/khilafah-concept" element={<KhilafahConcept />} />
+                <Route path="/jihad-types" element={<JihadTypes />} />
+                <Route path="/war-ethics" element={<WarEthics />} />
+                <Route path="/prisoners-of-war" element={<PrisonersOfWar />} />
+                <Route path="/treaties" element={<Treaties />} />
+                <Route path="/interfaith-dialogue" element={<InterfaithDialogue />} />
+                <Route path="/christianity-compared" element={<ChristianityCompared />} />
+                <Route path="/judaism-compared" element={<JudaismCompared />} />
+                <Route path="/hinduism-buddhism" element={<HinduismBuddhism />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
