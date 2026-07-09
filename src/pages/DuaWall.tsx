@@ -26,6 +26,7 @@ export default function DuaWall() {
   const { user } = useAuth();
   const [duas, setDuas] = useState<Dua[]>([]);
   const [myAmeens, setMyAmeens] = useState<Set<string>>(new Set());
+  const [myOwnIds, setMyOwnIds] = useState<Set<string>>(new Set());
   const [body, setBody] = useState("");
   const [anon, setAnon] = useState(false);
   const [loading, setLoading] = useState(true);
