@@ -523,6 +523,26 @@ const App = () => (
                 <Route path="/ottoman-era" element={<OttomanEra />} />
                 <Route path="/andalus-heritage" element={<AndalusHeritage />} />
                 <Route path="/contemporary-islam" element={<ContemporaryIslam />} />
+                <Route path="/sahaba-women" element={<SahabaWomen />} />
+                <Route path="/sahaba-men" element={<SahabaMen />} />
+                <Route path="/tabiun-era" element={<TabiunEra />} />
+                <Route path="/imam-abu-hanifa" element={<ImamAbuHanifa />} />
+                <Route path="/imam-malik" element={<ImamMalik />} />
+                <Route path="/imam-shafii" element={<ImamShafii />} />
+                <Route path="/imam-ahmad" element={<ImamAhmad />} />
+                <Route path="/imam-bukhari" element={<ImamBukhari />} />
+                <Route path="/imam-muslim" element={<ImamMuslim />} />
+                <Route path="/ibn-taymiyyah" element={<IbnTaymiyyah />} />
+                <Route path="/ibn-qayyim" element={<IbnQayyim />} />
+                <Route path="/imam-ghazali" element={<ImamGhazali />} />
+                <Route path="/imam-nawawi" element={<ImamNawawi />} />
+                <Route path="/ibn-kathir" element={<IbnKathir />} />
+                <Route path="/ibn-hajar" element={<IbnHajar />} />
+                <Route path="/salafi-manhaj" element={<SalafiManhaj />} />
+                <Route path="/aqidah-tahawiyyah" element={<AqidahTahawiyyah />} />
+                <Route path="/asma-wa-sifat" element={<AsmaWaSifat />} />
+                <Route path="/shirk-types" element={<ShirkTypes />} />
+                <Route path="/kufr-nifaq" element={<KufrNifaq />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
