@@ -77,6 +77,7 @@ const Qibla = lazy(() => import("./pages/Qibla.tsx"));
 const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const DuaWall = lazy(() => import("./pages/DuaWall.tsx"));
 const BabyNames = lazy(() => import("./pages/BabyNames.tsx"));
+const Nikah = lazy(() => import("./pages/Nikah.tsx"));
 
 const queryClient = new QueryClient();
 
