@@ -57,6 +57,7 @@ const Navbar = () => {
                   { to: "/salah", label: "Salah tracker", icon: ListChecks },
                   { to: "/achievements", label: "Achievements", icon: Award },
                   { to: "/challenges", label: "Daily challenges", icon: Target },
+                  { to: "/reminders", label: "Habit reminders", icon: Bell },
                   { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
                   { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
                   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
