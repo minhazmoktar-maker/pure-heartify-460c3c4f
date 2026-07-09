@@ -90,6 +90,7 @@ const IslamicEvents = lazy(() => import("./pages/IslamicEvents.tsx"));
 const Inheritance = lazy(() => import("./pages/Inheritance.tsx"));
 const WuduGuide = lazy(() => import("./pages/WuduGuide.tsx"));
 const SalahGuide = lazy(() => import("./pages/SalahGuide.tsx"));
+const Fatwa = lazy(() => import("./pages/Fatwa.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -169,6 +170,7 @@ const App = () => (
                 <Route path="/inheritance" element={<Inheritance />} />
                 <Route path="/wudu" element={<WuduGuide />} />
                 <Route path="/salah-guide" element={<SalahGuide />} />
+                <Route path="/fatwa" element={<Fatwa />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
