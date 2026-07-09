@@ -51,6 +51,7 @@ const Prayer = lazy(() => import("./pages/Prayer.tsx"));
 const Quran = lazy(() => import("./pages/Quran.tsx"));
 const Dhikr = lazy(() => import("./pages/Dhikr.tsx"));
 const Adhkar = lazy(() => import("./pages/Adhkar.tsx"));
+const Zakat = lazy(() => import("./pages/Zakat.tsx"));
 
 const queryClient = new QueryClient();
 
