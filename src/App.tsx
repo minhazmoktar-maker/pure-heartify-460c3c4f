@@ -177,6 +177,26 @@ const EldersRights = lazy(() => import("./pages/EldersRights.tsx"));
 const RightsOfPoor = lazy(() => import("./pages/RightsOfPoor.tsx"));
 const SilaturRahm = lazy(() => import("./pages/SilaturRahm.tsx"));
 const HasadEvilEye = lazy(() => import("./pages/HasadEvilEye.tsx"));
+const Ghibah = lazy(() => import("./pages/Ghibah.tsx"));
+const AngerControl = lazy(() => import("./pages/AngerControl.tsx"));
+const Fitrah = lazy(() => import("./pages/Fitrah.tsx"));
+const HiraKhalwa = lazy(() => import("./pages/HiraKhalwa.tsx"));
+const TafakkurTadabbur = lazy(() => import("./pages/TafakkurTadabbur.tsx"));
+const IlmVsAmal = lazy(() => import("./pages/IlmVsAmal.tsx"));
+const NightPrayer = lazy(() => import("./pages/NightPrayer.tsx"));
+const Witr = lazy(() => import("./pages/Witr.tsx"));
+const Duha = lazy(() => import("./pages/Duha.tsx"));
+const Tahiyatul = lazy(() => import("./pages/Tahiyatul.tsx"));
+const AwwabinPrayer = lazy(() => import("./pages/AwwabinPrayer.tsx"));
+const KaffaratMajlis = lazy(() => import("./pages/KaffaratMajlis.tsx"));
+const SalatOnProphet = lazy(() => import("./pages/SalatOnProphet.tsx"));
+const ForbiddenTimes = lazy(() => import("./pages/ForbiddenTimes.tsx"));
+const MissedSunnah = lazy(() => import("./pages/MissedSunnah.tsx"));
+const IdPrayers = lazy(() => import("./pages/IdPrayers.tsx"));
+const KusufKhusuf = lazy(() => import("./pages/KusufKhusuf.tsx"));
+const Istisqa = lazy(() => import("./pages/Istisqa.tsx"));
+const Ghusl = lazy(() => import("./pages/Ghusl.tsx"));
+const Tayammum = lazy(() => import("./pages/Tayammum.tsx"));
 
 const queryClient = new QueryClient();
 
