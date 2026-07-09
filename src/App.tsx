@@ -89,7 +89,7 @@ const Nawawi40 = lazy(() => import("./pages/Nawawi40.tsx"));
 const NewMuslim = lazy(() => import("./pages/NewMuslim.tsx"));
 const Nikah = lazy(() => import("./pages/Nikah.tsx"));
 const Onboarding = lazy(() => import("./pages/Onboarding.tsx"));
-const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard.tsx"));
+
 const Parenting = lazy(() => import("./pages/Parenting.tsx"));
 const ParentsRights = lazy(() => import("./pages/ParentsRights.tsx"));
 const Pillars = lazy(() => import("./pages/Pillars.tsx"));
