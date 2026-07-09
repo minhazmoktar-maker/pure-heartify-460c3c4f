@@ -78,6 +78,7 @@ const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const DuaWall = lazy(() => import("./pages/DuaWall.tsx"));
 const BabyNames = lazy(() => import("./pages/BabyNames.tsx"));
 const Nikah = lazy(() => import("./pages/Nikah.tsx"));
+const Quiz = lazy(() => import("./pages/Quiz.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -145,6 +146,7 @@ const App = () => (
                 <Route path="/dua-wall" element={<DuaWall />} />
                 <Route path="/baby-names" element={<BabyNames />} />
                 <Route path="/nikah" element={<Nikah />} />
+                <Route path="/quiz" element={<Quiz />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
