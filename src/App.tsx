@@ -220,6 +220,11 @@ const App = () => (
                 <Route path="/masnoon-duas" element={<MasnoonDuas />} />
                 <Route path="/purification" element={<Purification />} />
                 <Route path="/travel-adab" element={<TravelAdab />} />
+                <Route path="/eating-sunnah" element={<EatingSunnah />} />
+                <Route path="/means-of-reward" element={<MeansOfReward />} />
+                <Route path="/major-sins" element={<MajorSins />} />
+                <Route path="/tawbah" element={<Tawbah />} />
+                <Route path="/jannah" element={<JannahDescriptions />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
