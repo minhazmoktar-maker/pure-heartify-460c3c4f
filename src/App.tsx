@@ -123,6 +123,11 @@ const SacredMosques = lazy(() => import("./pages/SacredMosques.tsx"));
 const Madhabs = lazy(() => import("./pages/Madhabs.tsx"));
 const QuranSciences = lazy(() => import("./pages/QuranSciences.tsx"));
 const HadithSciences = lazy(() => import("./pages/HadithSciences.tsx"));
+const Battles = lazy(() => import("./pages/Battles.tsx"));
+const Miracles = lazy(() => import("./pages/Miracles.tsx"));
+const FarewellSermon = lazy(() => import("./pages/FarewellSermon.tsx"));
+const AhlulBayt = lazy(() => import("./pages/AhlulBayt.tsx"));
+const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 
 const queryClient = new QueryClient();
 
