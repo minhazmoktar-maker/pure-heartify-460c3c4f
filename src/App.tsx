@@ -683,6 +683,26 @@ const App = () => (
                 <Route path="/qard-hasan" element={<QardHasan />} />
                 <Route path="/waqf-modern" element={<WaqfModern />} />
                 <Route path="/zakat-calculators" element={<ZakatCalculators />} />
+                <Route path="/hifz-tips" element={<QuranMemorizationTips />} />
+                <Route path="/tafsir-basics" element={<QuranTafsirBasics />} />
+                <Route path="/asbab-nuzul" element={<QuranAsbabAnNuzul />} />
+                <Route path="/makki-madani" element={<QuranMakkiMadani />} />
+                <Route path="/naskh" element={<QuranAbrogation />} />
+                <Route path="/qiraat" element={<QuranQiraat />} />
+                <Route path="/hadith-grading" element={<HadithGrading />} />
+                <Route path="/kutub-sittah" element={<HadithSixBooks />} />
+                <Route path="/usul-fiqh" element={<FiqhUsul />} />
+                <Route path="/maqasid" element={<MaqasidShariah />} />
+                <Route path="/ijtihad-taqlid" element={<IjtihadTaqlid />} />
+                <Route path="/islamic-calligraphy" element={<IslamicCalligraphy />} />
+                <Route path="/islamic-architecture" element={<IslamicArchitecture />} />
+                <Route path="/islamic-science" element={<IslamicScience />} />
+                <Route path="/islamic-medicine" element={<IslamicMedicine />} />
+                <Route path="/islamic-psychology" element={<IslamicPsychology />} />
+                <Route path="/islamic-education" element={<IslamicEducation />} />
+                <Route path="/islamic-parenting" element={<IslamicParenting />} />
+                <Route path="/marriage-proposal" element={<MarriageProposal />} />
+                <Route path="/islamic-wedding" element={<IslamicWedding />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
