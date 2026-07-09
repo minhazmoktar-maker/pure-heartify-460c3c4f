@@ -483,6 +483,26 @@ const App = () => (
                 <Route path="/adab-of-masjid" element={<AdabOfMasjid />} />
                 <Route path="/visiting-the-sick" element={<VisitingSick />} />
                 <Route path="/funeral-rites" element={<FuneralRites />} />
+                <Route path="/sunnah-of-eating" element={<SunnahOfEating />} />
+                <Route path="/sunnah-of-drinking" element={<SunnahOfDrinking />} />
+                <Route path="/sunnah-of-travel" element={<SunnahOfTravel />} />
+                <Route path="/sunnah-of-greeting" element={<SunnahOfGreeting />} />
+                <Route path="/sunnah-of-gifts" element={<SunnahOfGifts />} />
+                <Route path="/hijra-lessons" element={<HijraLessons />} />
+                <Route path="/makkah-period" element={<MakkahPeriod />} />
+                <Route path="/madinah-period" element={<MadinahPeriod />} />
+                <Route path="/badr-lessons" element={<BadrLessons />} />
+                <Route path="/uhud-lessons" element={<UhudLessons />} />
+                <Route path="/khandaq-lessons" element={<KhandaqLessons />} />
+                <Route path="/hudaybiyah-lessons" element={<HudaybiyahLessons />} />
+                <Route path="/fath-makkah" element={<FathMakkah />} />
+                <Route path="/tabuk-lessons" element={<TabukLessons />} />
+                <Route path="/khilafah-rashida" element={<KhilafahRashida />} />
+                <Route path="/umayyad-era" element={<UmayyadEra />} />
+                <Route path="/abbasid-era" element={<AbbasidEra />} />
+                <Route path="/ottoman-era" element={<OttomanEra />} />
+                <Route path="/andalus-heritage" element={<AndalusHeritage />} />
+                <Route path="/contemporary-islam" element={<ContemporaryIslam />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
