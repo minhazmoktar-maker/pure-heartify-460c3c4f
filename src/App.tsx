@@ -317,6 +317,26 @@ const InterfaithDialogue = lazy(() => import("./pages/InterfaithDialogue.tsx"));
 const ChristianityCompared = lazy(() => import("./pages/ChristianityCompared.tsx"));
 const JudaismCompared = lazy(() => import("./pages/JudaismCompared.tsx"));
 const HinduismBuddhism = lazy(() => import("./pages/HinduismBuddhism.tsx"));
+const AtheismResponse = lazy(() => import("./pages/AtheismResponse.tsx"));
+const SecularismIslam = lazy(() => import("./pages/SecularismIslam.tsx"));
+const FeminismIslam = lazy(() => import("./pages/FeminismIslam.tsx"));
+const LiberalismIslam = lazy(() => import("./pages/LiberalismIslam.tsx"));
+const NationalismIslam = lazy(() => import("./pages/NationalismIslam.tsx"));
+const EnvironmentIslam = lazy(() => import("./pages/EnvironmentIslam.tsx"));
+const AnimalRights = lazy(() => import("./pages/AnimalRights.tsx"));
+const VegetarianismIslam = lazy(() => import("./pages/VegetarianismIslam.tsx"));
+const HalalTravel = lazy(() => import("./pages/HalalTravel.tsx"));
+const SharedEconomy = lazy(() => import("./pages/SharedEconomy.tsx"));
+const EthicalInvesting = lazy(() => import("./pages/EthicalInvesting.tsx"));
+const Sukuk = lazy(() => import("./pages/Sukuk.tsx"));
+const Takaful = lazy(() => import("./pages/Takaful.tsx"));
+const MurabahaFinance = lazy(() => import("./pages/MurabahaFinance.tsx"));
+const Ijarah = lazy(() => import("./pages/Ijarah.tsx"));
+const Musharakah = lazy(() => import("./pages/Musharakah.tsx"));
+const Mudarabah = lazy(() => import("./pages/Mudarabah.tsx"));
+const QardHasan = lazy(() => import("./pages/QardHasan.tsx"));
+const WaqfModern = lazy(() => import("./pages/WaqfModern.tsx"));
+const ZakatCalculators = lazy(() => import("./pages/ZakatCalculators.tsx"));
 
 const queryClient = new QueryClient();
 
