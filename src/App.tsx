@@ -143,6 +143,11 @@ const HeartDiseases = lazy(() => import("./pages/HeartDiseases.tsx"));
 const Bidah = lazy(() => import("./pages/Bidah.tsx"));
 const BusinessEthics = lazy(() => import("./pages/BusinessEthics.tsx"));
 const SeekingKnowledge = lazy(() => import("./pages/SeekingKnowledge.tsx"));
+const ParentsRights = lazy(() => import("./pages/ParentsRights.tsx"));
+const ChildrensRights = lazy(() => import("./pages/ChildrensRights.tsx"));
+const MuslimRights = lazy(() => import("./pages/MuslimRights.tsx"));
+const TongueAdab = lazy(() => import("./pages/TongueAdab.tsx"));
+const WomensPurity = lazy(() => import("./pages/WomensPurity.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -275,6 +280,11 @@ const App = () => (
                 <Route path="/bidah" element={<Bidah />} />
                 <Route path="/business-ethics" element={<BusinessEthics />} />
                 <Route path="/seeking-knowledge" element={<SeekingKnowledge />} />
+                <Route path="/parents-rights" element={<ParentsRights />} />
+                <Route path="/childrens-rights" element={<ChildrensRights />} />
+                <Route path="/muslim-rights" element={<MuslimRights />} />
+                <Route path="/tongue-adab" element={<TongueAdab />} />
+                <Route path="/womens-purity" element={<WomensPurity />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
