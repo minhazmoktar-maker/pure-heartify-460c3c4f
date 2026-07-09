@@ -2399,6 +2399,17 @@ export type Database = {
         Returns: boolean
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
+      list_dua_wall: {
+        Args: { _limit?: number }
+        Returns: {
+          ameen_count: number
+          body: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          user_id: string
+        }[]
+      }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
       rate_limit_cleanup: {
         Args: { _older_than_minutes?: number }
