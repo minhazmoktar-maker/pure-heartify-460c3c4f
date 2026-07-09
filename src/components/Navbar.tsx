@@ -59,6 +59,7 @@ const Navbar = () => {
                   { to: "/challenges", label: "Daily challenges", icon: Target },
                   { to: "/reminders", label: "Habit reminders", icon: Bell },
                   { to: "/recap", label: "Weekly recap", icon: LineChart },
+                  { to: "/journal", label: "Journal (Niyyah)", icon: BookMarked },
                   { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
                   { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
                   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
