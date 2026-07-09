@@ -357,6 +357,26 @@ const IslamicEducation = lazy(() => import("./pages/IslamicEducation.tsx"));
 const IslamicParenting = lazy(() => import("./pages/IslamicParenting.tsx"));
 const MarriageProposal = lazy(() => import("./pages/MarriageProposal.tsx"));
 const IslamicWedding = lazy(() => import("./pages/IslamicWedding.tsx"));
+const PolygamyRulings = lazy(() => import("./pages/PolygamyRulings.tsx"));
+const MahrRulings = lazy(() => import("./pages/MahrRulings.tsx"));
+const DivorceProcedure = lazy(() => import("./pages/DivorceProcedure.tsx"));
+const CustodyRules = lazy(() => import("./pages/CustodyRules.tsx"));
+const AdoptionKafalah = lazy(() => import("./pages/AdoptionKafalah.tsx"));
+const OrphanCare = lazy(() => import("./pages/OrphanCare.tsx"));
+const ElderCare = lazy(() => import("./pages/ElderCare.tsx"));
+const DisabilityIslam = lazy(() => import("./pages/DisabilityIslam.tsx"));
+const MartyrdomVirtues = lazy(() => import("./pages/MartyrdomVirtues.tsx"));
+const SuicidePrevention = lazy(() => import("./pages/SuicidePrevention.tsx"));
+const MentalHealthImams = lazy(() => import("./pages/MentalHealthImams.tsx"));
+const MuslimTherapists = lazy(() => import("./pages/MuslimTherapists.tsx"));
+const IslamicMeditation = lazy(() => import("./pages/IslamicMeditation.tsx"));
+const DhikrBenefits = lazy(() => import("./pages/DhikrBenefits.tsx"));
+const StressAnxietyRelief = lazy(() => import("./pages/StressAnxietyRelief.tsx"));
+const SleepSunnah = lazy(() => import("./pages/SleepSunnah.tsx"));
+const MorningRoutine = lazy(() => import("./pages/MorningRoutine.tsx"));
+const EveningRoutine = lazy(() => import("./pages/EveningRoutine.tsx"));
+const HalalRelationships = lazy(() => import("./pages/HalalRelationships.tsx"));
+const MuslimDating = lazy(() => import("./pages/MuslimDating.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -703,6 +723,26 @@ const App = () => (
                 <Route path="/islamic-parenting" element={<IslamicParenting />} />
                 <Route path="/marriage-proposal" element={<MarriageProposal />} />
                 <Route path="/islamic-wedding" element={<IslamicWedding />} />
+                <Route path="/polygamy-rulings" element={<PolygamyRulings />} />
+                <Route path="/mahr-rulings" element={<MahrRulings />} />
+                <Route path="/divorce-procedure" element={<DivorceProcedure />} />
+                <Route path="/custody-rules" element={<CustodyRules />} />
+                <Route path="/adoption-kafalah" element={<AdoptionKafalah />} />
+                <Route path="/orphan-care" element={<OrphanCare />} />
+                <Route path="/elder-care" element={<ElderCare />} />
+                <Route path="/disability-islam" element={<DisabilityIslam />} />
+                <Route path="/martyrdom" element={<MartyrdomVirtues />} />
+                <Route path="/suicide-prevention" element={<SuicidePrevention />} />
+                <Route path="/imam-mental-health" element={<MentalHealthImams />} />
+                <Route path="/muslim-therapists" element={<MuslimTherapists />} />
+                <Route path="/islamic-meditation" element={<IslamicMeditation />} />
+                <Route path="/dhikr-benefits" element={<DhikrBenefits />} />
+                <Route path="/stress-anxiety" element={<StressAnxietyRelief />} />
+                <Route path="/sleep-sunnah" element={<SleepSunnah />} />
+                <Route path="/morning-routine" element={<MorningRoutine />} />
+                <Route path="/evening-routine" element={<EveningRoutine />} />
+                <Route path="/halal-relationships" element={<HalalRelationships />} />
+                <Route path="/muslim-dating" element={<MuslimDating />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
