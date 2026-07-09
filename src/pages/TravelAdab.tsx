@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import SEO from "@/components/SEO";
 
-type Item = { id: string; title: string; detail: string; source: string };
+type Item = { id: string; title: string; detail: string; source?: string };
 
 const ITEMS: Item[] = [
   { id: "istikhara", title: "Pray Istikhara before deciding", detail: "For any journey, especially a long or life-changing one, offer 2 rak'ahs of istikhara.", source: "Bukhari 1162" },
