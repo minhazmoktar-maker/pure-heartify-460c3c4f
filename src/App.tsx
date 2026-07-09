@@ -23,14 +23,13 @@ const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const AdabPage = lazy(() => import("./pages/AdabPage.tsx"));
 const AdhanIqamah = lazy(() => import("./pages/AdhanIqamah.tsx"));
 const Adhkar = lazy(() => import("./pages/Adhkar.tsx"));
-const AdminAlerts = lazy(() => import("./pages/AdminAlerts.tsx"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
-const AdminGsc = lazy(() => import("./pages/AdminGsc.tsx"));
-const AdminPermissions = lazy(() => import("./pages/AdminPermissions.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
+const AdminUsers = lazy(() => import("./pages/AdminUsers.tsx"));
+
 const AhlulBayt = lazy(() => import("./pages/AhlulBayt.tsx"));
 const Akhlaq = lazy(() => import("./pages/Akhlaq.tsx"));
 const Alphabet = lazy(() => import("./pages/Alphabet.tsx"));
