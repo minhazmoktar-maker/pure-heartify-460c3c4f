@@ -277,6 +277,26 @@ const AqidahTahawiyyah = lazy(() => import("./pages/AqidahTahawiyyah.tsx"));
 const AsmaWaSifat = lazy(() => import("./pages/AsmaWaSifat.tsx"));
 const ShirkTypes = lazy(() => import("./pages/ShirkTypes.tsx"));
 const KufrNifaq = lazy(() => import("./pages/KufrNifaq.tsx"));
+const SocialMediaEthics = lazy(() => import("./pages/SocialMediaEthics.tsx"));
+const WorkplaceEthics = lazy(() => import("./pages/WorkplaceEthics.tsx"));
+const FinancialFraud = lazy(() => import("./pages/FinancialFraud.tsx"));
+const RibaExplained = lazy(() => import("./pages/RibaExplained.tsx"));
+const CryptoIslamic = lazy(() => import("./pages/CryptoIslamic.tsx"));
+const InsuranceIslamic = lazy(() => import("./pages/InsuranceIslamic.tsx"));
+const MortgageIslamic = lazy(() => import("./pages/MortgageIslamic.tsx"));
+const ModernMedicine = lazy(() => import("./pages/ModernMedicine.tsx"));
+const OrganDonation = lazy(() => import("./pages/OrganDonation.tsx"));
+const IVFIslam = lazy(() => import("./pages/IVFIslam.tsx"));
+const AbortionRulings = lazy(() => import("./pages/AbortionRulings.tsx"));
+const ContraceptionIslam = lazy(() => import("./pages/ContraceptionIslam.tsx"));
+const VaccinesIslam = lazy(() => import("./pages/VaccinesIslam.tsx"));
+const MentalHealthIslam = lazy(() => import("./pages/MentalHealthIslam.tsx"));
+const AddictionRecovery = lazy(() => import("./pages/AddictionRecovery.tsx"));
+const DepressionAnxiety = lazy(() => import("./pages/DepressionAnxiety.tsx"));
+const GenderRoles = lazy(() => import("./pages/GenderRoles.tsx"));
+const HijabRulings = lazy(() => import("./pages/HijabRulings.tsx"));
+const MahramNonMahram = lazy(() => import("./pages/MahramNonMahram.tsx"));
+const FreeMixing = lazy(() => import("./pages/FreeMixing.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -543,6 +563,26 @@ const App = () => (
                 <Route path="/asma-wa-sifat" element={<AsmaWaSifat />} />
                 <Route path="/shirk-types" element={<ShirkTypes />} />
                 <Route path="/kufr-nifaq" element={<KufrNifaq />} />
+                <Route path="/social-media-ethics" element={<SocialMediaEthics />} />
+                <Route path="/workplace-ethics" element={<WorkplaceEthics />} />
+                <Route path="/financial-fraud" element={<FinancialFraud />} />
+                <Route path="/riba-explained" element={<RibaExplained />} />
+                <Route path="/crypto-islamic" element={<CryptoIslamic />} />
+                <Route path="/insurance-islamic" element={<InsuranceIslamic />} />
+                <Route path="/mortgage-islamic" element={<MortgageIslamic />} />
+                <Route path="/modern-medicine" element={<ModernMedicine />} />
+                <Route path="/organ-donation" element={<OrganDonation />} />
+                <Route path="/ivf-islam" element={<IVFIslam />} />
+                <Route path="/abortion-rulings" element={<AbortionRulings />} />
+                <Route path="/contraception-islam" element={<ContraceptionIslam />} />
+                <Route path="/vaccines-islam" element={<VaccinesIslam />} />
+                <Route path="/mental-health-islam" element={<MentalHealthIslam />} />
+                <Route path="/addiction-recovery" element={<AddictionRecovery />} />
+                <Route path="/depression-anxiety" element={<DepressionAnxiety />} />
+                <Route path="/gender-roles" element={<GenderRoles />} />
+                <Route path="/hijab-rulings" element={<HijabRulings />} />
+                <Route path="/mahram-nonmahram" element={<MahramNonMahram />} />
+                <Route path="/free-mixing" element={<FreeMixing />} />
 
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
