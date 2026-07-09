@@ -46,6 +46,7 @@ const MfaVerify = lazy(() => import("./pages/MfaVerify.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
 const AdminGsc = lazy(() => import("./pages/AdminGsc.tsx"));
 const AdminPermissions = lazy(() => import("./pages/AdminPermissions.tsx"));
+const AdminAlerts = lazy(() => import("./pages/AdminAlerts.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,7 @@ const App = () => (
                 <Route path="/admin/roles" element={<AdminRoute><AdminRoles /></AdminRoute>} />
                 <Route path="/admin/gsc" element={<AdminRoute><AdminGsc /></AdminRoute>} />
                 <Route path="/admin/permissions" element={<AdminRoute><AdminPermissions /></AdminRoute>} />
+                <Route path="/admin/alerts" element={<AdminRoute><AdminAlerts /></AdminRoute>} />
                 <Route path="/security/mfa" element={<MfaEnroll />} />
                 <Route path="/security/mfa/verify" element={<MfaVerify />} />
                 <Route path="/mfa-enroll" element={<Navigate to="/security/mfa" replace />} />

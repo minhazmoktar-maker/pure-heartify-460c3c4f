@@ -182,6 +182,16 @@ const Watch = () => {
                   allowFullScreen
                   loading="eager"
                   className="absolute inset-0 h-full w-full border-0"
+                  onError={() => {
+                    void import("@/lib/alerts").then(({ reportAlert }) =>
+                      reportAlert({
+                        kind: "watch_iframe_error",
+                        severity: "error",
+                        message: `Watch iframe failed to load for video ${videoId}`,
+                        context: { videoId, title: currentVideo?.title },
+                      }),
+                    );
+                  }}
                 />
               ) : (
                 // Lite-YouTube facade: defers ~1.5MB of player JS until user intent.

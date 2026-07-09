@@ -1290,6 +1290,45 @@ export type Database = {
         }
         Relationships: []
       }
+      production_alerts: {
+        Row: {
+          context: Json
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          resolved_at: string | null
+          resolved_by: string | null
+          route: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json
+          created_at?: string
+          id?: string
+          kind: string
+          message: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          route?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          route?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
