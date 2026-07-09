@@ -48,6 +48,7 @@ const Navbar = () => {
                   { to: "/quran", label: "Quran reader", icon: BookOpen },
                   { to: "/dhikr", label: "Dhikr & Tasbih", icon: CircleDot },
                   { to: "/adhkar", label: "Adhkar & Duas", icon: Sunrise },
+                  { to: "/zakat", label: "Zakat calculator", icon: Calculator },
                   { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
                   { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
                   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
