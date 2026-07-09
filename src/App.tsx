@@ -66,6 +66,7 @@ const Journal = lazy(() => import("./pages/Journal.tsx"));
 const Khatm = lazy(() => import("./pages/Khatm.tsx"));
 const Bookmarks = lazy(() => import("./pages/Bookmarks.tsx"));
 const Fasting = lazy(() => import("./pages/Fasting.tsx"));
+const Seerah = lazy(() => import("./pages/Seerah.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -121,6 +122,7 @@ const App = () => (
                 <Route path="/khatm" element={<Khatm />} />
                 <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/fasting" element={<Fasting />} />
+                <Route path="/seerah" element={<Seerah />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
