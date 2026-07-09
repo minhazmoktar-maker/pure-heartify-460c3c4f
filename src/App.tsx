@@ -60,6 +60,7 @@ const SalahTracker = lazy(() => import("./pages/SalahTracker.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const Challenges = lazy(() => import("./pages/Challenges.tsx"));
 const Today = lazy(() => import("./pages/Today.tsx"));
+const Reminders = lazy(() => import("./pages/Reminders.tsx"));
 
 const queryClient = new QueryClient();
 
