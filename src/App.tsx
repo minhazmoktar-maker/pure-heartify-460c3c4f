@@ -378,6 +378,28 @@ const EveningRoutine = lazy(() => import("./pages/EveningRoutine.tsx"));
 const HalalRelationships = lazy(() => import("./pages/HalalRelationships.tsx"));
 const MuslimDating = lazy(() => import("./pages/MuslimDating.tsx"));
 
+const MatrimonyTrends = lazy(() => import("./pages/MatrimonyTrends.tsx"));
+const YouthMentorship = lazy(() => import("./pages/YouthMentorship.tsx"));
+const HalalRestaurants = lazy(() => import("./pages/HalalRestaurants.tsx"));
+const MuslimEntrepreneurs = lazy(() => import("./pages/MuslimEntrepreneurs.tsx"));
+const CharityDiscovery = lazy(() => import("./pages/CharityDiscovery.tsx"));
+const DisasterRelief = lazy(() => import("./pages/DisasterRelief.tsx"));
+const RefugeeSupport = lazy(() => import("./pages/RefugeeSupport.tsx"));
+const OrphanSponsorship = lazy(() => import("./pages/OrphanSponsorship.tsx"));
+const IftarApps = lazy(() => import("./pages/IftarApps.tsx"));
+const MasjidDiscovery = lazy(() => import("./pages/MasjidDiscovery.tsx"));
+const IslamicSchools = lazy(() => import("./pages/IslamicSchools.tsx"));
+const HalalKidsGames = lazy(() => import("./pages/HalalKidsGames.tsx"));
+const BedtimeStories = lazy(() => import("./pages/BedtimeStories.tsx"));
+const IslamicPodcasts = lazy(() => import("./pages/IslamicPodcasts.tsx"));
+const StreamingEthics = lazy(() => import("./pages/StreamingEthics.tsx"));
+const ModerationEthics = lazy(() => import("./pages/ModerationEthics.tsx"));
+const DigitalWellbeing = lazy(() => import("./pages/DigitalWellbeing.tsx"));
+const InfluencerEthics = lazy(() => import("./pages/InfluencerEthics.tsx"));
+const AIInIslam = lazy(() => import("./pages/AIInIslam.tsx"));
+const HalalGaming = lazy(() => import("./pages/HalalGaming.tsx"));
+
+
 const queryClient = new QueryClient();
 
 const RouteFallback = () => (
@@ -747,6 +769,26 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/matrimony-trends" element={<MatrimonyTrends />} />
+                <Route path="/youth-mentorship" element={<YouthMentorship />} />
+                <Route path="/halal-restaurants" element={<HalalRestaurants />} />
+                <Route path="/muslim-entrepreneurs" element={<MuslimEntrepreneurs />} />
+                <Route path="/charity-discovery" element={<CharityDiscovery />} />
+                <Route path="/disaster-relief" element={<DisasterRelief />} />
+                <Route path="/refugee-support" element={<RefugeeSupport />} />
+                <Route path="/orphan-sponsorship" element={<OrphanSponsorship />} />
+                <Route path="/iftar-apps" element={<IftarApps />} />
+                <Route path="/masjid-discovery" element={<MasjidDiscovery />} />
+                <Route path="/islamic-schools" element={<IslamicSchools />} />
+                <Route path="/halal-kids-games" element={<HalalKidsGames />} />
+                <Route path="/islamic-bedtime-stories" element={<BedtimeStories />} />
+                <Route path="/islamic-podcasts" element={<IslamicPodcasts />} />
+                <Route path="/streaming-ethics" element={<StreamingEthics />} />
+                <Route path="/moderation-ethics" element={<ModerationEthics />} />
+                <Route path="/digital-wellbeing" element={<DigitalWellbeing />} />
+                <Route path="/influencer-ethics" element={<InfluencerEthics />} />
+                <Route path="/ai-in-islam" element={<AIInIslam />} />
+                <Route path="/halal-gaming" element={<HalalGaming />} />
                 <Route path="/channels" element={<Channels />} />
                 <Route path="/admin" element={<Navigate to="/admin/console" replace />} />
                 <Route path="/admin/moderation" element={<AdminRoute><ModerationLog /></AdminRoute>} />
