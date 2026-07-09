@@ -113,6 +113,11 @@ const Kalimahs = lazy(() => import("./pages/Kalimahs.tsx"));
 const MasnoonDuas = lazy(() => import("./pages/MasnoonDuas.tsx"));
 const Purification = lazy(() => import("./pages/Purification.tsx"));
 const TravelAdab = lazy(() => import("./pages/TravelAdab.tsx"));
+const EatingSunnah = lazy(() => import("./pages/EatingSunnah.tsx"));
+const MeansOfReward = lazy(() => import("./pages/MeansOfReward.tsx"));
+const MajorSins = lazy(() => import("./pages/MajorSins.tsx"));
+const Tawbah = lazy(() => import("./pages/Tawbah.tsx"));
+const JannahDescriptions = lazy(() => import("./pages/JannahDescriptions.tsx"));
 
 const queryClient = new QueryClient();
 
