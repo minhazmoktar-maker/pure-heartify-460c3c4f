@@ -74,6 +74,7 @@ const Wasiyyah = lazy(() => import("./pages/Wasiyyah.tsx"));
 const Ramadan = lazy(() => import("./pages/Ramadan.tsx"));
 const Hajj = lazy(() => import("./pages/Hajj.tsx"));
 const Qibla = lazy(() => import("./pages/Qibla.tsx"));
+const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -137,6 +138,7 @@ const App = () => (
                 <Route path="/ramadan" element={<Ramadan />} />
                 <Route path="/hajj" element={<Hajj />} />
                 <Route path="/qibla" element={<Qibla />} />
+                <Route path="/halal-check" element={<HalalCheck />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/owner-profile" element={<Navigate to="/owner" replace />} />
                 <Route path="/onboarding" element={<Onboarding />} />
