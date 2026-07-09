@@ -148,17 +148,23 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
       || r.plan.toLowerCase().includes(needle);
   });
 
+  const shell = embedded ? "" : "min-h-screen bg-background";
   return (
-    <div className="min-h-screen bg-background">
-      <SEO title="Entitlements · Admin" description="Manage premium entitlements" path="/admin/entitlements" />
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        <Link to="/admin/console" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Admin console
-        </Link>
-        <div className="mb-6 flex items-center gap-3">
-          <Crown className="h-6 w-6 text-gold" />
-          <h1 className="font-heading text-2xl font-bold">Entitlements</h1>
-        </div>
+    <div className={shell}>
+      {!embedded && <SEO title="Entitlements · Admin" description="Manage premium entitlements" path="/admin/entitlements" />}
+      <div className={embedded ? "" : "mx-auto max-w-6xl px-4 py-8"}>
+        {!embedded && (
+          <>
+            <Link to="/admin/console" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="h-4 w-4" /> Admin console
+            </Link>
+            <div className="mb-6 flex items-center gap-3">
+              <Crown className="h-6 w-6 text-gold" />
+              <h1 className="font-heading text-2xl font-bold">Entitlements</h1>
+            </div>
+          </>
+        )}
+
 
         {/* Grant form */}
         <div className="mb-8 rounded-2xl border bg-card p-5 shadow-sm">
