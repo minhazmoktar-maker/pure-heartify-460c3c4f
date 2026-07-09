@@ -237,6 +237,26 @@ const SunnahOfClothing = lazy(() => import("./pages/SunnahOfClothing.tsx"));
 const AdabOfMasjid = lazy(() => import("./pages/AdabOfMasjid.tsx"));
 const VisitingSick = lazy(() => import("./pages/VisitingSick.tsx"));
 const FuneralRites = lazy(() => import("./pages/FuneralRites.tsx"));
+const SunnahOfEating = lazy(() => import("./pages/SunnahOfEating.tsx"));
+const SunnahOfDrinking = lazy(() => import("./pages/SunnahOfDrinking.tsx"));
+const SunnahOfTravel = lazy(() => import("./pages/SunnahOfTravel.tsx"));
+const SunnahOfGreeting = lazy(() => import("./pages/SunnahOfGreeting.tsx"));
+const SunnahOfGifts = lazy(() => import("./pages/SunnahOfGifts.tsx"));
+const HijraLessons = lazy(() => import("./pages/HijraLessons.tsx"));
+const MakkahPeriod = lazy(() => import("./pages/MakkahPeriod.tsx"));
+const MadinahPeriod = lazy(() => import("./pages/MadinahPeriod.tsx"));
+const BadrLessons = lazy(() => import("./pages/BadrLessons.tsx"));
+const UhudLessons = lazy(() => import("./pages/UhudLessons.tsx"));
+const KhandaqLessons = lazy(() => import("./pages/KhandaqLessons.tsx"));
+const HudaybiyahLessons = lazy(() => import("./pages/HudaybiyahLessons.tsx"));
+const FathMakkah = lazy(() => import("./pages/FathMakkah.tsx"));
+const TabukLessons = lazy(() => import("./pages/TabukLessons.tsx"));
+const KhilafahRashida = lazy(() => import("./pages/KhilafahRashida.tsx"));
+const UmayyadEra = lazy(() => import("./pages/UmayyadEra.tsx"));
+const AbbasidEra = lazy(() => import("./pages/AbbasidEra.tsx"));
+const OttomanEra = lazy(() => import("./pages/OttomanEra.tsx"));
+const AndalusHeritage = lazy(() => import("./pages/AndalusHeritage.tsx"));
+const ContemporaryIslam = lazy(() => import("./pages/ContemporaryIslam.tsx"));
 
 const queryClient = new QueryClient();
 
