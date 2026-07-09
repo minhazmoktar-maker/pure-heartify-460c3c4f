@@ -273,7 +273,26 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
             </Card>
           </TabsContent>
         </Tabs>
+    </>
+  );
+
+  if (embedded) return body;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SEO title="Roles & Permissions · Heartify" description="Owner control panel for roles, MFA, and audit events." path="/admin/roles" />
+      <Navbar />
+      <main className="mx-auto max-w-6xl px-4 py-8">
+        <header className="mb-6 flex items-center gap-3">
+          <Shield className="h-6 w-6 text-primary" />
+          <div>
+            <h1 className="text-2xl font-semibold">Roles & Permissions</h1>
+            <p className="text-sm text-muted-foreground">Owner-only control panel for admin, owner, and MFA access.</p>
+          </div>
+        </header>
+        {body}
       </main>
     </div>
   );
 }
+
