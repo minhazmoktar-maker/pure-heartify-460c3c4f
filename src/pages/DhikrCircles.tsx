@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Loader2, Plus, Users, Sparkles } from "lucide-react";
+import { Loader2, Plus, Users, Sparkles, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ import {
   type DhikrCircle,
 } from "@/hooks/useDhikrCircles";
 import { useAuth } from "@/contexts/AuthContext";
+import { shareContent } from "@/lib/share";
 
 const PHRASE_PRESETS = [
   { label: "SubhanAllah", value: "SubhanAllah" },
