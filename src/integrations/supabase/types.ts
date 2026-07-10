@@ -3342,6 +3342,10 @@ export type Database = {
         }[]
       }
       get_public_team_streak: { Args: { _id: string }; Returns: Json }
+      get_public_weekly_recap: {
+        Args: { _handle: string; _week_start: string }
+        Returns: Json
+      }
       get_referral_tier_progress: { Args: never; Returns: Json }
       get_related_searches: {
         Args: { _limit?: number; _query: string }

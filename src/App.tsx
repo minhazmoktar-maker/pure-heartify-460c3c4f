@@ -82,6 +82,7 @@ const PublicDhikrCircle = lazy(() => import("./pages/PublicDhikrCircle.tsx"));
 const PublicDua = lazy(() => import("./pages/PublicDua.tsx"));
 const PublicTeamStreak = lazy(() => import("./pages/PublicTeamStreak.tsx"));
 const PublicKhatmGroup = lazy(() => import("./pages/PublicKhatmGroup.tsx"));
+const PublicWeeklyRecap = lazy(() => import("./pages/PublicWeeklyRecap.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -218,6 +219,7 @@ const App = () => (
                 <Route path="/d/:id" element={<PublicDua />} />
                 <Route path="/t/:id" element={<PublicTeamStreak />} />
                 <Route path="/k/:id" element={<PublicKhatmGroup />} />
+                <Route path="/w/:handle/:week" element={<PublicWeeklyRecap />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
