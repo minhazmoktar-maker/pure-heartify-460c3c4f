@@ -77,6 +77,7 @@ Deno.serve(async (req) => {
       "tedx", "chris williamson", "dr. daf", "womenofquran",
       "islamic reflections", "islamiclife", "hamza's den", "hamzas den",
       "muslim matters tv", "imaan phase",
+      "healthy muslims", "healthymuslims", "zz brothers", "zzbrothers",
       // Title tokens that flagged all bulk-removed videos
       "women", "mujeres", "aurtain", "aurat", "female voice", "by women voice",
     ];
