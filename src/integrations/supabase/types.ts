@@ -1769,6 +1769,118 @@ export type Database = {
         }
         Relationships: []
       }
+      plus_household_members: {
+        Row: {
+          household_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          household_id: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          household_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plus_household_members_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "plus_households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plus_households: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          plan: string
+          seat_limit: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id: string
+          plan?: string
+          seat_limit?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          plan?: string
+          seat_limit?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      plus_seat_invites: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          created_by: string
+          expires_at: string
+          household_id: string
+          id: string
+          invited_email: string
+          status: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          household_id: string
+          id?: string
+          invited_email: string
+          status?: string
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          household_id?: string
+          id?: string
+          invited_email?: string
+          status?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plus_seat_invites_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "plus_households"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plus_waitlist: {
         Row: {
           country_code: string | null
@@ -3543,6 +3655,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_household_owner: {
+        Args: { _household_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_khatm_member: {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
@@ -3709,6 +3825,7 @@ export type Database = {
         }
         Returns: string
       }
+      user_household_id: { Args: { _user_id: string }; Returns: string }
       video_report_queue_summary: {
         Args: never
         Returns: {
