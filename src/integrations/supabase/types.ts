@@ -2098,6 +2098,42 @@ export type Database = {
           },
         ]
       }
+      referral_tiers: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          reward_type: string
+          reward_value: Json
+          slug: string
+          sort_order: number
+          threshold: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          reward_type: string
+          reward_value?: Json
+          slug: string
+          sort_order?: number
+          threshold: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          reward_type?: string
+          reward_value?: Json
+          slug?: string
+          sort_order?: number
+          threshold?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           code: string
@@ -3167,6 +3203,7 @@ export type Database = {
           referrals_redeemed: number
         }[]
       }
+      get_referral_tier_progress: { Args: never; Returns: Json }
       get_related_searches: {
         Args: { _limit?: number; _query: string }
         Returns: {
@@ -3220,6 +3257,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      grant_referral_tier_rewards: { Args: never; Returns: Json }
       has_active_premium: { Args: { _user_id: string }; Returns: boolean }
       has_min_role: {
         Args: { _min_tier: string; _user_id: string }
