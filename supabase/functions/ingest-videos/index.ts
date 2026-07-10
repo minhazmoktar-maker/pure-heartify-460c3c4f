@@ -374,6 +374,11 @@ function evaluateText(title: string, description: string, channelTitle: string, 
       return { ok: false, score: 0, reason: "blocked_creator", rule: blocked };
     }
   }
+  for (const tok of BLOCKED_TITLE_TOKENS) {
+    if (title.toLowerCase().includes(tok) || channelLower.includes(tok)) {
+      return { ok: false, score: 0, reason: "blocked_title_token", rule: tok };
+    }
+  }
   for (const sensitive of FEMALE_SENSITIVE_CHANNELS) {
     if (channelLower.includes(sensitive) && FEMALE_MENTION_RE.test(`${title} ${description}`)) {
       return { ok: false, score: 0, reason: "female_in_sensitive_channel", rule: sensitive };
