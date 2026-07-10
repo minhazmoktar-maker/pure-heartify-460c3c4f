@@ -2030,12 +2030,15 @@ export type Database = {
         Row: {
           attribution: string | null
           base_url: string
+          bitrate_kbps: number | null
           created_at: string
           id: string
           is_active: boolean
+          is_premium: boolean
           license: string | null
           metadata: Json
           quality: string | null
+          quality_tier: string
           reciter_id: string
           riwayah: string | null
           source_name: string
@@ -2044,12 +2047,15 @@ export type Database = {
         Insert: {
           attribution?: string | null
           base_url: string
+          bitrate_kbps?: number | null
           created_at?: string
           id?: string
           is_active?: boolean
+          is_premium?: boolean
           license?: string | null
           metadata?: Json
           quality?: string | null
+          quality_tier?: string
           reciter_id: string
           riwayah?: string | null
           source_name: string
@@ -2058,12 +2064,15 @@ export type Database = {
         Update: {
           attribution?: string | null
           base_url?: string
+          bitrate_kbps?: number | null
           created_at?: string
           id?: string
           is_active?: boolean
+          is_premium?: boolean
           license?: string | null
           metadata?: Json
           quality?: string | null
+          quality_tier?: string
           reciter_id?: string
           riwayah?: string | null
           source_name?: string
@@ -2088,15 +2097,19 @@ export type Database = {
           category: string
           country: string | null
           created_at: string
+          download_allowed: boolean
           era: string | null
           gender: string
           id: string
           image_url: string | null
           is_living: boolean | null
+          is_premium: boolean
           is_verified: boolean
+          min_plan: string
           notes: string | null
           popularity_score: number
           primary_riwayah: string | null
+          sample_seconds: number
           search_tsv: unknown
           social_links: Json
           updated_at: string
@@ -2110,15 +2123,19 @@ export type Database = {
           category?: string
           country?: string | null
           created_at?: string
+          download_allowed?: boolean
           era?: string | null
           gender?: string
           id?: string
           image_url?: string | null
           is_living?: boolean | null
+          is_premium?: boolean
           is_verified?: boolean
+          min_plan?: string
           notes?: string | null
           popularity_score?: number
           primary_riwayah?: string | null
+          sample_seconds?: number
           search_tsv?: unknown
           social_links?: Json
           updated_at?: string
@@ -2132,15 +2149,19 @@ export type Database = {
           category?: string
           country?: string | null
           created_at?: string
+          download_allowed?: boolean
           era?: string | null
           gender?: string
           id?: string
           image_url?: string | null
           is_living?: boolean | null
+          is_premium?: boolean
           is_verified?: boolean
+          min_plan?: string
           notes?: string | null
           popularity_score?: number
           primary_riwayah?: string | null
+          sample_seconds?: number
           search_tsv?: unknown
           social_links?: Json
           updated_at?: string
@@ -3597,6 +3618,10 @@ export type Database = {
       recent_video_report_count: {
         Args: { _user_id: string; _window_minutes?: number }
         Returns: number
+      }
+      reciter_is_accessible: {
+        Args: { _reciter_id: string; _user_id: string }
+        Returns: boolean
       }
       recompute_all_channel_trust: {
         Args: { _limit?: number }
