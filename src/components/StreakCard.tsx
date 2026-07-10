@@ -1,12 +1,26 @@
+import { useEffect, useState } from "react";
 import { Flame, Snowflake, Trophy, Loader2, Share2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useStreak } from "@/hooks/useStreak";
 import { shareContent } from "@/lib/share";
+import { supabase } from "@/integrations/supabase/client";
 
 export function StreakCard() {
   const s = useStreak();
+  const [handle, setHandle] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !mounted) return;
+      const { data } = await supabase.from("profiles").select("handle").eq("id", user.id).maybeSingle();
+      if (mounted && data?.handle) setHandle(data.handle);
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   if (s.loading) {
     return (
@@ -24,6 +38,7 @@ export function StreakCard() {
       refId: String(s.current),
       title: "My Heartify streak",
       text: `I'm on a ${s.current}-day Heartify streak 🔥 — building consistent worship, in shaa Allah.`,
+      url: handle ? `${window.location.origin}/s/${handle}/${s.current}` : undefined,
     });
 
 
