@@ -2487,6 +2487,71 @@ export type Database = {
         }
         Relationships: []
       }
+      team_streak_members: {
+        Row: {
+          joined_at: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_streak_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "team_streaks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_streaks: {
+        Row: {
+          created_at: string
+          created_by: string
+          current_streak: number
+          id: string
+          invite_code: string
+          last_all_completed_date: string | null
+          longest_streak: number
+          member_limit: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          current_streak?: number
+          id?: string
+          invite_code?: string
+          last_all_completed_date?: string | null
+          longest_streak?: number
+          member_limit?: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          current_streak?: number
+          id?: string
+          invite_code?: string
+          last_all_completed_date?: string | null
+          longest_streak?: number
+          member_limit?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_key: string
@@ -3049,6 +3114,27 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_team_streak: {
+        Args: { _name: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          current_streak: number
+          id: string
+          invite_code: string
+          last_all_completed_date: string | null
+          longest_streak: number
+          member_limit: number
+          name: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "team_streaks"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       enforce_retention_policies: { Args: never; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
@@ -3151,6 +3237,27 @@ export type Database = {
         Returns: boolean
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
+      join_team_streak: {
+        Args: { _code: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          current_streak: number
+          id: string
+          invite_code: string
+          last_all_completed_date: string | null
+          longest_streak: number
+          member_limit: number
+          name: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "team_streaks"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       list_dua_wall: {
         Args: { _limit?: number }
         Returns: {
@@ -3160,6 +3267,22 @@ export type Database = {
           id: string
           is_anonymous: boolean
           user_id: string
+        }[]
+      }
+      list_my_team_streaks: {
+        Args: never
+        Returns: {
+          completed_today_count: number
+          current_streak: number
+          i_completed_today: boolean
+          id: string
+          invite_code: string
+          is_creator: boolean
+          last_all_completed_date: string
+          longest_streak: number
+          member_count: number
+          member_limit: number
+          name: string
         }[]
       }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
@@ -3234,6 +3357,7 @@ export type Database = {
         }[]
       }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
+      settle_team_streaks: { Args: never; Returns: number }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       unaccent: { Args: { "": string }; Returns: string }
