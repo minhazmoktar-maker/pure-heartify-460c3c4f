@@ -1062,6 +1062,35 @@ export type Database = {
           },
         ]
       }
+      dua_anon_ameens: {
+        Row: {
+          created_at: string
+          dua_id: string
+          fp: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          dua_id: string
+          fp: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          dua_id?: string
+          fp?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dua_anon_ameens_dua_id_fkey"
+            columns: ["dua_id"]
+            isOneToOne: false
+            referencedRelation: "dua_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dua_requests: {
         Row: {
           ameen_count: number
@@ -3110,6 +3139,10 @@ export type Database = {
     }
     Functions: {
       _analytics_assert_admin: { Args: never; Returns: undefined }
+      add_anon_ameen: {
+        Args: { _dua_id: string; _fp: string }
+        Returns: number
+      }
       add_reciter_alias: {
         Args: { _alias: string; _alias_type?: string; _reciter_id: string }
         Returns: boolean
