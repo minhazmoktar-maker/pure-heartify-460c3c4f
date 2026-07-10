@@ -8,6 +8,8 @@ import { Loader2, Flame, Trophy, Users, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
+import NudgeButton from "@/components/NudgeButton";
+
 
 interface PublicProfileData {
   handle: string;
