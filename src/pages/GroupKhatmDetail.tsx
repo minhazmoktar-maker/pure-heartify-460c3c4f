@@ -112,7 +112,7 @@ export default function GroupKhatmDetail() {
   const pct = (completedCount / 30) * 100;
 
   const shareUrl = group
-    ? `${window.location.origin}/khatm/join/${group.invite_code}`
+    ? `${window.location.origin}/k/${group.id}?c=${group.invite_code}`
     : "";
 
   const copyShare = async () => {
