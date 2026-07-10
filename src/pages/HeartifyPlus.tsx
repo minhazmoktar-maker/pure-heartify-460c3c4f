@@ -390,8 +390,8 @@ export default function HeartifyPlus() {
               </thead>
               <tbody>
                 {COMPARISON.map((sec) => (
-                  <>
-                    <tr key={sec.section} className="bg-muted/20">
+                  <FragmentWithKey key={sec.section}>
+                    <tr className="bg-muted/20">
                       <td colSpan={3} className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                         {sec.section}
                       </td>
