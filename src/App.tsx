@@ -106,6 +106,7 @@ const PublicJuz = lazy(() => import("./pages/PublicJuz.tsx"));
 const PublicBattle = lazy(() => import("./pages/PublicBattle.tsx"));
 const PublicMiracle = lazy(() => import("./pages/PublicMiracle.tsx"));
 const PublicQuranDua = lazy(() => import("./pages/PublicQuranDua.tsx"));
+const PublicAdhkarSet = lazy(() => import("./pages/PublicAdhkarSet.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
