@@ -154,6 +154,7 @@ const Navbar = () => {
           >
             {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
           </button>
+          <UpgradeCTA compact className="hidden sm:inline-flex" />
           {user ? (
             <>
               <div className="hidden md:block"><SuggestContentDialog /></div>
