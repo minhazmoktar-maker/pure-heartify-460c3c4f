@@ -254,6 +254,10 @@ const Profile = () => {
             </div>
 
             <div className="pt-4">
+              <HandleClaimCard />
+            </div>
+
+            <div className="pt-4">
               <ReferralCard />
             </div>
 
