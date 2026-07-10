@@ -100,6 +100,7 @@ const PublicSalah = lazy(() => import("./pages/PublicSalah.tsx"));
 const PublicPillar = lazy(() => import("./pages/PublicPillar.tsx"));
 const PublicIman = lazy(() => import("./pages/PublicIman.tsx"));
 const PublicMadhhab = lazy(() => import("./pages/PublicMadhhab.tsx"));
+const PublicSeerah = lazy(() => import("./pages/PublicSeerah.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
