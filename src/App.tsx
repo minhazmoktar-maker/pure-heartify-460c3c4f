@@ -90,6 +90,7 @@ const PublicHadith = lazy(() => import("./pages/PublicHadith.tsx"));
 const PublicName = lazy(() => import("./pages/PublicName.tsx"));
 const PublicSurah = lazy(() => import("./pages/PublicSurah.tsx"));
 const PublicHisn = lazy(() => import("./pages/PublicHisn.tsx"));
+const PublicProphet = lazy(() => import("./pages/PublicProphet.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -234,6 +235,7 @@ const App = () => (
                 <Route path="/name/:index" element={<PublicName />} />
                 <Route path="/surah/:number" element={<PublicSurah />} />
                 <Route path="/hisn/:id" element={<PublicHisn />} />
+                <Route path="/prophet/:slug" element={<PublicProphet />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
