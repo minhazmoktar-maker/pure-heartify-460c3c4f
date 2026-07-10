@@ -110,6 +110,7 @@ const PublicAdhkarSet = lazy(() => import("./pages/PublicAdhkarSet.tsx"));
 const PublicSunnahAct = lazy(() => import("./pages/PublicSunnahAct.tsx"));
 const PublicDurood = lazy(() => import("./pages/PublicDurood.tsx"));
 const PublicProphetName = lazy(() => import("./pages/PublicProphetName.tsx"));
+const PublicSignOfHour = lazy(() => import("./pages/PublicSignOfHour.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
