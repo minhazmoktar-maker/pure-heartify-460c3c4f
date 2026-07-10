@@ -103,6 +103,7 @@ const Pillars = lazy(() => import("./pages/Pillars.tsx"));
 const Prayer = lazy(() => import("./pages/Prayer.tsx"));
 const Privacy = lazy(() => import("./pages/Privacy.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile.tsx"));
 const Prophets = lazy(() => import("./pages/Prophets.tsx"));
 const Purification = lazy(() => import("./pages/Purification.tsx"));
 const Qibla = lazy(() => import("./pages/Qibla.tsx"));
