@@ -13,27 +13,47 @@ import { useSmartSearch } from "@/hooks/useSmartSearch";
 import { growth } from "@/lib/growthEvents";
 import type { YouTubeVideo } from "@/services/youtube";
 
+// Query terms that are inherently off-brand for a halal platform.
+// Matching whole words only so surahs like "An-Nisa" (women in Arabic script/transliteration)
+// are still searchable via their proper names ("nisa", "an-nisa" surah numbers work).
+const BLOCKED_QUERY_TOKENS = [
+  "female", "females",
+  "woman", "women", "womans", "womens",
+  "girl", "girls",
+  "actress", "songstress",
+  "aurat", "aurtain", "mujeres",
+];
+const BLOCKED_QUERY_RE = new RegExp(
+  `\\b(${BLOCKED_QUERY_TOKENS.join("|")})\\b`,
+  "i",
+);
+
+function isBlockedQuery(q: string): boolean {
+  return BLOCKED_QUERY_RE.test(q);
+}
+
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = (searchParams.get("q") || "").trim();
+  const blocked = query.length > 0 && isBlockedQuery(query);
 
   const [liveInput, setLiveInput] = useState(query);
   useEffect(() => setLiveInput(query), [query]);
 
   useEffect(() => {
-    if (query) addRecentSearch(query);
-  }, [query]);
+    if (query && !blocked) addRecentSearch(query);
+  }, [query, blocked]);
 
-  const activeQuery = query || liveInput;
+  const activeQuery = blocked ? "" : query || liveInput;
   const smart = useSmartSearch(activeQuery);
 
   useEffect(() => {
-    if (!query || smart.isLoading) return;
+    if (!query || blocked || smart.isLoading) return;
     const n = smart.results.length;
     if (n === 0) growth.searchNoResults(query);
     else growth.searchIssued(query, n);
-  }, [query, smart.isLoading, smart.results.length]);
+  }, [query, blocked, smart.isLoading, smart.results.length]);
 
 
 
