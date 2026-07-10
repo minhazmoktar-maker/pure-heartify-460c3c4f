@@ -3,6 +3,7 @@ import { Crown, Loader2, Shield, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRole } from "@/hooks/useRole";
 
 const AdminRoles = lazy(() => import("./AdminRoles"));
 const AdminEntitlements = lazy(() => import("./AdminEntitlements"));
