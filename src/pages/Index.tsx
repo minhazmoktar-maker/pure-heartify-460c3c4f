@@ -68,6 +68,14 @@ const Index = () => {
 
       <NextSalahWidget />
 
+      {user && (
+        <div className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6">
+          <StreakCard />
+        </div>
+      )}
+
+
+
       <DailyDoseHero />
 
 
