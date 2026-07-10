@@ -1621,6 +1621,33 @@ export type Database = {
         }
         Relationships: []
       }
+      nudges: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          message: string
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       platform_owners: {
         Row: {
           created_at: string
@@ -3307,6 +3334,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      list_my_nudges_sent: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          recipient_id: string
+        }[]
+      }
       list_my_team_streaks: {
         Args: never
         Returns: {
@@ -3393,6 +3430,10 @@ export type Database = {
           title: string
           video_id: string
         }[]
+      }
+      send_nudge_by_handle: {
+        Args: { _handle: string; _kind: string; _message: string }
+        Returns: Json
       }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
