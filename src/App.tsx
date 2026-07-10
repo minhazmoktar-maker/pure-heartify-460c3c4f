@@ -223,6 +223,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/plus" element={<HeartifyPlus />} />
                 <Route path="/plus/join" element={<PlusInvite />} />
+                <Route path="/offline" element={<OfflineLibrary />} />
                 <Route path="/premium" element={<Navigate to="/plus" replace />} />
                 <Route path="/pricing" element={<Navigate to="/plus" replace />} />
                 <Route path="/profile" element={<Profile />} />
