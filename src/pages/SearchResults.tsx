@@ -13,27 +13,47 @@ import { useSmartSearch } from "@/hooks/useSmartSearch";
 import { growth } from "@/lib/growthEvents";
 import type { YouTubeVideo } from "@/services/youtube";
 
+// Query terms that are inherently off-brand for a halal platform.
+// Matching whole words only so surahs like "An-Nisa" (women in Arabic script/transliteration)
+// are still searchable via their proper names ("nisa", "an-nisa" surah numbers work).
+const BLOCKED_QUERY_TOKENS = [
+  "female", "females",
+  "woman", "women", "womans", "womens",
+  "girl", "girls",
+  "actress", "songstress",
+  "aurat", "aurtain", "mujeres",
+];
+const BLOCKED_QUERY_RE = new RegExp(
+  `\\b(${BLOCKED_QUERY_TOKENS.join("|")})\\b`,
+  "i",
+);
+
+function isBlockedQuery(q: string): boolean {
+  return BLOCKED_QUERY_RE.test(q);
+}
+
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = (searchParams.get("q") || "").trim();
+  const blocked = query.length > 0 && isBlockedQuery(query);
 
   const [liveInput, setLiveInput] = useState(query);
   useEffect(() => setLiveInput(query), [query]);
 
   useEffect(() => {
-    if (query) addRecentSearch(query);
-  }, [query]);
+    if (query && !blocked) addRecentSearch(query);
+  }, [query, blocked]);
 
-  const activeQuery = query || liveInput;
+  const activeQuery = blocked ? "" : query || liveInput;
   const smart = useSmartSearch(activeQuery);
 
   useEffect(() => {
-    if (!query || smart.isLoading) return;
+    if (!query || blocked || smart.isLoading) return;
     const n = smart.results.length;
     if (n === 0) growth.searchNoResults(query);
     else growth.searchIssued(query, n);
-  }, [query, smart.isLoading, smart.results.length]);
+  }, [query, blocked, smart.isLoading, smart.results.length]);
 
 
 
@@ -76,7 +96,31 @@ const SearchResults = () => {
           Back to home
         </button>
 
-        {query ? (
+        {query && blocked ? (
+          <div className="rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Sparkles className="h-6 w-6" aria-hidden />
+            </div>
+            <h1 className="text-lg font-bold text-foreground">
+              That search isn&apos;t available on Heartify
+            </h1>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              To keep the platform 100% halal, we don&apos;t index results for
+              &ldquo;{query}&rdquo;. Try a reciter, surah, or topic instead.
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {["Surah Yaseen", "Mishary", "Tafsir", "Seerah", "Adhkar"].map((s) => (
+                <Link
+                  key={s}
+                  to={`/search?q=${encodeURIComponent(s)}`}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent transition-colors"
+                >
+                  {s}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : query ? (
           <>
             <div className="mb-4 flex items-center gap-3">
               <Search className="h-6 w-6 text-primary" />
