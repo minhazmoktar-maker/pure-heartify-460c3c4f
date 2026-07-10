@@ -71,6 +71,11 @@ const JannahDescriptions = lazy(() => import("./pages/JannahDescriptions.tsx"));
 const Journal = lazy(() => import("./pages/Journal.tsx"));
 const Kalimahs = lazy(() => import("./pages/Kalimahs.tsx"));
 const Khatm = lazy(() => import("./pages/Khatm.tsx"));
+const GroupKhatm = lazy(() => import("./pages/GroupKhatm.tsx"));
+const GroupKhatmDetail = lazy(() => import("./pages/GroupKhatmDetail.tsx"));
+const GroupKhatmJoin = lazy(() => import("./pages/GroupKhatmJoin.tsx"));
+const AdminViral = lazy(() => import("./pages/AdminViral.tsx"));
+
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
 const Library = lazy(() => import("./pages/Library.tsx"));
