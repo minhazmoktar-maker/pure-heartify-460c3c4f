@@ -410,6 +410,19 @@ export default function HeartifyPlus() {
           </div>
         </section>
 
+        {/* Family seats */}
+        <section id="family" className="mt-16">
+          <h2 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
+            Family seats
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Share one Heartify+ plan with up to 5 family members. Each seat gets their own account, streaks, and history — nothing is mixed together.
+          </p>
+          <div className="mt-6">
+            <HouseholdPanel />
+          </div>
+        </section>
+
         {/* Waitlist */}
         <section
           id="waitlist"
