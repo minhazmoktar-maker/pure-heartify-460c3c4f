@@ -70,8 +70,9 @@ const Index = () => {
       <NextSalahWidget />
 
       {user && (
-        <div className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6">
+        <div className="mx-auto grid max-w-[1800px] gap-3 px-4 pt-2 md:grid-cols-2 md:px-6">
           <StreakCard />
+          <WeeklyRecapCard />
         </div>
       )}
 
