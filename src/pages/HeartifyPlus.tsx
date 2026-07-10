@@ -389,24 +389,22 @@ export default function HeartifyPlus() {
                 </tr>
               </thead>
               <tbody>
-                {COMPARISON.map((sec) => (
-                  <FragmentWithKey key={sec.section}>
-                    <tr className="bg-muted/20">
-                      <td colSpan={3} className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        {sec.section}
-                      </td>
+                {COMPARISON.flatMap((sec) => [
+                  <tr key={`sec-${sec.section}`} className="bg-muted/20">
+                    <td colSpan={3} className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      {sec.section}
+                    </td>
+                  </tr>,
+                  ...sec.rows.map((r) => (
+                    <tr key={`${sec.section}-${r.label}`} className="border-t border-border/60">
+                      <th scope="row" className="px-4 py-3 font-normal text-foreground">
+                        {r.label}
+                      </th>
+                      <td className="px-4 py-3"><Cell value={r.free} /></td>
+                      <td className="px-4 py-3"><Cell value={r.plus} /></td>
                     </tr>
-                    {sec.rows.map((r) => (
-                      <tr key={r.label} className="border-t border-border/60">
-                        <th scope="row" className="px-4 py-3 font-normal text-foreground">
-                          {r.label}
-                        </th>
-                        <td className="px-4 py-3"><Cell value={r.free} /></td>
-                        <td className="px-4 py-3"><Cell value={r.plus} /></td>
-                      </tr>
-                    ))}
-                  </>
-                ))}
+                  )),
+                ])}
               </tbody>
             </table>
           </div>
