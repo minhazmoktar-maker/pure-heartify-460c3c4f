@@ -275,6 +275,7 @@ const App = () => (
                 <Route path="/sunnah/:slug" element={<PublicSunnahAct />} />
                 <Route path="/durood/:slug" element={<PublicDurood />} />
                 <Route path="/prophet-name/:slug" element={<PublicProphetName />} />
+                <Route path="/sign-of-hour/:slug" element={<PublicSignOfHour />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
