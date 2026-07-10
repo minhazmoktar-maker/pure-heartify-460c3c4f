@@ -114,6 +114,7 @@ const BLOCKED_CREATORS: string[] = [
   "tedx", "tedx talks", "chris williamson", "dr. daf show", "dr daf show",
   "womenofquran", "women of quran", "islamic reflections videos",
   "islamiclife", "hamza's den", "hamzas den", "muslim matters tv", "imaan phase",
+  "healthy muslims", "healthymuslims", "zz brothers short", "zz brothers shorts", "zzbrothers", "zz brothers",
 ];
 
 // Title/description patterns that hard-reject regardless of channel.
