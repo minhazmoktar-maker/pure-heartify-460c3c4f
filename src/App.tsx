@@ -108,6 +108,7 @@ const PublicMiracle = lazy(() => import("./pages/PublicMiracle.tsx"));
 const PublicQuranDua = lazy(() => import("./pages/PublicQuranDua.tsx"));
 const PublicAdhkarSet = lazy(() => import("./pages/PublicAdhkarSet.tsx"));
 const PublicSunnahAct = lazy(() => import("./pages/PublicSunnahAct.tsx"));
+const PublicDurood = lazy(() => import("./pages/PublicDurood.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -270,6 +271,7 @@ const App = () => (
                 <Route path="/quran-dua/:slug" element={<PublicQuranDua />} />
                 <Route path="/adhkar-set/:id" element={<PublicAdhkarSet />} />
                 <Route path="/sunnah/:slug" element={<PublicSunnahAct />} />
+                <Route path="/durood/:slug" element={<PublicDurood />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
