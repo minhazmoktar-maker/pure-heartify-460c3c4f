@@ -69,7 +69,35 @@ const ReferralCard = () => {
           </Button>
         </div>
       </div>
+
+      {tier && (
+        <div className="mt-5 rounded-lg border border-border/60 bg-background/60 p-3">
+          <div className="flex items-center justify-between text-xs">
+            <span className="inline-flex items-center gap-1.5 font-medium">
+              <Trophy className="h-3.5 w-3.5 text-primary" />
+              {tier.current_tier ? tier.current_tier.label : "No tier yet"}
+            </span>
+            {tier.next_tier ? (
+              <span className="text-muted-foreground">
+                {tier.next_tier.remaining} to {tier.next_tier.label}
+              </span>
+            ) : (
+              <span className="text-primary font-medium">Top tier reached</span>
+            )}
+          </div>
+          {tier.next_tier && (
+            <Progress
+              className="mt-2 h-1.5"
+              value={Math.min(
+                100,
+                (redeemedCount / tier.next_tier.threshold) * 100,
+              )}
+            />
+          )}
+        </div>
+      )}
     </div>
+
   );
 };
 
