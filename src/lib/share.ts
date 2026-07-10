@@ -9,7 +9,8 @@ export type ShareKind =
   | "weekly_recap"
   | "badge_earned"
   | "referral_invite"
-  | "public_profile";
+  | "public_profile"
+  | "dhikr_circle";
 
 interface ShareOptions {
   kind: ShareKind;
