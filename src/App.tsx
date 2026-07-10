@@ -203,6 +203,7 @@ const App = () => (
                 <Route path="/khatm/groups" element={<GroupKhatm />} />
                 <Route path="/khatm/group/:id" element={<GroupKhatmDetail />} />
                 <Route path="/khatm/join/:code" element={<GroupKhatmJoin />} />
+                <Route path="/leaderboards" element={<Leaderboards />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/fasting" element={<Fasting />} />
