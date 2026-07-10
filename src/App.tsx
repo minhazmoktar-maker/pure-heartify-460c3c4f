@@ -97,6 +97,8 @@ const PublicIslamicEvent = lazy(() => import("./pages/PublicIslamicEvent.tsx"));
 const PublicMasjid = lazy(() => import("./pages/PublicMasjid.tsx"));
 const PublicKalimah = lazy(() => import("./pages/PublicKalimah.tsx"));
 const PublicSalah = lazy(() => import("./pages/PublicSalah.tsx"));
+const PublicPillar = lazy(() => import("./pages/PublicPillar.tsx"));
+const PublicIman = lazy(() => import("./pages/PublicIman.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -248,6 +250,8 @@ const App = () => (
                 <Route path="/masjid/:slug" element={<PublicMasjid />} />
                 <Route path="/kalimah/:n" element={<PublicKalimah />} />
                 <Route path="/salah/:slug" element={<PublicSalah />} />
+                <Route path="/pillar/:n" element={<PublicPillar />} />
+                <Route path="/iman/:n" element={<PublicIman />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
