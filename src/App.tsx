@@ -88,6 +88,7 @@ const PublicStreak = lazy(() => import("./pages/PublicStreak.tsx"));
 const PublicAyah = lazy(() => import("./pages/PublicAyah.tsx"));
 const PublicHadith = lazy(() => import("./pages/PublicHadith.tsx"));
 const PublicName = lazy(() => import("./pages/PublicName.tsx"));
+const PublicSurah = lazy(() => import("./pages/PublicSurah.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
