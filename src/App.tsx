@@ -225,6 +225,7 @@ const App = () => (
                 <Route path="/w/:handle/:week" element={<PublicWeeklyRecap />} />
                 <Route path="/b/:handle/:badgeId" element={<PublicBadge />} />
                 <Route path="/s/:handle/:days" element={<PublicStreak />} />
+                <Route path="/ayah/:surah/:verse" element={<PublicAyah />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
