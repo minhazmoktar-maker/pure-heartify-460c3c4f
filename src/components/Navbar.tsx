@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import NotificationsBell from "@/components/NotificationsBell";
 import SuggestContentDialog from "@/components/SuggestContentDialog";
+import UpgradeCTA from "@/components/UpgradeCTA";
 import { useRole } from "@/hooks/useRole";
 
 const Navbar = () => {
