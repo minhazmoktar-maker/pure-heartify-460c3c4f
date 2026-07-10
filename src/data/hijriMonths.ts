@@ -1,0 +1,26 @@
+// The 12 months of the Islamic (Hijri) lunar calendar.
+
+export type HijriMonth = {
+  slug: string;
+  n: number;
+  en: string;         // Common English rendering
+  ar: string;         // Arabic
+  translit: string;   // Transliteration
+  meaning: string;    // Etymological/traditional meaning
+  summary: string;    // Short overview of significance
+};
+
+export const HIJRI_MONTHS: HijriMonth[] = [
+  { slug: "muharram",       n: 1,  en: "Muharram",       ar: "مُحَرَّم",         translit: "Muḥarram",       meaning: "The forbidden (month of fighting)", summary: "One of the four sacred months. Contains ʿĀshūrāʾ (10th) — a recommended fast." },
+  { slug: "safar",          n: 2,  en: "Safar",          ar: "صَفَر",             translit: "Ṣafar",          meaning: "Empty (houses left for travel)",     summary: "A regular month; the Prophet ﷺ rejected superstitions attached to it." },
+  { slug: "rabi-al-awwal",  n: 3,  en: "Rabi' al-Awwal", ar: "رَبِيع الأَوَّل",   translit: "Rabīʿ al-Awwal", meaning: "The first spring",                   summary: "The month in which the Prophet ﷺ was born and in which he migrated to Madinah." },
+  { slug: "rabi-al-thani",  n: 4,  en: "Rabi' al-Thani", ar: "رَبِيع الثَّانِي",  translit: "Rabīʿ al-Thānī", meaning: "The second spring",                  summary: "A regular month with no specifically legislated rites." },
+  { slug: "jumada-al-awwal",n: 5,  en: "Jumada al-Awwal",ar: "جُمَادَىٰ الأُولَىٰ", translit: "Jumādā al-Ūlā", meaning: "The first of dry/frozen (land)",     summary: "A regular month; named from a period of dry cold in pre-Islamic Arabia." },
+  { slug: "jumada-al-thani",n: 6,  en: "Jumada al-Thani",ar: "جُمَادَىٰ الآخِرَة", translit: "Jumādā al-Ākhirah", meaning: "The last of dry/frozen (land)", summary: "A regular month completing the Jumādā pair." },
+  { slug: "rajab",          n: 7,  en: "Rajab",          ar: "رَجَب",             translit: "Rajab",          meaning: "To respect / honor",                 summary: "One of the four sacred months. Fighting was forbidden in it in pre-Islamic Arabia." },
+  { slug: "shaban",         n: 8,  en: "Sha'ban",        ar: "شَعْبَان",         translit: "Shaʿbān",        meaning: "Scattered / dispersed (for water)",  summary: "The Prophet ﷺ used to fast much of this month in preparation for Ramaḍān." },
+  { slug: "ramadan",        n: 9,  en: "Ramadan",        ar: "رَمَضَان",         translit: "Ramaḍān",        meaning: "Scorching heat",                     summary: "The month of the Qur'ān, obligatory fasting, and Laylat al-Qadr — better than a thousand months." },
+  { slug: "shawwal",        n: 10, en: "Shawwal",        ar: "شَوَّال",           translit: "Shawwāl",        meaning: "Raised / lifted",                    summary: "Begins with ʿĪd al-Fiṭr; six recommended fasts equal fasting the whole year." },
+  { slug: "dhu-al-qadah",   n: 11, en: "Dhu al-Qa'dah",  ar: "ذُو الْقَعْدَة",    translit: "Dhū al-Qaʿdah",  meaning: "The one of sitting (no fighting)",   summary: "One of the four sacred months. A month of preparation for Ḥajj." },
+  { slug: "dhu-al-hijjah",  n: 12, en: "Dhu al-Hijjah",  ar: "ذُو الْحِجَّة",     translit: "Dhū al-Ḥijjah",  meaning: "The one of the pilgrimage",          summary: "Contains the first ten — the most beloved days of the year — the Day of ʿArafah, Ḥajj, and ʿĪd al-Aḍḥā." },
+];
