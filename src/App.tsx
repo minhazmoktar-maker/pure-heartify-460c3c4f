@@ -112,6 +112,7 @@ const PublicDurood = lazy(() => import("./pages/PublicDurood.tsx"));
 const PublicProphetName = lazy(() => import("./pages/PublicProphetName.tsx"));
 const PublicSignOfHour = lazy(() => import("./pages/PublicSignOfHour.tsx"));
 const PublicMosque = lazy(() => import("./pages/PublicMosque.tsx"));
+const PublicVirtue = lazy(() => import("./pages/PublicVirtue.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -278,6 +279,7 @@ const App = () => (
                 <Route path="/prophet-name/:slug" element={<PublicProphetName />} />
                 <Route path="/sign-of-hour/:slug" element={<PublicSignOfHour />} />
                 <Route path="/mosque/:slug" element={<PublicMosque />} />
+                <Route path="/virtue/:slug" element={<PublicVirtue />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />

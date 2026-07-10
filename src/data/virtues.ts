@@ -1,0 +1,148 @@
+// Prophetic virtues (akhlāq) — for public shareable pages.
+
+export type Virtue = {
+  slug: string;
+  ar: string;
+  translit: string;
+  en: string;
+  ayah: string;
+  ayahRef: string;
+  hadith: string;
+  hadithRef: string;
+  summary: string;
+};
+
+export const VIRTUES: Virtue[] = [
+  {
+    slug: "ikhlas",
+    ar: "الإخلاص",
+    translit: "Al-Ikhlāṣ",
+    en: "Sincerity",
+    ayah: "And they were commanded only to worship Allah, being sincere to Him in religion.",
+    ayahRef: "Sūrat al-Bayyinah 98:5",
+    hadith: "Actions are but by intentions, and every man shall have what he intended.",
+    hadithRef: "Bukhārī 1 · Muslim 1907",
+    summary: "Purifying every act — outer and inner — for Allah alone. Without ikhlāṣ no deed is accepted; with it, the smallest deed outweighs mountains.",
+  },
+  {
+    slug: "sidq",
+    ar: "الصدق",
+    translit: "Aṣ-Ṣidq",
+    en: "Truthfulness",
+    ayah: "O you who believe! Fear Allah and be with the truthful.",
+    ayahRef: "Sūrat at-Tawbah 9:119",
+    hadith: "Truthfulness leads to righteousness, and righteousness leads to Paradise. A man keeps speaking the truth until he is written with Allah as a truthful one (ṣiddīq).",
+    hadithRef: "Bukhārī 6094 · Muslim 2607",
+    summary: "Truthfulness in speech, intention, action, and station. The rank of ṣiddīqīn is second only to the prophets.",
+  },
+  {
+    slug: "sabr",
+    ar: "الصبر",
+    translit: "Aṣ-Ṣabr",
+    en: "Patience",
+    ayah: "And give glad tidings to the patient — those who, when disaster strikes them, say: 'Indeed to Allah we belong and to Him we shall return.'",
+    ayahRef: "Sūrat al-Baqarah 2:155–156",
+    hadith: "No one is granted a gift better and more comprehensive than patience.",
+    hadithRef: "Bukhārī 1469 · Muslim 1053",
+    summary: "Restraint upon obedience, restraint from disobedience, and steadiness under decree. Allah is with the patient — an unmatched companionship.",
+  },
+  {
+    slug: "tawakkul",
+    ar: "التوكل",
+    translit: "At-Tawakkul",
+    en: "Reliance upon Allah",
+    ayah: "And whoever relies upon Allah — He is sufficient for him.",
+    ayahRef: "Sūrat aṭ-Ṭalāq 65:3",
+    hadith: "If you relied upon Allah with true reliance, He would provide for you as He provides for the birds — they leave in the morning hungry and return in the evening full.",
+    hadithRef: "Tirmidhī 2344 (ṣaḥīḥ)",
+    summary: "Tying the camel and trusting the Rope. Effort with the limbs, dependence with the heart — Allah alone is sufficient (ḥasbunā Allāhu wa niʿma al-wakīl).",
+  },
+  {
+    slug: "shukr",
+    ar: "الشكر",
+    translit: "Ash-Shukr",
+    en: "Gratitude",
+    ayah: "If you are grateful, I shall surely increase you.",
+    ayahRef: "Sūrat Ibrāhīm 14:7",
+    hadith: "Amazing is the affair of the believer — if good befalls him he is grateful and it is good for him; if harm befalls him he is patient and it is good for him.",
+    hadithRef: "Muslim 2999",
+    summary: "Gratitude of the tongue (ḥamd), heart (recognition), and limbs (obedience). It multiplies blessings and secures the giver against loss.",
+  },
+  {
+    slug: "haya",
+    ar: "الحياء",
+    translit: "Al-Ḥayāʾ",
+    en: "Modesty & Shame before Allah",
+    ayah: "Indeed, Allah does not shy from setting forth an example…",
+    ayahRef: "Sūrat al-Baqarah 2:26",
+    hadith: "Ḥayāʾ is entirely good. · Ḥayāʾ is a branch of faith.",
+    hadithRef: "Muslim 37 · Bukhārī 9",
+    summary: "The inner sense that restrains a servant from every ugliness — before Allah first, then before the angels, then before people and one's own self.",
+  },
+  {
+    slug: "hilm",
+    ar: "الحلم",
+    translit: "Al-Ḥilm",
+    en: "Forbearance",
+    ayah: "The servants of the Most Merciful are those who walk upon the earth in humility, and when the ignorant address them, they say 'Peace.'",
+    ayahRef: "Sūrat al-Furqān 25:63",
+    hadith: "The strong one is not the one who overpowers people in wrestling — the strong one is the one who controls himself at the moment of anger.",
+    hadithRef: "Bukhārī 6114 · Muslim 2609",
+    summary: "Stillness of the soul when provoked. Ḥilm is heavier on the scale than eloquence and sharper than the sword — it wins hearts kufr and wealth cannot.",
+  },
+  {
+    slug: "rahmah",
+    ar: "الرحمة",
+    translit: "Ar-Raḥmah",
+    en: "Mercy",
+    ayah: "And We have not sent you [O Muḥammad] except as a mercy to the worlds.",
+    ayahRef: "Sūrat al-Anbiyāʾ 21:107",
+    hadith: "Those who are merciful, the Most Merciful shows mercy to them. Show mercy to those on earth, the One above the heavens will show mercy to you.",
+    hadithRef: "Abū Dāwūd 4941 · Tirmidhī 1924",
+    summary: "Compassion toward every creature — Muslim and non-Muslim, human and animal. The Prophet ﷺ was a walking mercy; the ummah inherits that character.",
+  },
+  {
+    slug: "adl",
+    ar: "العدل",
+    translit: "Al-ʿAdl",
+    en: "Justice",
+    ayah: "Indeed, Allah commands justice, excellence, and giving to relatives, and forbids indecency, wrong, and oppression.",
+    ayahRef: "Sūrat an-Naḥl 16:90",
+    hadith: "The just will be seated on pulpits of light beside the Most Merciful — those who are just in their rulings, families, and responsibilities.",
+    hadithRef: "Muslim 1827",
+    summary: "Placing every right in its rightful place, even against oneself, one's kin, and one's opponents. The pillar upon which heaven and earth stand.",
+  },
+  {
+    slug: "tawadu",
+    ar: "التواضع",
+    translit: "At-Tawāḍuʿ",
+    en: "Humility",
+    ayah: "And do not walk upon the earth exultantly — indeed you will never tear the earth apart nor reach the mountains in height.",
+    ayahRef: "Sūrat al-Isrāʾ 17:37",
+    hadith: "No one humbles himself for Allah's sake except that Allah raises him.",
+    hadithRef: "Muslim 2588",
+    summary: "Lowering the wing of humility — accepting the truth from whoever brings it and treating every soul without disdain. Kibr (arrogance) bars Paradise; tawāḍuʿ opens it.",
+  },
+  {
+    slug: "zuhd",
+    ar: "الزهد",
+    translit: "Az-Zuhd",
+    en: "Detachment from the dunyā",
+    ayah: "Whatever you have will end, but what is with Allah is lasting.",
+    ayahRef: "Sūrat an-Naḥl 16:96",
+    hadith: "Be in this world as though you were a stranger or a wayfarer.",
+    hadithRef: "Bukhārī 6416",
+    summary: "Not the absence of possessions but the absence of attachment. The zāhid holds the dunyā in his hand and Allah in his heart — never the reverse.",
+  },
+  {
+    slug: "rida",
+    ar: "الرضا",
+    translit: "Ar-Riḍā",
+    en: "Contentment with Allah's decree",
+    ayah: "Allah is pleased with them and they are pleased with Him — that is the great success.",
+    ayahRef: "Sūrat al-Māʾidah 5:119",
+    hadith: "He has tasted the sweetness of faith who is pleased with Allah as Lord, with Islam as religion, and with Muḥammad ﷺ as Messenger.",
+    hadithRef: "Muslim 34",
+    summary: "The heart's stillness with everything Allah decrees — before it happens (through tawakkul) and after it happens (through riḍā). The highest station after ikhlāṣ.",
+  },
+];
