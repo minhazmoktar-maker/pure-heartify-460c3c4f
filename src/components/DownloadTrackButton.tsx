@@ -31,17 +31,21 @@ export default function DownloadTrackButton({ track, className }: Props) {
       toast.success("Removed from downloads");
       return;
     }
+    if (!track.url) {
+      toast.error("This track isn't available yet");
+      return;
+    }
     try {
       setStatus("downloading");
       setPct(0);
-      await saveOfflineTrack(track.id, track.audioUrl, setPct);
+      await saveOfflineTrack(track.id, track.url, setPct);
       setStatus("saved");
       toast.success("Saved for offline listening");
     } catch (e: unknown) {
       setStatus("idle");
       toast.error(e instanceof Error ? e.message : "Download failed");
     }
-  }, [status, track.id, track.audioUrl]);
+  }, [status, track.id, track.url]);
 
   const label =
     status === "saved" ? "Remove download"
