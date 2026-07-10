@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -10,14 +10,40 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTeamStreaks, type TeamStreak } from "@/hooks/useTeamStreaks";
 import { shareContent } from "@/lib/share";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 export default function TeamStreaks() {
   const { user } = useAuth();
   const { teams, loading, create, join, leave } = useTeamStreaks();
   const [name, setName] = useState("");
-  const [code, setCode] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [code, setCode] = useState(() => (searchParams.get("code") ?? "").toUpperCase());
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
+  const autoJoinedRef = useRef(false);
+
+  // Auto-apply ?code= from public team share links
+  useEffect(() => {
+    if (!user || autoJoinedRef.current) return;
+    const c = (searchParams.get("code") ?? "").toUpperCase();
+    if (!c) return;
+    autoJoinedRef.current = true;
+    (async () => {
+      setBusy("join");
+      try {
+        await join(c);
+        toast.success(`Joined team with code ${c}`);
+        setCode("");
+        const next = new URLSearchParams(searchParams);
+        next.delete("code");
+        setSearchParams(next, { replace: true });
+      } catch (e) {
+        toast.error((e as Error).message);
+      } finally {
+        setBusy(null);
+      }
+    })();
+  }, [user, searchParams, setSearchParams, join]);
+
 
   const onCreate = async () => {
     if (!name.trim()) return;
@@ -135,7 +161,7 @@ export default function TeamStreaks() {
 
 function TeamRow({ team, onLeave }: { team: TeamStreak; onLeave: () => Promise<void> }) {
   const [leaving, setLeaving] = useState(false);
-  const inviteUrl = `${window.location.origin}/teams?code=${team.invite_code}`;
+  const inviteUrl = `${window.location.origin}/t/${team.id}`;
   const allDoneToday = team.completed_today_count === team.member_count;
 
   return (
