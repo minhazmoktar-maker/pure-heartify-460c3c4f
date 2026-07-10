@@ -95,6 +95,7 @@ const PublicSahabi = lazy(() => import("./pages/PublicSahabi.tsx"));
 const PublicHijriMonth = lazy(() => import("./pages/PublicHijriMonth.tsx"));
 const PublicIslamicEvent = lazy(() => import("./pages/PublicIslamicEvent.tsx"));
 const PublicMasjid = lazy(() => import("./pages/PublicMasjid.tsx"));
+const PublicKalimah = lazy(() => import("./pages/PublicKalimah.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -244,6 +245,7 @@ const App = () => (
                 <Route path="/hijri-month/:slug" element={<PublicHijriMonth />} />
                 <Route path="/event/:slug" element={<PublicIslamicEvent />} />
                 <Route path="/masjid/:slug" element={<PublicMasjid />} />
+                <Route path="/kalimah/:n" element={<PublicKalimah />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
