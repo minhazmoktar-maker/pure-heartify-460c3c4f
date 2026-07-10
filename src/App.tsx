@@ -219,6 +219,9 @@ const App = () => (
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/plus" element={<HeartifyPlus />} />
+                <Route path="/premium" element={<Navigate to="/plus" replace />} />
+                <Route path="/pricing" element={<Navigate to="/plus" replace />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/channels" element={<Channels />} />
