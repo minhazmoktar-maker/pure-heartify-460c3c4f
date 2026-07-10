@@ -61,6 +61,7 @@ const HadithSciences = lazy(() => import("./pages/HadithSciences.tsx"));
 const Hajj = lazy(() => import("./pages/Hajj.tsx"));
 const HeartifyPlus = lazy(() => import("./pages/HeartifyPlus.tsx"));
 const PlusInvite = lazy(() => import("./pages/PlusInvite.tsx"));
+const OfflineLibrary = lazy(() => import("./pages/OfflineLibrary.tsx"));
 const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const Hifz = lazy(() => import("./pages/Hifz.tsx"));
 const HijriCalendar = lazy(() => import("./pages/HijriCalendar.tsx"));
