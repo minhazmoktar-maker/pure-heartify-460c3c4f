@@ -158,6 +158,13 @@ export default function Achievements() {
             <span className="font-bold text-primary">{unlockedCount}</span>
             <span className="text-muted-foreground"> / {enriched.length} unlocked</span>
           </div>
+          <div className="flex items-center gap-2">
+            <div className="rounded-full border bg-card px-4 py-2 text-sm">
+              <span className="font-bold text-primary">{unlockedCount}</span>
+              <span className="text-muted-foreground"> / {enriched.length} unlocked</span>
+            </div>
+            <GiftDialog freezesAvailable={streak.freezes} />
+          </div>
         </header>
 
         <div className="mb-6 grid gap-4 md:grid-cols-2">
