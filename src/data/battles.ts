@@ -1,0 +1,27 @@
+export interface Battle {
+  slug: string;
+  name_ar: string;
+  translit: string;
+  hijri: string; // "2 AH"
+  ce: string; // "624 CE"
+  place: string;
+  opponent: string;
+  muslim_force: string;
+  outcome: "Decisive Victory" | "Setback" | "Strategic Victory" | "Truce" | "Withdrawal";
+  summary: string;
+  lesson: string;
+}
+
+export const BATTLES: Battle[] = [
+  { slug: "badr", name_ar: "غزوة بدر", translit: "Ghazwat Badr", hijri: "17 Ramaḍān 2 AH", ce: "624 CE", place: "Wells of Badr", opponent: "Quraysh of Makkah (~1000)", muslim_force: "313 companions", outcome: "Decisive Victory", summary: "The first great battle in Islam. The Prophet ﷺ spent the night in duʿāʾ; angels descended and 70 of the Quraysh chiefs were killed, 70 captured.", lesson: "Yawm al-Furqān — 'the day the truth was distinguished from falsehood' (8:41)." },
+  { slug: "uhud", name_ar: "غزوة أحد", translit: "Ghazwat Uḥud", hijri: "Shawwāl 3 AH", ce: "625 CE", place: "Mount Uḥud, north of Madīnah", opponent: "Quraysh (~3000) under Abū Sufyān", muslim_force: "700 companions", outcome: "Setback", summary: "Early Muslim victory reversed when archers abandoned their post. Ḥamzah رضي الله عنه was martyred and the Prophet ﷺ was wounded.", lesson: "Sūrat Āl ʿImrān 3:152 — obey the Messenger and hold your position." },
+  { slug: "khandaq", name_ar: "غزوة الخندق", translit: "Ghazwat al-Khandaq (al-Aḥzāb)", hijri: "Shawwāl 5 AH", ce: "627 CE", place: "Northern Madīnah", opponent: "Confederate armies (~10,000)", muslim_force: "3000 companions", outcome: "Strategic Victory", summary: "A trench was dug on Salmān al-Fārisī's advice. A month-long siege was broken by a fierce wind — 'and Allah drove back those who disbelieved in their rage.' (33:25)", lesson: "Consultation (shūrā) and patience under siege." },
+  { slug: "banu-qurayza", name_ar: "بنو قريظة", translit: "Banū Qurayẓah", hijri: "Dhū al-Qaʿdah 5 AH", ce: "627 CE", place: "South-east of Madīnah", opponent: "Banū Qurayẓah tribe", muslim_force: "3000 companions", outcome: "Decisive Victory", summary: "The tribe broke the Constitution of Madīnah during al-Khandaq. Their own arbiter Saʿd ibn Muʿādh judged them by their own scripture.", lesson: "The gravity of breaking a covenant (mīthāq)." },
+  { slug: "hudaybiyya", name_ar: "صلح الحديبية", translit: "Ṣulḥ al-Ḥudaybiyyah", hijri: "Dhū al-Qaʿdah 6 AH", ce: "628 CE", place: "Ḥudaybiyyah, near Makkah", opponent: "Quraysh (treaty)", muslim_force: "1400 companions", outcome: "Truce", summary: "A ten-year truce that at first seemed disadvantageous was called 'a clear victory' by Allah (48:1). It opened Arabia to daʿwah.", lesson: "Long-term vision over short-term appearance." },
+  { slug: "khaybar", name_ar: "غزوة خيبر", translit: "Ghazwat Khaybar", hijri: "Muḥarram 7 AH", ce: "628 CE", place: "Khaybar oasis", opponent: "Fortified Jewish tribes", muslim_force: "1400 companions", outcome: "Decisive Victory", summary: "ʿAlī رضي الله عنه received the standard and Allah granted the conquest through him. The final northern threat was neutralised.", lesson: "'I shall give the flag to one whom Allah and His Messenger love.'" },
+  { slug: "mutah", name_ar: "غزوة مؤتة", translit: "Ghazwat Muʾtah", hijri: "Jumādā al-Ūlā 8 AH", ce: "629 CE", place: "Muʾtah, southern Jordan", opponent: "Byzantine army (~100,000+)", muslim_force: "3000 companions", outcome: "Withdrawal", summary: "The three appointed commanders — Zayd, Jaʿfar, and Ibn Rawāḥah — were all martyred. Khālid ibn al-Walīd took command and skilfully withdrew the army.", lesson: "Origin of Khālid's title 'Sayf Allāh al-Maslūl' — the Drawn Sword of Allah." },
+  { slug: "fath-makkah", name_ar: "فتح مكة", translit: "Fatḥ Makkah", hijri: "20 Ramaḍān 8 AH", ce: "630 CE", place: "Makkah", opponent: "Quraysh (surrender)", muslim_force: "10,000 companions", outcome: "Decisive Victory", summary: "The Prophet ﷺ entered Makkah with head bowed in humility, proclaimed a general amnesty, and cleansed the Kaʿbah of 360 idols.", lesson: "'Go, for you are the freed ones.' Mercy at the moment of complete power." },
+  { slug: "hunayn", name_ar: "غزوة حنين", translit: "Ghazwat Ḥunayn", hijri: "Shawwāl 8 AH", ce: "630 CE", place: "Valley of Ḥunayn", opponent: "Hawāzin and Thaqīf (~20,000)", muslim_force: "12,000 companions", outcome: "Decisive Victory", summary: "Ambushed in a narrow valley, the ranks scattered. The Prophet ﷺ stood firm calling 'I am the Prophet, no lie! I am the son of ʿAbd al-Muṭṭalib!'", lesson: "Numerical superiority is nothing without tawakkul (9:25)." },
+  { slug: "taif", name_ar: "غزوة الطائف", translit: "Ghazwat al-Ṭāʾif", hijri: "Shawwāl 8 AH", ce: "630 CE", place: "Ṭāʾif", opponent: "Thaqīf inside the fortified city", muslim_force: "~12,000 companions", outcome: "Withdrawal", summary: "After Ḥunayn, the Muslims besieged Ṭāʾif but withdrew when it proved fortified. The city surrendered peacefully the following year.", lesson: "Wisdom in withdrawing when force is not the best path." },
+  { slug: "tabuk", name_ar: "غزوة تبوك", translit: "Ghazwat Tabūk", hijri: "Rajab 9 AH", ce: "630 CE", place: "Tabūk, north-west Arabia", opponent: "Byzantine forces (no engagement)", muslim_force: "30,000 companions", outcome: "Strategic Victory", summary: "The last expedition of the Prophet ﷺ, in extreme summer heat. No battle took place — the show of force alone secured the northern frontier.", lesson: "'The Hour of Difficulty' — sincerity when the way is hardest." },
+];
