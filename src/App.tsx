@@ -92,6 +92,7 @@ const PublicSurah = lazy(() => import("./pages/PublicSurah.tsx"));
 const PublicHisn = lazy(() => import("./pages/PublicHisn.tsx"));
 const PublicProphet = lazy(() => import("./pages/PublicProphet.tsx"));
 const PublicSahabi = lazy(() => import("./pages/PublicSahabi.tsx"));
+const PublicHijriMonth = lazy(() => import("./pages/PublicHijriMonth.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -238,6 +239,7 @@ const App = () => (
                 <Route path="/hisn/:id" element={<PublicHisn />} />
                 <Route path="/prophet/:slug" element={<PublicProphet />} />
                 <Route path="/sahabi/:slug" element={<PublicSahabi />} />
+                <Route path="/hijri-month/:slug" element={<PublicHijriMonth />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
