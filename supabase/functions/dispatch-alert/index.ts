@@ -20,7 +20,33 @@ interface Payload {
   route?: string | null;
   context?: Record<string, unknown>;
   alert_id?: string;
+  user_id?: string | null;
+  persist?: boolean;
   test?: boolean;
+}
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+async function persistAlert(p: Payload): Promise<{ ok: boolean; status: number; body: string }> {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/production_alerts`, {
+    method: "POST",
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      kind: p.kind,
+      severity: p.severity,
+      message: p.message,
+      route: p.route ?? null,
+      context: p.context ?? {},
+      user_id: p.user_id ?? null,
+    }),
+  });
+  return { ok: r.ok, status: r.status, body: r.ok ? "" : await r.text() };
 }
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -152,6 +178,16 @@ Deno.serve(async (req) => {
     });
   }
   p.severity = (p.severity ?? "warn").toLowerCase();
+
+  // Persist to production_alerts when requested (service-role only)
+  if (p.persist) {
+    try {
+      const r = await persistAlert(p);
+      results.persist = r.ok ? "ok" : `failed ${r.status}: ${r.body.slice(0, 200)}`;
+    } catch (e) {
+      results.persist = `error: ${(e as Error).message}`;
+    }
+  }
 
   const emoji = SEV_EMOJI[p.severity] ?? "•";
   const kindLabel = KIND_LABEL[p.kind] ?? p.kind;
