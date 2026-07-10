@@ -76,6 +76,7 @@ const GroupKhatmDetail = lazy(() => import("./pages/GroupKhatmDetail.tsx"));
 const GroupKhatmJoin = lazy(() => import("./pages/GroupKhatmJoin.tsx"));
 const AdminViral = lazy(() => import("./pages/AdminViral.tsx"));
 const Leaderboards = lazy(() => import("./pages/Leaderboards.tsx"));
+const TeamStreaks = lazy(() => import("./pages/TeamStreaks.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -206,6 +207,7 @@ const App = () => (
                 <Route path="/khatm/group/:id" element={<GroupKhatmDetail />} />
                 <Route path="/khatm/join/:code" element={<GroupKhatmJoin />} />
                 <Route path="/leaderboards" element={<Leaderboards />} />
+                <Route path="/teams" element={<TeamStreaks />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
