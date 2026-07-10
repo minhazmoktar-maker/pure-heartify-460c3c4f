@@ -104,9 +104,13 @@ export default function PublicProfile() {
                       Joined {new Date(profile.joined_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <Button size="sm" variant="outline" onClick={onShare} aria-label="Share profile">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-1.5">
+                    <NudgeButton handle={profile.handle} displayName={profile.display_name} />
+                    <Button size="sm" variant="outline" onClick={onShare} aria-label="Share profile">
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+
                 </div>
 
                 {profile.bio && (
