@@ -44,8 +44,27 @@ const Watch = () => {
   useEffect(() => {
     setPlayerActivated(false);
     setShowOverlay(false);
+    setAutoNextIn(null);
     completedRef.current = null;
   }, [videoId]);
+
+  // Autoplay countdown once overlay appears
+  useEffect(() => {
+    if (!showOverlay || !nextVideo) return;
+    setAutoNextIn(5);
+    const iv = setInterval(() => {
+      setAutoNextIn((n) => {
+        if (n === null) return null;
+        if (n <= 1) {
+          clearInterval(iv);
+          navigate(`/watch/${nextVideo.id}`, { replace: true });
+          return null;
+        }
+        return n - 1;
+      });
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [showOverlay, nextVideo, navigate]);
 
   // Track watch history + first-play growth event
   useEffect(() => {
