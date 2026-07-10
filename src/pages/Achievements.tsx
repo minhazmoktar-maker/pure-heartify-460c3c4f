@@ -142,7 +142,17 @@ export default function Achievements() {
           </div>
         </header>
 
+        <div className="mb-6 grid gap-4 md:grid-cols-2">
+          <StreakCard />
+          <ReferralCard />
+        </div>
+
+        <div className="mb-6">
+          <BadgeShelf />
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
           {enriched.map((a) => {
             const Icon = a.icon;
             const card = (
