@@ -1744,6 +1744,7 @@ export type Database = {
           bio: string | null
           created_at: string
           display_name: string | null
+          handle: string | null
           id: string
           preferences: Json | null
           updated_at: string
@@ -1754,6 +1755,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          handle?: string | null
           id?: string
           preferences?: Json | null
           updated_at?: string
@@ -1764,6 +1766,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           display_name?: string | null
+          handle?: string | null
           id?: string
           preferences?: Json | null
           updated_at?: string
@@ -3064,6 +3067,20 @@ export type Database = {
       }
       get_internal_config: { Args: { _key: string }; Returns: string }
       get_or_create_referral_code: { Args: never; Returns: string }
+      get_public_profile: {
+        Args: { _handle: string }
+        Returns: {
+          avatar_url: string
+          badge_count: number
+          bio: string
+          current_streak: number
+          display_name: string
+          handle: string
+          joined_at: string
+          longest_streak: number
+          referrals_redeemed: number
+        }[]
+      }
       get_related_searches: {
         Args: { _limit?: number; _query: string }
         Returns: {
@@ -3216,6 +3233,7 @@ export type Database = {
           video_id: string
         }[]
       }
+      set_profile_handle: { Args: { _handle: string }; Returns: string }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       unaccent: { Args: { "": string }; Returns: string }
