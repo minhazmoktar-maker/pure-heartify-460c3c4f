@@ -38,6 +38,7 @@ const DiversityToggle = () => {
 type MainTab = "videos" | "listen" | "curated";
 
 const Index = () => {
+  const { user } = useAuth();
   const [mainTab, setMainTab] = useState<MainTab>("curated");
   const [selectedCategory, setSelectedCategory] = useState<HalalCategory>("All");
 
