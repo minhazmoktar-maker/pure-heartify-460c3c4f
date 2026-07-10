@@ -75,6 +75,9 @@ const Watch = () => {
               completedRef.current = videoId;
               completeDose.mutate(videoId, {
                 onSuccess: (res) => {
+                  // Fire the RPC that also handles freezes, milestones, badges, and
+                  // in-app notifications. Idempotent per user/day.
+                  void supabase.rpc("record_streak_activity");
                   if (res?.justCompleted) {
                     toast.success("Alhamdulillah 🌿 Daily Dose complete", {
                       description: `Streak: ${res.streak?.current_streak ?? 1} day${(res.streak?.current_streak ?? 1) === 1 ? "" : "s"}`,
@@ -89,6 +92,7 @@ const Watch = () => {
                   }
                 },
               });
+
             }
           }
         }

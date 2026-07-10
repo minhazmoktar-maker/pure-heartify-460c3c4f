@@ -71,6 +71,11 @@ const JannahDescriptions = lazy(() => import("./pages/JannahDescriptions.tsx"));
 const Journal = lazy(() => import("./pages/Journal.tsx"));
 const Kalimahs = lazy(() => import("./pages/Kalimahs.tsx"));
 const Khatm = lazy(() => import("./pages/Khatm.tsx"));
+const GroupKhatm = lazy(() => import("./pages/GroupKhatm.tsx"));
+const GroupKhatmDetail = lazy(() => import("./pages/GroupKhatmDetail.tsx"));
+const GroupKhatmJoin = lazy(() => import("./pages/GroupKhatmJoin.tsx"));
+const AdminViral = lazy(() => import("./pages/AdminViral.tsx"));
+
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
 const Library = lazy(() => import("./pages/Library.tsx"));
@@ -195,6 +200,10 @@ const App = () => (
                 <Route path="/recap" element={<Recap />} />
                 <Route path="/journal" element={<Journal />} />
                 <Route path="/khatm" element={<Khatm />} />
+                <Route path="/khatm/groups" element={<GroupKhatm />} />
+                <Route path="/khatm/group/:id" element={<GroupKhatmDetail />} />
+                <Route path="/khatm/join/:code" element={<GroupKhatmJoin />} />
+
                 <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/fasting" element={<Fasting />} />
                 <Route path="/seerah" element={<Seerah />} />
@@ -270,6 +279,8 @@ const App = () => (
 
                 <Route path="/admin" element={<Navigate to="/admin/console" replace />} />
                 <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
+                <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
+
                 <Route path="/admin/moderation-log" element={<Navigate to="/admin/moderation" replace />} />
                 <Route path="/admin/audit" element={<AdminRoute><Audit /></AdminRoute>} />
                 <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />

@@ -89,6 +89,8 @@ const Navbar = () => {
                     {[
                       ...(isOwner ? [{ to: "/admin/users", label: "Users, roles & entitlements", icon: Crown }] : []),
                       { to: "/admin/moderation", label: "Moderation" },
+                      { to: "/admin/viral", label: "Viral & flags" },
+
                       { to: "/admin/console", label: "Admin console" },
                       { to: "/admin/audit", label: "Audit log" },
                     ].map((l) => {

@@ -6,6 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
+import StreakCard from "@/components/StreakCard";
+import BadgeShelf from "@/components/BadgeShelf";
+import ReferralCard from "@/components/ReferralCard";
+
 
 type Stats = {
   salahStreak: number;
@@ -138,7 +142,17 @@ export default function Achievements() {
           </div>
         </header>
 
+        <div className="mb-6 grid gap-4 md:grid-cols-2">
+          <StreakCard />
+          <ReferralCard />
+        </div>
+
+        <div className="mb-6">
+          <BadgeShelf />
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
           {enriched.map((a) => {
             const Icon = a.icon;
             const card = (

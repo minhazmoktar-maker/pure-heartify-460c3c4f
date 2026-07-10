@@ -281,6 +281,36 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          category: string
+          created_at: string
+          criteria: Json
+          description: string
+          icon: string
+          key: string
+          name: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          criteria?: Json
+          description: string
+          icon?: string
+          key: string
+          name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          criteria?: Json
+          description?: string
+          icon?: string
+          key?: string
+          name?: string
+        }
+        Relationships: []
+      }
       blocked_creators: {
         Row: {
           created_at: string
@@ -1069,6 +1099,36 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          key: string
+          rollout_percent: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key: string
+          rollout_percent?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          rollout_percent?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       gsc_sync_snapshots: {
         Row: {
           created_at: string
@@ -1128,6 +1188,147 @@ export type Database = {
           videos_found?: number
         }
         Relationships: []
+      }
+      khatm_events: {
+        Row: {
+          created_at: string
+          data: Json
+          group_id: string
+          id: string
+          kind: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          group_id: string
+          id?: string
+          kind: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          group_id?: string
+          id?: string
+          kind?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khatm_events_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "khatm_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      khatm_group_members: {
+        Row: {
+          group_id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khatm_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "khatm_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      khatm_groups: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          intention: string | null
+          invite_code: string
+          is_public: boolean
+          name: string
+          owner_id: string
+          target_completion_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          intention?: string | null
+          invite_code?: string
+          is_public?: boolean
+          name: string
+          owner_id: string
+          target_completion_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          intention?: string | null
+          invite_code?: string
+          is_public?: boolean
+          name?: string
+          owner_id?: string
+          target_completion_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      khatm_juz_claims: {
+        Row: {
+          claimed_at: string
+          completed_at: string | null
+          group_id: string
+          id: string
+          juz_number: number
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          completed_at?: string | null
+          group_id: string
+          id?: string
+          juz_number: number
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          completed_at?: string | null
+          group_id?: string
+          id?: string
+          juz_number?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khatm_juz_claims_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "khatm_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       moderation_decisions: {
         Row: {
@@ -1746,6 +1947,74 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_clicks: {
+        Row: {
+          code: string
+          created_at: string
+          fingerprint: string | null
+          id: string
+          ip_hash: string | null
+          referrer: string | null
+          ua_hash: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_hash?: string | null
+          referrer?: string | null
+          ua_hash?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_hash?: string | null
+          referrer?: string | null
+          ua_hash?: string | null
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          granted_at: string
+          id: string
+          referral_id: string
+          reward_type: string
+          reward_value: Json
+          role: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          id?: string
+          referral_id: string
+          reward_type: string
+          reward_value?: Json
+          role: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          id?: string
+          referral_id?: string
+          reward_type?: string
+          reward_value?: Json
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_rewards_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           code: string
@@ -2030,6 +2299,54 @@ export type Database = {
         }
         Relationships: []
       }
+      streak_freezes: {
+        Row: {
+          granted_at: string
+          id: string
+          reason: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          id?: string
+          reason?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          id?: string
+          reason?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      streak_milestones: {
+        Row: {
+          id: string
+          milestone: number
+          reached_at: string
+          shared: boolean
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          milestone: number
+          reached_at?: string
+          shared?: boolean
+          user_id: string
+        }
+        Update: {
+          id?: string
+          milestone?: number
+          reached_at?: string
+          shared?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       streaks: {
         Row: {
           created_at: string
@@ -2059,6 +2376,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_key: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_key: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_key?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_key_fkey"
+            columns: ["badge_key"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       user_interests: {
         Row: {
@@ -2131,6 +2477,39 @@ export type Database = {
           rtl_override?: boolean | null
           ui_language?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json
+          id: string
+          kind: string
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          kind: string
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          kind?: string
+          read_at?: string | null
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -2497,6 +2876,8 @@ export type Database = {
           score: number
         }[]
       }
+      claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
+      complete_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       compute_owner_key: { Args: { _name: string }; Returns: string }
       enforce_retention_policies: { Args: never; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
@@ -2515,6 +2896,7 @@ export type Database = {
         }[]
       }
       get_internal_config: { Args: { _key: string }; Returns: string }
+      get_or_create_referral_code: { Args: never; Returns: string }
       get_related_searches: {
         Args: { _limit?: number; _query: string }
         Returns: {
@@ -2572,6 +2954,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_khatm_member: {
+        Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
       list_dua_wall: {
         Args: { _limit?: number }
@@ -2605,6 +2991,8 @@ export type Database = {
         Args: { _channel_id: string }
         Returns: number
       }
+      record_streak_activity: { Args: never; Returns: Json }
+      redeem_referral: { Args: { _code: string }; Returns: Json }
       revoke_entitlement: {
         Args: { _reason?: string; _user_id: string }
         Returns: boolean
@@ -2655,6 +3043,7 @@ export type Database = {
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       unaccent: { Args: { "": string }; Returns: string }
+      unread_notification_count: { Args: never; Returns: number }
       upsert_reciter: {
         Args: {
           _active_years?: string

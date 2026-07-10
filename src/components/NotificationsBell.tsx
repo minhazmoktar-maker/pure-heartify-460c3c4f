@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
-import { Bell, ShieldAlert, CheckCircle2, XCircle, Loader2, Inbox } from "lucide-react";
+import { Bell, ShieldAlert, CheckCircle2, XCircle, Loader2, Inbox, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useNotifications } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
+
 
 interface UserReport {
   id: string;
@@ -21,6 +23,8 @@ interface Props { isAdmin: boolean }
 export default function NotificationsBell({ isAdmin }: Props) {
   const { user } = useAuth();
   const { entitlement, isPremium } = useEntitlement();
+  const notif = useNotifications();
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingReports, setPendingReports] = useState(0);
@@ -73,7 +77,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
   const newResolved = resolvedItems.filter(
     (r) => new Date(r.updated_at ?? r.created_at).getTime() > lastSeen,
   ).length;
-  const unread = newResolved + (isAdmin ? pendingReports : 0);
+  const unread = newResolved + (isAdmin ? pendingReports : 0) + notif.unread;
 
   const handleOpenChange = (v: boolean) => {
     setOpen(v);
@@ -151,13 +155,37 @@ export default function NotificationsBell({ isAdmin }: Props) {
                 </Link>
               )}
 
+              {/* Server-side in-app notifications (streaks, referrals, khatm, badges) */}
+              {notif.items.map((n) => (
+                <button
+                  key={n.id}
+                  onClick={() => {
+                    void notif.markRead(n.id);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-secondary/50 ${
+                    n.read_at ? "" : "bg-primary/5"
+                  }`}
+                >
+                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{n.title}</p>
+                    {n.body && <p className="text-xs text-muted-foreground">{n.body}</p>}
+                    <p className="text-[10px] text-muted-foreground">
+                      {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                </button>
+              ))}
+
               {/* My reports */}
-              {myReports.length === 0 && !isAdmin && (
+              {myReports.length === 0 && notif.items.length === 0 && !isAdmin && (
                 <div className="flex flex-col items-center gap-2 p-8 text-center text-muted-foreground">
                   <Inbox className="h-8 w-8 opacity-40" />
                   <p className="text-xs">You're all caught up.</p>
                 </div>
               )}
+
               {myReports.map((r) => {
                 const isResolved = r.status !== "pending";
                 const Icon = r.status === "resolved" ? CheckCircle2
@@ -192,7 +220,17 @@ export default function NotificationsBell({ isAdmin }: Props) {
           )}
         </div>
 
-        <div className="border-t px-4 py-2 text-right">
+        <div className="flex items-center justify-between border-t px-4 py-2">
+          {notif.unread > 0 ? (
+            <button
+              onClick={() => void notif.markAllRead()}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              Mark all read
+            </button>
+          ) : (
+            <span />
+          )}
           <Link
             to="/profile"
             onClick={() => setOpen(false)}
@@ -201,6 +239,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
             Manage preferences
           </Link>
         </div>
+
       </PopoverContent>
     </Popover>
   );
