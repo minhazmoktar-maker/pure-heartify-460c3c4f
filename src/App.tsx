@@ -269,6 +269,7 @@ const App = () => (
                 <Route path="/miracle/:slug" element={<PublicMiracle />} />
                 <Route path="/quran-dua/:slug" element={<PublicQuranDua />} />
                 <Route path="/adhkar-set/:id" element={<PublicAdhkarSet />} />
+                <Route path="/sunnah/:slug" element={<PublicSunnahAct />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
