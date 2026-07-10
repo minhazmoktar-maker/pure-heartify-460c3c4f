@@ -8,7 +8,8 @@ export type ShareKind =
   | "khatm_complete"
   | "weekly_recap"
   | "badge_earned"
-  | "referral_invite";
+  | "referral_invite"
+  | "public_profile";
 
 interface ShareOptions {
   kind: ShareKind;
