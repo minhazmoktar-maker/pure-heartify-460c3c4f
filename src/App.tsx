@@ -15,6 +15,7 @@ import Signup from "./pages/Signup.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { MobileBridge } from "./components/MobileBridge";
 import ReferralBridge from "./components/ReferralBridge";
+import AdhanNotifier from "./components/AdhanNotifier";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AdminRoute from "./components/AdminRoute";
 
@@ -203,6 +204,7 @@ const App = () => (
           <BrowserRouter>
             <MobileBridge />
             <ReferralBridge />
+            <AdhanNotifier />
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route path="/" element={<Index />} />

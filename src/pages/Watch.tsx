@@ -141,10 +141,6 @@ const Watch = () => {
   };
 
   const handleBookmark = () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
     if (!currentVideo || !videoId) return;
     toggleFavorite.mutate({
       videoId,
