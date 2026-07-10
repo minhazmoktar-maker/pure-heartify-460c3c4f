@@ -200,6 +200,10 @@ const App = () => (
                 <Route path="/recap" element={<Recap />} />
                 <Route path="/journal" element={<Journal />} />
                 <Route path="/khatm" element={<Khatm />} />
+                <Route path="/khatm/groups" element={<GroupKhatm />} />
+                <Route path="/khatm/group/:id" element={<GroupKhatmDetail />} />
+                <Route path="/khatm/join/:code" element={<GroupKhatmJoin />} />
+
                 <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/fasting" element={<Fasting />} />
                 <Route path="/seerah" element={<Seerah />} />
