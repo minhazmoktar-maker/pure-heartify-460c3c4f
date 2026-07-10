@@ -265,6 +265,7 @@ const App = () => (
                 <Route path="/juz/:n" element={<PublicJuz />} />
                 <Route path="/battle/:slug" element={<PublicBattle />} />
                 <Route path="/miracle/:slug" element={<PublicMiracle />} />
+                <Route path="/quran-dua/:slug" element={<PublicQuranDua />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
