@@ -11,6 +11,7 @@ import DailyDoseHero from "@/components/DailyDoseHero";
 import SEO from "@/components/SEO";
 import NextSalahWidget from "@/components/NextSalahWidget";
 import StreakCard from "@/components/StreakCard";
+import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
