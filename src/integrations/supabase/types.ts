@@ -1129,6 +1129,39 @@ export type Database = {
         }
         Relationships: []
       }
+      gifts: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          months: number | null
+          note: string | null
+          recipient_id: string
+          sender_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          months?: number | null
+          note?: string | null
+          recipient_id: string
+          sender_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          months?: number | null
+          note?: string | null
+          recipient_id?: string
+          sender_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       gsc_sync_snapshots: {
         Row: {
           created_at: string
@@ -3051,6 +3084,14 @@ export type Database = {
           hits: number
           video_id: string
         }[]
+      }
+      gift_premium_month: {
+        Args: { _months?: number; _note?: string; _recipient: string }
+        Returns: Json
+      }
+      gift_streak_freeze: {
+        Args: { _note?: string; _recipient: string }
+        Returns: Json
       }
       grant_entitlement: {
         Args: {
