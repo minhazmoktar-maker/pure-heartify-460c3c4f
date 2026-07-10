@@ -4,7 +4,8 @@ import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import StreakCard from "@/components/StreakCard";
 import BadgeShelf from "@/components/BadgeShelf";
@@ -14,6 +15,11 @@ import Leaderboard from "@/components/Leaderboard";
 import { InvitePrompt, shouldShowInvitePrompt } from "@/components/InvitePrompt";
 import { GiftDialog } from "@/components/GiftDialog";
 import { useStreak } from "@/hooks/useStreak";
+import { supabase } from "@/integrations/supabase/client";
+import { getBadge } from "@/data/badges";
+import { shareContent } from "@/lib/share";
+import { track } from "@/lib/analytics";
+import { toast } from "sonner";
 
 
 type Stats = {
