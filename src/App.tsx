@@ -86,6 +86,7 @@ const PublicWeeklyRecap = lazy(() => import("./pages/PublicWeeklyRecap.tsx"));
 const PublicBadge = lazy(() => import("./pages/PublicBadge.tsx"));
 const PublicStreak = lazy(() => import("./pages/PublicStreak.tsx"));
 const PublicAyah = lazy(() => import("./pages/PublicAyah.tsx"));
+const PublicHadith = lazy(() => import("./pages/PublicHadith.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
