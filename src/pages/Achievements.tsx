@@ -6,6 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
+import StreakCard from "@/components/StreakCard";
+import BadgeShelf from "@/components/BadgeShelf";
+import ReferralCard from "@/components/ReferralCard";
+
 
 type Stats = {
   salahStreak: number;
