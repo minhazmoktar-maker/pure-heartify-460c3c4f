@@ -44,6 +44,7 @@ export default function PublicProfile() {
   const onShare = async () => {
     if (!profile) return;
     await shareContent({
+      kind: "public_profile",
       title: `${profile.display_name ?? profile.handle} on Heartify`,
       text: `🔥 ${profile.current_streak}-day streak · 🏆 ${profile.badge_count} badges`,
       url: `${window.location.origin}/u/${profile.handle}`,
