@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import HouseholdPanel from "@/components/plus/HouseholdPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
