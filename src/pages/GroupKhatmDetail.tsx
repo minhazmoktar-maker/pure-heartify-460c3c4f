@@ -236,7 +236,7 @@ export default function GroupKhatmDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title={`${group.name} — Group Khatm`} description={group.description ?? "Group Quran completion"} />
+      <SEO title={`${group.name} — Group Khatm`} description={group.description ?? "Group Quran completion"} path={`/khatm/group/${group.id}`} />
       <Navbar />
       <main className="container mx-auto max-w-3xl px-4 py-6 space-y-5">
         <Link

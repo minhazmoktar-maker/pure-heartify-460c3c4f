@@ -83,7 +83,7 @@ export default function AdminViral() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Admin — Viral Mechanisms" description="Feature flags, referral fraud, khatm stats" />
+      <SEO title="Admin — Viral Mechanisms" description="Feature flags, referral fraud, khatm stats" path="/admin/viral" />
       <Navbar />
       <main className="container mx-auto max-w-4xl px-4 py-6 space-y-5">
         <header>
