@@ -48,7 +48,7 @@ export function useReferral() {
     setCode((codeData as string | null) ?? null);
     setRedeemedCount((refs ?? []).filter((r) => r.status === "redeemed").length);
     setRewards((rew ?? []) as ReferralReward[]);
-    setTier((tierData as ReferralTierProgress | null) ?? null);
+    setTier((tierData as unknown as ReferralTierProgress | null) ?? null);
     // Fire-and-forget: award any newly reached tiers.
     void supabase.rpc("grant_referral_tier_rewards");
     setLoading(false);
