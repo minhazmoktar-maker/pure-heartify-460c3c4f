@@ -40,18 +40,18 @@ export async function reportAlert(opts: ReportAlertOptions): Promise<void> {
     const message = opts.message.slice(0, 2000);
     const context = (opts.context ?? {}) as Record<string, unknown>;
 
-    await supabase.from("production_alerts").insert({
-      kind: opts.kind,
-      severity,
-      message,
-      context: context as never,
-      route,
-      user_id: userRes?.user?.id ?? null,
-    });
-
-    // Fan-out to email + Slack (fire-and-forget)
+    // Route both DB persistence and fan-out through dispatch-alert
+    // (service-role only insert on production_alerts).
     void supabase.functions.invoke("dispatch-alert", {
-      body: { kind: opts.kind, severity, message, route, context },
+      body: {
+        kind: opts.kind,
+        severity,
+        message,
+        route,
+        context,
+        user_id: userRes?.user?.id ?? null,
+        persist: true,
+      },
     }).catch((e) => console.warn("[alerts] dispatch failed", e));
   } catch (err) {
     // Never throw from monitoring
