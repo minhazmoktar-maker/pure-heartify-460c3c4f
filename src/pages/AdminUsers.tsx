@@ -18,6 +18,8 @@ const AdminEntitlements = lazy(() => import("./AdminEntitlements"));
  * primary experience lives here.
  */
 export default function AdminUsers() {
+  const { isOwner } = useRole();
+  const defaultTab = isOwner ? "roles" : "entitlements";
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -37,7 +39,7 @@ export default function AdminUsers() {
           </div>
         </header>
 
-        <Tabs defaultValue="roles">
+        <Tabs defaultValue={defaultTab}>
           <TabsList>
             <TabsTrigger value="roles">
               <Shield className="mr-2 h-4 w-4" /> Roles & MFA
