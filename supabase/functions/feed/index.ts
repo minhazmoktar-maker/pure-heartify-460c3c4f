@@ -71,11 +71,20 @@ Deno.serve(async (req) => {
     // Belt-and-suspenders moderation guard: even though a DB trigger blocks
     // inserts and a nightly sweep purges rows, we also filter at read time so
     // any race, cache, or manual insert can never surface blocked creators.
-    const BLOCKED_PATTERNS = ["mia yilin", "leila hormozi", "layla hormozi", "mehreen"];
+    const BLOCKED_PATTERNS = [
+      "mia yilin", "leila hormozi", "layla hormozi", "mehreen",
+      // Female-centric / non-halal channels & topics reported by owner
+      "tedx", "chris williamson", "dr. daf", "womenofquran",
+      "islamic reflections", "islamiclife", "hamza's den", "hamzas den",
+      "muslim matters tv", "imaan phase",
+      // Title tokens that flagged all bulk-removed videos
+      "women", "mujeres", "aurtain", "aurat", "female voice", "by women voice",
+    ];
     for (const p of BLOCKED_PATTERNS) {
       url += `&channel_title=not.ilike.*${encodeURIComponent(p)}*`;
       url += `&title=not.ilike.*${encodeURIComponent(p)}*`;
     }
+
 
     // Server-side premium gate — hide premium-only videos from non-premium.
     if (!isPremium) {
