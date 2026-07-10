@@ -10,6 +10,8 @@ import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import DailyDoseHero from "@/components/DailyDoseHero";
 import SEO from "@/components/SEO";
 import NextSalahWidget from "@/components/NextSalahWidget";
+import StreakCard from "@/components/StreakCard";
+import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { FeedDiversityProvider, useFeedDiversity } from "@/contexts/FeedDiversityContext";
@@ -36,6 +38,7 @@ const DiversityToggle = () => {
 type MainTab = "videos" | "listen" | "curated";
 
 const Index = () => {
+  const { user } = useAuth();
   const [mainTab, setMainTab] = useState<MainTab>("curated");
   const [selectedCategory, setSelectedCategory] = useState<HalalCategory>("All");
 
@@ -64,6 +67,14 @@ const Index = () => {
       <HeroSection />
 
       <NextSalahWidget />
+
+      {user && (
+        <div className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6">
+          <StreakCard />
+        </div>
+      )}
+
+
 
       <DailyDoseHero />
 
