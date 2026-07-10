@@ -103,6 +103,7 @@ const Pillars = lazy(() => import("./pages/Pillars.tsx"));
 const Prayer = lazy(() => import("./pages/Prayer.tsx"));
 const Privacy = lazy(() => import("./pages/Privacy.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile.tsx"));
 const Prophets = lazy(() => import("./pages/Prophets.tsx"));
 const Purification = lazy(() => import("./pages/Purification.tsx"));
 const Qibla = lazy(() => import("./pages/Qibla.tsx"));
@@ -205,6 +206,7 @@ const App = () => (
                 <Route path="/khatm/group/:id" element={<GroupKhatmDetail />} />
                 <Route path="/khatm/join/:code" element={<GroupKhatmJoin />} />
                 <Route path="/leaderboards" element={<Leaderboards />} />
+                <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/fasting" element={<Fasting />} />

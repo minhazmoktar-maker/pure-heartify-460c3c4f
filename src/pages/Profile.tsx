@@ -4,6 +4,7 @@ import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle 
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
 import ReferralCard from "@/components/ReferralCard";
+import HandleClaimCard from "@/components/HandleClaimCard";
 import LanguageSettings from "@/components/LanguageSettings";
 import MfaStatusCard from "@/components/MfaStatusCard";
 import { useAuth } from "@/contexts/AuthContext";
@@ -250,6 +251,10 @@ const Profile = () => {
 
             <div className="pt-4">
               <LanguageSettings />
+            </div>
+
+            <div className="pt-4">
+              <HandleClaimCard />
             </div>
 
             <div className="pt-4">
