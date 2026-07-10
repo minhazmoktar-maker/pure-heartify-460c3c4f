@@ -25,8 +25,11 @@ const ReferralBridge = () => {
       const url = new URL(window.location.href);
       const ref = url.searchParams.get("ref");
       if (ref && ref.length <= 32) {
-        localStorage.setItem(STORAGE_KEY, ref.toUpperCase());
+        const code = ref.toUpperCase();
+        localStorage.setItem(STORAGE_KEY, code);
+        void logReferralClickOnce(code);
       }
+
     } catch {
       /* noop */
     }
