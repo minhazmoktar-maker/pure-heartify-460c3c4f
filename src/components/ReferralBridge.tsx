@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { linkAttributionToUser } from "@/lib/attribution";
+import { logReferralClickOnce } from "@/lib/referralClicks";
+
 
 const STORAGE_KEY = "heartify-pending-ref";
 const DONE_KEY = "heartify-ref-redeemed";
