@@ -220,7 +220,17 @@ export default function NotificationsBell({ isAdmin }: Props) {
           )}
         </div>
 
-        <div className="border-t px-4 py-2 text-right">
+        <div className="flex items-center justify-between border-t px-4 py-2">
+          {notif.unread > 0 ? (
+            <button
+              onClick={() => void notif.markAllRead()}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              Mark all read
+            </button>
+          ) : (
+            <span />
+          )}
           <Link
             to="/profile"
             onClick={() => setOpen(false)}
@@ -229,6 +239,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
             Manage preferences
           </Link>
         </div>
+
       </PopoverContent>
     </Popover>
   );
