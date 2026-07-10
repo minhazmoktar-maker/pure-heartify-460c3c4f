@@ -3297,6 +3297,21 @@ export type Database = {
       }
       get_internal_config: { Args: { _key: string }; Returns: string }
       get_or_create_referral_code: { Args: never; Returns: string }
+      get_public_dhikr_circle: {
+        Args: { _circle_id: string }
+        Returns: {
+          created_at: string
+          current_count: number
+          ends_at: string
+          id: string
+          is_active: boolean
+          member_count: number
+          phrase: string
+          target_count: number
+          title: string
+          top_contributors: Json
+        }[]
+      }
       get_public_profile: {
         Args: { _handle: string }
         Returns: {
