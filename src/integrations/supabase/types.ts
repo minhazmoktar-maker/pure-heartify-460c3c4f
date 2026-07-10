@@ -3312,6 +3312,17 @@ export type Database = {
           top_contributors: Json
         }[]
       }
+      get_public_dua: {
+        Args: { _id: string }
+        Returns: {
+          ameen_count: number
+          author_handle: string
+          body: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+        }[]
+      }
       get_public_profile: {
         Args: { _handle: string }
         Returns: {

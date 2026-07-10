@@ -10,7 +10,8 @@ export type ShareKind =
   | "badge_earned"
   | "referral_invite"
   | "public_profile"
-  | "dhikr_circle";
+  | "dhikr_circle"
+  | "dua";
 
 interface ShareOptions {
   kind: ShareKind;

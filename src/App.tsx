@@ -79,6 +79,7 @@ const Leaderboards = lazy(() => import("./pages/Leaderboards.tsx"));
 const TeamStreaks = lazy(() => import("./pages/TeamStreaks.tsx"));
 const DhikrCircles = lazy(() => import("./pages/DhikrCircles.tsx"));
 const PublicDhikrCircle = lazy(() => import("./pages/PublicDhikrCircle.tsx"));
+const PublicDua = lazy(() => import("./pages/PublicDua.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
@@ -212,6 +213,7 @@ const App = () => (
                 <Route path="/teams" element={<TeamStreaks />} />
                 <Route path="/dhikr/circles" element={<DhikrCircles />} />
                 <Route path="/c/:id" element={<PublicDhikrCircle />} />
+                <Route path="/d/:id" element={<PublicDua />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
