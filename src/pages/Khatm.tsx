@@ -132,7 +132,14 @@ const Khatm = () => {
               Complete the Quran at your own pace — {state.completedKhatms} khatm{state.completedKhatms === 1 ? "" : "s"} completed.
             </p>
           </div>
+          <Link
+            to="/khatm/groups"
+            className="ml-auto rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10"
+          >
+            Group Khatm →
+          </Link>
         </header>
+
 
         {/* Progress */}
         <Card className="mb-6 p-6">
