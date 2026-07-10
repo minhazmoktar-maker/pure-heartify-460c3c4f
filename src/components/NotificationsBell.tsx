@@ -155,13 +155,37 @@ export default function NotificationsBell({ isAdmin }: Props) {
                 </Link>
               )}
 
+              {/* Server-side in-app notifications (streaks, referrals, khatm, badges) */}
+              {notif.items.map((n) => (
+                <button
+                  key={n.id}
+                  onClick={() => {
+                    void notif.markRead(n.id);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-secondary/50 ${
+                    n.read_at ? "" : "bg-primary/5"
+                  }`}
+                >
+                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{n.title}</p>
+                    {n.body && <p className="text-xs text-muted-foreground">{n.body}</p>}
+                    <p className="text-[10px] text-muted-foreground">
+                      {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                </button>
+              ))}
+
               {/* My reports */}
-              {myReports.length === 0 && !isAdmin && (
+              {myReports.length === 0 && notif.items.length === 0 && !isAdmin && (
                 <div className="flex flex-col items-center gap-2 p-8 text-center text-muted-foreground">
                   <Inbox className="h-8 w-8 opacity-40" />
                   <p className="text-xs">You're all caught up.</p>
                 </div>
               )}
+
               {myReports.map((r) => {
                 const isResolved = r.status !== "pending";
                 const Icon = r.status === "resolved" ? CheckCircle2
