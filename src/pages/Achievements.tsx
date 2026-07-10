@@ -9,6 +9,10 @@ import { Link } from "react-router-dom";
 import StreakCard from "@/components/StreakCard";
 import BadgeShelf from "@/components/BadgeShelf";
 import ReferralCard from "@/components/ReferralCard";
+import WeeklyRecapCard from "@/components/WeeklyRecapCard";
+import Leaderboard from "@/components/Leaderboard";
+import { InvitePrompt, shouldShowInvitePrompt } from "@/components/InvitePrompt";
+import { useStreak } from "@/hooks/useStreak";
 
 
 type Stats = {
