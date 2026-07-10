@@ -30,7 +30,7 @@ export function useTeamStreaks() {
     setLoading(true);
     setError(null);
     // settle first so today's advance is reflected
-    await supabase.rpc("settle_team_streaks").catch(() => null);
+    try { await supabase.rpc("settle_team_streaks"); } catch { /* noop */ }
     const { data, error } = await supabase.rpc("list_my_team_streaks");
     if (error) setError(error.message);
     setTeams((data ?? []) as TeamStreak[]);
