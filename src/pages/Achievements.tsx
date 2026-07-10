@@ -106,6 +106,9 @@ export default function Achievements() {
   const [stats, setStats] = useState<Stats>({
     salahStreak: 0, salahOnTime30: 0, dhikrTotal: 0, dhikrStreak: 0, surahsRead: 0, adhkarDays: 0,
   });
+  const streak = useStreak();
+  const [invitePromptOpen, setInvitePromptOpen] = useState(false);
+  const [inviteTrigger, setInviteTrigger] = useState<string>("streak_milestone");
 
   useEffect(() => {
     const s = readSalahStats();
@@ -120,6 +123,16 @@ export default function Achievements() {
       adhkarDays: readAdhkarDays(),
     });
   }, []);
+
+  useEffect(() => {
+    if (streak.loading || streak.milestones.length === 0) return;
+    const latest = streak.milestones[streak.milestones.length - 1];
+    const trigger = `streak_milestone_${latest}`;
+    if (shouldShowInvitePrompt(trigger)) {
+      setInviteTrigger(trigger);
+      setInvitePromptOpen(true);
+    }
+  }, [streak.loading, streak.milestones]);
 
   const enriched = useMemo(() => ACHIEVEMENTS.map((a) => {
     const current = a.current(stats);
@@ -148,12 +161,26 @@ export default function Achievements() {
 
         <div className="mb-6 grid gap-4 md:grid-cols-2">
           <StreakCard />
+          <WeeklyRecapCard />
+        </div>
+
+        <div className="mb-6 grid gap-4 md:grid-cols-2">
           <ReferralCard />
+          <Leaderboard scope="global" />
         </div>
 
         <div className="mb-6">
           <BadgeShelf />
         </div>
+
+        <InvitePrompt
+          trigger={inviteTrigger}
+          open={invitePromptOpen}
+          onOpenChange={setInvitePromptOpen}
+          headline={`You hit a ${streak.current}-day streak! 🎉`}
+          body="Invite a friend to build a habit together — you both earn rewards when they join."
+        />
+
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
