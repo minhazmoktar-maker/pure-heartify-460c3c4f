@@ -231,6 +231,7 @@ const App = () => (
                 <Route path="/ayah/:surah/:verse" element={<PublicAyah />} />
                 <Route path="/hadith/:collection/:number" element={<PublicHadith />} />
                 <Route path="/name/:index" element={<PublicName />} />
+                <Route path="/surah/:number" element={<PublicSurah />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
