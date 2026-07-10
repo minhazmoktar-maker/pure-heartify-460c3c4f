@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import SEO from "@/components/SEO";
 
 interface InviteRow {
@@ -91,7 +91,7 @@ export default function PlusInvite() {
       <SEO
         title="Accept Heartify+ Family invite"
         description="Join a Heartify+ family household."
-        noindex
+        path="/plus/join"
       />
       <Navbar />
       <main className="mx-auto max-w-lg px-4 py-16">
