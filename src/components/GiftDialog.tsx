@@ -23,8 +23,7 @@ interface Props {
 export function GiftDialog({ freezesAvailable = 0, trigger }: Props) {
   const freezeFlag = useFeatureFlag("viral.gift_freeze", true);
   const premiumFlag = useFeatureFlag("viral.gift_premium", true);
-  const { plan } = useEntitlement();
-  const isPremium = plan === "premium";
+  const { isPremium } = useEntitlement();
   const { giftFreeze, giftPremium } = useGifts();
   const [open, setOpen] = useState(false);
   const [recipient, setRecipient] = useState("");
