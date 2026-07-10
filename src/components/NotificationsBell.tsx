@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
-import { Bell, ShieldAlert, CheckCircle2, XCircle, Loader2, Inbox } from "lucide-react";
+import { Bell, ShieldAlert, CheckCircle2, XCircle, Loader2, Inbox, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useNotifications } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
+
 
 interface UserReport {
   id: string;
