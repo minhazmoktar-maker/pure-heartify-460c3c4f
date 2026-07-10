@@ -257,6 +257,7 @@ const App = () => (
                 <Route path="/iman/:n" element={<PublicIman />} />
                 <Route path="/madhhab/:slug" element={<PublicMadhhab />} />
                 <Route path="/seerah/:id" element={<PublicSeerah />} />
+                <Route path="/scholar/:slug" element={<PublicScholar />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
