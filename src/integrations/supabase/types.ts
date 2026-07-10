@@ -3135,7 +3135,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      leaderboard_public: {
+        Row: {
+          computed_at: string | null
+          display_name: string | null
+          group_id: string | null
+          id: string | null
+          metric: string | null
+          period: string | null
+          rank: number | null
+          scope: string | null
+          score: number | null
+        }
+        Insert: {
+          computed_at?: string | null
+          display_name?: string | null
+          group_id?: string | null
+          id?: string | null
+          metric?: string | null
+          period?: string | null
+          rank?: number | null
+          scope?: string | null
+          score?: number | null
+        }
+        Update: {
+          computed_at?: string | null
+          display_name?: string | null
+          group_id?: string | null
+          id?: string | null
+          metric?: string | null
+          period?: string | null
+          rank?: number | null
+          scope?: string | null
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_snapshots_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "khatm_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       _analytics_assert_admin: { Args: never; Returns: undefined }
