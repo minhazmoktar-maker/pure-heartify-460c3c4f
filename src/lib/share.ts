@@ -11,7 +11,8 @@ export type ShareKind =
   | "referral_invite"
   | "public_profile"
   | "dhikr_circle"
-  | "dua";
+  | "dua"
+  | "khatm_group";
 
 interface ShareOptions {
   kind: ShareKind;

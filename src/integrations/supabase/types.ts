@@ -3323,6 +3323,10 @@ export type Database = {
           is_anonymous: boolean
         }[]
       }
+      get_public_khatm_group: {
+        Args: { _code?: string; _id: string }
+        Returns: Json
+      }
       get_public_profile: {
         Args: { _handle: string }
         Returns: {
