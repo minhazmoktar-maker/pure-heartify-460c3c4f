@@ -1769,6 +1769,39 @@ export type Database = {
         }
         Relationships: []
       }
+      plus_waitlist: {
+        Row: {
+          country_code: string | null
+          created_at: string
+          email: string
+          id: string
+          interested_features: Json
+          preferred_tier: string
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          country_code?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          interested_features?: Json
+          preferred_tier?: string
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          country_code?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          interested_features?: Json
+          preferred_tier?: string
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       privileged_actions_log: {
         Row: {
           action: string
