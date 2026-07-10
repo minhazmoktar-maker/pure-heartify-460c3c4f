@@ -36,7 +36,8 @@ export default function PublicDhikrCircle() {
     if (error) {
       toast.error(error.message);
     }
-    setCircle((Array.isArray(data) ? data[0] : data) ?? null);
+    const row = (Array.isArray(data) ? data[0] : data) as unknown;
+    setCircle((row as PublicCircle) ?? null);
     setLoading(false);
   };
 
