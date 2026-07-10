@@ -7,6 +7,7 @@ import { usePlayer } from "@/contexts/PlayerContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ReportAudioDialog from "@/components/ReportAudioDialog";
+import DownloadTrackButton from "@/components/DownloadTrackButton";
 
 const fmt = (s: number) => {
   if (!isFinite(s) || s < 0) return "0:00";
@@ -70,7 +71,8 @@ const AudioPlayer = () => {
                   {currentTrack.artist} · {currentTrack.language}
                 </p>
               </div>
-              <span className="ml-1 hidden md:inline">
+              <span className="ml-1 hidden items-center gap-1 md:inline-flex">
+                <DownloadTrackButton track={currentTrack} />
                 <ReportAudioDialog track={currentTrack} errorCode={lastError?.code} compact />
               </span>
             </div>

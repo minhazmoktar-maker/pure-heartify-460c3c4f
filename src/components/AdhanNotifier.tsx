@@ -6,6 +6,7 @@ import {
   type PrayerSettings,
 } from "@/lib/prayerTimes";
 import { useAdhanNotifications } from "@/hooks/useAdhanNotifications";
+import { useAdhanLocalNotifications } from "@/hooks/useAdhanLocalNotifications";
 
 /**
  * Mount once at app root so Fajr/Maghrib reminders fire whenever the tab is
@@ -34,5 +35,6 @@ export default function AdhanNotifier() {
   }, [settings.location, settings.method, settings.madhab, now]);
 
   useAdhanNotifications(settings, slots);
+  useAdhanLocalNotifications(settings, slots);
   return null;
 }
