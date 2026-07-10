@@ -227,6 +227,7 @@ const App = () => (
                 <Route path="/b/:handle/:badgeId" element={<PublicBadge />} />
                 <Route path="/s/:handle/:days" element={<PublicStreak />} />
                 <Route path="/ayah/:surah/:verse" element={<PublicAyah />} />
+                <Route path="/hadith/:collection/:number" element={<PublicHadith />} />
                 <Route path="/u/:handle" element={<PublicProfile />} />
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
