@@ -10,6 +10,8 @@ import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import DailyDoseHero from "@/components/DailyDoseHero";
 import SEO from "@/components/SEO";
 import NextSalahWidget from "@/components/NextSalahWidget";
+import StreakCard from "@/components/StreakCard";
+import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { FeedDiversityProvider, useFeedDiversity } from "@/contexts/FeedDiversityContext";
