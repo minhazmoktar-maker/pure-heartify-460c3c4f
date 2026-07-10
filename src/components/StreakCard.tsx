@@ -3,8 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useStreak } from "@/hooks/useStreak";
-import { track } from "@/lib/analytics";
-import { toast } from "sonner";
+import { shareContent } from "@/lib/share";
 
 export function StreakCard() {
   const s = useStreak();
@@ -19,24 +18,14 @@ export function StreakCard() {
 
   const pct = s.nextMilestone ? Math.min(100, (s.current / s.nextMilestone) * 100) : 100;
 
-  const share = async () => {
-    const text = `I'm on a ${s.current}-day Heartify streak 🔥 — building consistent worship, in shaa Allah.`;
-    track("streak_shared", { current: s.current });
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title: "My Heartify streak", text, url: window.location.origin });
-        return;
-      } catch {
-        /* cancelled */
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(`${text} ${window.location.origin}`);
-      toast.success("Copied to clipboard");
-    } catch {
-      /* noop */
-    }
-  };
+  const share = () =>
+    shareContent({
+      kind: "streak_milestone",
+      refId: String(s.current),
+      title: "My Heartify streak",
+      text: `I'm on a ${s.current}-day Heartify streak 🔥 — building consistent worship, in shaa Allah.`,
+    });
+
 
   return (
     <Card className="p-5 space-y-4" aria-label="Current streak">

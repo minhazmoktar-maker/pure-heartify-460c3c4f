@@ -1330,6 +1330,53 @@ export type Database = {
           },
         ]
       }
+      leaderboard_snapshots: {
+        Row: {
+          computed_at: string
+          display_name: string | null
+          group_id: string | null
+          id: string
+          metric: string
+          period: string
+          rank: number
+          scope: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          computed_at?: string
+          display_name?: string | null
+          group_id?: string | null
+          id?: string
+          metric: string
+          period: string
+          rank: number
+          scope: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          computed_at?: string
+          display_name?: string | null
+          group_id?: string | null
+          id?: string
+          metric?: string
+          period?: string
+          rank?: number
+          scope?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_snapshots_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "khatm_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       moderation_decisions: {
         Row: {
           actor_id: string | null
@@ -2299,6 +2346,33 @@ export type Database = {
         }
         Relationships: []
       }
+      share_events: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          kind: string
+          ref_id: string | null
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          id?: string
+          kind: string
+          ref_id?: string | null
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          ref_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       streak_freezes: {
         Row: {
           granted_at: string
@@ -2756,6 +2830,45 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_recaps: {
+        Row: {
+          created_at: string
+          dhikr_count: number
+          favorites_added: number
+          highlights: Json
+          id: string
+          juz_completed: number
+          minutes_watched: number
+          streak_length: number
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          dhikr_count?: number
+          favorites_added?: number
+          highlights?: Json
+          id?: string
+          juz_completed?: number
+          minutes_watched?: number
+          streak_length?: number
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          dhikr_count?: number
+          favorites_added?: number
+          highlights?: Json
+          id?: string
+          juz_completed?: number
+          minutes_watched?: number
+          streak_length?: number
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -2879,6 +2992,27 @@ export type Database = {
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       complete_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       compute_owner_key: { Args: { _name: string }; Returns: string }
+      compute_weekly_recap: {
+        Args: { _user_id: string; _week_start: string }
+        Returns: {
+          created_at: string
+          dhikr_count: number
+          favorites_added: number
+          highlights: Json
+          id: string
+          juz_completed: number
+          minutes_watched: number
+          streak_length: number
+          user_id: string
+          week_start: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "weekly_recaps"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       enforce_retention_policies: { Args: never; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
@@ -2993,6 +3127,7 @@ export type Database = {
       }
       record_streak_activity: { Args: never; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
+      refresh_leaderboards: { Args: never; Returns: undefined }
       revoke_entitlement: {
         Args: { _reason?: string; _user_id: string }
         Returns: boolean
