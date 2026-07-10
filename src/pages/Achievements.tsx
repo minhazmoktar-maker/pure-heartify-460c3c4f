@@ -12,6 +12,7 @@ import ReferralCard from "@/components/ReferralCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import Leaderboard from "@/components/Leaderboard";
 import { InvitePrompt, shouldShowInvitePrompt } from "@/components/InvitePrompt";
+import { GiftDialog } from "@/components/GiftDialog";
 import { useStreak } from "@/hooks/useStreak";
 
 
