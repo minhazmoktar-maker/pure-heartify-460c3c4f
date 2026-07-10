@@ -1,14 +1,16 @@
-import { Gift, Copy, Check, Share2 } from "lucide-react";
+import { Gift, Copy, Check, Share2, Trophy } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useReferral } from "@/hooks/useReferral";
 import { track } from "@/lib/analytics";
 
 const ReferralCard = () => {
-  const { code, shareUrl, redeemedCount, loading, copy } = useReferral();
+  const { code, shareUrl, redeemedCount, tier, loading, copy } = useReferral();
   const [copied, setCopied] = useState(false);
 
   if (loading || !code) return null;
+
 
   const handleCopy = async () => {
     const ok = await copy();
