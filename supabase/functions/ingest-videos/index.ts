@@ -110,7 +110,17 @@ const HARD_REJECT_KEYWORDS = [
 // Hard-blocked creators (channel name OR mention in title/description triggers reject).
 const BLOCKED_CREATORS: string[] = [
   "mia yilin", "mehreen", "leila hormozi", "layla hormozi",
+  // Owner-blocked channels (secular / female-centric / non-halal framing)
+  "tedx", "tedx talks", "chris williamson", "dr. daf show", "dr daf show",
+  "womenofquran", "women of quran", "islamic reflections videos",
+  "islamiclife", "hamza's den", "hamzas den", "muslim matters tv", "imaan phase",
 ];
+
+// Title/description patterns that hard-reject regardless of channel.
+const BLOCKED_TITLE_TOKENS: string[] = [
+  "women", "mujeres", "aurtain", "aurat", "female voice", "by women voice",
+];
+
 
 // Channels where ONLY female-free content should pass: if title/desc mentions woman/female/sister/her,
 // reject. Used to keep e.g. Sami Yusuf and "Why They Converted" male-only.
