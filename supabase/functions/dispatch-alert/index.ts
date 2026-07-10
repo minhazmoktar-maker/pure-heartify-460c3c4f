@@ -179,6 +179,16 @@ Deno.serve(async (req) => {
   }
   p.severity = (p.severity ?? "warn").toLowerCase();
 
+  // Persist to production_alerts when requested (service-role only)
+  if (p.persist) {
+    try {
+      const r = await persistAlert(p);
+      results.persist = r.ok ? "ok" : `failed ${r.status}: ${r.body.slice(0, 200)}`;
+    } catch (e) {
+      results.persist = `error: ${(e as Error).message}`;
+    }
+  }
+
   const emoji = SEV_EMOJI[p.severity] ?? "•";
   const kindLabel = KIND_LABEL[p.kind] ?? p.kind;
   const title = `${emoji} [${p.severity.toUpperCase()}] ${kindLabel}`;
