@@ -70,8 +70,9 @@ Deno.serve(async (req) => {
       lastError = errorBody;
       lastStatus = res.status;
 
+      const quotaKeywords = /quotaExceeded|dailyLimitExceeded|rateLimitExceeded|userRateLimitExceeded|exceeded your .*quota/i.test(errorBody);
       const isQuotaExceeded =
-        res.status === 403 && /quotaExceeded|dailyLimitExceeded|exceeded your .*quota/i.test(errorBody);
+        res.status === 429 || (res.status === 403 && quotaKeywords) || quotaKeywords;
       // If quota exceeded, try the next key. Other errors fail fast.
       if (!isQuotaExceeded) {
         return json({ error: `YouTube API error: ${res.status}`, code: "YOUTUBE_API_ERROR" }, res.status);

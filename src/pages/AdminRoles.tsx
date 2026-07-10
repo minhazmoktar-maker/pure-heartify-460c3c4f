@@ -126,7 +126,19 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
       </div>
     );
   }
-  if (!isOwner) return <Navigate to="/" replace />;
+  if (!isOwner) {
+    if (embedded) {
+      return (
+        <Card>
+          <CardHeader><CardTitle className="text-base">Owner-only area</CardTitle></CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            Roles, MFA, and audit management are restricted to the platform owner. Admins can still manage premium access in the Entitlements tab.
+          </CardContent>
+        </Card>
+      );
+    }
+    return <Navigate to="/admin/users" replace />;
+  }
 
   const body = (
     <>
