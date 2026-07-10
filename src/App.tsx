@@ -279,6 +279,8 @@ const App = () => (
 
                 <Route path="/admin" element={<Navigate to="/admin/console" replace />} />
                 <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
+                <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
+
                 <Route path="/admin/moderation-log" element={<Navigate to="/admin/moderation" replace />} />
                 <Route path="/admin/audit" element={<AdminRoute><Audit /></AdminRoute>} />
                 <Route path="/admin/console" element={<AdminRoute><AdminConsole /></AdminRoute>} />
