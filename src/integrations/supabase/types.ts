@@ -897,6 +897,77 @@ export type Database = {
         }
         Relationships: []
       }
+      dhikr_circle_members: {
+        Row: {
+          circle_id: string
+          contribution: number
+          id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          contribution?: number
+          id?: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          contribution?: number
+          id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dhikr_circle_members_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "dhikr_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dhikr_circles: {
+        Row: {
+          created_at: string
+          current_count: number
+          ends_at: string | null
+          host_user_id: string
+          id: string
+          is_active: boolean
+          phrase: string
+          target_count: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_count?: number
+          ends_at?: string | null
+          host_user_id: string
+          id?: string
+          is_active?: boolean
+          phrase: string
+          target_count: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_count?: number
+          ends_at?: string | null
+          host_user_id?: string
+          id?: string
+          is_active?: boolean
+          phrase?: string
+          target_count?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dhikr_sessions: {
         Row: {
           completed_at: string | null
@@ -3177,6 +3248,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      contribute_to_dhikr_circle: {
+        Args: { _circle_id: string; _count: number }
+        Returns: {
+          current_count: number
+          is_active: boolean
+          my_contribution: number
+          target_count: number
+        }[]
+      }
       create_team_streak: {
         Args: { _name: string }
         Returns: {
@@ -3198,6 +3278,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
