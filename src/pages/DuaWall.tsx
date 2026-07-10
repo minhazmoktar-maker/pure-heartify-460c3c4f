@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Heart, Loader2, Send, Trash2, Users } from "lucide-react";
+import { Heart, Loader2, Send, Share2, Trash2, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { shareContent } from "@/lib/share";
 
 type Dua = {
   id: string;
@@ -157,6 +158,22 @@ export default function DuaWall() {
                           </Badge>
                           <Button size="sm" variant={said ? "default" : "outline"} onClick={() => toggleAmeen(d)}>
                             {said ? "Ameen ✓" : "Ameen"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            aria-label="Share du'a"
+                            onClick={() =>
+                              shareContent({
+                                kind: "dua",
+                                refId: d.id,
+                                title: "A du'a on Heartify",
+                                text: d.body.slice(0, 140),
+                                url: `${window.location.origin}/d/${d.id}`,
+                              })
+                            }
+                          >
+                            <Share2 className="h-4 w-4" />
                           </Button>
                           {mine && (
                             <Button size="sm" variant="ghost" onClick={() => remove(d)} aria-label="Delete">
