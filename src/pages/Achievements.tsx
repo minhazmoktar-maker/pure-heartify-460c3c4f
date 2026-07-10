@@ -154,10 +154,6 @@ export default function Achievements() {
             <h1 className="flex items-center gap-2 text-3xl font-bold"><Award className="h-7 w-7 text-primary" />Achievements</h1>
             <p className="mt-1 text-muted-foreground">Milestones for salah, dhikr, Quran, and adhkar consistency.</p>
           </div>
-          <div className="rounded-full border bg-card px-4 py-2 text-sm">
-            <span className="font-bold text-primary">{unlockedCount}</span>
-            <span className="text-muted-foreground"> / {enriched.length} unlocked</span>
-          </div>
           <div className="flex items-center gap-2">
             <div className="rounded-full border bg-card px-4 py-2 text-sm">
               <span className="font-bold text-primary">{unlockedCount}</span>
