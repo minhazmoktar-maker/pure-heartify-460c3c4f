@@ -4,7 +4,8 @@ import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock, Share2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import StreakCard from "@/components/StreakCard";
 import BadgeShelf from "@/components/BadgeShelf";
@@ -14,6 +15,11 @@ import Leaderboard from "@/components/Leaderboard";
 import { InvitePrompt, shouldShowInvitePrompt } from "@/components/InvitePrompt";
 import { GiftDialog } from "@/components/GiftDialog";
 import { useStreak } from "@/hooks/useStreak";
+import { supabase } from "@/integrations/supabase/client";
+import { getBadge } from "@/data/badges";
+import { shareContent } from "@/lib/share";
+import { track } from "@/lib/analytics";
+import { toast } from "sonner";
 
 
 type Stats = {
@@ -110,6 +116,35 @@ export default function Achievements() {
   const streak = useStreak();
   const [invitePromptOpen, setInvitePromptOpen] = useState(false);
   const [inviteTrigger, setInviteTrigger] = useState<string>("streak_milestone");
+  const [handle, setHandle] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !mounted) return;
+      const { data } = await supabase.from("profiles").select("handle").eq("id", user.id).maybeSingle();
+      if (mounted && data?.handle) setHandle(data.handle);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const onShareBadge = async (badgeId: string) => {
+    const meta = getBadge(badgeId);
+    if (!meta) return;
+    if (!handle) {
+      toast.info("Set a public handle in your Profile to share badges.");
+      return;
+    }
+    await shareContent({
+      kind: "badge_earned",
+      refId: badgeId,
+      title: `I unlocked ${meta.title} on Heartify`,
+      text: `${meta.emoji} ${meta.title} — ${meta.description}`,
+      url: `${window.location.origin}/b/${handle}/${badgeId}`,
+    });
+    await track("badge.share_clicked", { badge_id: badgeId });
+  };
 
   useEffect(() => {
     const s = readSalahStats();
@@ -202,9 +237,22 @@ export default function Achievements() {
                 <CardContent className="space-y-2">
                   <p className="text-xs text-muted-foreground">{a.description}</p>
                   <Progress value={a.pct} className="h-2" />
-                  <p className="text-right text-xs font-mono">
-                    {a.current.toLocaleString()} / {a.target.toLocaleString()}
-                  </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-mono">
+                      {a.current.toLocaleString()} / {a.target.toLocaleString()}
+                    </p>
+                    {a.unlocked && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2 text-xs"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onShareBadge(a.id); }}
+                        aria-label={`Share ${a.title}`}
+                      >
+                        <Share2 className="h-3 w-3 mr-1" /> Share
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             );
