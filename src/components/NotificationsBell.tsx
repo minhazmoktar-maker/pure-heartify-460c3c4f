@@ -23,6 +23,8 @@ interface Props { isAdmin: boolean }
 export default function NotificationsBell({ isAdmin }: Props) {
   const { user } = useAuth();
   const { entitlement, isPremium } = useEntitlement();
+  const notif = useNotifications();
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pendingReports, setPendingReports] = useState(0);
