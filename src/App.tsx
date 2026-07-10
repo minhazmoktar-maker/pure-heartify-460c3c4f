@@ -75,6 +75,7 @@ const GroupKhatm = lazy(() => import("./pages/GroupKhatm.tsx"));
 const GroupKhatmDetail = lazy(() => import("./pages/GroupKhatmDetail.tsx"));
 const GroupKhatmJoin = lazy(() => import("./pages/GroupKhatmJoin.tsx"));
 const AdminViral = lazy(() => import("./pages/AdminViral.tsx"));
+const Leaderboards = lazy(() => import("./pages/Leaderboards.tsx"));
 
 const KidsDuas = lazy(() => import("./pages/KidsDuas.tsx"));
 const Learn = lazy(() => import("./pages/Learn.tsx"));
