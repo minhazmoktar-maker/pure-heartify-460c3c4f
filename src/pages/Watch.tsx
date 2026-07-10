@@ -260,13 +260,13 @@ const Watch = () => {
                     className="mt-2 flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                   >
                     <Play className="h-4 w-4 fill-current" />
-                    Play Now
+                    {autoNextIn !== null ? `Play now (${autoNextIn})` : "Play Now"}
                   </button>
                   <button
-                    onClick={() => setShowOverlay(false)}
+                    onClick={() => { setAutoNextIn(null); setShowOverlay(false); }}
                     className="text-xs text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Replay current video
+                    Cancel autoplay & replay
                   </button>
                 </div>
               )}
