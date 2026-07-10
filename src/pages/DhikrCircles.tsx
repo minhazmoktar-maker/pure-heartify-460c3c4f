@@ -92,6 +92,21 @@ function CircleCard({ circle, isHost }: { circle: DhikrCircle; isHost: boolean }
               +{n}
             </Button>
           ))}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() =>
+              shareContent({
+                kind: "dhikr_circle",
+                refId: circle.id,
+                title: circle.title,
+                text: `Join our dhikr circle: ${circle.phrase}`,
+                url: `${window.location.origin}/c/${circle.id}`,
+              })
+            }
+          >
+            <Share2 className="h-4 w-4" />
+          </Button>
           {isHost && (
             <Button size="sm" variant="outline" disabled={busy} onClick={close} className="ml-auto">
               End
