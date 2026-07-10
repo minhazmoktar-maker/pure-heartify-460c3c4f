@@ -77,7 +77,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
   const newResolved = resolvedItems.filter(
     (r) => new Date(r.updated_at ?? r.created_at).getTime() > lastSeen,
   ).length;
-  const unread = newResolved + (isAdmin ? pendingReports : 0);
+  const unread = newResolved + (isAdmin ? pendingReports : 0) + notif.unread;
 
   const handleOpenChange = (v: boolean) => {
     setOpen(v);
