@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
@@ -28,7 +29,7 @@ const load = (): State => {
   return { entries: {}, dailyLog: {} };
 };
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const todayKey = () => localToday();
 
 const Hifz = () => {
   const [state, setState] = useState<State>(load);

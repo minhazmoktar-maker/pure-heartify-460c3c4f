@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Moon, Sun, Sparkles, Check, Flame, CalendarDays } from "lucide-react";
@@ -30,7 +31,7 @@ const TYPE_META: Record<FastType, { label: string; color: string }> = {
   voluntary: { label: "Voluntary", color: "bg-secondary text-foreground" },
 };
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const todayKey = () => localToday();
 
 const loadLog = (): FastEntry[] => {
   try {

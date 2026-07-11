@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Sunrise, Moon, BedDouble, Sparkles, RotateCcw, Check } from "lucide-react";
@@ -7,7 +8,7 @@ import { ADHKAR } from "@/data/adhkar";
 import { cn } from "@/lib/utils";
 
 const STORAGE = "heartify:adhkar:v1";
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const todayKey = () => localToday();
 
 interface State {
   date: string;

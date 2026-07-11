@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Target, CalendarDays, TrendingUp, Plus, Minus, RotateCcw, Trash2, History } from "lucide-react";
@@ -24,7 +25,7 @@ interface KhatmState {
 }
 
 function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+  return localToday();
 }
 
 function daysBetween(a: string, b: string) {
