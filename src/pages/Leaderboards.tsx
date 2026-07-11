@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import Leaderboard from "@/components/Leaderboard";
+import SectionHeader from "@/components/SectionHeader";
 import { useFeatureFlag } from "@/hooks/useFeatureFlag";
 import { Trophy } from "lucide-react";
 
@@ -15,14 +16,12 @@ export default function Leaderboards() {
       />
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8 md:px-6">
-        <header className="mb-6">
-          <h1 className="flex items-center gap-2 text-3xl font-bold">
-            <Trophy className="h-7 w-7 text-amber-500" /> Leaderboards
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            Friendly competition to encourage consistency. Rankings refresh hourly.
-          </p>
-        </header>
+        <SectionHeader
+          title="Leaderboards"
+          description="Friendly competition to encourage consistency. Rankings refresh hourly."
+          icon={Trophy}
+          className="mb-6"
+        />
         {enabled ? (
           <Leaderboard scope="global" />
         ) : (
@@ -32,3 +31,4 @@ export default function Leaderboards() {
     </div>
   );
 }
+
