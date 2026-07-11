@@ -117,14 +117,6 @@ export function decideState(
   if (confidence >= t.human_review_min_confidence) return "human_review_required";
   return "rejected";
 }
-  if (confidence < t.reject_below_confidence) return "rejected";
-  if (confidence >= t.auto_approve_min_confidence && risk <= t.auto_approve_max_risk) {
-    return "auto_approved";
-  }
-  if (confidence >= t.ai_review_min_confidence) return "ai_review_required";
-  if (confidence >= t.human_review_min_confidence) return "human_review_required";
-  return "rejected";
-}
 
 function aggregateSignals(results: StageResult[]): Record<string, unknown> {
   const out: Record<string, unknown> = {};
