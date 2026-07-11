@@ -64,7 +64,11 @@ export async function runPipeline(
   const confidence = confidences.length ? Math.min(...confidences) : 0;
   const risk = risks.length ? Math.max(...risks) : 100;
 
-  const finalState = decideState(confidence, risk, thresholds, ruleHits);
+  const aggregatedFlags: string[] = stageResults.flatMap((s) => {
+    const f = (s.signals as { flags?: unknown } | undefined)?.flags;
+    return Array.isArray(f) ? (f as unknown[]).map(String) : [];
+  });
+  const finalState = decideState(confidence, risk, thresholds, ruleHits, aggregatedFlags);
   const aiResult = stageResults.find((s) => s.stage === "ai_reasoning");
 
   const reasoning = buildReasoning(finalState, confidence, risk, stageResults);
