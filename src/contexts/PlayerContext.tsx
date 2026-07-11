@@ -42,6 +42,10 @@ interface PlayerState {
   shuffle: boolean;
   repeat: RepeatMode;
   playbackRate: number;
+  /** True while playing a gated 30s preview for a non-entitled listener. */
+  isPreview: boolean;
+  /** Fixed length (s) of gated previews. */
+  previewCapSeconds: number;
   recent: Track[];
   playCounts: PlayCounts;
   lastError: PlaybackError | null;
