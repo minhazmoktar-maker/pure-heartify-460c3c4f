@@ -48,23 +48,25 @@ export default function PublicKhatmGroup() {
 
   if (loading) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="min-h-dvh bg-background">
+        <PageSkeleton variant="detail" className="max-w-lg" />
       </div>
     );
   }
 
   if (notFound || !group) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background p-6 text-center">
+      <div className="min-h-dvh bg-background">
         <SEO title="Group not found — Heartify" description="This Khatm group link is not available." path={`/k/${id}`} />
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Group not found</h1>
-          <p className="text-muted-foreground mt-2">
-            This link may be private or the invite code is missing.
-          </p>
-          <Button asChild className="mt-4"><Link to="/khatm/groups">Explore groups</Link></Button>
-        </div>
+        <main className="container mx-auto max-w-lg px-4 py-16">
+          <EmptyState
+            icon={Link2Off}
+            title="Group not found"
+            description="This link may be private or the invite code is missing. Browse public circles to join one that's open."
+            actionLabel="Explore groups"
+            actionHref="/khatm/groups"
+          />
+        </main>
       </div>
     );
   }
