@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Swords, RotateCcw, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Swords, RotateCcw, CheckCircle2, SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 
 type Battle = { id: string; name: string; year: string; place: string; outcome: string; summary: string; lesson: string };
 
@@ -37,17 +37,31 @@ const Battles = () => {
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Studied</span><span className="text-sm font-medium">{count} / {BATTLES.length}</span></div><Progress value={(count / BATTLES.length) * 100} /></Card>
         <div className="flex gap-2"><Input placeholder="Search battles…" value={q} onChange={e => setQ(e.target.value)} /><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>
-        {filtered.map(b => (
-          <Card key={b.id} className="p-5 cursor-pointer hover:border-primary transition" onClick={() => persist({ ...done, [b.id]: !done[b.id] })}>
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div><h2 className="font-semibold text-lg">{b.name}</h2><p className="text-xs text-muted-foreground">{b.year} · {b.place}</p></div>
-              {done[b.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
-            </div>
-            <Badge variant="secondary" className="mb-2">{b.outcome}</Badge>
-            <p className="text-sm mb-2">{b.summary}</p>
-            <p className="text-sm italic border-l-2 border-primary pl-3"><span className="font-medium">Lesson:</span> {b.lesson}</p>
-          </Card>
-        ))}
+        {filtered.length === 0 ? (
+          <EmptyState
+            icon={SearchX}
+            title="No battles match your search"
+            description="Try a different name, place, or lesson keyword."
+            tone="muted"
+          />
+        ) : filtered.map(b => {
+          const tone = /victory|conquest|dispersed|withdrew|fell/i.test(b.outcome)
+            ? "heartify-chip--primary"
+            : /setback|withdrawal/i.test(b.outcome)
+            ? "heartify-chip--warning"
+            : "heartify-chip--muted";
+          return (
+            <Card key={b.id} className="p-5 cursor-pointer hover:border-primary transition" onClick={() => persist({ ...done, [b.id]: !done[b.id] })}>
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div><h2 className="font-semibold text-lg">{b.name}</h2><p className="text-xs text-muted-foreground">{b.year} · {b.place}</p></div>
+                {done[b.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
+              </div>
+              <span className={`heartify-chip ${tone} mb-2 inline-flex`}>{b.outcome}</span>
+              <p className="text-sm mb-2 mt-2">{b.summary}</p>
+              <p className="text-sm italic border-l-2 border-primary pl-3"><span className="font-medium">Lesson:</span> {b.lesson}</p>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
