@@ -9,6 +9,7 @@ import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock, 
 import { Link } from "react-router-dom";
 import StreakCard from "@/components/StreakCard";
 import BadgeShelf from "@/components/BadgeShelf";
+import StatCard from "@/components/StatCard";
 import ReferralCard from "@/components/ReferralCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import Leaderboard from "@/components/Leaderboard";
