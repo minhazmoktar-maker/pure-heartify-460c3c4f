@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
+import PageSkeleton from "@/components/PageSkeleton";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { useCuratedSection } from "@/hooks/useCuratedSection";
 import { isTrustedChannel } from "@/data/trustedChannels";
