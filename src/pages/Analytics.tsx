@@ -10,10 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2, Download, RefreshCcw, BarChart3 } from "lucide-react";
 import {
-import SEO from "@/components/SEO";
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
   BarChart, Bar, PieChart, Pie, Cell, Legend, AreaChart, Area,
 } from "recharts";
+import SEO from "@/components/SEO";
 
 // --- helpers -----------------------------------------------------------------
 
