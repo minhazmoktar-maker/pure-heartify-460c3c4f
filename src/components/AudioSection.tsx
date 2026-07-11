@@ -13,6 +13,7 @@ import {
 } from "@/data/audio";
 import { cn } from "@/lib/utils";
 import { FEATURE_FLAGS } from "@/lib/featureFlags";
+import SectionHeader from "@/components/SectionHeader";
 
 const PREMIUM_BENEFITS = [
   { icon: Radio, title: "Ad-free listening", desc: "Uninterrupted Qur'an, nasheeds and lectures." },
@@ -52,21 +53,16 @@ const CollectionRow = ({
   if (items.length === 0) return null;
   return (
     <section className="mb-10">
-      <div className="mb-3 flex items-end justify-between">
-        <div>
-          <h3 className="flex items-center gap-2 font-heading text-lg font-bold text-foreground">
-            {Icon && <Icon className="h-4 w-4 text-primary" />}
-            {title}
-          </h3>
-          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-        </div>
-        <button
-          onClick={() => playQueue(items.filter((t) => !t.comingSoon && t.url), 0)}
-          className="hidden items-center gap-1 text-xs font-semibold text-primary hover:underline sm:inline-flex"
-        >
-          <Play className="h-3 w-3" />Play all
-        </button>
-      </div>
+      <SectionHeader
+        as="h3"
+        title={title}
+        description={subtitle}
+        icon={Icon as any}
+        actionLabel="Play all"
+        onAction={() => playQueue(items.filter((t) => !t.comingSoon && t.url), 0)}
+        className="mb-3"
+      />
+
       <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin]">
         {items.map((t) => (
           <button
