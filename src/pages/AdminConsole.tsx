@@ -209,39 +209,53 @@ const AdminConsole = () => {
           </div>
 
           <div className="max-h-[420px] overflow-y-auto rounded-lg border">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-muted/60 text-left">
+            <table className="heartify-table w-full text-sm">
+              <thead>
                 <tr>
-                  <th className="px-3 py-2">Pattern</th>
-                  <th className="px-3 py-2">Reason</th>
-                  <th className="px-3 py-2">Added</th>
-                  <th className="px-3 py-2"></th>
+                  <th>Pattern</th>
+                  <th>Reason</th>
+                  <th>Added</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {blocked.map((b) => (
-                  <tr key={b.id} className="border-t">
-                    <td className="px-3 py-2 font-mono text-xs">{b.pattern}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{b.reason ?? "—"}</td>
-                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                  <tr key={b.id} tabIndex={0}>
+                    <td className="font-mono text-xs">{b.pattern}</td>
+                    <td className="text-muted-foreground">{b.reason ?? "—"}</td>
+                    <td className="text-xs text-muted-foreground">
                       {new Date(b.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="text-right">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => removePattern(b)}
                         disabled={busy}
+                        aria-label={`Unblock ${b.pattern}`}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </td>
                   </tr>
                 ))}
+                {blocked.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="p-0">
+                      <EmptyState
+                        icon={Ban}
+                        title="No blocked patterns"
+                        description="Add a channel handle or keyword pattern above to block it from ever surfacing."
+                      />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </section>
+
+
 
         <section className="rounded-xl border bg-card p-4">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
