@@ -27,6 +27,11 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 
 vi.mock("@/components/ui/use-toast", () => ({ toast: vi.fn() }));
+vi.mock("@/components/SEO", () => ({ default: () => null, SEO: () => null }));
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({ user: { id: "u1", email: "test@example.com" }, loading: false }),
+}));
+vi.mock("@/components/Navbar", () => ({ default: () => <nav /> }));
 
 import MfaVerify from "@/pages/MfaVerify";
 

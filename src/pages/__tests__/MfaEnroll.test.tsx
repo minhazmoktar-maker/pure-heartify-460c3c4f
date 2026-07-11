@@ -35,6 +35,7 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 
 vi.mock("@/components/Navbar", () => ({ default: () => <nav /> }));
+vi.mock("@/components/SEO", () => ({ default: () => null, SEO: () => null }));
 vi.mock("@/components/ui/use-toast", () => ({ toast: vi.fn() }));
 
 // Component under test — imported *after* mocks are registered.
