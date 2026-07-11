@@ -86,8 +86,9 @@ const Dhikr = () => {
       const newTodayCompleted = s.todayCompleted + (justCompleted ? 1 : 0);
       let newStreak = s.streak;
       if (justCompleted && s.todayCompleted === 0) newStreak = s.streak + 1;
-      if (justCompleted && "vibrate" in navigator) {
-        try { (navigator as any).vibrate?.(30); } catch {}
+      if (justCompleted) {
+        // Lazy import to avoid cost on component mount
+        import("@/lib/celebrate").then((m) => m.celebrateSmall()).catch(() => {});
       }
       return {
         ...s,
