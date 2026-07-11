@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import SectionHeader from "@/components/SectionHeader";
 import EmptyState from "@/components/EmptyState";
+import StatCard from "@/components/StatCard";
 import { toast } from "sonner";
 
 type Entry = {
@@ -143,18 +144,9 @@ const Journal = () => {
 
         {/* Stats */}
         <div className="mb-6 grid grid-cols-3 gap-3">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <div className="font-heading text-2xl font-bold text-foreground">{stats.total}</div>
-            <div className="text-xs text-muted-foreground">Entries</div>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <div className="font-heading text-2xl font-bold text-foreground">{stats.days}</div>
-            <div className="text-xs text-muted-foreground">Days written</div>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <div className="font-heading text-2xl font-bold text-foreground">{stats.byType.gratitude}</div>
-            <div className="text-xs text-muted-foreground">Gratitude notes</div>
-          </div>
+          <StatCard label="Entries" value={stats.total} />
+          <StatCard label="Days written" value={stats.days} />
+          <StatCard label="Gratitude notes" value={stats.byType.gratitude} tone="primary" />
         </div>
 
         {/* Composer */}
