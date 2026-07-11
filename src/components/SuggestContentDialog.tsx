@@ -139,7 +139,15 @@ export default function SuggestContentDialog({ trigger }: Props) {
           </button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        className="max-w-lg"
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !submitting) {
+            e.preventDefault();
+            submit();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lightbulb className="h-4 w-4 text-primary" /> Suggest halal content
@@ -158,7 +166,7 @@ export default function SuggestContentDialog({ trigger }: Props) {
           <TabsContent value="video" className="mt-4 space-y-3">
             <div>
               <Label htmlFor="v-url">YouTube link or video id</Label>
-              <Input id="v-url" placeholder="https://youtu.be/…" value={vUrl} onChange={(e) => setVUrl(e.target.value)} />
+              <Input id="v-url" autoFocus placeholder="https://youtu.be/…" value={vUrl} onChange={(e) => setVUrl(e.target.value)} />
             </div>
             <div>
               <Label htmlFor="v-title">Title</Label>
@@ -190,7 +198,10 @@ export default function SuggestContentDialog({ trigger }: Props) {
           </TabsContent>
         </Tabs>
 
-        <DialogFooter className="mt-2">
+        <DialogFooter className="mt-2 sm:items-center">
+          <p className="mr-auto hidden text-[11px] text-muted-foreground sm:block">
+            Tip: press <kbd className="rounded border border-border bg-muted px-1">⌘</kbd>+<kbd className="rounded border border-border bg-muted px-1">Enter</kbd> to submit
+          </p>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>Cancel</Button>
           <Button onClick={submit} disabled={submitting}>
             {submitting ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="mr-1.5 h-3.5 w-3.5" />}
