@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { shareContent } from "@/lib/share";
 import EmptyState from "@/components/EmptyState";
+import PageSkeleton from "@/components/PageSkeleton";
 
 type Dua = {
   id: string;
