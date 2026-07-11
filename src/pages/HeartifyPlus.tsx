@@ -31,6 +31,9 @@ import { useEntitlement } from "@/hooks/useEntitlement";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlusWaitlist, type PreferredTier } from "@/hooks/usePlusWaitlist";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/contexts/LocaleContext";
+import { currencyForCountry, formatCurrency } from "@/lib/intl";
+
 
 interface Tier {
   id: PreferredTier | "free";
