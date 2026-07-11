@@ -7,6 +7,7 @@ import ReferralCard from "@/components/ReferralCard";
 import HandleClaimCard from "@/components/HandleClaimCard";
 import LanguageSettings from "@/components/LanguageSettings";
 import MfaStatusCard from "@/components/MfaStatusCard";
+import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
