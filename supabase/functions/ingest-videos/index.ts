@@ -594,7 +594,41 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
     console.error(`upsert failed ${res.status}: ${await res.text()}`);
     return 0;
   }
+  // Fire-and-forget: embed the newly-inserted videos so semantic recall works.
+  // Errors are logged inside embedNewVideos; never blocks ingest.
+  embedNewVideos(rows).catch((e) => console.warn("[embed] batch failed:", e));
   return rows.length;
+}
+
+// Embed a batch of newly ingested rows and store the vectors on curated_videos.
+async function embedNewVideos(rows: Record<string, unknown>[]) {
+  const { embedTexts, toPgVector } = await import("../_shared/embed.ts");
+  const items = rows
+    .map((r) => ({
+      video_id: String(r.video_id ?? ""),
+      text: `${r.title ?? ""}\n${r.channel_title ?? ""}\n${r.category ?? ""}`.trim(),
+    }))
+    .filter((r) => r.video_id && r.text.length > 0);
+  if (!items.length) return;
+  // OpenAI text-embedding-3-small caps at 300k tokens/req; batch of 100 is safe.
+  for (let i = 0; i < items.length; i += 100) {
+    const slice = items.slice(i, i + 100);
+    const vecs = await embedTexts(slice.map((s) => s.text));
+    if (!vecs) continue;
+    await Promise.all(
+      slice.map((s, idx) =>
+        sbFetch(`curated_videos?video_id=eq.${encodeURIComponent(s.video_id)}`, {
+          method: "PATCH",
+          headers: { "Prefer": "return=headers-only" },
+          body: JSON.stringify({
+            embedding: toPgVector(vecs[idx]),
+            embedding_model: "openai/text-embedding-3-small",
+            embedding_updated_at: new Date().toISOString(),
+          }),
+        }).catch(() => {}),
+      ),
+    );
+  }
 }
 
 async function logIngestion(query: string, sectionId: string | null, found: number, added: number, quota: number) {
