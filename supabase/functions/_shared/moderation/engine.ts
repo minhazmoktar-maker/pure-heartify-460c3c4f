@@ -92,8 +92,15 @@ export function decideState(
   risk: number,
   t: Thresholds,
   ruleHits: RuleHit[],
+  flags: string[] = [],
 ): PipelineOutcome["final_state"] {
   if (ruleHits.some((h) => h.severity === "hard")) return "blocked";
+  // Adversarial content — never reject silently, always escalate for a human.
+  if (flags.includes("prompt_injection_attempt")) return "human_review_required";
+  // AI produced unparseable / low-quality output — do NOT auto-reject; escalate.
+  if (flags.includes("parse_failed") || flags.includes("low_quality_reasoning")) {
+    return "human_review_required";
+  }
   if (confidence < t.reject_below_confidence) return "rejected";
   if (confidence >= t.auto_approve_min_confidence && risk <= t.auto_approve_max_risk) {
     return "auto_approved";
