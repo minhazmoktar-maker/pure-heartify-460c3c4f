@@ -214,6 +214,7 @@ const App = () => (
             <AdhanNotifier />
             <GatedPreviewGuard />
             <OfflineSweeper />
+            <BackToTop />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
