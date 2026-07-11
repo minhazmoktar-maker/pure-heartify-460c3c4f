@@ -12,6 +12,7 @@ import SEO from "@/components/SEO";
 import NextSalahWidget from "@/components/NextSalahWidget";
 import StreakCard from "@/components/StreakCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
+import StreakAtRiskBanner from "@/components/StreakAtRiskBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
@@ -70,9 +71,12 @@ const Index = () => {
       <NextSalahWidget />
 
       {user && (
-        <div className="mx-auto grid max-w-[1800px] gap-3 px-4 pt-2 md:grid-cols-2 md:px-6">
-          <StreakCard />
-          <WeeklyRecapCard />
+        <div className="mx-auto max-w-[1800px] space-y-3 px-4 pt-2 md:px-6">
+          <StreakAtRiskBanner />
+          <div className="grid gap-3 md:grid-cols-2">
+            <StreakCard />
+            <WeeklyRecapCard />
+          </div>
         </div>
       )}
 
