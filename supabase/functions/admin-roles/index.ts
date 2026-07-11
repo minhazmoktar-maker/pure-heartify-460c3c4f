@@ -15,6 +15,8 @@
  */
 
 import { authorize, CORS_HEADERS } from "../_shared/authz.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
