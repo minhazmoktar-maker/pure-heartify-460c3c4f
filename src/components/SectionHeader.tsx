@@ -52,7 +52,9 @@ export default function SectionHeader({
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
-      {showAction && (
+      {actions ? (
+        <div className="shrink-0">{actions}</div>
+      ) : showAction && (
         actionTo ? (
           <Button
             asChild
