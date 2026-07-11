@@ -445,11 +445,13 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         // signed-URL layer for entitled sessions. This surface just gives
         // browsing users an audition before the paywall.
         previewCapRef.current = PREVIEW_SECONDS;
+        setIsPreview(true);
         toast("30-second preview", {
           description: `Sampling "${track.title}" — upgrade to hear the full recitation.`,
         });
       } else {
         previewCapRef.current = null;
+        setIsPreview(false);
       }
       // iOS: warm up the element inside the user gesture. Setting src + calling
       // play() synchronously is what earns the media element its autoplay
