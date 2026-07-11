@@ -5,10 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Flag, Gift, BookOpen } from "lucide-react";
+import { Flag, Gift, BookOpen, ToggleLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { invalidateFeatureFlags } from "@/hooks/useFeatureFlag";
 import { toast } from "sonner";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 
 interface Flag {
   key: string;
