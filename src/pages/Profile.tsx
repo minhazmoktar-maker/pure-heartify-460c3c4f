@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle, Download } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
 import ReferralCard from "@/components/ReferralCard";
