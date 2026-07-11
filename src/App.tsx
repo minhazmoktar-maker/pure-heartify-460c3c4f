@@ -211,6 +211,7 @@ const App = () => (
             <ReferralBridge />
             <AdhanNotifier />
             <GatedPreviewGuard />
+            <OfflineSweeper />
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route path="/" element={<Index />} />
