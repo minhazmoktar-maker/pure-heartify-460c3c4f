@@ -107,15 +107,15 @@ export default function PublicDuaPage() {
       />
       <main className="container mx-auto max-w-xl px-4 py-16">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
+          <PageSkeleton variant="detail" />
         ) : notFound || !dua ? (
-          <Card className="p-8 text-center space-y-4">
-            <h1 className="text-lg font-semibold">Du'a not found</h1>
-            <p className="text-sm text-muted-foreground">It may have been removed. Explore the community wall instead.</p>
-            <Button asChild><Link to="/dua-wall">Open Du'a Wall</Link></Button>
-          </Card>
+          <EmptyState
+            icon={MessageCircleOff}
+            title="Du'a not found"
+            description="This du'a may have been removed by its author. Open the community wall to add your Āmīn to other supplications."
+            actionLabel="Open Du'a Wall"
+            actionHref="/dua-wall"
+          />
         ) : (
           <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
             <CardContent className="space-y-6 py-8">
