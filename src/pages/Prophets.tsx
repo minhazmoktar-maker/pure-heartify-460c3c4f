@@ -96,21 +96,19 @@ const Prophets = () => {
       </Helmet>
 
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-              <Users className="h-7 w-7 text-primary" />
-              Stories of the Prophets
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              The 25 prophets named in the Qur'an — their people, mission, and enduring lesson for us.
-            </p>
-          </div>
-          <Button variant="outline" size="sm" onClick={reset} className="shrink-0">
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Reset
-          </Button>
-        </div>
+        <SectionHeader
+          title="Stories of the Prophets"
+          description="The 25 prophets named in the Qur'an — their people, mission, and enduring lesson for us."
+          icon={Users}
+          className="mb-6"
+          actions={
+            <Button variant="outline" size="sm" onClick={reset}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Reset
+            </Button>
+          }
+        />
+
 
         <Card className="mb-6">
           <CardContent className="pt-6">
