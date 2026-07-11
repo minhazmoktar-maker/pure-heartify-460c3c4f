@@ -74,9 +74,13 @@ export function formatHijri(
   }
 }
 
-export function formatList(items: string[], locale: string, options?: Intl.ListFormatOptions) {
-  return cached<Intl.ListFormat>(
-    Intl.ListFormat,
+export function formatList(items: string[], locale: string, options?: object) {
+  // Intl.ListFormat requires lib.es2021+; guard for older TS lib targets.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const LF: any = (Intl as any).ListFormat;
+  if (!LF) return items.join(", ");
+  return cached<{ format: (v: string[]) => string }>(
+    LF,
     JSON.stringify(options ?? {}),
     locale,
     options,
