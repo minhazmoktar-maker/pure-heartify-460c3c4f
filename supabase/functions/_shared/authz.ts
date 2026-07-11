@@ -120,9 +120,27 @@ export interface AuthorizeSuccess {
  * Verifies auth + role + permission for an edge function request.
  * Returns a Response (401/403) on denial, or a principal on success.
  */
+export interface AuthorizeOptions {
+  /** Require AAL2 (MFA-verified session). Denies with 403 mfa_required otherwise. */
+  requireAal2?: boolean;
+}
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const part = token.split(".")[1];
+    if (!part) return null;
+    const b64 = part.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
+    return JSON.parse(atob(padded));
+  } catch {
+    return null;
+  }
+}
+
 export async function authorize(
   req: Request,
   permission: Permission,
+  options: AuthorizeOptions = {},
 ): Promise<Response | AuthorizeSuccess> {
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -137,6 +155,17 @@ export async function authorize(
   if (!userRes.ok) return deny(401, "unauthorized");
   const user = await userRes.json();
   if (!user?.id) return deny(401, "unauthorized");
+
+  if (options.requireAal2) {
+    const claims = decodeJwtPayload(auth.slice(7));
+    const aal = (claims?.aal as string | undefined) ?? "aal1";
+    if (aal !== "aal2") {
+      return new Response(
+        JSON.stringify({ error: "mfa_required", message: "AAL2 session required for this action" }),
+        { status: 403, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } },
+      );
+    }
+  }
 
   const svc = {
     apikey: SERVICE_KEY,
