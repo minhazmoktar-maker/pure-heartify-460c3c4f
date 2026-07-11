@@ -86,7 +86,7 @@ export function StreakCard() {
           </p>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold text-foreground tabular-nums">{s.current}</div>
+          <div className={`text-3xl font-bold text-foreground tabular-nums ${celebrate ? "animate-milestone-pop text-primary" : ""}`}>{s.current}</div>
           <div className="text-xs text-muted-foreground">longest: {s.longest}</div>
         </div>
       </div>
