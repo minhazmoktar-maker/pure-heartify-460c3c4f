@@ -28,6 +28,7 @@ import { formatDistanceToNow } from "date-fns";
 import SEO from "@/components/SEO";
 import EmptyState from "@/components/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type ReportRow = {
   id: string;
@@ -95,6 +96,7 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
   const [actions, setActions] = useState<ActionRow[]>([]);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState<null | { kind: "remove" | "ban"; report: ReportRow }>(null);
 
   const load = async () => {
     setLoading(true);
