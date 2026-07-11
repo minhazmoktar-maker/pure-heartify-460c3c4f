@@ -17,6 +17,8 @@
  */
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { authorize } from "../_shared/authz.ts";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   defaultPipeline, loadThresholds, persistDecision, runPipeline,
   type VideoContext,
