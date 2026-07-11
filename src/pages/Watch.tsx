@@ -16,6 +16,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useCompleteDoseVideo } from "@/hooks/useDailyDose";
 import { growth } from "@/lib/growthEvents";
 import { triggerIfDelightful } from "@/lib/inAppReview";
+import { celebrateSmall, celebrateBig, celebrateMilestone } from "@/lib/celebrate";
 import { toast } from "sonner";
 
 const Watch = () => {
@@ -98,13 +99,18 @@ const Watch = () => {
                   // Fire the RPC that also handles freezes, milestones, badges, and
                   // in-app notifications. Idempotent per user/day.
                   void supabase.rpc("record_streak_activity");
+                  // Small confetti + haptic on every dose video completion
+                  celebrateSmall();
                   if (res?.justCompleted) {
+                    // Big celebration when the whole day's dose is done
+                    celebrateBig();
                     toast.success("Alhamdulillah 🌿 Daily Dose complete", {
                       description: `Streak: ${res.streak?.current_streak ?? 1} day${(res.streak?.current_streak ?? 1) === 1 ? "" : "s"}`,
                       duration: 6000,
                     });
                   }
                   if (res?.milestone) {
+                    celebrateMilestone(res.milestone);
                     toast(`🌟 ${res.milestone}-day milestone reached!`, {
                       description: "Keep going — small daily steps, big transformation.",
                       duration: 8000,

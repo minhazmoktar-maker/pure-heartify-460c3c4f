@@ -20,6 +20,7 @@ import AdhanNotifier from "./components/AdhanNotifier";
 import OfflineSweeper from "./components/OfflineSweeper";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AdminRoute from "./components/AdminRoute";
+import RouteTransition from "./components/RouteTransition";
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
@@ -213,6 +214,7 @@ const App = () => (
             <GatedPreviewGuard />
             <OfflineSweeper />
             <Suspense fallback={<RouteFallback />}>
+              <RouteTransition>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
@@ -684,6 +686,7 @@ const App = () => (
                 <Route path="/zuhd" element={<Navigate to="/library/zuhd" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </RouteTransition>
             </Suspense>
           </BrowserRouter>
         </PlayerProvider>
