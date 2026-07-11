@@ -3,7 +3,12 @@
  *
  * MIRROR of the client-side permission matrix in `src/lib/permissions.ts`.
  * When adding a new permission or changing role membership, update BOTH
- * files. A regression test in the frontend verifies matrix consistency.
+ * files. Parity is enforced by the vitest suite
+ * `src/lib/__tests__/authz-parity.test.ts` — any drift breaks the build.
+ *
+ * Role resolution: `authorize()` fetches `platform_owners` and
+ * `user_roles?role=in.(admin,moderator)` in parallel and picks the highest
+ * rank (`owner > admin > moderator > user`). Fails closed to `user`.
  *
  * Usage inside an edge function:
  *
