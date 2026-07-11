@@ -113,4 +113,9 @@
   .shadow-card-hover {
     box-shadow: 0 8px 30px -4px hsl(var(--primary) / 0.15), 0 2px 6px hsl(var(--primary) / 0.06);
   }
+
+  /* Canonical interactive card motion — apply to any grid card that navigates or triggers an action. */
+  .card-interactive {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover focus-visible:-translate-y-0.5 focus-visible:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:translate-y-0 active:scale-[0.99];
+  }
 }
