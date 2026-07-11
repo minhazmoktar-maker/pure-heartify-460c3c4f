@@ -4,15 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "@/components/ui/use-toast";
-import { CheckCircle2, XCircle, AlertTriangle, Eye, Search } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Eye, Search, Inbox, Flag, Film, ScrollText } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Candidate = {
@@ -231,17 +231,20 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsList>
 
           <TabsContent value="pending" className="space-y-2">
-            {pending.length === 0 && <p className="text-sm text-muted-foreground p-4">No pending candidates.</p>}
+            {pending.length === 0 && (
+              <EmptyState icon={Inbox} tone="muted" title="No pending candidates"
+                description="Every submitted channel has been triaged. Submit new channel IDs above to start another verification pass." />
+            )}
             {pending.map((c) => (
               <Card key={c.id}>
                 <CardContent className="p-4 flex items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{c.title}</h3>
-                      <Badge variant="outline">conf {c.confidence ?? "?"}</Badge>
-                      <Badge variant={c.duplicate_risk === "low" ? "outline" : "destructive"}>
+                      <span className="heartify-chip heartify-chip--muted">conf {c.confidence ?? "?"}</span>
+                      <span className={`heartify-chip ${c.duplicate_risk === "low" ? "heartify-chip--muted" : "heartify-chip--danger"}`}>
                         dup: {c.duplicate_risk ?? "?"}
-                      </Badge>
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground">{c.youtube_channel_id} · {c.category ?? "uncategorized"}</p>
                     {c.evidence?.exclusion_hits?.length > 0 && (
@@ -261,6 +264,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
               </Card>
             ))}
           </TabsContent>
+
 
           <TabsContent value="compare">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -294,7 +298,10 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsContent>
 
           <TabsContent value="flagged" className="space-y-2">
-            {flaggedCh.length === 0 && <p className="text-sm text-muted-foreground p-4">No flagged channels.</p>}
+            {flaggedCh.length === 0 && (
+              <EmptyState icon={Flag} tone="muted" title="No flagged channels"
+                description="Automated rechecks haven't surfaced any regressions. Run a recheck to re-scan approved channels immediately." />
+            )}
             {flaggedCh.map((c) => (
               <Card key={c.id}>
                 <CardContent className="p-4 flex items-center justify-between">
@@ -331,7 +338,10 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsContent>
 
           <TabsContent value="videos" className="space-y-2">
-            {videoCandidates.length === 0 && <p className="text-sm text-muted-foreground p-4">No video candidates.</p>}
+            {videoCandidates.length === 0 && (
+              <EmptyState icon={Film} tone="muted" title="No video candidates"
+                description="User-suggested videos and pipeline uploads will appear here for triage." />
+            )}
             {videoCandidates.map((v) => (
               <Card key={v.id}>
                 <CardContent className="p-4 flex items-center justify-between">
@@ -346,12 +356,19 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsContent>
 
           <TabsContent value="audit" className="space-y-2 max-h-[600px] overflow-auto">
+            {audit.length === 0 && (
+              <EmptyState icon={ScrollText} tone="muted" title="No audit events yet"
+                description="Approvals, rejections and rechecks will be logged here for full traceability." />
+            )}
             {audit.map((r) => (
               <div key={r.id} className="flex items-center justify-between text-sm p-2 border-b">
-                <div>
-                  <Badge variant={r.action === "approved" ? "default" : r.action === "rejected" ? "destructive" : "outline"}>
-                    {r.action}
-                  </Badge>{" "}
+                <div className="flex items-center gap-2">
+                  <span className={`heartify-chip ${
+                    r.action === "approved" ? "heartify-chip--primary"
+                    : r.action === "rejected" ? "heartify-chip--danger"
+                    : r.action === "removed" ? "heartify-chip--warning"
+                    : "heartify-chip--muted"
+                  }`}>{r.action}</span>
                   <span className="font-mono text-xs">{r.youtube_channel_id}</span>
                 </div>
                 <div className="text-xs text-muted-foreground flex items-center gap-2">
@@ -361,6 +378,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
               </div>
             ))}
           </TabsContent>
+
         </Tabs>
       </div>
 

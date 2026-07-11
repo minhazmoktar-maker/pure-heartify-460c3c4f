@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -80,11 +80,11 @@ const REASON_LABEL: Record<string, string> = {
   other: "Other",
 };
 
-function severityColor(s: string) {
-  if (s === "critical") return "bg-destructive text-destructive-foreground";
-  if (s === "high") return "bg-orange-500/90 text-white";
-  if (s === "low") return "bg-muted text-muted-foreground";
-  return "bg-secondary text-secondary-foreground";
+function severityChip(s: string) {
+  if (s === "critical") return "heartify-chip heartify-chip--danger";
+  if (s === "high") return "heartify-chip heartify-chip--warning";
+  if (s === "low") return "heartify-chip heartify-chip--muted";
+  return "heartify-chip heartify-chip--primary";
 }
 
 export default function AdminReports({ embedded = false }: { embedded?: boolean } = {}) {
@@ -292,9 +292,9 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <Badge className={severityColor(r.severity)}>{r.severity}</Badge>
-                            <Badge variant="outline">{REASON_LABEL[r.reason] ?? r.reason}</Badge>
-                            {r.notify_reporter && <Badge variant="secondary" className="gap-1"><MessageSquare className="h-3 w-3" /> notify</Badge>}
+                            <span className={severityChip(r.severity)}>{r.severity}</span>
+                            <span className="heartify-chip heartify-chip--muted">{REASON_LABEL[r.reason] ?? r.reason}</span>
+                            {r.notify_reporter && <span className="heartify-chip heartify-chip--primary gap-1"><MessageSquare className="h-3 w-3" /> notify</span>}
                           </div>
                           <div className="mt-2 truncate text-sm font-medium">
                             {r.video_title ?? r.channel_title ?? r.video_id ?? r.channel_id ?? "(untitled)"}
