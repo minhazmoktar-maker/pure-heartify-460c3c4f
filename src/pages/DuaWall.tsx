@@ -141,7 +141,7 @@ export default function DuaWall() {
         </Card>
 
         {loading ? (
-          <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          <PageSkeleton variant="list" className="max-w-none px-0" />
         ) : duas.length === 0 ? (
           <EmptyState icon={Heart} title="No du'as yet" description="Be the first to share a du'a and let the ummah say āmīn." />
         ) : (
