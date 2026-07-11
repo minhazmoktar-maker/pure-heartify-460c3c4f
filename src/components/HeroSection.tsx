@@ -1,6 +1,6 @@
-import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
+import FadeIn from "@/components/FadeIn";
 
 const HeroSection = () => {
   return (
@@ -20,12 +20,7 @@ const HeroSection = () => {
       </div>
 
       <div className="relative mx-auto max-w-[1800px] px-4 py-14 md:px-6 md:py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="max-w-2xl"
-        >
+        <FadeIn y={30} duration={0.7} className="max-w-2xl">
           <span className="inline-block rounded-full bg-gold/20 px-3 py-1 text-xs font-semibold text-gold">
             ✦ 100% Halal · Zero music · Zero women on camera
           </span>
@@ -58,7 +53,7 @@ const HeroSection = () => {
             <Play className="h-4 w-4" />
             Start Watching
           </button>
-        </motion.div>
+        </FadeIn>
       </div>
     </section>
   );
