@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Target, CalendarDays, TrendingUp, Plus, Minus, RotateCcw, Trash2 } from "lucide-react";
+import { BookOpen, Target, CalendarDays, TrendingUp, Plus, Minus, RotateCcw, Trash2, History } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import EmptyState from "@/components/EmptyState";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "heartify.khatm.v1";
