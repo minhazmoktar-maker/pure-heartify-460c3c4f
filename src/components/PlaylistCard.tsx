@@ -1,5 +1,6 @@
 import { Crown, Lock, Play } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
+import SmartImage from "@/components/SmartImage";
 import type { Playlist } from "@/data/audio";
 import { tracks as allTracks } from "@/data/audio";
 import { usePlayer } from "@/contexts/PlayerContext";
