@@ -59,15 +59,13 @@ export default function HadithLibrary() {
       />
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-        <header className="mb-6">
-          <h1 className="flex items-center gap-2 text-3xl font-bold">
-            <BookText className="h-7 w-7 text-primary" />
-            Hadith Library
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            The Six Books, 40 Nawawi, and 40 Qudsi — English translation with Arabic source.
-          </p>
-        </header>
+        <SectionHeader
+          title="Hadith Library"
+          description="The Six Books, 40 Nawawi, and 40 Qudsi — English translation with Arabic source."
+          icon={BookText}
+          className="mb-6"
+        />
+
 
         <Card className="mb-6">
           <CardContent className="grid gap-3 p-4 sm:grid-cols-[1fr_auto_auto]">
