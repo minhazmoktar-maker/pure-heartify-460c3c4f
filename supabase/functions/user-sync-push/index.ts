@@ -62,6 +62,16 @@ Deno.serve(async (req) => {
   const userId = userData.user?.id;
   if (!userId) return new Response(JSON.stringify({ error: "invalid token" }), { status: 401, headers: corsHeaders });
 
+  // Sync-push is bursty on session start, so allow generous per-user cap
+  // but block runaway/replay loops: 60 pushes/min.
+  const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const limited = await enforceRateLimit(admin, {
+    identity: userId, action: "user-sync-push", limit: 60, windowSeconds: 60,
+  });
+  if (limited) return new Response(JSON.stringify({ error: "rate_limited" }), {
+    status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+
   const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return new Response(JSON.stringify({ error: parsed.error.flatten() }), {
