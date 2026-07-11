@@ -257,8 +257,15 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
       </div>
 
       {isLoading && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Loading surah…
+        <div className="space-y-3" role="status" aria-label="Loading surah">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="rounded-lg border border-border bg-card p-4">
+              <Skeleton className="ml-auto h-6 w-3/4" />
+              <Skeleton className="ml-auto mt-3 h-4 w-1/2" />
+              <Skeleton className="mt-2 h-3 w-2/3" />
+            </div>
+          ))}
+          <span className="sr-only">Loading surah…</span>
         </div>
       )}
       {err && (
