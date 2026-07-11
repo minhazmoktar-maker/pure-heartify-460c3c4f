@@ -5,10 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Crown, ShieldOff, Search, ArrowLeft, AlertTriangle } from "lucide-react";
 import SEO from "@/components/SEO";
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface Row {
   id: string;
@@ -313,60 +310,55 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
       </div>
 
       {/* Grant confirmation */}
-      <AlertDialog open={grantConfirmOpen} onOpenChange={setGrantConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {existingForTarget ? "Update this entitlement?" : "Grant this entitlement?"}
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-2 text-sm">
-                <div><span className="text-muted-foreground">User:</span> <span className="font-mono">{targetId.trim()}</span></div>
-                <div><span className="text-muted-foreground">Plan:</span> <span className="font-semibold">{plan}</span></div>
-                <div>
-                  <span className="text-muted-foreground">Expires:</span>{" "}
-                  {plan === "premium_lifetime" || !expiresAt ? "never" : new Date(expiresAt).toLocaleString()}
-                </div>
-                {existingForTarget && (
-                  <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-2 text-xs">
-                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-                    <span>
-                      This overwrites the existing <strong>{existingForTarget.plan}</strong> entitlement
-                      {existingForTarget.expires_at
-                        ? ` (previously expiring ${new Date(existingForTarget.expires_at).toLocaleString()})`
-                        : " (previously with no expiry)"}.
-                    </span>
-                  </div>
-                )}
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={grant}>Confirm</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={grantConfirmOpen}
+        onOpenChange={setGrantConfirmOpen}
+        title={existingForTarget ? "Update this entitlement?" : "Grant this entitlement?"}
+        description="This will be written to privileged_actions_log."
+        confirmLabel={existingForTarget ? "Update" : "Grant"}
+        tone={existingForTarget ? "destructive" : "default"}
+        loading={busy === "grant"}
+        onConfirm={grant}
+      >
+        <div className="space-y-2">
+          <div><span className="text-muted-foreground">User:</span> <span className="font-mono">{targetId.trim()}</span></div>
+          <div><span className="text-muted-foreground">Plan:</span> <span className="font-semibold">{plan}</span></div>
+          <div>
+            <span className="text-muted-foreground">Expires:</span>{" "}
+            {plan === "premium_lifetime" || !expiresAt ? "never" : new Date(expiresAt).toLocaleString()}
+          </div>
+          {existingForTarget && (
+            <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-2 text-xs">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+              <span>
+                This overwrites the existing <strong>{existingForTarget.plan}</strong> entitlement
+                {existingForTarget.expires_at
+                  ? ` (previously expiring ${new Date(existingForTarget.expires_at).toLocaleString()})`
+                  : " (previously with no expiry)"}.
+              </span>
+            </div>
+          )}
+        </div>
+      </ConfirmDialog>
 
       {/* Revoke confirmation */}
-      <AlertDialog open={!!revokeTarget} onOpenChange={(o) => !o && setRevokeTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Revoke premium?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This immediately downgrades <strong>{revokeTarget?.display_name ?? revokeTarget?.user_id}</strong> to
-              the free plan. They will lose access to premium-only content on their next request. The action is
-              logged to <code>privileged_actions_log</code>.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={revoke} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Revoke
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={!!revokeTarget}
+        onOpenChange={(o) => !o && setRevokeTarget(null)}
+        tone="destructive"
+        title="Revoke premium?"
+        description={
+          <>
+            This immediately downgrades{" "}
+            <strong className="text-foreground">{revokeTarget?.display_name ?? revokeTarget?.user_id}</strong>{" "}
+            to the free plan. They will lose access to premium-only content on their next request. The action is
+            logged to <code>privileged_actions_log</code>.
+          </>
+        }
+        confirmLabel="Revoke"
+        loading={busy === revokeTarget?.user_id}
+        onConfirm={revoke}
+      />
     </div>
   );
 }

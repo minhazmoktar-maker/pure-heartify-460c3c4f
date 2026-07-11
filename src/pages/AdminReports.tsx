@@ -28,6 +28,7 @@ import { formatDistanceToNow } from "date-fns";
 import SEO from "@/components/SEO";
 import EmptyState from "@/components/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type ReportRow = {
   id: string;
@@ -95,6 +96,7 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
   const [actions, setActions] = useState<ActionRow[]>([]);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [confirm, setConfirm] = useState<null | { kind: "remove" | "ban"; report: ReportRow }>(null);
 
   const load = async () => {
     setLoading(true);
@@ -383,13 +385,13 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                   </Button>
                   <Button
                     variant="destructive" size="sm" disabled={!!busy || !selected.video_id}
-                    onClick={() => removeVideo(selected)}
+                    onClick={() => setConfirm({ kind: "remove", report: selected })}
                   >
                     <Trash2 className="mr-1 h-4 w-4" /> Remove video
                   </Button>
                   <Button
                     variant="destructive" size="sm" disabled={!!busy}
-                    onClick={() => banChannel(selected)}
+                    onClick={() => setConfirm({ kind: "ban", report: selected })}
                     className="col-span-2"
                   >
                     <Ban className="mr-1 h-4 w-4" /> Ban channel
@@ -435,6 +437,39 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
           )}
         </SheetContent>
       </Sheet>
+
+      <ConfirmDialog
+        open={!!confirm}
+        onOpenChange={(o) => !o && setConfirm(null)}
+        tone="destructive"
+        loading={!!busy}
+        title={confirm?.kind === "remove" ? "Remove this video?" : "Ban this channel?"}
+        description={
+          confirm?.kind === "remove" ? (
+            <>
+              This soft-removes <strong className="text-foreground">
+                {confirm.report.video_title ?? confirm.report.video_id}
+              </strong> from Heartify and deletes any curation row. Reversible via the removed-videos table.
+            </>
+          ) : (
+            <>
+              This bans <strong className="text-foreground">
+                {confirm?.report.channel_title ?? confirm?.report.channel_id}
+              </strong> from the platform and blocks the creator pattern from future imports.
+            </>
+          )
+        }
+        confirmLabel={confirm?.kind === "remove" ? "Remove video" : "Ban channel"}
+        onConfirm={async () => {
+          if (!confirm) return;
+          try {
+            if (confirm.kind === "remove") await removeVideo(confirm.report);
+            else await banChannel(confirm.report);
+          } finally {
+            setConfirm(null);
+          }
+        }}
+      />
     </div>
   );
 }

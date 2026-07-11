@@ -13,6 +13,7 @@ import { toast } from "@/components/ui/use-toast";
 import { CheckCircle2, XCircle, AlertTriangle, Eye, Search } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import SEO from "@/components/SEO";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Candidate = {
   id: string;
@@ -62,6 +63,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [drawer, setDrawer] = useState<Candidate | AuditRow | null>(null);
   const [newChannelId, setNewChannelId] = useState("");
   const [busy, setBusy] = useState(false);
+  const [rejectTarget, setRejectTarget] = useState<Candidate | null>(null);
 
   const reload = async () => {
     const [c, a, l, v] = await Promise.all([
@@ -251,7 +253,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                     <Button size="sm" onClick={() => decide(c, "approved", "Manual approval")} disabled={busy}>
                       <CheckCircle2 className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => decide(c, "rejected", "Manual rejection")} disabled={busy}>
+                    <Button size="sm" variant="destructive" onClick={() => setRejectTarget(c)} disabled={busy} aria-label={`Reject ${c.title}`}>
                       <XCircle className="h-4 w-4" />
                     </Button>
                   </div>
@@ -372,6 +374,27 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           )}
         </SheetContent>
       </Sheet>
+
+      <ConfirmDialog
+        open={!!rejectTarget}
+        onOpenChange={(o) => !o && setRejectTarget(null)}
+        tone="destructive"
+        loading={busy}
+        title="Reject this candidate?"
+        description={
+          <>
+            This marks <strong className="text-foreground">{rejectTarget?.title}</strong> as rejected and writes to
+            the audit log. Approval will require re-submitting the channel through the verifier.
+          </>
+        }
+        confirmLabel="Reject"
+        onConfirm={async () => {
+          if (!rejectTarget) return;
+          const t = rejectTarget;
+          setRejectTarget(null);
+          await decide(t, "rejected", "Manual rejection");
+        }}
+      />
     </div>
   );
 };
