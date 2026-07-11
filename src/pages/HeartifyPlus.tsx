@@ -52,8 +52,9 @@ const TIERS: Tier[] = [
     id: "free",
     name: "Heartify",
     tagline: "Everything you need to stay steadfast, forever free.",
-    price: "$0",
+    priceUsd: 0,
     period: "always",
+    periodShort: "always",
     cta: "Continue with Free",
     icon: Heart,
     bullets: [
@@ -68,8 +69,9 @@ const TIERS: Tier[] = [
     id: "plus",
     name: "Heartify+",
     tagline: "For the seeker who wants depth without limits.",
-    price: "$4.99",
+    priceUsd: 4.99,
     period: "per month",
+    periodShort: "mo",
     highlight: true,
     cta: "Join the Heartify+ waitlist",
     icon: Sparkles,
@@ -87,8 +89,9 @@ const TIERS: Tier[] = [
     id: "family",
     name: "Heartify+ Family",
     tagline: "One barakah for the whole household.",
-    price: "$8.99",
+    priceUsd: 8.99,
     period: "per month · up to 6 seats",
+    periodShort: "mo",
     cta: "Join the Family waitlist",
     icon: Users,
     bullets: [
@@ -103,8 +106,9 @@ const TIERS: Tier[] = [
     id: "lifetime",
     name: "Heartify+ Lifetime",
     tagline: "One sadaqah jāriyah, forever access.",
-    price: "$149",
+    priceUsd: 149,
     period: "one‑time · counts as sadaqah",
+    periodShort: "one‑time",
     cta: "Reserve Lifetime access",
     icon: Crown,
     bullets: [
@@ -115,6 +119,7 @@ const TIERS: Tier[] = [
     ],
   },
 ];
+
 
 const COMPARISON: {
   section: string;
