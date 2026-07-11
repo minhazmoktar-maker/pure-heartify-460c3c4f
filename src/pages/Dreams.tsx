@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 
 type DreamKind = "good" | "bad" | "neutral";
 type Dream = {
@@ -206,9 +207,12 @@ export default function Dreams() {
             </div>
 
             {filtered.length === 0 ? (
-              <Card className="p-6 text-center text-sm text-muted-foreground">
-                No dreams yet. Log one above.
-              </Card>
+              <EmptyState
+                icon={Moon}
+                title="No dreams yet"
+                description="Log a dream above to start noticing patterns and remembrance triggers."
+              />
+
             ) : (
               <div className="space-y-2">
                 {filtered.map((d) => (
