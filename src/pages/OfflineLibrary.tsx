@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/EmptyState";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import {
   listOfflineMeta,
