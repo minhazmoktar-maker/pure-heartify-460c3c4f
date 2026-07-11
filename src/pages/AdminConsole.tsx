@@ -5,8 +5,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, Ban, Plus, Trash2, Sparkles, History } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+
+const overrideTone = (action: string): string => {
+  const a = action.toLowerCase();
+  if (a.includes("delete") || a.includes("remove") || a.includes("ban") || a.includes("reject") || a.includes("revoke")) return "danger";
+  if (a.includes("grant") || a.includes("approve") || a.includes("allow") || a.includes("unblock")) return "primary";
+  if (a.includes("block") || a.includes("flag") || a.includes("warn")) return "warning";
+  if (a.includes("promote") || a.includes("owner") || a.includes("admin")) return "gold";
+  return "muted";
+};
 import { toast } from "@/components/ui/use-toast";
 import { track } from "@/lib/analytics";
 import { useRequireAdminMfa } from "@/hooks/useRequireAdminMfa";
