@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 export function StreakCard() {
   const s = useStreak();
   const [handle, setHandle] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
+  const MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
 
   useEffect(() => {
     let mounted = true;
