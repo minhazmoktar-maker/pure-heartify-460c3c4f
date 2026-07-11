@@ -35,7 +35,7 @@ const Navbar = () => {
             <SheetTrigger asChild>
               <button
                 aria-label="Open navigation menu"
-                className="rounded-lg p-2 hover:bg-secondary transition-colors"
+                className="tap-target rounded-lg hover:bg-secondary transition-colors"
               >
                 <Menu className="h-5 w-5 text-foreground" />
               </button>
@@ -151,7 +151,7 @@ const Navbar = () => {
           <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="rounded-full p-2 hover:bg-secondary transition-colors"
+            className="tap-target rounded-full hover:bg-secondary transition-colors"
             title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
             {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
@@ -164,7 +164,7 @@ const Navbar = () => {
               <button
                 onClick={signOut}
                 aria-label="Sign out"
-                className="rounded-full p-2 hover:bg-secondary transition-colors"
+                className="tap-target rounded-full hover:bg-secondary transition-colors"
                 title="Sign out"
               >
                 <LogOut className="h-5 w-5 text-foreground" />
