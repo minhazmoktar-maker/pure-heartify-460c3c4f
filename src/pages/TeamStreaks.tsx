@@ -140,8 +140,17 @@ export default function TeamStreaks() {
         <section className="space-y-3">
           <h2 className="font-semibold text-foreground">Your teams</h2>
           {loading ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            <div className="space-y-3" aria-label="Loading your teams" role="status">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Card key={i} className="flex items-center gap-3 p-4">
+                  <Skeleton className="h-10 w-10 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                  <Skeleton className="h-8 w-16 rounded-md" />
+                </Card>
+              ))}
             </div>
           ) : teams.length === 0 ? (
             <Card className="p-8 text-center text-sm text-muted-foreground">
