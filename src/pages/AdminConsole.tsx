@@ -5,8 +5,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, Ban, Plus, Trash2, Sparkles, History } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+
+const overrideTone = (action: string): string => {
+  const a = action.toLowerCase();
+  if (a.includes("delete") || a.includes("remove") || a.includes("ban") || a.includes("reject") || a.includes("revoke")) return "danger";
+  if (a.includes("grant") || a.includes("approve") || a.includes("allow") || a.includes("unblock")) return "primary";
+  if (a.includes("block") || a.includes("flag") || a.includes("warn")) return "warning";
+  if (a.includes("promote") || a.includes("owner") || a.includes("admin")) return "gold";
+  return "muted";
+};
 import { toast } from "@/components/ui/use-toast";
 import { track } from "@/lib/analytics";
 import { useRequireAdminMfa } from "@/hooks/useRequireAdminMfa";
@@ -200,76 +209,97 @@ const AdminConsole = () => {
           </div>
 
           <div className="max-h-[420px] overflow-y-auto rounded-lg border">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-muted/60 text-left">
+            <table className="heartify-table w-full text-sm">
+              <thead>
                 <tr>
-                  <th className="px-3 py-2">Pattern</th>
-                  <th className="px-3 py-2">Reason</th>
-                  <th className="px-3 py-2">Added</th>
-                  <th className="px-3 py-2"></th>
+                  <th>Pattern</th>
+                  <th>Reason</th>
+                  <th>Added</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {blocked.map((b) => (
-                  <tr key={b.id} className="border-t">
-                    <td className="px-3 py-2 font-mono text-xs">{b.pattern}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{b.reason ?? "—"}</td>
-                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                  <tr key={b.id} tabIndex={0}>
+                    <td className="font-mono text-xs">{b.pattern}</td>
+                    <td className="text-muted-foreground">{b.reason ?? "—"}</td>
+                    <td className="text-xs text-muted-foreground">
                       {new Date(b.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-3 py-2 text-right">
+                    <td className="text-right">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => removePattern(b)}
                         disabled={busy}
+                        aria-label={`Unblock ${b.pattern}`}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </td>
                   </tr>
                 ))}
+                {blocked.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="p-0">
+                      <EmptyState
+                        icon={Ban}
+                        title="No blocked patterns"
+                        description="Add a channel handle or keyword pattern above to block it from ever surfacing."
+                      />
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </section>
+
+
 
         <section className="rounded-xl border bg-card p-4">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
             <History className="h-5 w-5 text-primary" /> Audit trail ({overrides.length})
           </h2>
           <div className="max-h-[420px] overflow-y-auto rounded-lg border">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-muted/60 text-left">
+            <table className="heartify-table w-full text-sm">
+              <thead>
                 <tr>
-                  <th className="px-3 py-2">When</th>
-                  <th className="px-3 py-2">Action</th>
-                  <th className="px-3 py-2">Target</th>
-                  <th className="px-3 py-2">Reason</th>
+                  <th>When</th>
+                  <th>Action</th>
+                  <th>Target</th>
+                  <th>Reason</th>
                 </tr>
               </thead>
               <tbody>
                 {overrides.map((o) => (
-                  <tr key={o.id} className="border-t">
-                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                  <tr key={o.id} tabIndex={0}>
+                    <td className="text-xs text-muted-foreground">
                       {new Date(o.created_at).toLocaleString()}
                     </td>
-                    <td className="px-3 py-2">
-                      <Badge variant="secondary">{o.action}</Badge>
+                    <td>
+                      <span className={`heartify-chip heartify-chip--${overrideTone(o.action)}`}>
+                        {o.action}
+                      </span>
                     </td>
-                    <td className="px-3 py-2 font-mono text-xs">{o.target}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{o.reason ?? "—"}</td>
+                    <td className="font-mono text-xs">{o.target}</td>
+                    <td className="text-muted-foreground">{o.reason ?? "—"}</td>
                   </tr>
                 ))}
                 {overrides.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-3 py-6 text-center text-sm text-muted-foreground">
-                      No overrides yet.
+                    <td colSpan={4} className="p-0">
+                      <EmptyState
+                        icon={History}
+                        title="No overrides yet"
+                        description="Admin actions like blocking, granting, or revoking will appear here for audit."
+                      />
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+
           </div>
         </section>
       </main>
