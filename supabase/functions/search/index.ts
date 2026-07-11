@@ -60,14 +60,37 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const q = String(body.q ?? "").slice(0, 200);
+    const q = String(body.q ?? "").slice(0, 500);
     const category = body.category ? String(body.category) : null;
     const channel = body.channel ? String(body.channel) : null;
     const limit = Math.min(Math.max(Number(body.limit ?? 40), 1), 100);
     const offset = Math.max(Number(body.offset ?? 0), 0);
     const useAi = body.useAi !== false && q.length >= 3;
 
-    const intent = useAi ? await detectIntent(q) : null;
+    let intent = useAi ? await detectIntent(q) : null;
+
+    // H2: validate AI-suggested channel/entities against real channels.
+    // Hallucinated names would otherwise silently narrow results to zero.
+    if (intent?.channel) {
+      const { data: found } = await admin
+        .from("approved_channels")
+        .select("channel_id, channel_title")
+        .ilike("channel_title", intent.channel)
+        .limit(1)
+        .maybeSingle();
+      if (!found) intent = { ...intent, channel: undefined };
+    }
+    if (intent?.entities?.length) {
+      const { data: knownChannels } = await admin
+        .from("approved_channels")
+        .select("channel_title")
+        .in("channel_title", intent.entities);
+      const known = new Set((knownChannels ?? []).map((c) => (c.channel_title as string).toLowerCase()));
+      intent = {
+        ...intent,
+        entities: intent.entities.filter((e) => known.has(e.toLowerCase()) || /[\p{L}]{3,}/u.test(e)),
+      };
+    }
 
     const hits = await provider.search({
       q,
