@@ -94,8 +94,8 @@ const Khatm = () => {
   };
 
   const clearAll = () => {
-    if (!confirm("Clear all khatm data? This cannot be undone.")) return;
     setState(defaultState());
+    setConfirmClear(false);
     toast("Khatm data cleared.");
   };
 
