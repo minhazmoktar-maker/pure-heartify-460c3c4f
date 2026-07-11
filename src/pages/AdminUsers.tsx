@@ -21,7 +21,7 @@ export default function AdminUsers() {
   const { isOwner } = useRole();
   const defaultTab = isOwner ? "roles" : "entitlements";
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Admin · Users, Roles & Entitlements"
         description="Unified admin console for user roles, MFA, and premium entitlements."

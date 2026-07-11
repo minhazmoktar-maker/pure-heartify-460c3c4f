@@ -21,7 +21,7 @@ export default function AsmaUlHusna() {
   }, [q]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="99 Names of Allah — Heartify"
         description="Asma ul-Husna: the 99 beautiful Names of Allah with Arabic, transliteration, and meanings. Searchable and shareable."

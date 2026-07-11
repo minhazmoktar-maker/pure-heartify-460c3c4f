@@ -135,7 +135,7 @@ const Fasting = () => {
   const recent = log.slice(0, 14);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Fasting Tracker — Ramadan, Sunnah & Voluntary Fasts · Heartify"
         description="Log daily fasts, track your streak, and see Suhoor and Iftar times based on your location. Supports Ramadan, Monday/Thursday, Ayyām al-Bīḍ, ʿĀshūrāʾ and ʿArafah."

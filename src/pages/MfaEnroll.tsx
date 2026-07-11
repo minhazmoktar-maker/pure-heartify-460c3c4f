@@ -64,7 +64,7 @@ export default function MfaEnroll() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <main className="mx-auto max-w-xl px-4 py-8">
         <div className="mb-6 flex items-center gap-3">

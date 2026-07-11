@@ -26,7 +26,7 @@ const Channels = () => {
   const totalShown = filtered.reduce((s, c) => s + c.channels.length, 0);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Trusted Halal Channels — Heartify"
         description={`Browse ${TOTAL_CHANNELS}+ vetted halal YouTube channels across ${CHANNEL_CATEGORIES.length} categories on Heartify.`}

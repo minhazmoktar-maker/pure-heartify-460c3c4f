@@ -28,7 +28,7 @@ export default function PublicPillar() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`Pillar ${num} of Islam — ${p.translit} (${p.en}) · Heartify`}
         description={`${p.translit}: ${p.summary}`}

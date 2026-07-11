@@ -36,7 +36,7 @@ export default function PublicIslamicEvent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${e.translit} (${e.en}) — ${LABEL[e.category]} · Heartify`}
         description={`${e.translit} — ${e.when}. ${e.summary}`}

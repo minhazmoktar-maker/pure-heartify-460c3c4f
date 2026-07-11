@@ -80,7 +80,7 @@ export default function PublicSurah() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${title} — Heartify`}
         description={meta ? `Read Sūrah ${meta.englishName} (${meta.englishNameTranslation}), ${meta.revelationType}, ${meta.numberOfAyahs} verses.` : `Sūrah ${n} of the Noble Qur'an.`}

@@ -18,7 +18,7 @@ export default function PublicMosque() {
 
   if (!m) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Mosque not found — Heartify" description="This sacred mosque page could not be found." path={`/mosque/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
@@ -44,7 +44,7 @@ export default function PublicMosque() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${m.translit} — ${m.en} · Sacred Mosques · Heartify`}
         description={`${m.translit} (${m.ar}) in ${m.city}, ${m.country}. ${m.summary.slice(0, 140)}`}

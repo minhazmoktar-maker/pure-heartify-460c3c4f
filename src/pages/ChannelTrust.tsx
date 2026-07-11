@@ -136,7 +136,7 @@ const ChannelTrust = () => {
 
   if (isAdmin === false) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="max-w-6xl mx-auto px-4 py-16 text-center text-muted-foreground">
           Admins only.
@@ -146,7 +146,7 @@ const ChannelTrust = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-4">

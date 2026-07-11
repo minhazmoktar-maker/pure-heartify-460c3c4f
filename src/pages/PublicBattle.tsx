@@ -26,7 +26,7 @@ export default function PublicBattle() {
 
   if (!b) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Battle not found — Heartify" description="This battle page could not be found." path={`/battle/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
@@ -52,7 +52,7 @@ export default function PublicBattle() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${b.translit} — Ghazawāt of the Prophet ﷺ · Heartify`}
         description={`${b.translit} (${b.name_ar}) — ${b.hijri} / ${b.ce}. ${b.summary.slice(0, 140)}`}

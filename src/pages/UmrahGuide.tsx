@@ -31,7 +31,7 @@ const UmrahGuide = () => {
   const doneCount = Object.values(done).filter(Boolean).length;
   const pct = Math.round((doneCount / STEPS.length) * 100);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Umrah Step-by-Step Guide — Heartify" description="Complete Umrah walkthrough: ihram, talbiyah, tawaf, sa'i, and halq — with du'as and sources." path="/umrah" />
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>

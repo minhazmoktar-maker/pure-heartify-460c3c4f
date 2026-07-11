@@ -30,9 +30,9 @@ const Tawbah = () => {
   const count = Object.values(done).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Tawbah — Sincere Repentance in Islam" description="The conditions, steps, and prophetic du'as of sincere repentance from Qur'an and Sunnah." path="/tawbah" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link><HeartHandshake className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Tawbah — Sincere Repentance</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><HeartHandshake className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Tawbah — Sincere Repentance</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4">
         <Card className="p-4 bg-primary/5"><p className="text-sm italic">"And turn to Allah in repentance, all of you, O believers, that you may succeed." — <span className="text-muted-foreground">Qur'an 24:31</span></p></Card>
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Conditions internalized</span><span className="text-sm font-medium">{count} / {STEPS.length}</span></div><Progress value={(count / STEPS.length) * 100} /></Card>

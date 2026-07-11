@@ -81,7 +81,7 @@ export default function PublicAyah() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`Qur'an ${ref} — Heartify`}
         description={`${ref}: ${excerpt}${excerpt.length >= 140 ? '…' : ''}`}

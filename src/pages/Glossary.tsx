@@ -109,7 +109,7 @@ export default function Glossary() {
   }, [q, cat]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="Islamic Terms Glossary | Heartify"
         description="Searchable dictionary of essential Islamic terms across Aqeedah, Fiqh, Salah, Hajj, Zakat, Qur'an, Hadith, and more."

@@ -86,12 +86,12 @@ const Onboarding = () => {
   };
 
   if (loading || !user) {
-    return <div className="min-h-screen bg-background" />;
+    return <div className="min-h-dvh bg-background" />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-background">
-      <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-4 py-10 md:py-16">
+    <div className="min-h-dvh bg-gradient-to-br from-primary/5 via-background to-background">
+      <div className="mx-auto flex min-h-dvh max-w-3xl flex-col px-4 py-10 md:py-16">
         {/* Progress dots */}
         <div className="mb-8 flex items-center justify-center gap-2">
           {STEPS.map((_, i) => (

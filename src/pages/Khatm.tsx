@@ -113,7 +113,7 @@ const Khatm = () => {
   }, [state.log]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Khatm Tracker — Quran completion goal"
         description="Track your Quran completion with pacing, daily goals, and khatm milestones."

@@ -97,7 +97,7 @@ export default function BabyNames() {
   }, [q, gender, favs, onlyFavs]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Helmet>
         <title>Islamic Baby Names — Heartify</title>
         <meta name="description" content="Browse Islamic baby names with Arabic script, meanings, and origins. Save favorites for later." />

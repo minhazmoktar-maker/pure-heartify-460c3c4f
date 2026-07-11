@@ -27,9 +27,9 @@ const FarewellSermon = () => {
   const count = Object.values(done).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="The Farewell Sermon — Khuṭbat al-Wadā'" description="The final sermon of the Prophet Muḥammad ﷺ at 'Arafah — a charter of universal human dignity, delivered before 100,000+ pilgrims." path="/farewell-sermon" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link><Mic className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">The Farewell Sermon</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Mic className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">The Farewell Sermon</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4 bg-primary/5"><p className="text-sm">Delivered at 'Arafah on 9 Dhū'l-Ḥijjah 10 AH (632 CE) during the Farewell Ḥajj, three months before the Prophet's ﷺ death — before roughly 124,000 Companions.</p></Card>
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Studied</span><span className="text-sm font-medium">{count} / {POINTS.length}</span></div><Progress value={(count / POINTS.length) * 100} /></Card>

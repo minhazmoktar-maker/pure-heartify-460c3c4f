@@ -124,7 +124,7 @@ export default function GroupKhatmList() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Group Khatm — Complete the Quran together"
         description="Start or join a Khatm circle: 30 members, 30 Juz, one shared completion." path="/khatm/groups"

@@ -210,7 +210,7 @@ const Wasiyyah = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Wasiyyah Builder — Draft Your Islamic Will | Heartify"
         description="Draft your Islamic last will (wasiyyah) privately on-device: executors, assets, debts, up-to-one-third bequests, funeral wishes, exportable to text."

@@ -122,7 +122,7 @@ const Nikah = () => {
     setS((p) => ({ ...p, expenses: p.expenses.filter((e) => e.id !== id) }));
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-dvh bg-background pb-20">
       <SEO
         title="Nikah Planner — Heartify"
         description="Plan a halal nikah: mahr, witnesses, walimah checklist, guest list with RSVP, and budget tracker."

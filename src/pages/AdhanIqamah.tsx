@@ -21,10 +21,10 @@ const S2 = [
 
 export default function AdhanIqamah() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Adhān & Iqāmah — The Call to Prayer" description="Rulings, wording, response, and the du'ā after the adhān." path="/adhan-iqamah" />
       <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3">
-        <Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link>
+        <Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link>
         <Volume2 className="w-6 h-6 text-primary" />
         <h1 className="text-2xl font-bold">Adhān & Iqāmah</h1>
       </div></div>

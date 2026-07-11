@@ -214,7 +214,7 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
   const currentList = grouped[tab] ?? [];
 
   return (
-    <div className={embedded ? "" : "min-h-screen bg-background"}>
+    <div className={embedded ? "" : "min-h-dvh bg-background"}>
       {!embedded && <Navbar />}
       <main className={embedded ? "" : "mx-auto max-w-6xl px-4 py-6"}>
         {!embedded && (

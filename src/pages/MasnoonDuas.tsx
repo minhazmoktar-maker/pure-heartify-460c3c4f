@@ -45,9 +45,9 @@ const MasnoonDuas = () => {
   const count = Object.values(done).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Masnoon Du'as — Prophetic Supplications for Every Occasion" description="Authentic du'as from Qur'an and Sunnah for daily life: waking, sleep, food, travel, hardship, family and more." path="/masnoon-duas" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link><Sparkles className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Masnoon Du'as</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Sparkles className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Masnoon Du'as</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Learned</span><span className="text-sm font-medium">{count} / {DUAS.length}</span></div><Progress value={(count / DUAS.length) * 100} /></Card>
         <div className="flex gap-2"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search occasion or meaning…" className="pl-9" /></div><Button variant="outline" size="icon" onClick={() => persist({})} title="Reset"><RotateCcw className="w-4 h-4" /></Button></div>

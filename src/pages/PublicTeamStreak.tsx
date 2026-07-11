@@ -39,7 +39,7 @@ export default function PublicTeamStreak() {
 
   if (loading) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background">
+      <div className="min-h-dvh grid place-items-center bg-background">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
@@ -47,7 +47,7 @@ export default function PublicTeamStreak() {
 
   if (notFound || !team) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background text-center p-6">
+      <div className="min-h-dvh grid place-items-center bg-background text-center p-6">
         <SEO title="Team not found — Heartify" description="This team streak link is not available." path={`/t/${id}`} />
         <div>
           <h1 className="text-xl font-bold text-foreground">Team not found</h1>
@@ -61,7 +61,7 @@ export default function PublicTeamStreak() {
   const full = team.member_count >= team.member_limit;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`Join "${team.name}" — Team streak on Heartify`}
         description={`${team.member_count}/${team.member_limit} members · ${team.current_streak}-day streak. Join and keep it alive.`}

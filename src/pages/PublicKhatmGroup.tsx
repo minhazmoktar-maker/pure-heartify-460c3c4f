@@ -46,7 +46,7 @@ export default function PublicKhatmGroup() {
 
   if (loading) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background">
+      <div className="min-h-dvh grid place-items-center bg-background">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
@@ -54,7 +54,7 @@ export default function PublicKhatmGroup() {
 
   if (notFound || !group) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background p-6 text-center">
+      <div className="min-h-dvh grid place-items-center bg-background p-6 text-center">
         <SEO title="Group not found — Heartify" description="This Khatm group link is not available." path={`/k/${id}`} />
         <div>
           <h1 className="text-xl font-bold text-foreground">Group not found</h1>
@@ -71,7 +71,7 @@ export default function PublicKhatmGroup() {
   const joinTarget = `/khatm/join/${group.invite_code}`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${group.name} — Group Khatm on Heartify`}
         description={`${group.juz_completed}/30 juz completed by ${group.member_count} reciters. Join and claim a juz.`}

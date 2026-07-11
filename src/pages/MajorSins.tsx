@@ -73,9 +73,9 @@ const MajorSins = () => {
   const count = Object.values(done).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Major Sins in Islam (al-Kaba'ir)" description="50 major sins compiled from Qur'an and Sunnah with authentic references — a warning and reminder." path="/major-sins" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link><ShieldAlert className="w-6 h-6 text-destructive" /><h1 className="text-2xl font-bold">Major Sins (al-Kaba'ir)</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><ShieldAlert className="w-6 h-6 text-destructive" /><h1 className="text-2xl font-bold">Major Sins (al-Kaba'ir)</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4">
         <Card className="p-4 border-destructive/40 bg-destructive/5"><p className="text-sm">A reminder — not a fatwa. If you have fallen into any of these, the door of tawbah is open. 'Say: O My servants who have transgressed against themselves — do not despair of Allah's mercy…' (39:53)</p></Card>
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Reviewed</span><span className="text-sm font-medium">{count} / {SINS.length}</span></div><Progress value={(count / SINS.length) * 100} /></Card>

@@ -62,7 +62,7 @@ const AdabPage = () => {
   const pct = Math.round((readCount / ADAB.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Islamic Etiquette (Adab) — Heartify"
         description="Prophetic manners for daily life: speech, food, sleep, travel, home, masjid, and family."

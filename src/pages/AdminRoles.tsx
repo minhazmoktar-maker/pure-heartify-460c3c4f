@@ -121,7 +121,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
 
   if (loading) {
     return (
-      <div className={embedded ? "flex justify-center py-10" : "min-h-screen bg-background flex items-center justify-center"}>
+      <div className={embedded ? "flex justify-center py-10" : "min-h-dvh bg-background flex items-center justify-center"}>
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
@@ -291,7 +291,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
   if (embedded) return body;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Roles & Permissions · Heartify" description="Owner control panel for roles, MFA, and audit events." path="/admin/roles" />
       <Navbar />
       <main className="mx-auto max-w-6xl px-4 py-8">

@@ -14,7 +14,7 @@ const Terms = () => {
   const effective = "July 8, 2026";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Terms of Service — Heartify"
         description="The terms that govern your use of Heartify's halal-first video curation service."

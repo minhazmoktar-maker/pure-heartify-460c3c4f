@@ -83,7 +83,7 @@ export default function HijriCalendar() {
   const monthLabel = cursor.toLocaleDateString(undefined, { month: "long", year: "numeric" });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Hijri Calendar — Heartify" description="Islamic Hijri calendar with today's date, upcoming events, Ramadan, Hajj, and Eid observances." path="/hijri" />
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">

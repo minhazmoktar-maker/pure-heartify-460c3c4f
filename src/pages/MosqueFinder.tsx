@@ -112,7 +112,7 @@ export default function MosqueFinder() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Mosque Finder — Heartify"
         description="Find nearby mosques and Muslim prayer places using OpenStreetMap. Get walking distance and directions."

@@ -39,7 +39,7 @@ const Scholars = () => {
   const readCount = Object.values(read).filter(Boolean).length;
   const pct = Math.round((readCount / SCHOLARS.length) * 100);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Great Scholars of Islam — Heartify" description="The lives and legacies of 16 defining scholars: the four imams, hadith masters, mufassirin, and reformers." path="/scholars" />
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>

@@ -71,7 +71,7 @@ const AuditPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="mx-auto max-w-2xl px-6 py-20 text-center">
           <p className="text-muted-foreground">Please <Link className="text-primary underline" to="/login">log in</Link> to run the audit.</p>
@@ -81,7 +81,7 @@ const AuditPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-dvh bg-background pb-20">
       <Navbar />
       <div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6 flex items-center gap-3">

@@ -180,7 +180,7 @@ export default function Achievements() {
   const unlockedCount = enriched.filter(a => a.unlocked).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Achievements — Heartify" description="Earn badges for consistency in salah, dhikr, Quran, and adhkar. Track your spiritual milestones." path="/achievements" />
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">

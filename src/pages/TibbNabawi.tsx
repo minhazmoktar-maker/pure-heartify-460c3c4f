@@ -33,7 +33,7 @@ const TibbNabawi = () => {
   const readCount = Object.values(read).filter(Boolean).length;
   const pct = Math.round((readCount / REMEDIES.length) * 100);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Tibb an-Nabawi (Prophetic Medicine) — Heartify" description="Prophetic natural remedies: black seed, honey, olive oil, dates, miswak, hijamah, and more." path="/tibb" />
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>

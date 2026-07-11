@@ -74,7 +74,7 @@ export default function WuduGuide() {
     });
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="Wudu, Ghusl & Tayammum Guide | Heartify"
         description="Step-by-step interactive guides for wudu, ghusl, and tayammum with fard and sunnah acts clearly marked."

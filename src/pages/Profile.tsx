@@ -169,7 +169,7 @@ const Profile = () => {
 
   if (authLoading || !profileLoaded) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -179,7 +179,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-dvh bg-background pb-12">
       <Navbar />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <button

@@ -106,7 +106,7 @@ const Wird = () => {
 
   if (running) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
           <div className="mb-4 flex items-center justify-between">
@@ -165,7 +165,7 @@ const Wird = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Wird Builder — Custom Daily Dhikr Routines | Heartify"
         description="Build your own wird from classic adhkar or custom entries. Track each dhikr's count, complete a session, and record it privately on-device."

@@ -39,9 +39,9 @@ const JannahDescriptions = () => {
   const count = Object.values(done).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Descriptions of Jannah (Paradise)" description="Rivers, trees, gates, levels and people of Paradise from Qur'an and authentic Sunnah." path="/jannah" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link><TreePine className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Descriptions of Jannah</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><TreePine className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Descriptions of Jannah</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Reflected on</span><span className="text-sm font-medium">{count} / {ITEMS.length}</span></div><Progress value={(count / ITEMS.length) * 100} /></Card>
         <div className="flex gap-2"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search…" className="pl-9" /></div><Button variant="outline" size="icon" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>

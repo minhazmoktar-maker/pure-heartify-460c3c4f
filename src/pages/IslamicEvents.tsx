@@ -135,7 +135,7 @@ export default function IslamicEvents() {
     "bg-muted text-muted-foreground";
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="Islamic Events & Sacred Days | Heartify"
         description="Countdown to Ramadan, Eid, Laylatul Qadr, Arafah, Ashura and every notable day of the Hijri year."

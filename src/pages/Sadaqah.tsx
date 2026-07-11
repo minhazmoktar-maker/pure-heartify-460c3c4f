@@ -85,7 +85,7 @@ const Sadaqah = () => {
   const maxCat = Math.max(1, ...Object.values(stats.byCat));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Sadaqah Tracker — Log Charity & Set Monthly Goals | Heartify"
         description="Track your sadaqah privately: log donations by category, set a monthly goal, and see all-time giving. Data stays on your device."

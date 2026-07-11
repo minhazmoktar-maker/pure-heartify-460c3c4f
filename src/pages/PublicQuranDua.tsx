@@ -28,7 +28,7 @@ export default function PublicQuranDua() {
 
   if (!d) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Duʿāʾ not found — Heartify" description="This duʿā could not be found." path={`/quran-dua/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
@@ -54,7 +54,7 @@ export default function PublicQuranDua() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`Duʿāʾ from the Qurʾān — ${d.translit} (Qurʾān ${d.ref}) · Heartify`}
         description={`${d.translation} — Qurʾānic duʿā from ${d.ref}. ${d.context}`}

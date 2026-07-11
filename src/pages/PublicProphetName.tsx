@@ -17,7 +17,7 @@ export default function PublicProphetName() {
 
   if (!n) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Name not found — Heartify" description="This name of the Prophet ﷺ was not found." path={`/prophet-name/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
@@ -43,7 +43,7 @@ export default function PublicProphetName() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${n.translit} ﷺ — ${n.meaning} · Names of the Prophet · Heartify`}
         description={`${n.translit} (${n.arabic}) — ${n.meaning}. ${n.explanation.slice(0, 120)}`}

@@ -96,7 +96,7 @@ const Reminders = () => {
     setPrefs((p) => ({ ...p, [key]: { ...p[key], time } }));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Habit reminders — Heartify"
         description="Configure daily reminders for prayer, Quran, dhikr, and adhkar so consistency becomes effortless."

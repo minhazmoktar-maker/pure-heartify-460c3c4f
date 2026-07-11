@@ -84,7 +84,7 @@ const Prophets = () => {
   const progress = Math.round((doneCount / PROPHETS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <Helmet>
         <title>Stories of the Prophets — Qisas al-Anbiya | Heartify</title>
         <meta

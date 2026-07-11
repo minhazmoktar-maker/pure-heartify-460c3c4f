@@ -134,7 +134,7 @@ export default function SalahGuide() {
   const pct = Math.round(((i + 1) / STEPS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="How to Pray Salah — Step by Step | Heartify"
         description="A guided walkthrough of every posture and recitation in salah, from takbiratul ihram to tasleem, with Arabic, transliteration, and translation."

@@ -87,7 +87,7 @@ export default function PlusInvite() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Accept Heartify+ Family invite"
         description="Join a Heartify+ family household."

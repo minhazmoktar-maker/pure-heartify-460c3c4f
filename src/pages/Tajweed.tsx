@@ -104,7 +104,7 @@ export default function Tajweed() {
   }, [q, cat]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="Tajweed Rules Guide | Heartify"
         description="A concise, searchable reference of Tajweed rules: Nun Sakinah, Mim Sakinah, Madd, Qalqalah, and Lam & Ra — with Arabic examples."

@@ -94,7 +94,7 @@ const Nawawi40 = () => {
   const progress = Math.round((doneCount / HADITHS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <Helmet>
         <title>40 Hadith of Imam an-Nawawi — Study & Track | Heartify</title>
         <meta

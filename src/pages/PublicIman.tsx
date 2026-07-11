@@ -28,7 +28,7 @@ export default function PublicIman() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`Article ${num} of Īmān — ${a.translit} (${a.en}) · Heartify`}
         description={`${a.translit}: ${a.summary}`}

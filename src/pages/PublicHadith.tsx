@@ -90,7 +90,7 @@ export default function PublicHadith() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${ref} — Heartify`}
         description={`${ref}: ${excerpt}${excerpt.length >= 140 ? "…" : ""}`}

@@ -49,7 +49,7 @@ export default function OfflineLibrary() {
   const freeUsed = items.filter((m) => m.plan === "free").length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Offline Library — Heartify"
         description="Your downloaded recitations and audio, available without a connection."
