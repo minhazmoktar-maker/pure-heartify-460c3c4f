@@ -6,6 +6,8 @@
  */
 
 import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
