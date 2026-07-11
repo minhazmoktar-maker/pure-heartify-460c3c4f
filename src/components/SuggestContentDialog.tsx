@@ -198,7 +198,10 @@ export default function SuggestContentDialog({ trigger }: Props) {
           </TabsContent>
         </Tabs>
 
-        <DialogFooter className="mt-2">
+        <DialogFooter className="mt-2 sm:items-center">
+          <p className="mr-auto hidden text-[11px] text-muted-foreground sm:block">
+            Tip: press <kbd className="rounded border border-border bg-muted px-1">⌘</kbd>+<kbd className="rounded border border-border bg-muted px-1">Enter</kbd> to submit
+          </p>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>Cancel</Button>
           <Button onClick={submit} disabled={submitting}>
             {submitting ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="mr-1.5 h-3.5 w-3.5" />}
