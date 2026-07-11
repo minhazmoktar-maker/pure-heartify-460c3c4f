@@ -32,11 +32,13 @@ const TrackRow = ({ track, index, queue, showAlbum = false }: TrackRowProps) => 
       transition={{ delay: Math.min(index * 0.02, 0.2) }}
       onClick={handlePlay}
       role="button"
-      tabIndex={0}
+      tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled}
+      aria-label={`Play track ${index + 1}`}
       onKeyDown={(e) => !disabled && (e.key === "Enter" || e.key === " ") && (e.preventDefault(), handlePlay())}
       className={cn(
         "group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
         isActive ? "bg-primary/10" : "hover:bg-secondary",
         disabled && "opacity-60 cursor-not-allowed hover:bg-transparent",
       )}
