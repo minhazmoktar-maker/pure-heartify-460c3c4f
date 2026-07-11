@@ -11,6 +11,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { enforceRateLimit } from '../_shared/rateLimit.ts';
 
 // Tables that store rows keyed by user_id and must be scrubbed on deletion.
 // Keep this list in sync with the schema — every new user-scoped table should
