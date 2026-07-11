@@ -601,15 +601,33 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
 }
 
 // Embed a batch of newly ingested rows and store the vectors on curated_videos.
+// Idempotent: only rows whose `embedding` column is NULL are embedded, so
+// re-ingesting the same video_id (ignore-duplicates upsert path) never
+// re-embeds and re-charges the AI gateway.
 async function embedNewVideos(rows: Record<string, unknown>[]) {
   const { embedTexts, toPgVector } = await import("../_shared/embed.ts");
-  const items = rows
+  const candidates = rows
     .map((r) => ({
       video_id: String(r.video_id ?? ""),
       text: `${r.title ?? ""}\n${r.channel_title ?? ""}\n${r.category ?? ""}`.trim(),
     }))
     .filter((r) => r.video_id && r.text.length > 0);
+  if (!candidates.length) return;
+
+  // Idempotency guard: keep only rows without an existing embedding.
+  const ids = candidates.map((c) => c.video_id);
+  const inList = ids.map((id) => `"${id.replace(/"/g, '\\"')}"`).join(",");
+  const existingRes = await sbFetch(
+    `curated_videos?video_id=in.(${inList})&embedding=is.null&select=video_id`,
+    { method: "GET" },
+  ).catch(() => null);
+  if (!existingRes || !existingRes.ok) return;
+  const needing = new Set(
+    ((await existingRes.json()) as Array<{ video_id: string }>).map((r) => r.video_id),
+  );
+  const items = candidates.filter((c) => needing.has(c.video_id));
   if (!items.length) return;
+
   // OpenAI text-embedding-3-small caps at 300k tokens/req; batch of 100 is safe.
   for (let i = 0; i < items.length; i += 100) {
     const slice = items.slice(i, i + 100);
