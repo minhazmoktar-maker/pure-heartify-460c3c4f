@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import {
   contributeToDhikrCircle,
   createDhikrCircle,
