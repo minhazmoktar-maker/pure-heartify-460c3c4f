@@ -12,6 +12,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { enforceRateLimit } from "../_shared/rateLimit.ts";
+import { verifyTurnstile } from "../_shared/turnstile.ts";
 
 const BodySchema = z.object({
   video_id: z.string().min(1).max(64).optional(),
@@ -26,6 +27,7 @@ const BodySchema = z.object({
   severity: z.enum(["low","normal","high","critical"]).optional(),
   notify_reporter: z.boolean().optional(),
   platform: z.string().max(60).optional(),
+  captcha_token: z.string().max(4000).optional(),
 }).refine(
   (v) => !!(v.video_id || v.channel_id),
   { message: "video_id or channel_id required" },
@@ -68,7 +70,14 @@ Deno.serve(async (req) => {
   }
   const body = parsed.data;
 
+  // CAPTCHA (fail-open if TURNSTILE_SECRET_KEY not set).
+  const captcha = await verifyTurnstile(body.captcha_token ?? null, req);
+  if (!captcha.ok) {
+    return json({ error: "captcha_failed", reason: captcha.reason }, 400);
+  }
+
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
 
   // Rate limit: 5 per minute, 20 per hour.
   const minLimit = await enforceRateLimit(admin, {

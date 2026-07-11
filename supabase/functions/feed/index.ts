@@ -6,6 +6,8 @@
  */
 
 import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,6 +42,18 @@ Deno.serve(async (req) => {
     // for non-premium/anon users. Never trust a client-supplied flag.
     const callerId = await getCallerUserId(req);
     const isPremium = await hasActivePremium(callerId);
+
+    // Rate limit: 240/min per user, 60/min per IP for anon. Feed is the
+    // hottest endpoint so limits are generous but abuse-resistant.
+    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const limited = await enforceRateLimit(admin, {
+      identity: getClientIdentity(req, callerId),
+      action: "feed",
+      limit: callerId ? 240 : 60,
+      windowSeconds: 60,
+    });
+    if (limited) return json({ error: "rate_limited" }, 429);
+
 
     const body = await req.json().catch(() => ({}));
     const category = body?.category as string | undefined;

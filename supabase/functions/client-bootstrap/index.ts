@@ -2,6 +2,7 @@
 // Returns everything a fresh client needs in one round-trip.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -9,10 +10,12 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get("Authorization") ?? "";
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
   const anonClient = createClient(supabaseUrl, anonKey, {
     global: { headers: { Authorization: authHeader } },
   });
+  const admin = createClient(supabaseUrl, serviceKey);
 
   let userId: string | null = null;
   let profile: unknown = null;
@@ -22,17 +25,33 @@ Deno.serve(async (req) => {
   if (authHeader) {
     const { data: userData } = await anonClient.auth.getUser();
     userId = userData.user?.id ?? null;
+  }
 
-    if (userId) {
-      const [profileRes, entRes, prefsRes] = await Promise.all([
-        anonClient.from("profiles").select("display_name, avatar_url, locale").eq("user_id", userId).maybeSingle(),
-        anonClient.from("entitlements").select("plan, expires_at").eq("user_id", userId).maybeSingle(),
-        anonClient.from("user_preferences_v2").select("key, value").eq("user_id", userId),
-      ]);
-      profile = profileRes.data;
-      if (entRes.data) entitlement = entRes.data as typeof entitlement;
-      for (const row of prefsRes.data ?? []) preferences[(row as any).key] = (row as any).value;
-    }
+  // Rate limit: 120/min per user, 30/min per IP for anon (bootstrap is cheap
+  // but expensive if fanned out from a bot farm).
+  const identity = getClientIdentity(req, userId);
+  const limited = await enforceRateLimit(admin, {
+    identity,
+    action: "client-bootstrap",
+    limit: userId ? 120 : 30,
+    windowSeconds: 60,
+  });
+  if (limited) {
+    return new Response(JSON.stringify({ error: "rate_limited" }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (userId) {
+    const [profileRes, entRes, prefsRes] = await Promise.all([
+      anonClient.from("profiles").select("display_name, avatar_url, locale").eq("user_id", userId).maybeSingle(),
+      anonClient.from("entitlements").select("plan, expires_at").eq("user_id", userId).maybeSingle(),
+      anonClient.from("user_preferences_v2").select("key, value").eq("user_id", userId),
+    ]);
+    profile = profileRes.data;
+    if (entRes.data) entitlement = entRes.data as typeof entitlement;
+    for (const row of prefsRes.data ?? []) preferences[(row as any).key] = (row as any).value;
   }
 
   const body = {

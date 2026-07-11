@@ -15,6 +15,8 @@
  */
 
 import { authorize, CORS_HEADERS } from "../_shared/authz.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -58,10 +60,23 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS_HEADERS });
   if (req.method !== "POST") return json({ error: "method not allowed" }, 405);
 
-  // Owner-only surface (manage_roles permission is owner-only)
-  const authResult = await authorize(req, "manage_roles");
+  // Owner-only surface (manage_roles permission is owner-only).
+  // Also require AAL2 (MFA-verified session) — mutations to roles and MFA
+  // enrollments must be protected against stolen single-factor sessions.
+  const authResult = await authorize(req, "manage_roles", { requireAal2: true });
   if (authResult instanceof Response) return authResult;
   const { principal } = authResult;
+
+  // Per-owner rate limit: 60 mutations/min. Owner surfaces are low-traffic,
+  // so anything beyond that is almost certainly abuse or automation gone wrong.
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const limited = await enforceRateLimit(admin, {
+    identity: `admin-roles:${principal.id}`,
+    action: "admin-roles",
+    limit: 60,
+    windowSeconds: 60,
+  });
+  if (limited) return json({ error: "rate_limited" }, 429);
 
   let body: Record<string, unknown>;
   try {

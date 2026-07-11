@@ -17,6 +17,8 @@
  */
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { authorize } from "../_shared/authz.ts";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   defaultPipeline, loadThresholds, persistDecision, runPipeline,
   type VideoContext,
@@ -35,6 +37,18 @@ Deno.serve(async (req) => {
   try { body = await req.json(); } catch { return json({ error: "invalid json" }, 400); }
   const v = body.video;
   if (!v?.video_id || !v?.title) return json({ error: "video.video_id and video.title required" }, 400);
+
+  // Rate limit — moderation is compute-heavy and calls out to AI providers.
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const rlLimited = await enforceRateLimit(admin, {
+    identity: getClientIdentity(req, null),
+    action: "moderate-video",
+    limit: 30,
+    windowSeconds: 60,
+  });
+  if (rlLimited) return json({ error: "rate_limited" }, 429);
+
+
 
   // Only privileged actors may write non-system audit entries.
   let actorId: string | null = null;
