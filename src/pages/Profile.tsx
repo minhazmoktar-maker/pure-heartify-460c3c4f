@@ -258,6 +258,10 @@ const Profile = () => {
             </Button>
 
             <div className="pt-4">
+              <WeeklyRecapCard />
+            </div>
+
+            <div className="pt-4">
               <MfaStatusCard />
             </div>
 
