@@ -39,9 +39,15 @@ export function Leaderboard({ scope = "global", groupId = null }: Props) {
         {METRICS.map((m) => (
           <TabsContent key={m.key} value={m.key} className="mt-3">
             {loading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              </div>
+              <ol className="divide-y" aria-label="Loading leaderboard" role="status">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <li key={i} className="flex items-center gap-3 px-2 py-2">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 flex-1" />
+                    <Skeleton className="h-4 w-12" />
+                  </li>
+                ))}
+              </ol>
             ) : rows.length === 0 ? (
               <p className="py-6 text-center text-sm text-muted-foreground">
                 No data yet — be among the first to appear here.
