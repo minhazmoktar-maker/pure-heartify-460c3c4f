@@ -12,8 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /owner
-Disallow: /security/
 
 Sitemap: https://pure-heartify.lovable.app/sitemap.xml
