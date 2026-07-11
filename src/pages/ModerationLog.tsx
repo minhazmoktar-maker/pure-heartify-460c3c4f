@@ -23,14 +23,14 @@ interface ModerationRow {
   created_at: string;
 }
 
-const reasonColors: Record<string, string> = {
-  keyword: "bg-red-500/15 text-red-700 dark:text-red-300",
-  female_visual: "bg-pink-500/15 text-pink-700 dark:text-pink-300",
-  female_presenter: "bg-pink-500/15 text-pink-700 dark:text-pink-300",
-  soft_pattern: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-  emoji: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
-  low_score: "bg-slate-500/15 text-slate-700 dark:text-slate-300",
-  thumbnail_unsafe: "bg-purple-500/15 text-purple-700 dark:text-purple-300",
+const reasonTone: Record<string, "danger" | "warning" | "muted" | "primary" | "gold"> = {
+  keyword: "danger",
+  female_visual: "danger",
+  female_presenter: "danger",
+  soft_pattern: "warning",
+  emoji: "warning",
+  low_score: "muted",
+  thumbnail_unsafe: "danger",
 };
 
 const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
