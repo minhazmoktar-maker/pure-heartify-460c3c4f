@@ -191,8 +191,8 @@ const Zakat = lazy(() => import("./pages/Zakat.tsx"));
 const queryClient = new QueryClient();
 
 const RouteFallback = () => (
-  <div className="flex min-h-screen items-center justify-center bg-background">
-    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+  <div className="min-h-dvh bg-background">
+    <PageSkeleton variant="default" />
   </div>
 );
 
