@@ -262,37 +262,44 @@ const AdminConsole = () => {
             <History className="h-5 w-5 text-primary" /> Audit trail ({overrides.length})
           </h2>
           <div className="max-h-[420px] overflow-y-auto rounded-lg border">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-muted/60 text-left">
+            <table className="heartify-table w-full text-sm">
+              <thead>
                 <tr>
-                  <th className="px-3 py-2">When</th>
-                  <th className="px-3 py-2">Action</th>
-                  <th className="px-3 py-2">Target</th>
-                  <th className="px-3 py-2">Reason</th>
+                  <th>When</th>
+                  <th>Action</th>
+                  <th>Target</th>
+                  <th>Reason</th>
                 </tr>
               </thead>
               <tbody>
                 {overrides.map((o) => (
-                  <tr key={o.id} className="border-t">
-                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                  <tr key={o.id} tabIndex={0}>
+                    <td className="text-xs text-muted-foreground">
                       {new Date(o.created_at).toLocaleString()}
                     </td>
-                    <td className="px-3 py-2">
-                      <Badge variant="secondary">{o.action}</Badge>
+                    <td>
+                      <span className={`heartify-chip heartify-chip--${overrideTone(o.action)}`}>
+                        {o.action}
+                      </span>
                     </td>
-                    <td className="px-3 py-2 font-mono text-xs">{o.target}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{o.reason ?? "—"}</td>
+                    <td className="font-mono text-xs">{o.target}</td>
+                    <td className="text-muted-foreground">{o.reason ?? "—"}</td>
                   </tr>
                 ))}
                 {overrides.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-3 py-6 text-center text-sm text-muted-foreground">
-                      No overrides yet.
+                    <td colSpan={4} className="p-0">
+                      <EmptyState
+                        icon={History}
+                        title="No overrides yet"
+                        description="Admin actions like blocking, granting, or revoking will appear here for audit."
+                      />
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+
           </div>
         </section>
       </main>
