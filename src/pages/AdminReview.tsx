@@ -4,15 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "@/components/ui/use-toast";
-import { CheckCircle2, XCircle, AlertTriangle, Eye, Search } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Eye, Search, Inbox, Flag, Film, ScrollText } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Candidate = {
