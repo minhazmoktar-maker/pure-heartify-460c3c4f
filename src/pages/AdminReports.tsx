@@ -385,13 +385,13 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                   </Button>
                   <Button
                     variant="destructive" size="sm" disabled={!!busy || !selected.video_id}
-                    onClick={() => removeVideo(selected)}
+                    onClick={() => setConfirm({ kind: "remove", report: selected })}
                   >
                     <Trash2 className="mr-1 h-4 w-4" /> Remove video
                   </Button>
                   <Button
                     variant="destructive" size="sm" disabled={!!busy}
-                    onClick={() => banChannel(selected)}
+                    onClick={() => setConfirm({ kind: "ban", report: selected })}
                     className="col-span-2"
                   >
                     <Ban className="mr-1 h-4 w-4" /> Ban channel
