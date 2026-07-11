@@ -64,13 +64,13 @@ export default function PublicBadge() {
         <SEO title="Badge not found — Heartify" description="This achievement badge doesn't exist." path={`/b/${handle}/${badgeId}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
-          <Card>
-            <CardContent className="py-12 text-center space-y-3">
-              <h1 className="text-xl font-semibold">Badge not found</h1>
-              <p className="text-sm text-muted-foreground">This achievement doesn't exist.</p>
-              <Button asChild variant="outline"><Link to="/achievements">See all badges</Link></Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={Trophy}
+            title="Badge not found"
+            description="This achievement badge doesn't exist or is no longer public. Explore the full catalogue and earn your own."
+            actionLabel="See all badges"
+            actionHref="/achievements"
+          />
         </main>
       </div>
     );
