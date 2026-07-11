@@ -30,8 +30,28 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "invalid_code" }), { status: 400, headers: jsonHeaders });
     }
 
+    // CAPTCHA (Cloudflare Turnstile). No-op until TURNSTILE_SECRET_KEY is set.
+    const captcha = await verifyTurnstile(body.captcha_token ?? null, req);
+    if (!captcha.ok) {
+      return new Response(JSON.stringify({ error: "captcha_failed", reason: captcha.reason }), {
+        status: 400, headers: jsonHeaders,
+      });
+    }
+
     // Fraud logging: hash IP + UA and record a click as well.
     const admin = createClient(url, serviceKey);
+
+    // Rate limit: 10 redemption attempts / hour per IP to blunt referral farms.
+    const limited = await enforceRateLimit(admin, {
+      identity: getClientIdentity(req, null),
+      action: "redeem-referral",
+      limit: 10,
+      windowSeconds: 3600,
+    });
+    if (limited) {
+      return new Response(JSON.stringify({ error: "rate_limited" }), { status: 429, headers: jsonHeaders });
+    }
+
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
     const ua = req.headers.get("user-agent") ?? "";
     const enc = new TextEncoder();
