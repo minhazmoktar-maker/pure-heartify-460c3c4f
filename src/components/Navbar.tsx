@@ -8,6 +8,8 @@ import NotificationsBell from "@/components/NotificationsBell";
 import SuggestContentDialog from "@/components/SuggestContentDialog";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import { useRole } from "@/hooks/useRole";
+import { useScrolled } from "@/hooks/useScrolled";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +18,7 @@ const Navbar = () => {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { isAdmin, isOwner } = useRole();
+  const scrolled = useScrolled(8);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +29,20 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-[1800px] items-center justify-between gap-4 px-4 md:px-6">
+    <nav
+      className={cn(
+        "sticky top-0 z-50 border-b backdrop-blur-xl transition-[height,background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        scrolled
+          ? "border-border/60 bg-card/95 shadow-[0_4px_20px_-12px_hsl(var(--foreground)/0.25)]"
+          : "border-border/40 bg-card/70",
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto flex max-w-[1800px] items-center justify-between gap-4 px-4 md:px-6 transition-[height] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          scrolled ? "h-14" : "h-16",
+        )}
+      >
         {/* Left */}
         {/* Left */}
         <div className="flex items-center gap-3">
