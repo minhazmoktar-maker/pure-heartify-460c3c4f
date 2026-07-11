@@ -40,6 +40,7 @@ export async function runPipeline(
         confidence: 0,
         risk: 90,
         reasoning: `Stage ${stage.name} threw: ${(e as Error).message}`,
+        signals: { flags: ["stage_error"] },
       });
     }
   }
@@ -64,7 +65,11 @@ export async function runPipeline(
   const confidence = confidences.length ? Math.min(...confidences) : 0;
   const risk = risks.length ? Math.max(...risks) : 100;
 
-  const finalState = decideState(confidence, risk, thresholds, ruleHits);
+  const aggregatedFlags: string[] = stageResults.flatMap((s) => {
+    const f = (s.signals as { flags?: unknown } | undefined)?.flags;
+    return Array.isArray(f) ? (f as unknown[]).map(String) : [];
+  });
+  const finalState = decideState(confidence, risk, thresholds, ruleHits, aggregatedFlags);
   const aiResult = stageResults.find((s) => s.stage === "ai_reasoning");
 
   const reasoning = buildReasoning(finalState, confidence, risk, stageResults);
@@ -92,8 +97,18 @@ export function decideState(
   risk: number,
   t: Thresholds,
   ruleHits: RuleHit[],
+  flags: string[] = [],
 ): PipelineOutcome["final_state"] {
   if (ruleHits.some((h) => h.severity === "hard")) return "blocked";
+  // Adversarial / low-quality / stage-error output — never reject silently, always escalate.
+  if (
+    flags.includes("prompt_injection_attempt") ||
+    flags.includes("parse_failed") ||
+    flags.includes("low_quality_reasoning") ||
+    flags.includes("stage_error")
+  ) {
+    return "human_review_required";
+  }
   if (confidence < t.reject_below_confidence) return "rejected";
   if (confidence >= t.auto_approve_min_confidence && risk <= t.auto_approve_max_risk) {
     return "auto_approved";
