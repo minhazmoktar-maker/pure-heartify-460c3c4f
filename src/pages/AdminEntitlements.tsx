@@ -256,7 +256,8 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
               {rows.length === 0 ? "No entitlements yet. Grant the first one above." : "No entitlements match your filter."}
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 text-left">User</th>
