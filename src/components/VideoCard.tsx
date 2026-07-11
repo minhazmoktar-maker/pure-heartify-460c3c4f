@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import FadeIn from "@/components/FadeIn";
 import { CheckCircle2, Clock } from "lucide-react";
 import type { Video } from "@/data/videos";
 
