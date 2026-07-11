@@ -259,26 +259,36 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
               </CardHeader>
               <CardContent>
                 <div className="rounded-md border overflow-auto max-h-[600px]">
-                  <table className="w-full text-xs">
-                    <thead className="bg-muted/40 text-left sticky top-0">
+                  <table className="heartify-table text-xs">
+                    <thead>
                       <tr>
-                        <th className="px-3 py-2">When</th>
-                        <th className="px-3 py-2">Actor</th>
-                        <th className="px-3 py-2">Role</th>
-                        <th className="px-3 py-2">Action</th>
-                        <th className="px-3 py-2">Target</th>
-                        <th className="px-3 py-2">OK</th>
+                        <th>When</th>
+                        <th>Actor</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>OK</th>
                       </tr>
                     </thead>
                     <tbody>
                       {audit.map(a => (
-                        <tr key={a.id} className="border-t align-top">
-                          <td className="px-3 py-2 whitespace-nowrap">{new Date(a.created_at).toLocaleString()}</td>
-                          <td className="px-3 py-2">{a.user_email ?? "—"}</td>
-                          <td className="px-3 py-2">{a.actor_role}</td>
-                          <td className="px-3 py-2 font-mono">{a.action}</td>
-                          <td className="px-3 py-2 font-mono">{a.target_type}:{a.target_id?.slice(0, 12) ?? "—"}</td>
-                          <td className="px-3 py-2">{a.success ? "✓" : `✗ ${a.failure_reason ?? ""}`}</td>
+                        <tr key={a.id} className="align-top">
+                          <td className="whitespace-nowrap">{new Date(a.created_at).toLocaleString()}</td>
+                          <td>{a.user_email ?? "—"}</td>
+                          <td>
+                            <span className={`heartify-chip ${
+                              a.actor_role === "owner" ? "heartify-chip--gold"
+                              : a.actor_role === "admin" ? "heartify-chip--primary"
+                              : "heartify-chip--muted"
+                            }`}>{a.actor_role}</span>
+                          </td>
+                          <td className="font-mono">{a.action}</td>
+                          <td className="font-mono">{a.target_type}:{a.target_id?.slice(0, 12) ?? "—"}</td>
+                          <td>
+                            {a.success
+                              ? <span className="heartify-chip heartify-chip--primary">✓</span>
+                              : <span className="heartify-chip heartify-chip--danger" title={a.failure_reason ?? ""}>✗</span>}
+                          </td>
                         </tr>
                       ))}
                       {audit.length === 0 && (
@@ -287,6 +297,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
                     </tbody>
                   </table>
                 </div>
+
               </CardContent>
             </Card>
           </TabsContent>
