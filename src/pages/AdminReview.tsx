@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { toast } from "@/components/ui/use-toast";
 import { CheckCircle2, XCircle, AlertTriangle, Eye, Search } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
+import SEO from "@/components/SEO";
 
 type Candidate = {
   id: string;
@@ -183,6 +184,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   return (
     <div className={embedded ? "" : "min-h-dvh bg-background"}>
+      <SEO title="Content Review — Heartify Admin" description="Approve, reject, and moderate incoming Heartify content candidates." path="/admin/review" />
       {!embedded && <Navbar />}
       <div className={embedded ? "space-y-6" : "mx-auto max-w-6xl p-4 space-y-6"}>
         <div className="flex items-center justify-between">

@@ -11,6 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { track } from "@/lib/analytics";
 import { useRequireAdminMfa } from "@/hooks/useRequireAdminMfa";
 import { useRole } from "@/hooks/useRole";
+import SEO from "@/components/SEO";
 
 interface BlockedRow { id: string; pattern: string; reason: string | null; created_at: string }
 interface OverrideRow {
@@ -146,6 +147,7 @@ const AdminConsole = () => {
 
   return (
     <div className="min-h-dvh bg-background">
+      <SEO title="Admin Console — Heartify" description="Unified admin console for Heartify moderators and owners." path="/admin" />
       <Navbar />
       <main className="container mx-auto max-w-5xl px-4 py-8">
         <div className="mb-6 flex items-center gap-3">

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, ShieldCheck, AlertTriangle, ImageOff } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { toast } from "@/components/ui/use-toast";
+import SEO from "@/components/SEO";
 
 interface Report {
   ok: boolean;
@@ -82,6 +83,7 @@ const AuditPage = () => {
 
   return (
     <div className="min-h-dvh bg-background pb-20">
+      <SEO title="Audit Log — Heartify Admin" description="Immutable audit trail of Heartify admin, moderator, and owner actions." path="/admin/audit" />
       <Navbar />
       <div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6 flex items-center gap-3">

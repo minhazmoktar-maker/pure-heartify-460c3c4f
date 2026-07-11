@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import SEO from "@/components/SEO";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
+      <SEO title="Reset your Password — Heartify" description="Request a password reset link to regain access to your Heartify account." path="/forgot-password" />
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2">

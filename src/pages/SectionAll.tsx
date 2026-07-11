@@ -6,6 +6,7 @@ import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { useCuratedSection } from "@/hooks/useCuratedSection";
 import { isTrustedChannel } from "@/data/trustedChannels";
 import { Badge } from "@/components/ui/badge";
+import SEO from "@/components/SEO";
 
 const SectionAll = () => {
   const { sectionId } = useParams<{ sectionId: string }>();
@@ -44,6 +45,7 @@ const SectionAll = () => {
 
   return (
     <div className="min-h-dvh bg-background pb-12">
+      <SEO title="Browse Section — Heartify" description="Explore curated halal videos and audio across every section on Heartify." path="/section" />
       <Navbar />
 
       <div className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">
