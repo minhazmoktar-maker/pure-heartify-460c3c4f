@@ -77,3 +77,25 @@ export function celebrateMilestone(days: number) {
     colors: ["#22c55e", "#facc15", "#10b981", "#f59e0b", "#a78bfa"],
   });
 }
+
+/** Heartify+ upgrade success — gold/emerald burst tuned to brand hues. */
+export function celebrateUpgrade() {
+  if (REDUCED()) return;
+  void buzz([12, 40, 20]);
+  const colors = ["#facc15", "#f59e0b", "#10b981", "#22c55e", "#ffffff"];
+  // Center burst
+  confetti({
+    particleCount: 90,
+    spread: 80,
+    startVelocity: 38,
+    origin: { y: 0.55 },
+    ticks: 160,
+    scalar: 1,
+    colors,
+  });
+  // Delayed side puffs for a layered feel
+  setTimeout(() => {
+    confetti({ particleCount: 25, angle: 60, spread: 55, origin: { x: 0.05, y: 0.7 }, colors });
+    confetti({ particleCount: 25, angle: 120, spread: 55, origin: { x: 0.95, y: 0.7 }, colors });
+  }, 180);
+}

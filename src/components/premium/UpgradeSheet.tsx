@@ -45,7 +45,11 @@ export default function UpgradeSheet({ open, onOpenChange, feature }: UpgradeShe
           ))}
         </ul>
         <div className="mt-6 flex flex-col gap-2">
-          <Button asChild size="lg" className="w-full">
+          <Button
+            asChild
+            size="lg"
+            className="w-full bg-[hsl(var(--gold))] text-[hsl(var(--gold-foreground,var(--background)))] hover:bg-[hsl(var(--gold))]/90 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 shadow-sm active:scale-[0.98] transition-transform"
+          >
             <Link to="/plus" onClick={() => onOpenChange(false)}>See Heartify+ plans</Link>
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
