@@ -12,6 +12,8 @@
 //                            defaults to https://pure-heartify.lovable.app/admin/alerts
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 
 interface Payload {
   kind: string;
@@ -164,6 +166,18 @@ function renderEmailHtml(p: Payload, title: string, timestamp: string): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // 60 alerts/min per identity. Client fire-and-forgets on frontend errors —
+  // a bug loop or malicious page could spam Slack/email/DB otherwise.
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const limited = await enforceRateLimit(admin, {
+    identity: getClientIdentity(req, null),
+    action: "dispatch-alert", limit: 60, windowSeconds: 60,
+  });
+  if (limited) return new Response(JSON.stringify({ error: "rate_limited" }), {
+    status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+
+
   let p: Payload;
   try {
     p = await req.json();
@@ -179,6 +193,12 @@ Deno.serve(async (req) => {
   }
   p.severity = (p.severity ?? "warn").toLowerCase();
 
+  const emoji = SEV_EMOJI[p.severity] ?? "•";
+  const kindLabel = KIND_LABEL[p.kind] ?? p.kind;
+  const title = `${emoji} [${p.severity.toUpperCase()}] ${kindLabel}`;
+  const timestamp = new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC";
+  const results: Record<string, unknown> = {};
+
   // Persist to production_alerts when requested (service-role only)
   if (p.persist) {
     try {
@@ -189,11 +209,6 @@ Deno.serve(async (req) => {
     }
   }
 
-  const emoji = SEV_EMOJI[p.severity] ?? "•";
-  const kindLabel = KIND_LABEL[p.kind] ?? p.kind;
-  const title = `${emoji} [${p.severity.toUpperCase()}] ${kindLabel}`;
-  const timestamp = new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC";
-  const results: Record<string, unknown> = {};
 
   // ── Slack ────────────────────────────────────────────────
   if (SLACK_WEBHOOK_URL) {

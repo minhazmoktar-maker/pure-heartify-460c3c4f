@@ -2,6 +2,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 const DhikrSchema = z.object({
   dhikr_key: z.string().min(1).max(120),
@@ -60,6 +61,16 @@ Deno.serve(async (req) => {
   const { data: userData } = await client.auth.getUser();
   const userId = userData.user?.id;
   if (!userId) return new Response(JSON.stringify({ error: "invalid token" }), { status: 401, headers: corsHeaders });
+
+  // Sync-push is bursty on session start, so allow generous per-user cap
+  // but block runaway/replay loops: 60 pushes/min.
+  const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const limited = await enforceRateLimit(admin, {
+    identity: userId, action: "user-sync-push", limit: 60, windowSeconds: 60,
+  });
+  if (limited) return new Response(JSON.stringify({ error: "rate_limited" }), {
+    status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 
   const parsed = BodySchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {

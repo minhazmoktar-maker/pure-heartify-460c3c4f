@@ -11,6 +11,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { enforceRateLimit } from '../_shared/rateLimit.ts';
 
 // Tables that store rows keyed by user_id and must be scrubbed on deletion.
 // Keep this list in sync with the schema — every new user-scoped table should
@@ -82,6 +83,13 @@ Deno.serve(async (req) => {
   const admin = createClient(supabaseUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+
+  // Rate limit: 3 delete attempts / hour per user — prevents accidental
+  // repeated firings and forecloses brute-force enumeration of the endpoint.
+  const limited = await enforceRateLimit(admin, {
+    identity: userId, action: 'delete_account', limit: 3, windowSeconds: 3600,
+  });
+  if (limited) return json({ error: 'rate_limited' }, 429);
 
   // Refuse to delete platform owners — they must be transferred first, or
   // the platform loses its last admin. Matches prevent_last_owner_removal().

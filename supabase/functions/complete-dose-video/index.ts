@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +37,16 @@ Deno.serve(async (req) => {
 
     const userId = userData.user.id;
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
+    // Rate limit: 30 completions/min. Dose has ≤3 videos, so this is 10x
+    // headroom over legitimate use and stops scripted streak inflation.
+    const limited = await enforceRateLimit(admin, {
+      identity: userId, action: "complete-dose", limit: 30, windowSeconds: 60,
+    });
+    if (limited) return new Response(JSON.stringify({ error: "rate_limited" }), {
+      status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
     const today = new Date().toISOString().slice(0, 10);
 
     // Find today's dose containing this video

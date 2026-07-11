@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { enforceRateLimit } from '../_shared/rateLimit.ts';
 
 const EXCLUSION_KEYWORDS = [
   'music', 'song', 'dance', 'sexy', 'bikini', 'alcohol', 'beer', 'wine',
@@ -38,6 +39,15 @@ Deno.serve(async (req) => {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Verification hits YouTube Data API (quota-costly). Cap at 20/min/admin.
+    const limited = await enforceRateLimit(admin, {
+      identity: `verify-channel:${user.id}`,
+      action: 'verify-channel', limit: 20, windowSeconds: 60,
+    });
+    if (limited) return new Response(JSON.stringify({ error: 'rate_limited' }), {
+      status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
     const body = await req.json();
     const { youtube_channel_id, handle, title: fallbackTitle, category, source } = body;

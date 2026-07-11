@@ -17,6 +17,9 @@
  *   }
  */
 
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -70,6 +73,13 @@ Deno.serve(async (req) => {
   const isAdmin = adminRes.ok && ((await adminRes.json()) as unknown[]).length > 0;
 
   if (!isOwner && !isAdmin) return json({ error: "forbidden" }, 403);
+
+  // 120 log writes/min/actor — protects the audit table from being flooded.
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const limited = await enforceRateLimit(admin, {
+    identity: user.id, action: "log-privileged-action", limit: 120, windowSeconds: 60,
+  });
+  if (limited) return json({ error: "rate_limited" }, 429);
 
   let body: Record<string, unknown> = {};
   try {
