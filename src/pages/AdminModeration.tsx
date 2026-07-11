@@ -1,3 +1,4 @@
+import PageSkeleton from "@/components/PageSkeleton";
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { FileWarning, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";

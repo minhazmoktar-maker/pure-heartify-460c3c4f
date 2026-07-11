@@ -1,3 +1,4 @@
+import PageSkeleton from "@/components/PageSkeleton";
 import { lazy, Suspense } from "react";
 import { Crown, Loader2, Shield, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";

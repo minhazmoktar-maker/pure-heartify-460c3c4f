@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Sparkles, Clock, CheckCircle2, Flame, PlayCircle } from "lucide-react";
