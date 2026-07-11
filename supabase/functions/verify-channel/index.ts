@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { enforceRateLimit } from '../_shared/rateLimit.ts';
 
 const EXCLUSION_KEYWORDS = [
   'music', 'song', 'dance', 'sexy', 'bikini', 'alcohol', 'beer', 'wine',
