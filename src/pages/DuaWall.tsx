@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Heart, Loader2, Send, Share2, Trash2, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Navbar from "@/components/Navbar";
+import SectionHeader from "@/components/SectionHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
