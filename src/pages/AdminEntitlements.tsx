@@ -254,45 +254,43 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
             </div>
           ) : (
             <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+            <table className="heartify-table min-w-[640px]">
+              <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left">User</th>
-                  <th className="px-4 py-3 text-left">Plan</th>
-                  <th className="px-4 py-3 text-left">Expires</th>
-                  <th className="px-4 py-3 text-left">Updated</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th>User</th>
+                  <th>Plan</th>
+                  <th>Expires</th>
+                  <th>Updated</th>
+                  <th className="!text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {visible.map((r) => {
                   const active = r.plan !== "free" && (!r.expires_at || new Date(r.expires_at) > new Date());
                   return (
-                    <tr key={r.id} className="border-t">
-                      <td className="px-4 py-3">
+                    <tr key={r.id}>
+                      <td>
                         <div className="font-medium">{r.display_name ?? "—"}</div>
-                        <div className="text-xs text-muted-foreground">{r.user_id}</div>
+                        <div className="text-xs text-muted-foreground font-mono">{r.user_id}</div>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                          active ? "bg-gold/20 text-gold" : "bg-muted text-muted-foreground"
-                        }`}>
+                      <td>
+                        <span className={`heartify-chip ${active ? "heartify-chip--gold" : "heartify-chip--muted"}`}>
                           {active && <Crown className="h-3 w-3" />}
                           {r.plan}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                      <td className="text-xs text-muted-foreground whitespace-nowrap">
                         {r.expires_at ? new Date(r.expires_at).toLocaleString() : "never"}
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                      <td className="text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(r.updated_at).toLocaleString()}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="text-right">
                         {active && (
                           <button
                             onClick={() => setRevokeTarget(r)}
                             disabled={busy === r.user_id}
-                            className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40 disabled:opacity-50"
                           >
                             {busy === r.user_id ? <Loader2 className="h-3 w-3 animate-spin" /> : <ShieldOff className="h-3 w-3" />}
                             Revoke
@@ -305,6 +303,7 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
               </tbody>
             </table>
             </div>
+
           )}
         </div>
       </div>
