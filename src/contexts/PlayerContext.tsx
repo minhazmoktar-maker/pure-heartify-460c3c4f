@@ -583,17 +583,24 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   // Suppress unused warning for platform (used inside effects & remote save).
   void platform;
 
-  const value: PlayerState = {
+  const next = useCallback(() => goNext(false), [goNext]);
+  const value = useMemo<PlayerState>(() => ({
     currentTrack, queue, isPlaying, isBuffering, isPremiumUser, isPremiumLoading,
     progress, duration, volume, muted, shuffle, repeat, playbackRate,
     isPreview, previewCapSeconds: PREVIEW_SECONDS,
     recent, playCounts, lastError, needsUserGesture, resumePlayback,
     play, playQueue, togglePlay,
-    next: () => goNext(false),
+    next,
     prev: goPrev,
     seek, setVolume, toggleMute, toggleShuffle, cycleRepeat,
     setPlaybackRate, togglePremium, addToQueue, clearQueue,
-  };
+  }), [
+    currentTrack, queue, isPlaying, isBuffering, isPremiumUser, isPremiumLoading,
+    progress, duration, volume, muted, shuffle, repeat, playbackRate,
+    isPreview, recent, playCounts, lastError, needsUserGesture, resumePlayback,
+    play, playQueue, togglePlay, next, goPrev, seek, setVolume, toggleMute,
+    toggleShuffle, cycleRepeat, setPlaybackRate, togglePremium, addToQueue, clearQueue,
+  ]);
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
 };
