@@ -292,9 +292,9 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <Badge className={severityColor(r.severity)}>{r.severity}</Badge>
-                            <Badge variant="outline">{REASON_LABEL[r.reason] ?? r.reason}</Badge>
-                            {r.notify_reporter && <Badge variant="secondary" className="gap-1"><MessageSquare className="h-3 w-3" /> notify</Badge>}
+                            <span className={severityChip(r.severity)}>{r.severity}</span>
+                            <span className="heartify-chip heartify-chip--muted">{REASON_LABEL[r.reason] ?? r.reason}</span>
+                            {r.notify_reporter && <span className="heartify-chip heartify-chip--primary gap-1"><MessageSquare className="h-3 w-3" /> notify</span>}
                           </div>
                           <div className="mt-2 truncate text-sm font-medium">
                             {r.video_title ?? r.channel_title ?? r.video_id ?? r.channel_id ?? "(untitled)"}
