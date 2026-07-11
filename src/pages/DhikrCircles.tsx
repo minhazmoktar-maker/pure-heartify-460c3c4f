@@ -255,12 +255,17 @@ export default function DhikrCircles() {
             <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading circles…
           </div>
         ) : activeSorted.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
-              <Users className="h-10 w-10 text-muted-foreground" />
-              <p className="text-muted-foreground">No active circles yet. Start one!</p>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={Users}
+            title="No active circles yet"
+            description={
+              user
+                ? "Be the first to start one — invite friends and rack up the collective reward, in shā' Allāh."
+                : "Sign in to start the first circle and invite your friends."
+            }
+            actionLabel={user ? undefined : "Sign in"}
+            actionHref={user ? undefined : "/auth"}
+          />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {activeSorted.map((c) => (
