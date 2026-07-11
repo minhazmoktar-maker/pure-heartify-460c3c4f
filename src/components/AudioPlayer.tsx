@@ -39,7 +39,7 @@ const AudioPlayer = () => {
         <motion.div
           initial={{ y: 90 }} animate={{ y: 0 }} exit={{ y: 90 }}
           transition={{ type: "spring", stiffness: 320, damping: 32 }}
-          className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-card/95 backdrop-blur-xl shadow-[0_-8px_24px_-12px_hsl(var(--foreground)/0.25)]"
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-card/95 backdrop-blur-xl shadow-[0_-8px_24px_-12px_hsl(var(--foreground)/0.25)] pb-safe"
           role="region"
           aria-label="Now playing"
         >
@@ -98,17 +98,17 @@ const AudioPlayer = () => {
               <div className="flex items-center gap-3">
                 <button onClick={toggleShuffle} aria-label="Shuffle" aria-pressed={shuffle}
                   className={cn(
-                    "transition-colors",
+                    "tap-target transition-colors",
                     shuffle ? "text-primary" : "text-muted-foreground hover:text-foreground",
                   )}>
                   <Shuffle className="h-4 w-4" />
                 </button>
                 <button onClick={prev} aria-label="Previous"
-                  className="text-muted-foreground transition-colors hover:text-foreground">
+                  className="tap-target text-muted-foreground transition-colors hover:text-foreground">
                   <SkipBack className="h-4 w-4" />
                 </button>
                 <button onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105 disabled:opacity-60"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105 active:scale-95 disabled:opacity-60"
                   disabled={isBuffering && !isPlaying}>
                   {isBuffering ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -119,13 +119,13 @@ const AudioPlayer = () => {
                   )}
                 </button>
                 <button onClick={next} aria-label="Next"
-                  className="text-muted-foreground transition-colors hover:text-foreground">
+                  className="tap-target text-muted-foreground transition-colors hover:text-foreground">
                   <SkipForward className="h-4 w-4" />
                 </button>
                 <button onClick={cycleRepeat}
                   aria-label={`Repeat ${repeat}`}
                   className={cn(
-                    "transition-colors",
+                    "tap-target transition-colors",
                     repeat !== "off" ? "text-primary" : "text-muted-foreground hover:text-foreground",
                   )}>
                   {repeat === "one" ? <Repeat1 className="h-4 w-4" /> : <Repeat className="h-4 w-4" />}

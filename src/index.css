@@ -118,4 +118,19 @@
   .card-interactive {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover focus-visible:-translate-y-0.5 focus-visible:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:translate-y-0 active:scale-[0.99];
   }
+
+  /* iOS safe-area helpers. Use on any fixed bottom bar so the notch/home indicator
+     doesn't overlap tap targets. */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Minimum accessible tap target (WCAG 2.5.5 recommends ≥44×44 CSS px).
+     Wraps icon-only buttons to hit the target without changing visual size. */
+  .tap-target {
+    @apply inline-flex items-center justify-center min-h-[44px] min-w-[44px];
+  }
 }
