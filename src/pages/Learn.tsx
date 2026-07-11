@@ -50,19 +50,13 @@ const Learn = () => {
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         {!openCourse ? (
           <>
-            <header className="mb-6 flex items-start gap-3">
-              <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-                <GraduationCap className="h-6 w-6" />
-              </div>
-              <div>
-                <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
-                  Learning Paths
-                </h1>
-                <p className="mt-1 text-muted-foreground">
-                  Short, structured mini-courses. Read a lesson, mark it done, keep going.
-                </p>
-              </div>
-            </header>
+            <SectionHeader
+              title="Learning Paths"
+              description="Short, structured mini-courses. Read a lesson, mark it done, keep going."
+              icon={GraduationCap}
+              className="mb-6"
+            />
+
 
             <div className="mb-5 flex flex-wrap gap-2">
               {LEARNING_CATEGORIES.map((c) => (
