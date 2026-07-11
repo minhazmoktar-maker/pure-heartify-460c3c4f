@@ -4,6 +4,7 @@ import {
   Search, Play, ChevronRight, Clock3, Flame, ListMusic,
 } from "lucide-react";
 import FadeIn from "@/components/FadeIn";
+import SmartImage from "@/components/SmartImage";
 import { usePlayer } from "@/contexts/PlayerContext";
 import PlaylistCard from "@/components/PlaylistCard";
 import TrackRow from "@/components/TrackRow";
