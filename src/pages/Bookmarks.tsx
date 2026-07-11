@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Bookmark, BookOpen, BookText, Trash2, Search, StickyNote, Save, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import SectionHeader from "@/components/SectionHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
