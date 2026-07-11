@@ -49,11 +49,11 @@ export default function PageHeader({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+        <h1 className="truncate font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
+          <p className="mt-1 line-clamp-2 text-sm leading-6 text-muted-foreground sm:text-[15px]">
             {subtitle}
           </p>
         )}

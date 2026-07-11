@@ -89,11 +89,20 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
+    @apply font-heading tracking-tight text-foreground;
   }
+  h1 { line-height: 1.15; letter-spacing: -0.02em; }
+  h2 { line-height: 1.2;  letter-spacing: -0.015em; }
+  h3 { line-height: 1.25; letter-spacing: -0.01em; }
+  h4, h5, h6 { line-height: 1.3; }
+
+  p { line-height: 1.65; }
 }
 
 @layer utilities {
@@ -132,6 +141,69 @@
      Wraps icon-only buttons to hit the target without changing visual size. */
   .tap-target {
     @apply inline-flex items-center justify-center min-h-[44px] min-w-[44px];
+  }
+
+  /* Long-form typographic rhythm — apply to any article/prose wrapper
+     (About, Quran surah body, Hadith translations, Seerah chapters).
+     Establishes a modular scale, comfortable measure, and consistent spacing. */
+  .prose-heartify {
+    @apply text-foreground;
+    max-width: 68ch;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  .prose-heartify > * + * { margin-top: 1em; }
+  .prose-heartify h1 {
+    @apply font-heading tracking-tight;
+    font-size: clamp(1.875rem, 1.4rem + 1.8vw, 2.5rem);
+    line-height: 1.15;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+  }
+  .prose-heartify h2 {
+    @apply font-heading tracking-tight;
+    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+    line-height: 1.25;
+    margin-top: 2em;
+    margin-bottom: 0.5em;
+  }
+  .prose-heartify h3 {
+    @apply font-heading tracking-tight;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin-top: 1.75em;
+    margin-bottom: 0.4em;
+  }
+  .prose-heartify h4 {
+    @apply font-heading;
+    font-size: 1.0625rem;
+    margin-top: 1.5em;
+    margin-bottom: 0.35em;
+  }
+  .prose-heartify p { line-height: 1.75; }
+  .prose-heartify a {
+    @apply text-primary underline underline-offset-4 decoration-primary/40 hover:decoration-primary transition-colors;
+  }
+  .prose-heartify blockquote {
+    @apply border-l-2 border-primary/50 pl-4 italic text-muted-foreground;
+    margin: 1.5em 0;
+  }
+  .prose-heartify ul, .prose-heartify ol {
+    padding-left: 1.5rem;
+  }
+  .prose-heartify ul { list-style: disc; }
+  .prose-heartify ol { list-style: decimal; }
+  .prose-heartify li + li { margin-top: 0.35em; }
+  .prose-heartify hr {
+    @apply border-border/60;
+    margin: 2em 0;
+  }
+  .prose-heartify code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.9em];
+  }
+  .prose-heartify :where(.font-arabic) {
+    line-height: 2.1;
+    letter-spacing: 0;
   }
 }
 

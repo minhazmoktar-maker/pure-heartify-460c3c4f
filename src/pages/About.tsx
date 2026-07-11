@@ -21,11 +21,9 @@ export default function About() {
           Back to home
         </Link>
 
-        <header className="mb-10">
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
-            About Heartify
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
+        <header className="prose-heartify mb-10">
+          <h1>About Heartify</h1>
+          <p className="text-muted-foreground">
             Heartify is a curated halal video and audio experience built around trusted
             channels, clean recommendations, user reports, and administrator review.
           </p>
