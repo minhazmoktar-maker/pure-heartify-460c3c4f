@@ -215,9 +215,7 @@ export default function GroupKhatmDetail() {
     return (
       <div className="min-h-dvh bg-background">
         <Navbar />
-        <div className="flex justify-center py-24">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
+        <PageSkeleton variant="detail" />
       </div>
     );
   }
@@ -226,11 +224,14 @@ export default function GroupKhatmDetail() {
     return (
       <div className="min-h-dvh bg-background">
         <Navbar />
-        <main className="container mx-auto max-w-2xl px-4 py-12 text-center">
-          <p className="text-muted-foreground">Group not found or you don't have access.</p>
-          <Button asChild variant="outline" className="mt-4">
-            <Link to="/khatm/groups">Back to groups</Link>
-          </Button>
+        <main className="container mx-auto max-w-2xl px-4 py-12">
+          <EmptyState
+            icon={BookOpen}
+            title="Group not found"
+            description="This Khatm group is private, no longer available, or you don't have access. Explore public circles below."
+            actionLabel="Browse groups"
+            actionHref="/khatm/groups"
+          />
         </main>
       </div>
     );
