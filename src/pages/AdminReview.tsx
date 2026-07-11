@@ -374,6 +374,27 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           )}
         </SheetContent>
       </Sheet>
+
+      <ConfirmDialog
+        open={!!rejectTarget}
+        onOpenChange={(o) => !o && setRejectTarget(null)}
+        tone="destructive"
+        loading={busy}
+        title="Reject this candidate?"
+        description={
+          <>
+            This marks <strong className="text-foreground">{rejectTarget?.title}</strong> as rejected and writes to
+            the audit log. Approval will require re-submitting the channel through the verifier.
+          </>
+        }
+        confirmLabel="Reject"
+        onConfirm={async () => {
+          if (!rejectTarget) return;
+          const t = rejectTarget;
+          setRejectTarget(null);
+          await decide(t, "rejected", "Manual rejection");
+        }}
+      />
     </div>
   );
 };
