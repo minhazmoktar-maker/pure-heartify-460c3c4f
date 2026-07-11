@@ -12,6 +12,8 @@
 //                            defaults to https://pure-heartify.lovable.app/admin/alerts
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 
 interface Payload {
   kind: string;
