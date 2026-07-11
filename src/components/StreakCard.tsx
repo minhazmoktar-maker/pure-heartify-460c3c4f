@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Flame, Snowflake, Trophy, Loader2, Share2 } from "lucide-react";
+import { Flame, Snowflake, Trophy, Share2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useStreak } from "@/hooks/useStreak";
 import { shareContent } from "@/lib/share";
 import { supabase } from "@/integrations/supabase/client";
