@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, CalendarDays, Clock, Flame, Heart, Loader2, Sparkles } from "lucide-react";
+import { BookOpen, CalendarDays, Clock, Flame, Heart, Sparkles, CalendarX } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 
 interface PublicRecap {
   handle: string;
