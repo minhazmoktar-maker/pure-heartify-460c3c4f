@@ -231,17 +231,20 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsList>
 
           <TabsContent value="pending" className="space-y-2">
-            {pending.length === 0 && <p className="text-sm text-muted-foreground p-4">No pending candidates.</p>}
+            {pending.length === 0 && (
+              <EmptyState icon={Inbox} tone="muted" title="No pending candidates"
+                description="Every submitted channel has been triaged. Submit new channel IDs above to start another verification pass." />
+            )}
             {pending.map((c) => (
               <Card key={c.id}>
                 <CardContent className="p-4 flex items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{c.title}</h3>
-                      <Badge variant="outline">conf {c.confidence ?? "?"}</Badge>
-                      <Badge variant={c.duplicate_risk === "low" ? "outline" : "destructive"}>
+                      <span className="heartify-chip heartify-chip--muted">conf {c.confidence ?? "?"}</span>
+                      <span className={`heartify-chip ${c.duplicate_risk === "low" ? "heartify-chip--muted" : "heartify-chip--danger"}`}>
                         dup: {c.duplicate_risk ?? "?"}
-                      </Badge>
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground">{c.youtube_channel_id} · {c.category ?? "uncategorized"}</p>
                     {c.evidence?.exclusion_hits?.length > 0 && (
@@ -261,6 +264,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
               </Card>
             ))}
           </TabsContent>
+
 
           <TabsContent value="compare">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
