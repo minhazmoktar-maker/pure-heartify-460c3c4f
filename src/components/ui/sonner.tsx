@@ -10,13 +10,28 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      position="top-center"
+      closeButton
+      richColors={false}
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-border group-[.toaster]:shadow-lg group-[.toaster]:rounded-xl group-[.toaster]:backdrop-blur-sm",
+          title: "group-[.toast]:font-medium group-[.toast]:text-[0.925rem]",
+          description: "group-[.toast]:text-muted-foreground group-[.toast]:text-sm",
+          actionButton:
+            "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground group-[.toast]:rounded-md",
+          cancelButton:
+            "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground group-[.toast]:rounded-md",
+          closeButton:
+            "group-[.toast]:bg-background group-[.toast]:border-border group-[.toast]:text-muted-foreground hover:group-[.toast]:text-foreground",
+          success:
+            "group-[.toaster]:border-l-4 group-[.toaster]:border-l-[hsl(var(--gold))] [&_[data-icon]]:text-[hsl(var(--gold))]",
+          error:
+            "group-[.toaster]:border-l-4 group-[.toaster]:border-l-destructive [&_[data-icon]]:text-destructive",
+          info: "group-[.toaster]:border-l-4 group-[.toaster]:border-l-primary [&_[data-icon]]:text-primary",
+          warning:
+            "group-[.toaster]:border-l-4 group-[.toaster]:border-l-[hsl(var(--gold))] [&_[data-icon]]:text-[hsl(var(--gold))]",
         },
       }}
       {...props}
