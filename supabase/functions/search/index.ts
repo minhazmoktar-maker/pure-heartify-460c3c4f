@@ -14,6 +14,7 @@ import { getSearchProvider } from "../_shared/search/providers.ts";
 import { detectIntent } from "../_shared/search/intent.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
+import { embedOne, toPgVector } from "../_shared/embed.ts";
 
 const NORMALIZE = (s: string) =>
   s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
