@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -16,7 +17,7 @@ type DailyCache = {
   hadith?: { text: string; ref: string };
 };
 
-function todayISO() { return new Date().toISOString().slice(0, 10); }
+function todayISO() { return localToday(); }
 
 // Deterministic "seed of the day" so ayah/hadith rotate but stay stable per day
 function dayIndex() {

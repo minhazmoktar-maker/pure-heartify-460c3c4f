@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";

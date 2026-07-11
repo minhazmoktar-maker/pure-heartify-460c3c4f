@@ -135,3 +135,32 @@ export function localDayKey(date: Date, timezone: string): string {
   const d = parts.find((p) => p.type === "day")?.value ?? "01";
   return `${y}-${m}-${d}`;
 }
+
+/** Convenience: today's YYYY-MM-DD in the user's local timezone. */
+export function localToday(timezone: string = detectTimezone()): string {
+  return localDayKey(new Date(), timezone);
+}
+
+/**
+ * Country → ISO 4217 currency map for the 60+ markets we price for.
+ * Falls back to USD for unknown countries.
+ */
+const COUNTRY_CURRENCY: Record<string, string> = {
+  US: "USD", CA: "CAD", GB: "GBP", EU: "EUR",
+  DE: "EUR", FR: "EUR", ES: "EUR", IT: "EUR", NL: "EUR", IE: "EUR", PT: "EUR", BE: "EUR", AT: "EUR", FI: "EUR", GR: "EUR",
+  TR: "TRY", SA: "SAR", AE: "AED", QA: "QAR", KW: "KWD", BH: "BHD", OM: "OMR", JO: "JOD", LB: "LBP",
+  EG: "EGP", MA: "MAD", DZ: "DZD", TN: "TND", LY: "LYD", SD: "SDG",
+  PK: "PKR", BD: "BDT", IN: "INR", LK: "LKR", NP: "NPR",
+  ID: "IDR", MY: "MYR", SG: "SGD", TH: "THB", PH: "PHP", VN: "VND", BN: "BND",
+  JP: "JPY", KR: "KRW", CN: "CNY", HK: "HKD", TW: "TWD",
+  AU: "AUD", NZ: "NZD",
+  BR: "BRL", MX: "MXN", AR: "ARS", CL: "CLP", CO: "COP", PE: "PEN",
+  NG: "NGN", ZA: "ZAR", KE: "KES", GH: "GHS", ET: "ETB", UG: "UGX", TZ: "TZS",
+  RU: "RUB", UA: "UAH", PL: "PLN", CZ: "CZK", RO: "RON", HU: "HUF", SE: "SEK", NO: "NOK", DK: "DKK", CH: "CHF",
+};
+
+export function currencyForCountry(country: string | null | undefined): string {
+  if (!country) return "USD";
+  return COUNTRY_CURRENCY[country.toUpperCase()] ?? "USD";
+}
+

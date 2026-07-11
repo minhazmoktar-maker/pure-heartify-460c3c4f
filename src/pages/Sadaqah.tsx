@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { HandCoins, Plus, Trash2, Target, TrendingUp, Calendar } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -31,7 +32,7 @@ const CATEGORIES = [
 const CURRENCIES = ["USD", "GBP", "EUR", "SAR", "AED", "PKR", "INR", "BDT", "MYR", "IDR", "TRY", "NGN"];
 
 const uid = () => Math.random().toString(36).slice(2, 10);
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => localToday();
 const monthKey = (d: string) => d.slice(0, 7);
 
 function load<T>(k: string, fb: T): T {

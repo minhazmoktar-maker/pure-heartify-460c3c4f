@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, BookMarked, Plus, Trash2, Heart, Sparkles } from "lucide-react";
@@ -56,7 +57,7 @@ const typeMeta: Record<Entry["type"], { label: string; icon: typeof Sparkles; co
   },
 };
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => localToday();
 
 const Journal = () => {
   const [entries, setEntries] = useState<Entry[]>([]);

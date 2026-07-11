@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { RotateCcw, Plus, Minus, Flame, Target, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -31,7 +32,7 @@ interface State {
   todayCompleted: number;
 }
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const todayKey = () => localToday();
 
 const loadState = (): State => {
   try {

@@ -1,3 +1,4 @@
+import { localToday } from "@/lib/intl";
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2, Play, Check, RotateCcw, ListPlus, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -31,7 +32,7 @@ function loadLog(): Record<string, string[]> {
 }
 function saveLog(v: Record<string, string[]>) { localStorage.setItem(LOG_KEY, JSON.stringify(v)); }
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const todayKey = () => localToday();
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
