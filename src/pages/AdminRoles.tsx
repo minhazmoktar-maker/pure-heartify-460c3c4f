@@ -163,25 +163,30 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
                   />
                   <Button onClick={() => refreshUsers()} disabled={busy}>Search</Button>
                 </div>
-                <div className="rounded-md border">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/40 text-left">
+                <div className="rounded-md border overflow-x-auto">
+                  <table className="heartify-table">
+                    <thead>
                       <tr>
-                        <th className="px-3 py-2">Email</th>
-                        <th className="px-3 py-2">Current role</th>
-                        <th className="px-3 py-2">Change to</th>
+                        <th>Email</th>
+                        <th>Current role</th>
+                        <th>Change to</th>
                       </tr>
                     </thead>
                     <tbody>
                       {users.map(u => {
                         const cur = roleOf(u.id);
+                        const chipTone =
+                          cur === "owner" ? "heartify-chip--gold"
+                          : cur === "admin" ? "heartify-chip--primary"
+                          : cur === "moderator" ? "heartify-chip--warning"
+                          : "heartify-chip--muted";
                         return (
-                          <tr key={u.id} className="border-t">
-                            <td className="px-3 py-2 font-mono text-xs">{u.email}</td>
-                            <td className="px-3 py-2">
-                              <Badge variant={cur === "owner" ? "default" : cur === "admin" ? "secondary" : "outline"}>{cur}</Badge>
+                          <tr key={u.id}>
+                            <td className="font-mono text-xs">{u.email}</td>
+                            <td>
+                              <span className={`heartify-chip ${chipTone}`}>{cur}</span>
                             </td>
-                            <td className="px-3 py-2">
+                            <td>
                               <div className="flex flex-wrap gap-1">
                                 {(["owner", "admin", "moderator", "user"] as const).map(r => (
                                   <Button key={r} size="sm" variant={cur === r ? "default" : "outline"}
@@ -201,6 +206,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
                     </tbody>
                   </table>
                 </div>
+
               </CardContent>
             </Card>
           </TabsContent>
