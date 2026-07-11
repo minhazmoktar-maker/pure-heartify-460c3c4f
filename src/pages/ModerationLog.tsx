@@ -140,41 +140,45 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
             {loading ? (
               <p className="text-muted-foreground">Loading…</p>
             ) : filtered.length === 0 ? (
-              <p className="text-muted-foreground">No rejections match.</p>
+              <EmptyState
+                icon={ShieldCheck}
+                title="No rejections match"
+                description="Either nothing has been auto-rejected under these filters, or the pipeline is running clean. Try widening the search or clearing filters."
+              />
             ) : (
               <div className="overflow-x-auto rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/50 text-left">
+                <table className="heartify-table w-full text-sm">
+                  <thead>
                     <tr>
-                      <th className="px-3 py-2">Thumb</th>
-                      <th className="px-3 py-2">Title</th>
-                      <th className="px-3 py-2">Channel</th>
-                      <th className="px-3 py-2">Reason</th>
-                      <th className="px-3 py-2">Matched rule</th>
-                      <th className="px-3 py-2">Score</th>
-                      <th className="px-3 py-2">Source</th>
-                      <th className="px-3 py-2">When</th>
+                      <th>Thumb</th>
+                      <th>Title</th>
+                      <th>Channel</th>
+                      <th>Reason</th>
+                      <th>Matched rule</th>
+                      <th>Score</th>
+                      <th>Source</th>
+                      <th>When</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((r) => (
-                      <tr key={r.id} className="border-t">
-                        <td className="px-3 py-2">
+                      <tr key={r.id} tabIndex={0}>
+                        <td>
                           {r.thumbnail_url ? (
-                            <img src={r.thumbnail_url} alt="" className="h-12 w-20 rounded object-cover" />
+                            <img src={r.thumbnail_url} alt="" loading="lazy" className="h-12 w-20 rounded object-cover" />
                           ) : null}
                         </td>
-                        <td className="max-w-xs truncate px-3 py-2 font-medium">{r.title}</td>
-                        <td className="px-3 py-2 text-muted-foreground">{r.channel_title}</td>
-                        <td className="px-3 py-2">
-                          <Badge className={reasonColors[r.reject_reason] ?? ""} variant="secondary">
+                        <td className="max-w-xs truncate font-medium">{r.title}</td>
+                        <td className="text-muted-foreground">{r.channel_title}</td>
+                        <td>
+                          <span className={`heartify-chip heartify-chip--${reasonTone[r.reject_reason] ?? "muted"}`}>
                             {r.reject_reason}
-                          </Badge>
+                          </span>
                         </td>
-                        <td className="px-3 py-2 font-mono text-xs">{r.matched_rule ?? "—"}</td>
-                        <td className="px-3 py-2">{r.halal_score ?? 0}</td>
-                        <td className="px-3 py-2 text-xs text-muted-foreground">{r.source}</td>
-                        <td className="px-3 py-2 text-xs text-muted-foreground">
+                        <td className="font-mono text-xs">{r.matched_rule ?? "—"}</td>
+                        <td>{r.halal_score ?? 0}</td>
+                        <td className="text-xs text-muted-foreground">{r.source}</td>
+                        <td className="text-xs text-muted-foreground">
                           {new Date(r.created_at).toLocaleString()}
                         </td>
                       </tr>
@@ -183,6 +187,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 </table>
               </div>
             )}
+
           </>
         )}
       </main>
