@@ -203,12 +203,12 @@ const Journal = () => {
 
         {/* Entries */}
         {grouped.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-            <BookMarked className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              Your journal is empty. Start with a small niyyah for today.
-            </p>
-          </div>
+          <EmptyState
+            icon={BookMarked}
+            title="Your journal is empty"
+            description="Start with a small niyyah, gratitude note, or reflection for today."
+          />
+
         ) : (
           <div className="space-y-6">
             {grouped.map(([date, list]) => (
