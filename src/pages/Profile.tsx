@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle, Download } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
 import ReferralCard from "@/components/ReferralCard";
@@ -187,6 +187,17 @@ const Profile = () => {
         >
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
+
+        {/* Quick links */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Link
+            to="/offline"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-secondary"
+          >
+            <Download className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
+            Offline downloads
+          </Link>
+        </div>
 
         {/* Tabs */}
         <div className="flex gap-0 border-b border-border mb-6 overflow-x-auto">

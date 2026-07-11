@@ -125,8 +125,12 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryRef = useRef(0);
   const lastRemoteSaveRef = useRef<number>(0);
+  /** When set, current playback is a 30s premium sample for a non-entitled user. */
+  const previewCapRef = useRef<number | null>(null);
   const platform = useMemo(() => detectPlatform(), []);
   const mobile = useMemo(() => isIOS() || isAndroid(), []);
+
+  const PREVIEW_SECONDS = 30;
 
   // Lazily construct audio element. iOS Safari REQUIRES construction inside
   // a user-gesture path AND `preload="none"` to avoid the "delay until user
@@ -289,6 +293,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setProgress(a.currentTime);
       saveLocal(a.currentTime);
       maybeSaveRemote(a.currentTime);
+      // Enforce the 30s premium sample cap for non-entitled listeners.
+      const cap = previewCapRef.current;
+      if (cap != null && a.currentTime >= cap) {
+        a.pause();
+        setIsPlaying(false);
+        previewCapRef.current = null;
+        window.dispatchEvent(new CustomEvent("heartify:preview-cap-reached", {
+          detail: { title: currentTrack?.title, trackId: currentTrack?.id },
+        }));
+      }
     };
     const onMeta = () => setDuration(a.duration || 0);
     const onWait = () => setIsBuffering(true);
@@ -420,8 +434,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       if (track.isPremium && !isPremiumUser) {
-        toast("Premium track", { description: "Unlock Premium to listen." });
-        return;
+        // Instead of blocking, offer a 30-second sample. The full source URL
+        // is still fetched — real bitstream protection lives at the CDN /
+        // signed-URL layer for entitled sessions. This surface just gives
+        // browsing users an audition before the paywall.
+        previewCapRef.current = PREVIEW_SECONDS;
+        toast("30-second preview", {
+          description: `Sampling "${track.title}" — upgrade to hear the full recitation.`,
+        });
+      } else {
+        previewCapRef.current = null;
       }
       // iOS: warm up the element inside the user gesture. Setting src + calling
       // play() synchronously is what earns the media element its autoplay

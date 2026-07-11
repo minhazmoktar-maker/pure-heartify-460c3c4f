@@ -1,4 +1,4 @@
-import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll } from "lucide-react";
+import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll, Download } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -75,6 +75,7 @@ const Navbar = () => {
                   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
                   { to: "/profile?tab=streak", label: "Daily dose & streak", icon: Flame },
                   { to: "/profile?tab=interests", label: "My interests", icon: ListMusic },
+                  { to: "/offline", label: "Offline downloads", icon: Download },
                   { to: "/profile", label: "Profile & settings", icon: Settings },
                 ].map(({ to, label, icon: Icon }) => (
                   <SheetClose asChild key={to}>
