@@ -253,7 +253,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                     <Button size="sm" onClick={() => decide(c, "approved", "Manual approval")} disabled={busy}>
                       <CheckCircle2 className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => decide(c, "rejected", "Manual rejection")} disabled={busy}>
+                    <Button size="sm" variant="destructive" onClick={() => setRejectTarget(c)} disabled={busy} aria-label={`Reject ${c.title}`}>
                       <XCircle className="h-4 w-4" />
                     </Button>
                   </div>
