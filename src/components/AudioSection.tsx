@@ -75,8 +75,11 @@ const CollectionRow = ({
             )}
           >
             <div className="relative aspect-square overflow-hidden">
-              <img src={t.cover} alt="" loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <SmartImage
+                src={t.cover}
+                alt=""
+                className="transition-transform duration-500 group-hover:scale-105"
+              />
               <div className="absolute inset-0 flex items-end justify-end p-2 opacity-0 transition-opacity group-hover:opacity-100">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary shadow-lg">
                   <Play className="ml-0.5 h-4 w-4 fill-primary-foreground text-primary-foreground" />
