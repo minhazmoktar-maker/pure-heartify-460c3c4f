@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import SectionHeader from "@/components/SectionHeader";
 import EmptyState from "@/components/EmptyState";
+import StatCard from "@/components/StatCard";
 import { toast } from "sonner";
 
 type Entry = {
