@@ -1,6 +1,9 @@
 import { LucideIcon, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import FadeIn from "@/components/FadeIn";
+
+type Tone = "default" | "muted" | "gold";
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -9,8 +12,25 @@ interface EmptyStateProps {
   actionLabel?: string;
   actionHref?: string;
   onAction?: () => void;
+  secondaryAction?: React.ReactNode;
+  tone?: Tone;
   className?: string;
 }
+
+const TONE_STYLES: Record<Tone, { icon: string; button: string }> = {
+  default: {
+    icon: "bg-primary/10 text-primary",
+    button: "bg-primary text-primary-foreground",
+  },
+  muted: {
+    icon: "bg-muted text-muted-foreground",
+    button: "bg-primary text-primary-foreground",
+  },
+  gold: {
+    icon: "bg-[hsl(var(--gold)/0.15)] text-[hsl(var(--gold))]",
+    button: "bg-[hsl(var(--gold))] text-black",
+  },
+};
 
 export default function EmptyState({
   icon: Icon = Sparkles,
@@ -19,20 +39,29 @@ export default function EmptyState({
   actionLabel,
   actionHref,
   onAction,
+  secondaryAction,
+  tone = "default",
   className,
 }: EmptyStateProps) {
+  const styles = TONE_STYLES[tone];
   const action = actionLabel ? (
     actionHref ? (
       <Link
         to={actionHref}
-        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+        className={cn(
+          "tap-target inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-transform hover:opacity-90 active:scale-[0.97]",
+          styles.button,
+        )}
       >
         {actionLabel}
       </Link>
     ) : (
       <button
         onClick={onAction}
-        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+        className={cn(
+          "tap-target inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-transform hover:opacity-90 active:scale-[0.97]",
+          styles.button,
+        )}
       >
         {actionLabel}
       </button>
@@ -40,20 +69,25 @@ export default function EmptyState({
   ) : null;
 
   return (
-    <div
+    <FadeIn
       className={cn(
         "flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center",
         className,
       )}
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+      <div className={cn("flex h-12 w-12 items-center justify-center rounded-full", styles.icon)}>
         <Icon className="h-6 w-6" />
       </div>
       <h3 className="text-base font-semibold text-foreground">{title}</h3>
       {description && (
         <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
       )}
-      {action && <div className="pt-1">{action}</div>}
-    </div>
+      {(action || secondaryAction) && (
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+          {action}
+          {secondaryAction}
+        </div>
+      )}
+    </FadeIn>
   );
 }
