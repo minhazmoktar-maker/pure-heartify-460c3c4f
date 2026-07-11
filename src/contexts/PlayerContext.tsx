@@ -119,6 +119,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [playbackRate, setPlaybackRateState] = useState(1);
   const [lastError, setLastError] = useState<PlaybackError | null>(null);
   const [needsUserGesture, setNeedsUserGesture] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
   const [recentEntries, setRecentEntries] = useState<RecentEntry[]>(() =>
     readJson<RecentEntry[]>(RECENT_KEY, []),
   );
