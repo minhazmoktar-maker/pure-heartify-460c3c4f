@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plus, Users, BookOpen, Loader2, Sparkles } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { z } from "zod";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
@@ -204,17 +206,16 @@ export default function GroupKhatmList() {
         </header>
 
         {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
+          <PageSkeleton variant="list" />
         ) : groups.length === 0 ? (
-          <Card className="p-8 text-center space-y-3">
-            <Sparkles className="mx-auto h-8 w-8 text-primary" aria-hidden />
-            <h2 className="text-lg font-semibold">No groups yet</h2>
-            <p className="text-sm text-muted-foreground">
-              Create a group and invite friends and family to complete the Quran together.
-            </p>
-          </Card>
+          <EmptyState
+            icon={Sparkles}
+            title="No groups yet"
+            description="Create a group and invite friends and family to complete the Quran together."
+            actionLabel={user ? "Create a group" : undefined}
+            onAction={user ? () => setOpen(true) : undefined}
+            tone="gold"
+          />
         ) : (
           <div className="grid gap-3">
             {groups.map((g) => (
@@ -231,9 +232,10 @@ export default function GroupKhatmList() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-foreground truncate">{g.name}</h3>
                       {g.completed_at && (
-                        <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-500">
-                          Completed
-                        </span>
+                        <span className="heartify-chip heartify-chip--primary">Completed</span>
+                      )}
+                      {g.is_public && !g.completed_at && (
+                        <span className="heartify-chip heartify-chip--muted">Public</span>
                       )}
                     </div>
                     {g.description && (

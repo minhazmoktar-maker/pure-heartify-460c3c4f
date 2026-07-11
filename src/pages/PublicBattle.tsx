@@ -3,18 +3,18 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Share2, Swords, ChevronLeft, ChevronRight, BookMarked, Users, MapPin, Calendar } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+import { Share2, Swords, ChevronLeft, ChevronRight, BookMarked, Users, MapPin, Calendar, SearchX } from "lucide-react";
 import { BATTLES } from "@/data/battles";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
 
-const OUTCOME_STYLES: Record<string, string> = {
-  "Decisive Victory":  "border-emerald-500/40 bg-emerald-500/10 text-emerald-500",
-  "Strategic Victory": "border-emerald-500/40 bg-emerald-500/10 text-emerald-500",
-  "Truce":             "border-sky-500/40 bg-sky-500/10 text-sky-500",
-  "Setback":           "border-amber-500/40 bg-amber-500/10 text-amber-500",
-  "Withdrawal":        "border-amber-500/40 bg-amber-500/10 text-amber-500",
+const OUTCOME_TONE: Record<string, string> = {
+  "Decisive Victory":  "heartify-chip--primary",
+  "Strategic Victory": "heartify-chip--primary",
+  "Truce":             "heartify-chip--muted",
+  "Setback":           "heartify-chip--warning",
+  "Withdrawal":        "heartify-chip--warning",
 };
 
 export default function PublicBattle() {
@@ -30,10 +30,14 @@ export default function PublicBattle() {
         <SEO title="Battle not found — Heartify" description="This battle page could not be found." path={`/battle/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Battle not found</h1>
-            <Button asChild variant="outline"><Link to="/">Home</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={SearchX}
+            title="Battle not found"
+            description="This ghazwah page doesn't exist. Browse all battles from the Sīrah."
+            actionLabel="Study the Sīrah"
+            actionHref="/seerah"
+            tone="muted"
+          />
         </main>
       </div>
     );
@@ -76,15 +80,15 @@ export default function PublicBattle() {
             </p>
             <h1 className="text-2xl md:text-3xl font-semibold">{b.translit}</h1>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-              <Badge variant="outline" className="text-[10px] uppercase inline-flex items-center gap-1">
+              <span className="heartify-chip heartify-chip--muted inline-flex items-center gap-1">
                 <Calendar className="h-3 w-3" /> {b.hijri} · {b.ce}
-              </Badge>
-              <Badge variant="outline" className="text-[10px] uppercase inline-flex items-center gap-1">
+              </span>
+              <span className="heartify-chip heartify-chip--muted inline-flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> {b.place}
-              </Badge>
-              <Badge variant="outline" className={`text-[10px] uppercase ${OUTCOME_STYLES[b.outcome] || ""}`}>
+              </span>
+              <span className={`heartify-chip ${OUTCOME_TONE[b.outcome] || "heartify-chip--muted"}`}>
                 {b.outcome}
-              </Badge>
+              </span>
             </div>
           </CardContent>
         </Card>

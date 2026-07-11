@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Target, CalendarDays, TrendingUp, Plus, Minus, RotateCcw, Trash2 } from "lucide-react";
+import { BookOpen, Target, CalendarDays, TrendingUp, Plus, Minus, RotateCcw, Trash2, History } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import EmptyState from "@/components/EmptyState";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "heartify.khatm.v1";
@@ -55,6 +57,8 @@ function loadState(): KhatmState {
 const Khatm = () => {
   const [state, setState] = useState<KhatmState>(loadState);
   const [amount, setAmount] = useState(1);
+  const [confirmClear, setConfirmClear] = useState(false);
+
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -90,8 +94,8 @@ const Khatm = () => {
   };
 
   const clearAll = () => {
-    if (!confirm("Clear all khatm data? This cannot be undone.")) return;
     setState(defaultState());
+    setConfirmClear(false);
     toast("Khatm data cleared.");
   };
 
@@ -239,13 +243,18 @@ const Khatm = () => {
         <Card className="mb-6 p-6">
           <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Last 7 sessions</h2>
           {recentLog.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No pages logged yet. Add your first session above.</p>
+            <EmptyState
+              icon={History}
+              title="No pages logged yet"
+              description="Add your first session above and it will appear here."
+              tone="muted"
+            />
           ) : (
             <ul className="divide-y divide-border">
               {recentLog.map((e) => (
                 <li key={e.date} className="flex items-center justify-between py-2 text-sm">
                   <span className="text-foreground">{new Date(e.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
-                  <span className="font-medium text-primary">{e.pages} page{e.pages === 1 ? "" : "s"}</span>
+                  <span className="heartify-chip heartify-chip--primary">{e.pages} page{e.pages === 1 ? "" : "s"}</span>
                 </li>
               ))}
             </ul>
@@ -256,7 +265,7 @@ const Khatm = () => {
           <Button variant="outline" onClick={resetCycle}>
             <RotateCcw className="mr-2 h-4 w-4" /> Start new khatm cycle
           </Button>
-          <Button variant="ghost" onClick={clearAll} className="text-destructive hover:text-destructive">
+          <Button variant="ghost" onClick={() => setConfirmClear(true)} className="text-destructive hover:text-destructive">
             <Trash2 className="mr-2 h-4 w-4" /> Clear all data
           </Button>
           <Link to="/quran" className="ml-auto">
@@ -264,6 +273,16 @@ const Khatm = () => {
           </Link>
         </div>
       </main>
+
+      <ConfirmDialog
+        open={confirmClear}
+        onOpenChange={setConfirmClear}
+        title="Clear all khatm data?"
+        description="This resets your pages read, cycles, and daily log. This cannot be undone."
+        confirmLabel="Clear everything"
+        tone="destructive"
+        onConfirm={clearAll}
+      />
     </div>
   );
 };
