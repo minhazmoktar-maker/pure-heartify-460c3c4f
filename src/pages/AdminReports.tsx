@@ -27,6 +27,7 @@ import { Loader2, ShieldAlert, MessageSquare, Ban, Trash2, ArrowDownRight, Arrow
 import { formatDistanceToNow } from "date-fns";
 import SEO from "@/components/SEO";
 import EmptyState from "@/components/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ReportRow = {
   id: string;
