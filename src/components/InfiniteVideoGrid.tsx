@@ -1,4 +1,5 @@
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
