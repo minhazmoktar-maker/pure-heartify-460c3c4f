@@ -166,7 +166,7 @@ export default function SuggestContentDialog({ trigger }: Props) {
           <TabsContent value="video" className="mt-4 space-y-3">
             <div>
               <Label htmlFor="v-url">YouTube link or video id</Label>
-              <Input id="v-url" placeholder="https://youtu.be/…" value={vUrl} onChange={(e) => setVUrl(e.target.value)} />
+              <Input id="v-url" autoFocus placeholder="https://youtu.be/…" value={vUrl} onChange={(e) => setVUrl(e.target.value)} />
             </div>
             <div>
               <Label htmlFor="v-title">Title</Label>
