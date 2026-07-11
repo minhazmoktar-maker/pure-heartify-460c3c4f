@@ -43,6 +43,18 @@ Deno.serve(async (req) => {
     const callerId = await getCallerUserId(req);
     const isPremium = await hasActivePremium(callerId);
 
+    // Rate limit: 240/min per user, 60/min per IP for anon. Feed is the
+    // hottest endpoint so limits are generous but abuse-resistant.
+    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const limited = await enforceRateLimit(admin, {
+      identity: getClientIdentity(req, callerId),
+      action: "feed",
+      limit: callerId ? 240 : 60,
+      windowSeconds: 60,
+    });
+    if (limited) return json({ error: "rate_limited" }, 429);
+
+
     const body = await req.json().catch(() => ({}));
     const category = body?.category as string | undefined;
     const sectionId = body?.section_id as string | undefined;
