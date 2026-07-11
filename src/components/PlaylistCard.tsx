@@ -1,5 +1,5 @@
 import { Crown, Lock, Play } from "lucide-react";
-import { motion } from "framer-motion";
+import FadeIn from "@/components/FadeIn";
 import type { Playlist } from "@/data/audio";
 import { tracks as allTracks } from "@/data/audio";
 import { usePlayer } from "@/contexts/PlayerContext";
@@ -31,14 +31,13 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08 }}
+    <FadeIn
+      index={index}
       onClick={handlePlay}
       role="button"
       tabIndex={0}
       aria-label={`Play ${playlist.title}${isLocked ? " (locked)" : ""}`}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), handlePlay())}
+      onKeyDown={(e: React.KeyboardEvent) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), handlePlay())}
       className={cn(
         "card-interactive group cursor-pointer overflow-hidden rounded-xl bg-card shadow-card",
         isLocked && "opacity-70 cursor-not-allowed hover:translate-y-0 hover:shadow-card"
@@ -70,7 +69,7 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
         <p className="mt-0.5 truncate text-xs text-muted-foreground">{playlist.description}</p>
         <p className="mt-1 text-[10px] text-muted-foreground">{playlist.trackCount} tracks</p>
       </div>
-    </motion.div>
+    </FadeIn>
   );
 };
 

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import FadeIn from "@/components/FadeIn";
 import { CheckCircle2, Play, Heart } from "lucide-react";
 import type { YouTubeVideo } from "@/services/youtube";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -42,10 +42,9 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   if (!isEmbeddableVideo) return null; // hide non-embeddable fallback videos
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.04 }}
+    <FadeIn
+      as="article"
+      index={index}
       className="group cursor-pointer"
       onClick={handleClick}
     >
@@ -96,7 +95,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           <p className="text-xs text-muted-foreground">{timeAgo}</p>
         </div>
       </div>
-    </motion.article>
+    </FadeIn>
   );
 };
 
