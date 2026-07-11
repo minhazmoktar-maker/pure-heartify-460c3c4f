@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Trash2, Download, Clock, Crown } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
+import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import {
@@ -56,25 +57,27 @@ export default function OfflineLibrary() {
         path="/offline"
       />
       <div className="max-w-3xl mx-auto px-4 py-10">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Download className="w-7 h-7" /> Offline Library
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            {loading
+        <PageHeader
+          title="Offline Library"
+          subtitle={
+            loading
               ? "Checking your plan…"
               : isPremium
                 ? "Heartify+ · unlimited downloads, no expiry."
-                : `Free plan · ${freeUsed}/${OFFLINE_LIMITS.FREE_LIMIT} slots used. Downloads expire after 24 hours.`}
-          </p>
-          {!loading && !isPremium && (
-            <Button asChild size="sm" variant="default" className="mt-4">
-              <Link to="/plus">
-                <Crown className="w-4 h-4 mr-2" /> Upgrade to Heartify+
-              </Link>
-            </Button>
-          )}
-        </header>
+                : `Free plan · ${freeUsed}/${OFFLINE_LIMITS.FREE_LIMIT} slots used. Downloads expire after 24 hours.`
+          }
+          icon={Download}
+          backHref="/"
+          actions={
+            !loading && !isPremium ? (
+              <Button asChild size="sm" variant="default">
+                <Link to="/plus">
+                  <Crown className="w-4 h-4" /> Upgrade
+                </Link>
+              </Button>
+            ) : undefined
+          }
+        />
 
         {items.length === 0 ? (
           <div className="rounded-lg border border-dashed p-12 text-center">
