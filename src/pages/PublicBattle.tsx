@@ -80,15 +80,15 @@ export default function PublicBattle() {
             </p>
             <h1 className="text-2xl md:text-3xl font-semibold">{b.translit}</h1>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-              <Badge variant="outline" className="text-[10px] uppercase inline-flex items-center gap-1">
+              <span className="heartify-chip heartify-chip--muted inline-flex items-center gap-1">
                 <Calendar className="h-3 w-3" /> {b.hijri} · {b.ce}
-              </Badge>
-              <Badge variant="outline" className="text-[10px] uppercase inline-flex items-center gap-1">
+              </span>
+              <span className="heartify-chip heartify-chip--muted inline-flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> {b.place}
-              </Badge>
-              <Badge variant="outline" className={`text-[10px] uppercase ${OUTCOME_STYLES[b.outcome] || ""}`}>
+              </span>
+              <span className={`heartify-chip ${OUTCOME_TONE[b.outcome] || "heartify-chip--muted"}`}>
                 {b.outcome}
-              </Badge>
+              </span>
             </div>
           </CardContent>
         </Card>
