@@ -147,6 +147,16 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
           detected_country: preferences.detected_country,
         });
       }
+      // Mirror country + timezone into profiles so server RLS/edge fns can
+      // personalize by geo. Fire-and-forget; errors are non-blocking.
+      const tz = detectTimezone();
+      const cc = preferences.country_code ?? preferences.detected_country ?? null;
+      if (cc || tz) {
+        void supabase
+          .from("profiles")
+          .update({ country_code: cc, timezone: tz })
+          .eq("id", user.id);
+      }
     })();
     return () => {
       cancelled = true;
