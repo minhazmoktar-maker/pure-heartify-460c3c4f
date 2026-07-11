@@ -3,18 +3,18 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Share2, Swords, ChevronLeft, ChevronRight, BookMarked, Users, MapPin, Calendar } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+import { Share2, Swords, ChevronLeft, ChevronRight, BookMarked, Users, MapPin, Calendar, SearchX } from "lucide-react";
 import { BATTLES } from "@/data/battles";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
 
-const OUTCOME_STYLES: Record<string, string> = {
-  "Decisive Victory":  "border-emerald-500/40 bg-emerald-500/10 text-emerald-500",
-  "Strategic Victory": "border-emerald-500/40 bg-emerald-500/10 text-emerald-500",
-  "Truce":             "border-sky-500/40 bg-sky-500/10 text-sky-500",
-  "Setback":           "border-amber-500/40 bg-amber-500/10 text-amber-500",
-  "Withdrawal":        "border-amber-500/40 bg-amber-500/10 text-amber-500",
+const OUTCOME_TONE: Record<string, string> = {
+  "Decisive Victory":  "heartify-chip--primary",
+  "Strategic Victory": "heartify-chip--primary",
+  "Truce":             "heartify-chip--muted",
+  "Setback":           "heartify-chip--warning",
+  "Withdrawal":        "heartify-chip--warning",
 };
 
 export default function PublicBattle() {
