@@ -304,6 +304,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         a.pause();
         setIsPlaying(false);
         previewCapRef.current = null;
+        setIsPreview(false);
         window.dispatchEvent(new CustomEvent("heartify:preview-cap-reached", {
           detail: { title: currentTrack?.title, trackId: currentTrack?.id },
         }));
