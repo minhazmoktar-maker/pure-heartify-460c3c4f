@@ -56,7 +56,7 @@ const TIERS: Tier[] = [
       { text: "Full curated halal video & audio catalog" },
       { text: "Prayer times, Qibla, Adhan reminders" },
       { text: "Daily dhikr, streaks, weekly recap" },
-      { text: "Up to 10 offline audio downloads" },
+      { text: "Up to 5 offline audio downloads" },
       { text: "Bookmark, share & report content" },
     ],
   },
@@ -129,7 +129,7 @@ const COMPARISON: {
   {
     section: "Offline & Devices",
     rows: [
-      { label: "Offline audio downloads", free: "10 tracks", plus: "Unlimited" },
+      { label: "Offline audio downloads", free: "5 tracks", plus: "Unlimited" },
       { label: "Devices per account", free: "1", plus: "5" },
       { label: "Background listening", free: true, plus: true },
     ],
@@ -160,7 +160,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Will free features be taken away?",
-    a: "No. Everything currently available on Heartify stays free forever — including prayer times, streaks, dhikr, curated video, and up to 10 offline audio downloads. Heartify+ only adds new value on top.",
+    a: "No. Everything currently available on Heartify stays free forever — including prayer times, streaks, dhikr, curated video, and up to 5 offline audio downloads. Heartify+ only adds new value on top.",
   },
   {
     q: "Is Heartify+ halal?",
