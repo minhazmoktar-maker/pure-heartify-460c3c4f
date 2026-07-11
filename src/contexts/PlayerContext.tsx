@@ -125,8 +125,12 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryRef = useRef(0);
   const lastRemoteSaveRef = useRef<number>(0);
+  /** When set, current playback is a 30s premium sample for a non-entitled user. */
+  const previewCapRef = useRef<number | null>(null);
   const platform = useMemo(() => detectPlatform(), []);
   const mobile = useMemo(() => isIOS() || isAndroid(), []);
+
+  const PREVIEW_SECONDS = 30;
 
   // Lazily construct audio element. iOS Safari REQUIRES construction inside
   // a user-gesture path AND `preload="none"` to avoid the "delay until user
