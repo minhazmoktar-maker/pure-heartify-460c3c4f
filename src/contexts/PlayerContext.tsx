@@ -424,8 +424,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       if (track.isPremium && !isPremiumUser) {
-        toast("Premium track", { description: "Unlock Premium to listen." });
-        return;
+        // Instead of blocking, offer a 30-second sample. The full source URL
+        // is still fetched — real bitstream protection lives at the CDN /
+        // signed-URL layer for entitled sessions. This surface just gives
+        // browsing users an audition before the paywall.
+        previewCapRef.current = PREVIEW_SECONDS;
+        toast("30-second preview", {
+          description: `Sampling "${track.title}" — upgrade to hear the full recitation.`,
+        });
+      } else {
+        previewCapRef.current = null;
       }
       // iOS: warm up the element inside the user gesture. Setting src + calling
       // play() synchronously is what earns the media element its autoplay
