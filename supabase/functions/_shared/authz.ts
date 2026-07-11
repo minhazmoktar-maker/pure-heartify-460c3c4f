@@ -167,30 +167,47 @@ export async function authorize(
     }
   }
 
-  const svc = {
-    apikey: SERVICE_KEY,
-    Authorization: `Bearer ${SERVICE_KEY}`,
-  };
-  const [ownerRes, adminRes] = await Promise.all([
-    fetch(
-      `${SUPABASE_URL}/rest/v1/platform_owners?user_id=eq.${user.id}&select=user_id`,
-      { headers: svc },
-    ),
-    fetch(
-      `${SUPABASE_URL}/rest/v1/user_roles?user_id=eq.${user.id}&role=eq.admin&select=role`,
-      { headers: svc },
-    ),
-  ]);
-
-  const isOwner = ownerRes.ok && ((await ownerRes.json()) as unknown[]).length > 0;
-  const isAdmin = adminRes.ok && ((await adminRes.json()) as unknown[]).length > 0;
-  const role: Role = isOwner ? "owner" : isAdmin ? "admin" : "user";
+  const role = await resolveRole(SUPABASE_URL, SERVICE_KEY, user.id);
 
   if (!ROLE_PERMS[role].has(permission)) return deny(403, "forbidden");
 
   return {
     principal: { id: user.id, email: user.email ?? null, role },
   };
+}
+
+/**
+ * Resolve the highest-ranked role for a user id. Fails closed to "user".
+ * Order (highest wins): owner > admin > moderator > user.
+ *
+ * Exported for direct use and for unit testing.
+ */
+export async function resolveRole(
+  supabaseUrl: string,
+  serviceKey: string,
+  userId: string,
+): Promise<Role> {
+  const svc = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
+  const [ownerRes, roleRes] = await Promise.all([
+    fetch(
+      `${supabaseUrl}/rest/v1/platform_owners?user_id=eq.${userId}&select=user_id`,
+      { headers: svc },
+    ),
+    fetch(
+      `${supabaseUrl}/rest/v1/user_roles?user_id=eq.${userId}&role=in.(admin,moderator)&select=role`,
+      { headers: svc },
+    ),
+  ]);
+
+  if (ownerRes.ok && ((await ownerRes.json()) as unknown[]).length > 0) {
+    return "owner";
+  }
+  if (roleRes.ok) {
+    const rows = (await roleRes.json()) as Array<{ role: string }>;
+    if (rows.some((r) => r.role === "admin")) return "admin";
+    if (rows.some((r) => r.role === "moderator")) return "moderator";
+  }
+  return "user";
 }
 
 export { CORS_HEADERS };
