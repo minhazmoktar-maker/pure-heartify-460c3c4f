@@ -69,7 +69,7 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
         <p className="mt-0.5 truncate text-xs text-muted-foreground">{playlist.description}</p>
         <p className="mt-1 text-[10px] text-muted-foreground">{playlist.trackCount} tracks</p>
       </div>
-    </motion.div>
+    </FadeIn>
   );
 };
 
