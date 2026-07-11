@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import SEO from "@/components/SEO";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ const ResetPassword = () => {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
+      <SEO title="Set a new Password — Heartify" description="Choose a new password for your Heartify account." path="/reset-password" />
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <h1 className="font-heading text-xl font-bold text-foreground">Set New Password</h1>

@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import SEO from "@/components/SEO";
 
 /**
  * MFA challenge screen used mid-sign-in when the account has TOTP enrolled.
@@ -46,6 +47,7 @@ export default function MfaVerify() {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
+      <SEO title="Verify Two-Factor — Heartify" description="Enter your authenticator code to complete Heartify sign-in." path="/mfa/verify" />
       <Card className="w-full max-w-md p-6 space-y-4">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-primary" />

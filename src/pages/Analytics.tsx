@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2, Download, RefreshCcw, BarChart3 } from "lucide-react";
 import {
+import SEO from "@/components/SEO";
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
   BarChart, Bar, PieChart, Pie, Cell, Legend, AreaChart, Area,
 } from "recharts";
@@ -159,6 +160,7 @@ const Analytics = () => {
 
   return (
     <div className="min-h-dvh bg-background">
+      <SEO title="Analytics — Heartify Admin" description="Platform analytics for Heartify content, engagement, and moderation." path="/admin/analytics" />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-4">

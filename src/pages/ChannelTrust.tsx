@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2, ShieldCheck, TrendingUp, AlertTriangle, RefreshCcw, History } from "lucide-react";
+import SEO from "@/components/SEO";
 
 interface Profile {
   id: string;
@@ -147,6 +148,7 @@ const ChannelTrust = () => {
 
   return (
     <div className="min-h-dvh bg-background">
+      <SEO title="Channel Trust — Heartify Admin" description="Review channel trust scores and moderation signals across Heartify." path="/admin/channel-trust" />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-4">

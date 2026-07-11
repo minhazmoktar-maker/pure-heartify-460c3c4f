@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, ShieldAlert, MessageSquare, Ban, Trash2, ArrowDownRight, ArrowUpRight, X, Check, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import SEO from "@/components/SEO";
 
 type ReportRow = {
   id: string;
@@ -215,6 +216,7 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
 
   return (
     <div className={embedded ? "" : "min-h-dvh bg-background"}>
+      <SEO title="User Reports — Heartify Admin" description="Review reports submitted by Heartify users about content and channels." path="/admin/reports" />
       {!embedded && <Navbar />}
       <main className={embedded ? "" : "mx-auto max-w-6xl px-4 py-6"}>
         {!embedded && (

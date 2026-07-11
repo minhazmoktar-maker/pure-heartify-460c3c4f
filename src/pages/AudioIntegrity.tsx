@@ -3,6 +3,7 @@ import { ShieldCheck, PlayCircle, Loader2, CheckCircle2, XCircle, AlertTriangle 
 import { supabase } from "@/integrations/supabase/client";
 import { tracks } from "@/data/audio";
 import { toast } from "sonner";
+import SEO from "@/components/SEO";
 
 interface BrokenRow {
   track_id: string; track_title: string | null; url: string | null;
@@ -55,6 +56,7 @@ const AudioIntegrity = () => {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
+      <SEO title="Audio Integrity — Heartify Admin" description="Verify reciter attribution, licensing, and file integrity across the Heartify audio catalog." path="/admin/audio-integrity" />
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 font-heading text-2xl font-bold text-foreground">

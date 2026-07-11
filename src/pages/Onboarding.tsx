@@ -8,6 +8,7 @@ import { INTEREST_OPTIONS } from "@/data/interestOptions";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { growth } from "@/lib/growthEvents";
+import SEO from "@/components/SEO";
 
 const STEPS = [
   {
@@ -91,6 +92,7 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-dvh bg-gradient-to-br from-primary/5 via-background to-background">
+      <SEO title="Welcome to Heartify — Get Started" description="Personalize your Heartify feed with the topics that matter to you." path="/onboarding" />
       <div className="mx-auto flex min-h-dvh max-w-3xl flex-col px-4 py-10 md:py-16">
         {/* Progress dots */}
         <div className="mb-8 flex items-center justify-center gap-2">

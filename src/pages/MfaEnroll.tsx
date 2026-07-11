@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { ShieldCheck, KeyRound, Loader2 } from "lucide-react";
 import MfaEnrollmentHelp from "@/components/MfaEnrollmentHelp";
+import SEO from "@/components/SEO";
 
 /**
  * TOTP MFA enrollment + verification.
@@ -65,6 +66,7 @@ export default function MfaEnroll() {
 
   return (
     <div className="min-h-dvh bg-background">
+      <SEO title="Enable Two-Factor — Heartify" description="Enroll a TOTP authenticator to secure your Heartify admin and owner access." path="/mfa/enroll" />
       <Navbar />
       <main className="mx-auto max-w-xl px-4 py-8">
         <div className="mb-6 flex items-center gap-3">

@@ -27,6 +27,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import SEO from "@/components/SEO";
 
 type ProfileTab = "profile" | "continue" | "favorites" | "history";
 
@@ -180,6 +181,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-dvh bg-background pb-12">
+      <SEO title="Your Profile — Heartify" description="Manage your Heartify profile, streaks, offline library, MFA and language settings." path="/profile" />
       <Navbar />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <button

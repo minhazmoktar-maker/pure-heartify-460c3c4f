@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { ShieldAlert } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { toast } from "@/components/ui/use-toast";
+import SEO from "@/components/SEO";
 
 interface ModerationRow {
   id: string;
@@ -92,6 +93,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   return (
     <div className={embedded ? "" : "min-h-dvh bg-background"}>
+      <SEO title="Moderation Log — Heartify Admin" description="History of moderation decisions across the Heartify platform." path="/admin/moderation-log" />
       {!embedded && <Navbar />}
       <main className={embedded ? "" : "container mx-auto px-4 py-8"}>
         {!embedded && (
