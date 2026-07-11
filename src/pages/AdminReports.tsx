@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { Loader2, ShieldAlert, MessageSquare, Ban, Trash2, ArrowDownRight, ArrowUpRight, X, Check, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 
 type ReportRow = {
   id: string;
