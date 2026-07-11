@@ -1,3 +1,4 @@
+import PageSkeleton from "@/components/PageSkeleton";
 import { lazy, Suspense } from "react";
 import { Crown, Loader2, Shield, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -67,9 +68,5 @@ export default function AdminUsers() {
 }
 
 function Fallback() {
-  return (
-    <div className="flex justify-center py-10">
-      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-    </div>
-  );
+  return <PageSkeleton variant="list" />;
 }

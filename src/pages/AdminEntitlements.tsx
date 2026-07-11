@@ -1,3 +1,4 @@
+import PageSkeleton from "@/components/PageSkeleton";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -247,8 +248,8 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
         {/* Table */}
         <div className="overflow-hidden rounded-2xl border bg-card">
           {loading ? (
-            <div className="flex items-center justify-center p-10">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <div className="p-4">
+              <PageSkeleton variant="list" className="max-w-none px-0 py-0" />
             </div>
           ) : visible.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">

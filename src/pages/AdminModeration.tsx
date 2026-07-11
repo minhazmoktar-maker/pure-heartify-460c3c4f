@@ -1,3 +1,4 @@
+import PageSkeleton from "@/components/PageSkeleton";
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { FileWarning, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
@@ -81,9 +82,5 @@ export default function AdminModeration() {
 }
 
 function Fallback() {
-  return (
-    <div className="flex justify-center py-10">
-      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-    </div>
-  );
+  return <PageSkeleton variant="list" />;
 }
