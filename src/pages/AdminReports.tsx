@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { Loader2, ShieldAlert, MessageSquare, Ban, Trash2, ArrowDownRight, ArrowUpRight, X, Check, ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 
 type ReportRow = {
   id: string;
@@ -261,9 +262,12 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                   <Loader2 className="h-4 w-4 animate-spin" /> Loading reports…
                 </div>
               ) : currentList.length === 0 ? (
-                <p className="rounded-md border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-                  No {s.label.toLowerCase()} reports.
-                </p>
+                <EmptyState
+                  icon={ShieldAlert}
+                  tone="muted"
+                  title={`No ${s.label.toLowerCase()} reports`}
+                  description="When users flag content, it will land here for triage. Zero reports means the community is calm — al-ḥamdu lillāh."
+                />
               ) : (
                 <div className="space-y-3">
                   {currentList.map((r) => (

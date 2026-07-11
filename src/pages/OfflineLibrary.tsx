@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/EmptyState";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import {
   listOfflineMeta,
@@ -80,13 +81,13 @@ export default function OfflineLibrary() {
         />
 
         {items.length === 0 ? (
-          <div className="rounded-lg border border-dashed p-12 text-center">
-            <Download className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
-            <h2 className="font-semibold">Nothing downloaded yet</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Tap the download button on any track to save it for offline listening.
-            </p>
-          </div>
+          <EmptyState
+            icon={Download}
+            title="Nothing downloaded yet"
+            description="Tap the download button on any track to save it for offline listening — perfect for flights, commutes, and Jumu'ah."
+            actionLabel="Browse audio"
+            actionHref="/audio"
+          />
         ) : (
           <ul className="space-y-2">
             {items.map((m) => (

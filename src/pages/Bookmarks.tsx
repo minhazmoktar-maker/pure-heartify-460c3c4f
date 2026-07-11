@@ -4,6 +4,7 @@ import { Bookmark, BookOpen, BookText, Trash2, Search, StickyNote, Save, X } fro
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import SectionHeader from "@/components/SectionHeader";
+import EmptyState from "@/components/EmptyState";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -150,18 +151,23 @@ const Bookmarks = () => {
 
           <TabsContent value={tab} className="mt-6">
             {filtered.length === 0 ? (
-              <Card className="p-10 text-center">
-                <Bookmark className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
-                <h2 className="mb-1 font-heading text-lg font-semibold text-foreground">No bookmarks yet</h2>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  Save ayat from the Quran, hadith from the library, or duas from Adhkar. They will appear here.
-                </p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  <Link to="/quran"><Button variant="outline" size="sm">Open Quran</Button></Link>
-                  <Link to="/hadith"><Button variant="outline" size="sm">Open Hadith</Button></Link>
-                  <Link to="/adhkar"><Button variant="outline" size="sm">Open Adhkar</Button></Link>
-                </div>
-              </Card>
+              <EmptyState
+                icon={Bookmark}
+                title="No bookmarks yet"
+                description="Save ayat from the Quran, hadith from the library, or duas from Adhkar. They will appear here — with your private notes and reflections."
+                actionLabel="Open Quran"
+                actionHref="/quran"
+                secondaryAction={
+                  <>
+                    <Link to="/hadith" className="tap-target inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition-transform hover:bg-accent active:scale-[0.97]">
+                      Open Hadith
+                    </Link>
+                    <Link to="/adhkar" className="tap-target inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition-transform hover:bg-accent active:scale-[0.97]">
+                      Open Adhkar
+                    </Link>
+                  </>
+                }
+              />
             ) : (
               <ul className="space-y-3">
                 {filtered.map((item) => {
