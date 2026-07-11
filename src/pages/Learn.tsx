@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, Circle, Clock, GraduationCap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import SectionHeader from "@/components/SectionHeader";
 import { LEARNING_PATHS, LEARNING_CATEGORIES, type Course } from "@/data/learningPaths";
 
 const KEY = "learn:completed";
