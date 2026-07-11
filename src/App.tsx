@@ -21,6 +21,7 @@ import OfflineSweeper from "./components/OfflineSweeper";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AdminRoute from "./components/AdminRoute";
 import RouteTransition from "./components/RouteTransition";
+import BackToTop from "./components/BackToTop";
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
@@ -213,6 +214,7 @@ const App = () => (
             <AdhanNotifier />
             <GatedPreviewGuard />
             <OfflineSweeper />
+            <BackToTop />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
