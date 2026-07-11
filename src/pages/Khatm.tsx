@@ -57,6 +57,8 @@ function loadState(): KhatmState {
 const Khatm = () => {
   const [state, setState] = useState<KhatmState>(loadState);
   const [amount, setAmount] = useState(1);
+  const [confirmClear, setConfirmClear] = useState(false);
+
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
