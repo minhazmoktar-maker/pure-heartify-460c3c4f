@@ -45,8 +45,11 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
       )}
     >
       <div className="relative aspect-square overflow-hidden">
-        <img src={playlist.cover} alt={playlist.title} loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        <SmartImage
+          src={playlist.cover}
+          alt={playlist.title}
+          className="transition-transform duration-300 group-hover:scale-105"
+        />
         {isLocked ? (
           <div className="absolute inset-0 flex items-center justify-center bg-foreground/40">
             <Lock className="h-8 w-8 text-background" />
