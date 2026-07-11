@@ -80,11 +80,11 @@ const REASON_LABEL: Record<string, string> = {
   other: "Other",
 };
 
-function severityColor(s: string) {
-  if (s === "critical") return "bg-destructive text-destructive-foreground";
-  if (s === "high") return "bg-orange-500/90 text-white";
-  if (s === "low") return "bg-muted text-muted-foreground";
-  return "bg-secondary text-secondary-foreground";
+function severityChip(s: string) {
+  if (s === "critical") return "heartify-chip heartify-chip--danger";
+  if (s === "high") return "heartify-chip heartify-chip--warning";
+  if (s === "low") return "heartify-chip heartify-chip--muted";
+  return "heartify-chip heartify-chip--primary";
 }
 
 export default function AdminReports({ embedded = false }: { embedded?: boolean } = {}) {
