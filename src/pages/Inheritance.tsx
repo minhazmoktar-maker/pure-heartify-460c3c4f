@@ -181,7 +181,7 @@ export default function Inheritance() {
     n.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="Islamic Inheritance (Mirath) Calculator | Heartify"
         description="Estimate Islamic inheritance shares (faraid) for spouse, parents, sons and daughters based on Qur'anic fixed shares."

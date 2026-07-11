@@ -73,7 +73,7 @@ const Sahaba = () => {
   const pct = Math.round((readCount / SAHABA.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Companions of the Prophet ﷺ — Heartify"
         description="Learn from the lives of 20 leading Sahaba: bios, roles, and enduring lessons."

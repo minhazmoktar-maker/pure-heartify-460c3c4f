@@ -31,7 +31,7 @@ export default function PublicHijriMonth() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${m.translit} (${m.en}) — Islamic Month ${m.n} of 12 · Heartify`}
         description={`${m.translit}: ${m.summary}`}

@@ -161,7 +161,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   if (!user) {
     return (
-      <div className={embedded ? "" : "min-h-screen bg-background"}>
+      <div className={embedded ? "" : "min-h-dvh bg-background"}>
         {!embedded && <Navbar />}
         <div className="p-8 text-center">Please <Link className="underline" to="/login">sign in</Link>.</div>
       </div>
@@ -169,7 +169,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
   }
   if (!roleLoading && !isAdmin) {
     return (
-      <div className={embedded ? "" : "min-h-screen bg-background"}>
+      <div className={embedded ? "" : "min-h-dvh bg-background"}>
         {!embedded && <Navbar />}
         <div className="p-8 text-center text-destructive">Forbidden — admin access required.</div>
       </div>
@@ -182,7 +182,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const flaggedCh = approved.filter((c) => c.status === "flagged");
 
   return (
-    <div className={embedded ? "" : "min-h-screen bg-background"}>
+    <div className={embedded ? "" : "min-h-dvh bg-background"}>
       {!embedded && <Navbar />}
       <div className={embedded ? "space-y-6" : "mx-auto max-w-6xl p-4 space-y-6"}>
         <div className="flex items-center justify-between">

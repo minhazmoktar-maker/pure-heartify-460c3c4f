@@ -65,7 +65,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
 
   if (!user) {
     return (
-      <div className={embedded ? "" : "min-h-screen bg-background"}>
+      <div className={embedded ? "" : "min-h-dvh bg-background"}>
         {!embedded && <Navbar />}
         <main className={embedded ? "py-4 text-center" : "container mx-auto px-4 py-16 text-center"}>
           <h1 className="text-2xl font-bold">Sign in required</h1>
@@ -91,7 +91,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const reasons = Array.from(new Set(rows.map((r) => r.reject_reason)));
 
   return (
-    <div className={embedded ? "" : "min-h-screen bg-background"}>
+    <div className={embedded ? "" : "min-h-dvh bg-background"}>
       {!embedded && <Navbar />}
       <main className={embedded ? "" : "container mx-auto px-4 py-8"}>
         {!embedded && (

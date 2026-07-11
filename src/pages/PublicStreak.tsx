@@ -65,7 +65,7 @@ export default function PublicStreak() {
   const description = `🔥 ${nDays}-day consistency streak on Heartify (${label}). Build your own.`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title={`${title} — Heartify`} description={description} path={`/s/${handle}/${nDays}`} />
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">

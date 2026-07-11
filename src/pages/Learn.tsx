@@ -38,7 +38,7 @@ const Learn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Learning Paths — Islamic Mini-Courses | Heartify"
         description="Structured beginner courses in Aqeedah, Fiqh, Qur'an, Seerah and Akhlaq — with per-lesson progress tracking."

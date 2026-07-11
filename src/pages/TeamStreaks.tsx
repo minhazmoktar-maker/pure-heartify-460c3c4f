@@ -75,7 +75,7 @@ export default function TeamStreaks() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Team streaks — Heartify" description="Build a shared streak with friends." path="/teams" />
         <Navbar />
         <main className="container mx-auto max-w-lg px-4 py-16 text-center">
@@ -89,7 +89,7 @@ export default function TeamStreaks() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Team streaks — Heartify" description="Build a shared streak with friends." path="/teams" />
       <Navbar />
       <main className="container mx-auto max-w-3xl px-4 py-6 space-y-6">

@@ -109,7 +109,7 @@ const NewMuslim = () => {
   const pct = Math.round((completed / STEPS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-dvh bg-background pb-20">
       <SEO title="New Muslim Guide — Heartify" description="A gentle step-by-step guide for new Muslims: shahadah, wudu, salah, Fatihah, du'as, community." path="/new-muslim" />
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">

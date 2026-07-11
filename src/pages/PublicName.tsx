@@ -28,7 +28,7 @@ export default function PublicName() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${name.translit} (${name.ar}) — ${name.meaning} · Heartify`}
         description={`Name ${n} of 99: ${name.translit} — ${name.meaning}. Learn all Beautiful Names of Allah on Heartify.`}

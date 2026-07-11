@@ -107,7 +107,7 @@ const AdminConsole = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold">Sign in required</h1>
@@ -121,7 +121,7 @@ const AdminConsole = () => {
 
   if (!roleLoading && !isAdmin) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold">Admins only</h1>
@@ -133,7 +133,7 @@ const AdminConsole = () => {
 
   if (!mfaOk) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold">Two-factor authentication required</h1>
@@ -145,7 +145,7 @@ const AdminConsole = () => {
 
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Navbar />
       <main className="container mx-auto max-w-5xl px-4 py-8">
         <div className="mb-6 flex items-center gap-3">

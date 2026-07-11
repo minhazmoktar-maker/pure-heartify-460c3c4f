@@ -15,7 +15,7 @@ const Privacy = () => {
   const effective = "July 8, 2026";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Privacy Policy — Heartify"
         description="How Heartify collects, uses, and protects your personal information."

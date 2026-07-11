@@ -21,7 +21,7 @@ const ModerationLog = lazy(() => import("./ModerationLog"));
  */
 export default function AdminModeration() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Admin · Moderation"
         description="Unified moderation console for reports, candidate review, and audit history."

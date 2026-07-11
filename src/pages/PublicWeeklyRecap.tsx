@@ -45,7 +45,7 @@ export default function PublicWeeklyRecap() {
 
   if (loading) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background">
+      <div className="min-h-dvh grid place-items-center bg-background">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
@@ -53,7 +53,7 @@ export default function PublicWeeklyRecap() {
 
   if (notFound || !recap) {
     return (
-      <div className="min-h-screen grid place-items-center bg-background p-6 text-center">
+      <div className="min-h-dvh grid place-items-center bg-background p-6 text-center">
         <SEO title="Recap not found — Heartify" description="This weekly recap link is not available." path={`/w/${handle}/${week}`} />
         <div>
           <h1 className="text-xl font-bold text-foreground">Recap not found</h1>
@@ -69,7 +69,7 @@ export default function PublicWeeklyRecap() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${label}'s Heartify week — ${recap.streak_length}-day streak`}
         description={`${recap.minutes_watched} min watched · ${recap.dhikr_count} dhikr · ${recap.juz_completed} juz. See your own weekly recap on Heartify.`}

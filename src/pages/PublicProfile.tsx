@@ -57,7 +57,7 @@ export default function PublicProfile() {
   const displayName = profile?.display_name || profile?.handle || "Heartify user";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={profile ? `${displayName} — Heartify` : "Profile — Heartify"}
         description={

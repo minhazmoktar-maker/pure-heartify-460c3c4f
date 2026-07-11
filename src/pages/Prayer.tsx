@@ -97,7 +97,7 @@ export default function Prayer() {
   useAdhanNotifications(settings, slots);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Prayer Times & Qibla — Heartify"
         description="Accurate prayer times, Qibla direction, and Adhan reminders for Muslims worldwide."

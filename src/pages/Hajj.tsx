@@ -61,7 +61,7 @@ export default function Hajj() {
   const toggle = (k: string) => setState((s) => ({ ...s, done: { ...s.done, [k]: !s.done[k] } }));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Helmet>
         <title>Hajj & Umrah Planner — Heartify</title>
         <meta name="description" content="Day-by-day rites checklist, packing list, and budget tracker for Hajj and Umrah." />

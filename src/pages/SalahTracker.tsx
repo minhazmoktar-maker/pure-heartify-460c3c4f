@@ -119,7 +119,7 @@ export default function SalahTracker() {
   const isToday = selectedDate === iso(new Date());
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Salah Tracker — Heartify"
         description="Track your five daily prayers, build streaks, and see 30-day statistics."

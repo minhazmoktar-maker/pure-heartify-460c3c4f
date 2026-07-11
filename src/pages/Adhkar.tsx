@@ -75,7 +75,7 @@ const Adhkar = () => {
     });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Adhkar & Duas — morning, evening, sleep, after prayer"
         description="Authentic morning and evening adhkar, before-sleep duas, and post-salah remembrances with Arabic, transliteration, meaning, and tap-to-count progress."

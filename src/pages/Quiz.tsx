@@ -89,7 +89,7 @@ const Quiz = () => {
   const percent = useMemo(() => deck.length ? Math.round((score / deck.length) * 100) : 0, [score, deck.length]);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-dvh bg-background pb-20">
       <SEO title="Islamic Quiz — Heartify" description="Quick 10-question Islamic quizzes across Aqeedah, Seerah, Fiqh, Qur'an and Hadith." path="/quiz" />
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">

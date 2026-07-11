@@ -111,7 +111,7 @@ export default function Today() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Today — Heartify" description="Your daily dose: ayah of the day, hadith of the day, name of Allah, live streaks, and quick actions." path="/today" />
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">

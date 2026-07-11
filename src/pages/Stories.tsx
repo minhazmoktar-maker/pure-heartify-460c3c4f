@@ -68,7 +68,7 @@ const Stories = () => {
   const pct = Math.round((readCount / STORIES.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-dvh bg-background pb-20">
       <SEO title="Islamic Stories — Heartify" description="Curated stories of the Prophets, Sahaba, and Tabi'un with the moral lesson from each." path="/stories" />
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">

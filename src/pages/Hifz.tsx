@@ -119,7 +119,7 @@ const Hifz = () => {
     .sort((a, b) => a.surah - b.surah);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Hifz tracker — Heartify"
         description="Track your Quran memorization ayah by ayah, review with spaced reminders, and build a daily hifz streak."

@@ -113,7 +113,7 @@ const Ramadan = () => {
   const availableYears = Object.keys(RAMADAN_START).map(Number).sort((a, b) => a - b);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Ramadan Planner — Taraweeh, Last 10 Nights & Goals | Heartify"
         description="Plan your Ramadan: countdown, Taraweeh tracker across all 30 nights, Laylatul Qadr checklist for the last 10 nights, and your personal Ramadan goals."

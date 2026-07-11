@@ -30,9 +30,9 @@ const Miracles = () => {
   const filtered = MIRACLES.filter(m => (m.title + m.summary).toLowerCase().includes(q.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Miracles of the Prophet Muḥammad ﷺ — Mu'jizāt" description="Authentic miracles of the Prophet ﷺ: the Qur'an, Isrā' wa'l-Mi'rāj, splitting of the moon, water from his fingers, prophecies fulfilled." path="/miracles" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link><Sparkles className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Miracles of the Prophet ﷺ</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Sparkles className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Miracles of the Prophet ﷺ</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Studied</span><span className="text-sm font-medium">{count} / {MIRACLES.length}</span></div><Progress value={(count / MIRACLES.length) * 100} /></Card>
         <div className="flex gap-2"><Input placeholder="Search miracles…" value={q} onChange={e => setQ(e.target.value)} /><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>

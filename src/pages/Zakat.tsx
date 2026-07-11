@@ -134,7 +134,7 @@ const Zakat = () => {
   const zakatDue = meetsNisab ? zakatable * ZAKAT_RATE : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Zakat calculator — 2.5% on eligible wealth held one lunar year"
         description="Calculate your annual zakat with a fiqh-aligned worksheet: cash, gold, silver, investments, business inventory, receivables minus debts, against gold or silver nisab."

@@ -76,7 +76,7 @@ const IslamicFinance = () => {
   const pct = Math.round((readCount / TOPICS.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Islamic Finance Guide — Heartify"
         description="Riba, gharar, halal contracts (Murabaha, Ijarah, Musharakah, Mudarabah, Sukuk, Takaful) and practical guidance on cards, stocks, and mortgages."

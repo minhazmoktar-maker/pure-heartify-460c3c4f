@@ -56,7 +56,7 @@ const Parenting = () => {
   const pct = Math.round((readCount / STAGES.length) * 100);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Islamic Parenting Guide — Heartify"
         description="Prophetic tarbiyah from newborn sunnahs through adolescence: milestones, practices, and du'as."

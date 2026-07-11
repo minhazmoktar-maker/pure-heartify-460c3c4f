@@ -148,7 +148,7 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
       || r.plan.toLowerCase().includes(needle);
   });
 
-  const shell = embedded ? "" : "min-h-screen bg-background";
+  const shell = embedded ? "" : "min-h-dvh bg-background";
   return (
     <div className={shell}>
       {!embedded && <SEO title="Entitlements · Admin" description="Manage premium entitlements" path="/admin/entitlements" />}

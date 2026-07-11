@@ -7,7 +7,7 @@ import { Trophy } from "lucide-react";
 export default function Leaderboards() {
   const enabled = useFeatureFlag("viral.leaderboards", true);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Leaderboards — Heartify"
         description="Global rankings for streaks and Quran juz completions on Heartify."

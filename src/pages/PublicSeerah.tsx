@@ -17,7 +17,7 @@ export default function PublicSeerah() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Seerah event not found — Heartify" description="This Seerah event could not be found." path={`/seerah/${id}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
@@ -43,7 +43,7 @@ export default function PublicSeerah() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${event.title} — ${event.year} · Seerah · Heartify`}
         description={`${event.title} at ${event.place} (${event.year}): ${event.summary}`}

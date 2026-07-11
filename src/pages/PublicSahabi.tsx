@@ -28,7 +28,7 @@ export default function PublicSahabi() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${s.translit} (${s.en}) — Companion of the Prophet ﷺ · Heartify`}
         description={`${s.translit}${s.title ? ` — ${s.title}` : ""}: ${s.summary}`}

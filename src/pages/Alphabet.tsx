@@ -95,7 +95,7 @@ export default function Alphabet() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="Arabic Alphabet Learner | Heartify"
         description="Learn the 28 Arabic letters with their four positional forms, transliteration, sounds, and a quick recognition quiz."

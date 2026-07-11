@@ -115,7 +115,7 @@ const Journal = () => {
   const meta = typeMeta[type];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Journal — Intentions, Gratitude & Reflection | Heartify"
         description="A private journal for niyyah, shukr, and tafakkur. Turn everyday moments into worship."

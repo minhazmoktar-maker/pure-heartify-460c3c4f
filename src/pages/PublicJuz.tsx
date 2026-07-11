@@ -28,7 +28,7 @@ export default function PublicJuz() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`Juzʾ ${num} — ${j.translit} (${j.name_ar}) · Heartify`}
         description={`Juzʾ ${num} of 30 covering ${j.start} → ${j.end}. ${j.summary}`}

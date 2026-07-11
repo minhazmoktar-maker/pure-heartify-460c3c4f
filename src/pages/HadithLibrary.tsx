@@ -50,7 +50,7 @@ export default function HadithLibrary() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Hadith Library — Heartify"
         description="Read the Six Books of Hadith (Kutub as-Sittah), 40 Nawawi, and 40 Qudsi with English and Arabic side-by-side."

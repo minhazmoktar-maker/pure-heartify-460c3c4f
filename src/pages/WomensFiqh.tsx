@@ -32,7 +32,7 @@ const WomensFiqh = () => {
   const readCount = Object.values(read).filter(Boolean).length;
   const pct = Math.round((readCount / RULINGS.length) * 100);
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Women's Fiqh — Heartify" description="Rulings on hayd, nifas, istihadah, purity, salah, and fasting for Muslim women." path="/womens-fiqh" />
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>

@@ -64,7 +64,7 @@ const Recap = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Weekly Recap — Heartify"
         description="Your last 7 days of prayers, dhikr, and Quran reading in one glance."

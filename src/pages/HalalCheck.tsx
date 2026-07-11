@@ -86,7 +86,7 @@ export default function HalalCheck() {
     : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Helmet>
         <title>Halal Ingredient Checker — Heartify</title>
         <meta name="description" content="Paste an ingredient list and check each item against a halal reference database." />

@@ -44,7 +44,7 @@ export default function Library() {
   const slice = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Heartify Library — Halal Knowledge Hub"
         description="Searchable library of Islamic topics: worship, ethics, family, finance, theology, history."

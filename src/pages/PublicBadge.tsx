@@ -58,7 +58,7 @@ export default function PublicBadge() {
 
   if (!badge) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Badge not found — Heartify" description="This achievement badge doesn't exist." path={`/b/${handle}/${badgeId}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
@@ -78,7 +78,7 @@ export default function PublicBadge() {
   const description = `${badge.emoji} ${badge.title} — ${badge.description}. Earn yours on Heartify.`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title={`${title} — Heartify`} description={description} path={`/b/${handle}/${badge.id}`} />
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">

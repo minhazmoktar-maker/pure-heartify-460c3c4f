@@ -107,7 +107,7 @@ export default function Dreams() {
     "bg-muted text-muted-foreground";
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-dvh bg-background text-foreground pb-20">
       <SEO
         title="Islamic Dream Journal | Heartify"
         description="Record dreams, mark them good, bad, or neutral, and consult a library of classical dream symbols and their meanings."

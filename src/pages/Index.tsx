@@ -45,7 +45,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<HalalCategory>("All");
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Heartify — Curated Halal Video & Audio App"
         description="Discover curated halal videos and audio from trusted creators. Distraction-free, family-friendly, and moderated for a mindful experience."

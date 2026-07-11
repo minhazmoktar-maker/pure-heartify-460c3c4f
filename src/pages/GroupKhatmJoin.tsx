@@ -57,7 +57,7 @@ export default function GroupKhatmJoin() {
   }, [code, user, navigate]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Join a Khatm circle" description="Join a group Quran completion." path={`/khatm/join/${code ?? ""}`} />
       <Navbar />
       <main className="container mx-auto max-w-md px-4 py-16">

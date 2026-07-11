@@ -5,7 +5,7 @@ import SEO from "@/components/SEO";
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="About Heartify — Halal Video App"
         description="Learn how Heartify curates halal video and audio with trusted channels, moderation, reports, and owner-reviewed safety controls."

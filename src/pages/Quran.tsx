@@ -299,7 +299,7 @@ const Quran = () => {
   const surahNum = surah ? Math.max(1, Math.min(114, Number(surah) || 0)) : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={surahNum ? `Surah ${surahNum} · Quran · Heartify` : "Quran Reader · Heartify"}
         description="Read the Quran in Uthmani script with verse-by-verse audio and translations in English, Urdu, French, Indonesian, Turkish and Bengali."

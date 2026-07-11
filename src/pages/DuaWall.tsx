@@ -91,7 +91,7 @@ export default function DuaWall() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <Helmet>
         <title>Community Du'a Wall — Heartify</title>
         <meta name="description" content="Share du'a requests and say Ameen to lift each other in prayer." />

@@ -125,7 +125,7 @@ export default function Challenges() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Daily Challenges — Heartify" description="Daily and weekly challenges for salah, dhikr, Quran, and adhkar. Earn points and build momentum." path="/challenges" />
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">

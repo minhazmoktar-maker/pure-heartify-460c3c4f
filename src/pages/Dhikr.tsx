@@ -101,7 +101,7 @@ const Dhikr = () => {
   const reset = () => setState((s) => ({ ...s, counts: { ...s.counts, [active.id]: 0 } }));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Dhikr & Tasbih counter — daily remembrance"
         description="Tap-to-count digital tasbih with SubhanAllah, Alhamdulillah, Allahu Akbar, salawat, istighfar, daily goals and streaks."

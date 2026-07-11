@@ -104,7 +104,7 @@ const Bookmarks = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Bookmarks — saved ayat, hadith & duas"
         description="Your saved ayat, hadith, duas, and names of Allah with private notes."

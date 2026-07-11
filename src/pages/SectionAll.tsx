@@ -33,7 +33,7 @@ const SectionAll = () => {
 
   if (!section) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="py-20 text-center">
           <p className="text-lg font-medium text-muted-foreground">Section not found.</p>
@@ -43,7 +43,7 @@ const SectionAll = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-dvh bg-background pb-12">
       <Navbar />
 
       <div className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">

@@ -17,7 +17,7 @@ export default function PublicDurood() {
 
   if (!d) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-dvh bg-background">
         <SEO title="Durood not found — Heartify" description="This form of ṣalawāt was not found." path={`/durood/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
@@ -43,7 +43,7 @@ export default function PublicDurood() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title={`${d.title} — Ṣalawāt on the Prophet ﷺ · Heartify`}
         description={`${d.translit} — ${d.meaning.slice(0, 140)}`}
