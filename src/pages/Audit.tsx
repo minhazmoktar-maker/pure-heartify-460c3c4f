@@ -112,6 +112,16 @@ const AuditPage = () => {
           </div>
         )}
 
+        {!report && !err && !loading && (
+          <div className="mt-8">
+            <EmptyState
+              icon={ShieldCheck}
+              title="No audit yet"
+              description="Run a dry-run to scan the catalog for halal-policy violations and broken thumbnails. Nothing is removed until you choose to auto-remove."
+            />
+          </div>
+        )}
+
         {report && (
           <div className="mt-8 space-y-6">
             <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
