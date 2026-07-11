@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, CheckCircle2, Loader2, Users } from "lucide-react";
+import { BookOpen, CheckCircle2, Users, Link2Off } from "lucide-react";
 
 interface PublicKhatm {
   id: string;
@@ -46,23 +48,25 @@ export default function PublicKhatmGroup() {
 
   if (loading) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="min-h-dvh bg-background">
+        <PageSkeleton variant="detail" className="max-w-lg" />
       </div>
     );
   }
 
   if (notFound || !group) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background p-6 text-center">
+      <div className="min-h-dvh bg-background">
         <SEO title="Group not found — Heartify" description="This Khatm group link is not available." path={`/k/${id}`} />
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Group not found</h1>
-          <p className="text-muted-foreground mt-2">
-            This link may be private or the invite code is missing.
-          </p>
-          <Button asChild className="mt-4"><Link to="/khatm/groups">Explore groups</Link></Button>
-        </div>
+        <main className="container mx-auto max-w-lg px-4 py-16">
+          <EmptyState
+            icon={Link2Off}
+            title="Group not found"
+            description="This link may be private or the invite code is missing. Browse public circles to join one that's open."
+            actionLabel="Explore groups"
+            actionHref="/khatm/groups"
+          />
+        </main>
       </div>
     );
   }
@@ -112,8 +116,10 @@ export default function PublicKhatmGroup() {
             <div>
               <CheckCircle2 className={`h-5 w-5 mx-auto ${group.completed_at ? "text-emerald-500" : "text-muted-foreground"}`} />
               <div className="mt-1 text-2xl font-bold text-foreground">{pct}%</div>
-              <div className="text-xs text-muted-foreground">
-                {group.completed_at ? "Completed 🎉" : "In progress"}
+              <div className="mt-1">
+                <span className={`heartify-chip ${group.completed_at ? "heartify-chip--primary" : "heartify-chip--muted"}`}>
+                  {group.completed_at ? "Completed" : "In progress"}
+                </span>
               </div>
             </div>
           </div>

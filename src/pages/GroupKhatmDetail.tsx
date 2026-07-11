@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Copy, Check, Share2, Loader2, CheckCircle2, Circle, Sparkles } from "lucide-react";
+import { ArrowLeft, Copy, Check, Share2, Loader2, CheckCircle2, Circle, Sparkles, Users, BookOpen } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -213,9 +215,7 @@ export default function GroupKhatmDetail() {
     return (
       <div className="min-h-dvh bg-background">
         <Navbar />
-        <div className="flex justify-center py-24">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
+        <PageSkeleton variant="detail" />
       </div>
     );
   }
@@ -224,11 +224,14 @@ export default function GroupKhatmDetail() {
     return (
       <div className="min-h-dvh bg-background">
         <Navbar />
-        <main className="container mx-auto max-w-2xl px-4 py-12 text-center">
-          <p className="text-muted-foreground">Group not found or you don't have access.</p>
-          <Button asChild variant="outline" className="mt-4">
-            <Link to="/khatm/groups">Back to groups</Link>
-          </Button>
+        <main className="container mx-auto max-w-2xl px-4 py-12">
+          <EmptyState
+            icon={BookOpen}
+            title="Group not found"
+            description="This Khatm group is private, no longer available, or you don't have access. Explore public circles below."
+            actionLabel="Browse groups"
+            actionHref="/khatm/groups"
+          />
         </main>
       </div>
     );
@@ -260,8 +263,8 @@ export default function GroupKhatmDetail() {
               )}
             </div>
             {group.completed_at && (
-              <span className="rounded bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-500">
-                Completed 🎉
+              <span className="heartify-chip heartify-chip--primary">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> Completed
               </span>
             )}
           </div>
@@ -367,7 +370,13 @@ export default function GroupKhatmDetail() {
             <Sparkles className="h-4 w-4 text-primary" aria-hidden /> Activity
           </h2>
           {events.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No activity yet — be the first!</p>
+            <EmptyState
+              icon={Users}
+              title="No activity yet"
+              description="Be the first to claim a Juz — every reservation shows up here for the whole circle."
+              tone="muted"
+              className="border-none bg-transparent py-6"
+            />
           ) : (
             <ul className="space-y-2 text-sm">
               {events.map((e) => (

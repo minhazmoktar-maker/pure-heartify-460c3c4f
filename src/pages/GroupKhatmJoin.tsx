@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { BookOpen, LogIn, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -56,45 +56,48 @@ export default function GroupKhatmJoin() {
     })();
   }, [code, user, navigate]);
 
+  if (state === "working") {
+    return (
+      <div className="min-h-dvh bg-background">
+        <SEO title="Joining Khatm circle…" description="One moment while we reserve your seat." path={`/khatm/join/${code ?? ""}`} />
+        <Navbar />
+        <PageSkeleton variant="default" className="max-w-md" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Join a Khatm circle" description="Join a group Quran completion." path={`/khatm/join/${code ?? ""}`} />
       <Navbar />
       <main className="container mx-auto max-w-md px-4 py-16">
-        <Card className="p-6 text-center space-y-4">
-          {state === "working" && <Loader2 className="mx-auto h-6 w-6 animate-spin" />}
-          {state === "notfound" && (
-            <>
-              <h1 className="text-lg font-semibold">Invite not found</h1>
-              <p className="text-sm text-muted-foreground">
-                That invite code isn't valid. Ask the organiser for a new link.
-              </p>
-              <Button asChild variant="outline">
-                <Link to="/khatm/groups">Browse groups</Link>
-              </Button>
-            </>
-          )}
-          {state === "idle" && !user && (
-            <>
-              <h1 className="text-lg font-semibold">Sign in to join</h1>
-              <p className="text-sm text-muted-foreground">
-                Create an account or sign in to reserve your Juz.
-              </p>
-              <Button asChild>
-                <Link
-                  to={`/signup?next=${encodeURIComponent(`/khatm/join/${code}`)}`}
-                >
-                  Continue
-                </Link>
-              </Button>
-            </>
-          )}
-          {state === "done" && groupId && (
-            <Button asChild>
-              <Link to={`/khatm/group/${groupId}`}>Open group</Link>
-            </Button>
-          )}
-        </Card>
+        {state === "notfound" && (
+          <EmptyState
+            icon={BookOpen}
+            title="Invite not found"
+            description="That invite code isn't valid or has been retired. Ask the organiser for a fresh link, or explore public circles."
+            actionLabel="Browse groups"
+            actionHref="/khatm/groups"
+          />
+        )}
+        {state === "idle" && !user && (
+          <EmptyState
+            icon={LogIn}
+            title="Sign in to reserve your Juz"
+            description="Create an account or sign in to claim a Juz. We'll bring you right back to this circle."
+            actionLabel="Continue"
+            actionHref={`/signup?next=${encodeURIComponent(`/khatm/join/${code}`)}`}
+          />
+        )}
+        {state === "done" && groupId && (
+          <EmptyState
+            icon={Users}
+            title="You're in the circle"
+            description="Open the group to pick your Juz and start reciting."
+            actionLabel="Open group"
+            actionHref={`/khatm/group/${groupId}`}
+          />
+        )}
       </main>
     </div>
   );
