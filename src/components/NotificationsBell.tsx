@@ -156,27 +156,42 @@ export default function NotificationsBell({ isAdmin }: Props) {
               )}
 
               {/* Server-side in-app notifications (streaks, referrals, khatm, badges) */}
-              {notif.items.map((n) => (
-                <button
-                  key={n.id}
-                  onClick={() => {
-                    void notif.markRead(n.id);
-                    setOpen(false);
-                  }}
-                  className={`flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-secondary/50 ${
-                    n.read_at ? "" : "bg-primary/5"
-                  }`}
-                >
-                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium">{n.title}</p>
-                    {n.body && <p className="text-xs text-muted-foreground">{n.body}</p>}
-                    <p className="text-[10px] text-muted-foreground">
-                      {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
-                    </p>
-                  </div>
-                </button>
-              ))}
+              {notif.items.map((n) => {
+                const ctaUrl = (n.data?.cta_url as string) || (n.data?.url as string) || "";
+                const ctaLabel = (n.data?.cta_label as string) || "Open";
+                const Wrapper: any = ctaUrl ? Link : "button";
+                const wrapperProps: any = ctaUrl
+                  ? { to: ctaUrl }
+                  : { type: "button" };
+                return (
+                  <Wrapper
+                    key={n.id}
+                    {...wrapperProps}
+                    onClick={() => {
+                      void notif.markRead(n.id);
+                      setOpen(false);
+                    }}
+                    className={`flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-secondary/50 ${
+                      n.read_at ? "" : "bg-primary/5"
+                    }`}
+                  >
+                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{n.title}</p>
+                      {n.body && <p className="text-xs text-muted-foreground">{n.body}</p>}
+                      {ctaUrl && (
+                        <p className="mt-1 text-xs font-semibold text-primary">
+                          {ctaLabel} →
+                        </p>
+                      )}
+                      <p className="text-[10px] text-muted-foreground">
+                        {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </Wrapper>
+                );
+              })}
+
 
               {/* My reports */}
               {myReports.length === 0 && notif.items.length === 0 && !isAdmin && (

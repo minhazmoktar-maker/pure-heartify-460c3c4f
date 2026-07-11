@@ -91,8 +91,10 @@ Deno.serve(async (req) => {
   for (const row of atRisk) {
     if (alreadySet.has(row.user_id)) continue;
 
-    const title = "Keep your streak alive";
-    const body = `You're on a ${row.current_streak}-day streak. Complete today's dose before midnight.`;
+    const title = "Keep your streak alive 🔥";
+    const body = `You're on a ${row.current_streak}-day streak. Tap to finish today's dose in under 2 minutes.`;
+    const ctaLabel = "Complete today's dose";
+    const ctaUrl = "/?focus=daily-dose";
 
     // In-app notification (always).
     await supabase.from("user_notifications").insert({
@@ -100,7 +102,12 @@ Deno.serve(async (req) => {
       kind: "streak_risk",
       title,
       body,
-      data: { current_streak: row.current_streak },
+      data: {
+        current_streak: row.current_streak,
+        cta_label: ctaLabel,
+        cta_url: ctaUrl,
+        url: ctaUrl,
+      },
     });
 
     // Push (if we have tokens + FCM configured).
@@ -123,12 +130,29 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           to: t.token,
-          notification: { title, body },
-          data: { kind: "streak_risk", current_streak: String(row.current_streak) },
+          notification: {
+            title,
+            body,
+            click_action: ctaUrl,
+          },
+          data: {
+            kind: "streak_risk",
+            current_streak: String(row.current_streak),
+            cta_label: ctaLabel,
+            cta_url: ctaUrl,
+            url: ctaUrl,
+          },
+          webpush: {
+            fcm_options: { link: ctaUrl },
+            notification: {
+              actions: [{ action: "open_dose", title: ctaLabel }],
+            },
+          },
         }),
       });
       if (res.ok) sent++;
     }
+
   }
 
   return new Response(
