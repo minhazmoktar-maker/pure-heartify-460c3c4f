@@ -2023,33 +2023,39 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          country_code: string | null
           created_at: string
           display_name: string | null
           handle: string | null
           id: string
           preferences: Json | null
+          timezone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          country_code?: string | null
           created_at?: string
           display_name?: string | null
           handle?: string | null
           id?: string
           preferences?: Json | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          country_code?: string | null
           created_at?: string
           display_name?: string | null
           handle?: string | null
           id?: string
           preferences?: Json | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
