@@ -9,10 +9,9 @@ interface VideoCardProps {
 
 const VideoCard = ({ video, index }: VideoCardProps) => {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
+    <FadeIn
+      as="article"
+      index={index}
       className="card-interactive group cursor-pointer rounded-xl"
     >
       {/* Thumbnail */}
@@ -54,7 +53,7 @@ const VideoCard = ({ video, index }: VideoCardProps) => {
           </p>
         </div>
       </div>
-    </motion.article>
+    </FadeIn>
   );
 };
 
