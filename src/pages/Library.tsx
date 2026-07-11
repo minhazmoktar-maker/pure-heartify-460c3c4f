@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, BookOpen } from "lucide-react";
+import { Search, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
+import PageHeader from "@/components/PageHeader";
 import libraryData from "@/data/library.json";
 
 type Entry = {
