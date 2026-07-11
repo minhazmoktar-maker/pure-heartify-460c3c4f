@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { ShieldCheck, KeyRound, Loader2 } from "lucide-react";
 import MfaEnrollmentHelp from "@/components/MfaEnrollmentHelp";
+import PageSkeleton from "@/components/PageSkeleton";
 import SEO from "@/components/SEO";
 
 /**
@@ -75,7 +76,7 @@ export default function MfaEnroll() {
         </div>
 
         {authLoading || loading ? (
-          <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin" /></div>
+          <PageSkeleton variant="detail" className="max-w-xl px-0" />
         ) : enrolled ? (
           <Card className="p-6">
             <p className="text-sm text-muted-foreground">TOTP is enabled on your account. You'll be prompted for a 6-digit code on every sign-in.</p>

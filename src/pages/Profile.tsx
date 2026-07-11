@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle, Download } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
+import PageSkeleton from "@/components/PageSkeleton";
 import ReferralCard from "@/components/ReferralCard";
 import HandleClaimCard from "@/components/HandleClaimCard";
 import LanguageSettings from "@/components/LanguageSettings";
@@ -172,9 +173,7 @@ const Profile = () => {
     return (
       <div className="min-h-dvh bg-background">
         <Navbar />
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <PageSkeleton variant="detail" />
       </div>
     );
   }

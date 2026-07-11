@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import PageSkeleton from "@/components/PageSkeleton";
 import SEO from "@/components/SEO";
 
 /**
@@ -54,7 +55,7 @@ export default function MfaVerify() {
           <h1 className="font-heading text-xl font-bold">Verify it's you</h1>
         </div>
         {authLoading || loading ? (
-          <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+          <PageSkeleton variant="default" className="max-w-md px-0 py-2" />
         ) : (
           <>
             <p className="text-sm text-muted-foreground">Enter the 6-digit code from your authenticator app.</p>

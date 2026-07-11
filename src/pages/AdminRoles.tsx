@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PageSkeleton from "@/components/PageSkeleton";
 
 import { Loader2, Shield, Users, ScrollText, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -120,10 +121,10 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
   };
 
   if (loading) {
-    return (
-      <div className={embedded ? "flex justify-center py-10" : "min-h-dvh bg-background flex items-center justify-center"}>
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
+    return embedded ? (
+      <PageSkeleton variant="list" className="max-w-none px-0" />
+    ) : (
+      <div className="min-h-dvh bg-background"><Navbar /><PageSkeleton variant="list" /></div>
     );
   }
   if (!isOwner) {
