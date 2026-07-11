@@ -205,6 +205,50 @@
     line-height: 2.1;
     letter-spacing: 0;
   }
+
+  /* Unified form input styling — branded focus ring, smooth border transition,
+     invalid state hookup. Applied via <AuthField /> and any raw <input>/<textarea>
+     that wants the same feel. */
+  .field-input {
+    @apply h-11 rounded-lg border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground;
+    transition:
+      border-color 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    outline: none;
+  }
+  .field-input:hover:not(:disabled):not(.field-input--invalid) {
+    border-color: hsl(var(--primary) / 0.5);
+  }
+  .field-input:focus-visible {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.18);
+  }
+  .field-input:disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+  .field-input--invalid {
+    border-color: hsl(var(--destructive)) !important;
+  }
+  .field-input--invalid:focus-visible {
+    box-shadow: 0 0 0 3px hsl(var(--destructive) / 0.22);
+  }
+
+  /* Inline validation choreography — a short horizontal shake nudges the eye
+     to the failing field. Respects reduced motion. */
+  @keyframes heartify-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+  }
+  .animate-shake {
+    animation: heartify-shake 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-shake { animation: none; }
+  }
 }
 
 @layer components {
