@@ -1,46 +1,49 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
+import { AuthField } from "@/components/auth/AuthField";
+import { PasswordStrength, scorePassword } from "@/components/auth/PasswordStrength";
+
+type Errors = { password?: string; confirmPassword?: string };
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
 
   useEffect(() => {
-    // Check for recovery token in URL hash
     const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
-      setIsRecovery(true);
-    }
-
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setIsRecovery(true);
-      }
+    if (hash.includes("type=recovery")) setIsRecovery(true);
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setIsRecovery(true);
     });
+    return () => data.subscription.unsubscribe();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
+  const validate = (): Errors => {
+    const e: Errors = {};
+    if (password.length < 8) e.password = "Use at least 8 characters.";
+    else if (scorePassword(password) < 2) e.password = "Try a stronger password (mix case, numbers, symbols).";
+    if (password !== confirmPassword) e.confirmPassword = "Passwords do not match.";
+    return e;
+  };
+
+  const handleSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    const v = validate();
+    setErrors(v);
+    if (Object.keys(v).length) return;
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (error) {
+      setErrors({ password: error.message });
       toast.error(error.message);
     } else {
       toast.success("Password updated successfully!");
@@ -68,19 +71,43 @@ const ResetPassword = () => {
           <p className="mt-1 text-sm text-muted-foreground">Choose a strong password (min 8 characters)</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <input type={showPassword ? "text" : "password"} placeholder="New password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none" />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3">
-              {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-            </button>
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <div className="space-y-2">
+            <AuthField
+              icon={Lock}
+              passwordToggle
+              autoComplete="new-password"
+              placeholder="New password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors((s) => ({ ...s, password: undefined }));
+              }}
+              error={errors.password ?? null}
+              required
+              minLength={8}
+            />
+            <PasswordStrength value={password} />
           </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <input type="password" placeholder="Confirm new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={8} className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50">
+          <AuthField
+            icon={Lock}
+            passwordToggle
+            autoComplete="new-password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (errors.confirmPassword) setErrors((s) => ({ ...s, confirmPassword: undefined }));
+            }}
+            error={errors.confirmPassword ?? null}
+            required
+            minLength={8}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.45)] transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50"
+          >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Update Password
           </button>
