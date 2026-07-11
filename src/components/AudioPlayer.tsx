@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ReportAudioDialog from "@/components/ReportAudioDialog";
 import DownloadTrackButton from "@/components/DownloadTrackButton";
+import SmartImage from "@/components/SmartImage";
 
 const fmt = (s: number) => {
   if (!isFinite(s) || s < 0) return "0:00";
