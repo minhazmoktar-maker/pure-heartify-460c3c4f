@@ -36,13 +36,16 @@ interface Tier {
   id: PreferredTier | "free";
   name: string;
   tagline: string;
-  price: string;
+  /** Base price in USD. Rendered in the user's locale/currency at display time. */
+  priceUsd: number;
   period: string;
+  periodShort: string;
   highlight?: boolean;
   cta: string;
   icon: typeof Sparkles;
   bullets: { text: string; strong?: boolean }[];
 }
+
 
 const TIERS: Tier[] = [
   {
