@@ -3665,6 +3665,10 @@ export type Database = {
         Returns: boolean
       }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
+      is_team_streak_member: {
+        Args: { _team_id: string; _user_id: string }
+        Returns: boolean
+      }
       join_team_streak: {
         Args: { _code: string }
         Returns: {
