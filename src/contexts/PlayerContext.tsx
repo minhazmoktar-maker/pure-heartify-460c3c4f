@@ -586,6 +586,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const value: PlayerState = {
     currentTrack, queue, isPlaying, isBuffering, isPremiumUser, isPremiumLoading,
     progress, duration, volume, muted, shuffle, repeat, playbackRate,
+    isPreview, previewCapSeconds: PREVIEW_SECONDS,
     recent, playCounts, lastError, needsUserGesture, resumePlayback,
     play, playQueue, togglePlay,
     next: () => goNext(false),
