@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, Star, ChevronLeft, ChevronRight, BookMarked } from "lucide-react";
+import { Share2, Star, ChevronLeft, ChevronRight, BookMarked, UserX } from "lucide-react";
 import { PROPHET_NAMES } from "@/data/prophetNames";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -21,10 +22,13 @@ export default function PublicProphetName() {
         <SEO title="Name not found — Heartify" description="This name of the Prophet ﷺ was not found." path={`/prophet-name/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Name not found</h1>
-            <Button asChild variant="outline"><Link to="/">Home</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={UserX}
+            title="Name not found"
+            description="This blessed name of the Prophet ﷺ was not found. Return home to explore more of his ﷺ noble attributes."
+            actionLabel="Return home"
+            actionHref="/"
+          />
         </main>
       </div>
     );

@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Share2, MapPin, ChevronLeft, ChevronRight, BookMarked, Building2 } from "lucide-react";
+import { Share2, MapPin, ChevronLeft, ChevronRight, BookMarked, Building2, MapPinOff } from "lucide-react";
 import { SACRED_MOSQUES } from "@/data/sacredMosques";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -22,10 +23,13 @@ export default function PublicMosque() {
         <SEO title="Mosque not found — Heartify" description="This sacred mosque page could not be found." path={`/mosque/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Mosque not found</h1>
-            <Button asChild variant="outline"><Link to="/">Home</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={MapPinOff}
+            title="Mosque not found"
+            description="This sacred mosque page could not be found. Return home to explore more sacred places."
+            actionLabel="Return home"
+            actionHref="/"
+          />
         </main>
       </div>
     );

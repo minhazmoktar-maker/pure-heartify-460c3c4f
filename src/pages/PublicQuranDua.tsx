@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, HandHeart, BookOpen, ChevronLeft, ChevronRight, Tag } from "lucide-react";
+import { Share2, HandHeart, BookOpen, ChevronLeft, ChevronRight, Tag, BookX } from "lucide-react";
 import { QURAN_DUAS } from "@/data/quranDuas";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -32,10 +33,13 @@ export default function PublicQuranDua() {
         <SEO title="Duʿāʾ not found — Heartify" description="This duʿā could not be found." path={`/quran-dua/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Duʿāʾ not found</h1>
-            <Button asChild variant="outline"><Link to="/adhkar">Open Adhkār</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={BookX}
+            title="Duʿāʾ not found"
+            description="This Qur'ānic supplication could not be found. Open the Adhkār library to continue."
+            actionLabel="Open Adhkār"
+            actionHref="/adhkar"
+          />
         </main>
       </div>
     );

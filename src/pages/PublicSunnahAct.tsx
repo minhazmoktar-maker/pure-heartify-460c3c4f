@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, Sparkles, ChevronLeft, ChevronRight, Tag, BookMarked } from "lucide-react";
+import { Share2, Sparkles, ChevronLeft, ChevronRight, Tag, BookMarked, BookOpen } from "lucide-react";
 import { SUNNAH_ACTS } from "@/data/sunnahActs";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -33,10 +34,13 @@ export default function PublicSunnahAct() {
         <SEO title="Sunnah not found — Heartify" description="This Sunnah act could not be found." path={`/sunnah/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Sunnah not found</h1>
-            <Button asChild variant="outline"><Link to="/adhkar">Open Adhkār</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={BookOpen}
+            title="Sunnah not found"
+            description="This Sunnah act could not be found. Open the Adhkār library for authentic prophetic practices."
+            actionLabel="Open Adhkār"
+            actionHref="/adhkar"
+          />
         </main>
       </div>
     );

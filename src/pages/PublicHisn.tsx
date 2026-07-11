@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, Share2 } from "lucide-react";
+import { Shield, Share2, MessageCircleOff } from "lucide-react";
 import { HISNUL_DUAS } from "@/data/hisnul";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -31,10 +32,13 @@ export default function PublicHisn() {
         <SEO title="Du'ā not found — Heartify" description="This du'ā could not be found." path={`/hisn/${id}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Du'ā not found</h1>
-            <Button asChild variant="outline"><Link to="/hisnul">Open the Fortress</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={MessageCircleOff}
+            title="Du'ā not found"
+            description="This du'ā could not be found. Open Ḥiṣnul-Muslim to find authentic supplications for every moment."
+            actionLabel="Open the Fortress"
+            actionHref="/hisnul"
+          />
         </main>
       </div>
     );

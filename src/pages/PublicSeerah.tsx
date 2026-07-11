@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, Scroll, MapPin, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Share2, Scroll, MapPin, Calendar, ChevronLeft, ChevronRight, CalendarX } from "lucide-react";
 import { SEERAH_EVENTS } from "@/data/seerah";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -21,10 +22,13 @@ export default function PublicSeerah() {
         <SEO title="Seerah event not found — Heartify" description="This Seerah event could not be found." path={`/seerah/${id}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Event not found</h1>
-            <Button asChild variant="outline"><Link to="/seerah">Open the Seerah timeline</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={CalendarX}
+            title="Event not found"
+            description="This event from the Seerah could not be found. Open the full timeline to continue your journey."
+            actionLabel="Open the Seerah timeline"
+            actionHref="/seerah"
+          />
         </main>
       </div>
     );

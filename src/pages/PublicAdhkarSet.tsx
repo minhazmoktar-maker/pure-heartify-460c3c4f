@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,10 +22,13 @@ export default function PublicAdhkarSet() {
         <SEO title="Adhkār set not found — Heartify" description="This adhkār collection could not be found." path={`/adhkar-set/${id}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Adhkār set not found</h1>
-            <Button asChild variant="outline"><Link to="/adhkar">Open Adhkār</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={BookMarked}
+            title="Adhkār set not found"
+            description="This adhkār collection could not be found. Explore the full Adhkār library to continue your remembrance."
+            actionLabel="Open Adhkār"
+            actionHref="/adhkar"
+          />
         </main>
       </div>
     );
