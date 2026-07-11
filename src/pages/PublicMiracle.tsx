@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,10 +31,13 @@ export default function PublicMiracle() {
         <SEO title="Miracle not found — Heartify" description="This miracle could not be found." path={`/miracle/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Miracle not found</h1>
-            <Button asChild variant="outline"><Link to="/seerah">Open the Seerah timeline</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={Sparkles}
+            title="Miracle not found"
+            description="This miracle could not be found. Open the Seerah timeline to explore the signs of Prophethood."
+            actionLabel="Open the Seerah timeline"
+            actionHref="/seerah"
+          />
         </main>
       </div>
     );

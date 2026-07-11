@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,10 +35,13 @@ export default function PublicSignOfHour() {
         <SEO title="Sign not found — Heartify" description="This sign of the Hour could not be found." path={`/sign-of-hour/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Sign not found</h1>
-            <Button asChild variant="outline"><Link to="/">Home</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={AlertTriangle}
+            title="Sign not found"
+            description="This sign of the Hour could not be found. Return home to explore Islamic eschatology."
+            actionLabel="Return home"
+            actionHref="/"
+          />
         </main>
       </div>
     );

@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Heart, ChevronLeft, ChevronRight, BookMarked, Quote } from "lucide-react";
+import { Share2, Heart, ChevronLeft, ChevronRight, BookMarked, Quote, Trophy } from "lucide-react";
 import { VIRTUES } from "@/data/virtues";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -22,10 +23,13 @@ export default function PublicVirtue() {
         <SEO title="Virtue not found — Heartify" description="This virtue page could not be found." path={`/virtue/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Virtue not found</h1>
-            <Button asChild variant="outline"><Link to="/">Home</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={Trophy}
+            title="Virtue not found"
+            description="This virtue page could not be found. Return home to explore more spiritual rewards."
+            actionLabel="Return home"
+            actionHref="/"
+          />
         </main>
       </div>
     );

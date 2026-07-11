@@ -1,9 +1,10 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import EmptyState from "@/components/EmptyState";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, GraduationCap, MapPin, Calendar, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { Share2, GraduationCap, MapPin, Calendar, BookOpen, ChevronLeft, ChevronRight, UserX } from "lucide-react";
 import { SCHOLARS } from "@/data/scholars";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
@@ -21,10 +22,13 @@ export default function PublicScholar() {
         <SEO title="Scholar not found — Heartify" description="This scholar could not be found." path={`/scholar/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Scholar not found</h1>
-            <Button asChild variant="outline"><Link to="/">Return home</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={UserX}
+            title="Scholar not found"
+            description="This scholar could not be found. Return home to explore the biographies of the pious predecessors."
+            actionLabel="Return home"
+            actionHref="/"
+          />
         </main>
       </div>
     );
