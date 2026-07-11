@@ -122,14 +122,14 @@ describe("App routing regression: privileged routes are auto-detected", () => {
   });
 
   if (PRIVILEGED_ROUTES.length > 0) {
-    it.each(PRIVILEGED_ROUTES.map((r) => [r.path, r.element]))(
+    // Redirect-only routes (<Navigate />) are aliases, not privileged pages
+    // themselves — the destination is what gets guarded.
+    const GUARDED = PRIVILEGED_ROUTES.filter(
+      (r) => !r.element.trim().startsWith("<Navigate"),
+    );
+    it.each(GUARDED.map((r) => [r.path, r.element]))(
       "privileged route %s is wrapped in <AdminRoute>",
       (routePath, element) => {
-        // The element expression must start with <AdminRoute> and close with
-        // </AdminRoute>. This catches:
-        //   - New /admin/* pages missing the wrapper
-        //   - Someone unwrapping an existing one
-        //   - Using a sibling guard instead of AdminRoute
         expect(
           element.trim().startsWith("<AdminRoute>"),
           `Route ${routePath} must start its element with <AdminRoute>. ` +
