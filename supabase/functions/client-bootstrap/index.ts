@@ -25,8 +25,25 @@ Deno.serve(async (req) => {
   if (authHeader) {
     const { data: userData } = await anonClient.auth.getUser();
     userId = userData.user?.id ?? null;
+  }
 
-    if (userId) {
+  // Rate limit: 120/min per user, 30/min per IP for anon (bootstrap is cheap
+  // but expensive if fanned out from a bot farm).
+  const identity = getClientIdentity(req, userId);
+  const limited = await enforceRateLimit(admin, {
+    identity,
+    action: "client-bootstrap",
+    limit: userId ? 120 : 30,
+    windowSeconds: 60,
+  });
+  if (limited) {
+    return new Response(JSON.stringify({ error: "rate_limited" }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (userId) {
       const [profileRes, entRes, prefsRes] = await Promise.all([
         anonClient.from("profiles").select("display_name, avatar_url, locale").eq("user_id", userId).maybeSingle(),
         anonClient.from("entitlements").select("plan, expires_at").eq("user_id", userId).maybeSingle(),
