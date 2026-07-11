@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,8 @@ interface SectionHeaderProps {
   actionLabel?: string;
   actionTo?: string;
   onAction?: () => void;
+  /** Optional custom action slot rendered on the right (replaces the built-in action button). */
+  actions?: ReactNode;
   className?: string;
   as?: "h2" | "h3";
   align?: "start" | "center";
