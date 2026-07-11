@@ -293,6 +293,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setProgress(a.currentTime);
       saveLocal(a.currentTime);
       maybeSaveRemote(a.currentTime);
+      // Enforce the 30s premium sample cap for non-entitled listeners.
+      const cap = previewCapRef.current;
+      if (cap != null && a.currentTime >= cap) {
+        a.pause();
+        setIsPlaying(false);
+        previewCapRef.current = null;
+        window.dispatchEvent(new CustomEvent("heartify:preview-cap-reached", {
+          detail: { title: currentTrack?.title, trackId: currentTrack?.id },
+        }));
+      }
     };
     const onMeta = () => setDuration(a.duration || 0);
     const onWait = () => setIsBuffering(true);
