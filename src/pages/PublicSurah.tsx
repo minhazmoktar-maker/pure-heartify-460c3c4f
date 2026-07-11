@@ -91,12 +91,15 @@ export default function PublicSurah() {
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+          <PageSkeleton variant="detail" />
         ) : notFound || !meta ? (
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Sūrah not found</h1>
-            <Button asChild variant="outline"><Link to="/quran">Browse the Qur'an</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={BookX}
+            title="Sūrah not found"
+            description={`Sūrah ${n} could not be loaded. Return to the Qur'an index to pick another chapter.`}
+            actionLabel="Browse the Qur'an"
+            actionHref="/quran"
+          />
         ) : (
           <>
             <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
