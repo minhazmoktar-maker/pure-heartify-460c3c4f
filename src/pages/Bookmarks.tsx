@@ -4,6 +4,7 @@ import { Bookmark, BookOpen, BookText, Trash2, Search, StickyNote, Save, X } fro
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import SectionHeader from "@/components/SectionHeader";
+import EmptyState from "@/components/EmptyState";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
