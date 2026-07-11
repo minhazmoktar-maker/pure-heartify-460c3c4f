@@ -39,7 +39,7 @@ const AudioPlayer = () => {
         <motion.div
           initial={{ y: 90 }} animate={{ y: 0 }} exit={{ y: 90 }}
           transition={{ type: "spring", stiffness: 320, damping: 32 }}
-          className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-card/95 backdrop-blur-xl shadow-[0_-8px_24px_-12px_hsl(var(--foreground)/0.25)]"
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-card/95 backdrop-blur-xl shadow-[0_-8px_24px_-12px_hsl(var(--foreground)/0.25)] pb-safe"
           role="region"
           aria-label="Now playing"
         >
