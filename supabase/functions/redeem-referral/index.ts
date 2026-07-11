@@ -1,5 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { verifyTurnstile } from "../_shared/turnstile.ts";
 
 /**
  * Thin edge wrapper around the SQL RPC `redeem_referral`.
