@@ -25,6 +25,21 @@ export function StreakCard() {
     return () => { mounted = false; };
   }, []);
 
+  // One-shot celebration when the current streak lands on a milestone day.
+  // Persists a "seen" marker per (user × milestone) so returning users don't
+  // re-trigger the pop on every mount.
+  useEffect(() => {
+    if (s.loading || s.current <= 0) return;
+    if (!MILESTONES.includes(s.current)) return;
+    const key = `streak:milestone-seen:${s.current}`;
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem(key)) return;
+    window.localStorage.setItem(key, "1");
+    setCelebrate(true);
+    const t = window.setTimeout(() => setCelebrate(false), 900);
+    return () => window.clearTimeout(t);
+  }, [s.loading, s.current]);
+
   if (s.loading) {
     return (
       <Card className="p-5 space-y-4" aria-label="Loading streak" role="status">
