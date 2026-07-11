@@ -93,7 +93,7 @@ const Quiz = () => {
       <SEO title="Islamic Quiz — Heartify" description="Quick 10-question Islamic quizzes across Aqeedah, Seerah, Fiqh, Qur'an and Hadith." path="/quiz" />
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <Button asChild variant="ghost" size="icon"><Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link></Button>
+          <Button asChild variant="ghost" size="icon" aria-label="Back"><Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link></Button>
           <Brain className="h-5 w-5 text-primary" />
           <h1 className="text-lg font-semibold">Islamic Quiz</h1>
         </div>

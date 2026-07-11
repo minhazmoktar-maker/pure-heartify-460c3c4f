@@ -130,7 +130,7 @@ const Nikah = () => {
       />
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">
-          <Button asChild variant="ghost" size="icon">
+          <Button asChild variant="ghost" size="icon" aria-label="Back">
             <Link to="/" aria-label="Back to home"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <Heart className="h-5 w-5 text-primary" />
