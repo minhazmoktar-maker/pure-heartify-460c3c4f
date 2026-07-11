@@ -27,6 +27,7 @@ const BodySchema = z.object({
   severity: z.enum(["low","normal","high","critical"]).optional(),
   notify_reporter: z.boolean().optional(),
   platform: z.string().max(60).optional(),
+  captcha_token: z.string().max(4000).optional(),
 }).refine(
   (v) => !!(v.video_id || v.channel_id),
   { message: "video_id or channel_id required" },
