@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound.tsx";
 import { MobileBridge } from "./components/MobileBridge";
 import ReferralBridge from "./components/ReferralBridge";
 import AdhanNotifier from "./components/AdhanNotifier";
+import OfflineSweeper from "./components/OfflineSweeper";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AdminRoute from "./components/AdminRoute";
 
@@ -210,6 +211,7 @@ const App = () => (
             <ReferralBridge />
             <AdhanNotifier />
             <GatedPreviewGuard />
+            <OfflineSweeper />
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route path="/" element={<Index />} />

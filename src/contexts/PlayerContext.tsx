@@ -42,6 +42,10 @@ interface PlayerState {
   shuffle: boolean;
   repeat: RepeatMode;
   playbackRate: number;
+  /** True while playing a gated 30s preview for a non-entitled listener. */
+  isPreview: boolean;
+  /** Fixed length (s) of gated previews. */
+  previewCapSeconds: number;
   recent: Track[];
   playCounts: PlayCounts;
   lastError: PlaybackError | null;
@@ -115,6 +119,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const [playbackRate, setPlaybackRateState] = useState(1);
   const [lastError, setLastError] = useState<PlaybackError | null>(null);
   const [needsUserGesture, setNeedsUserGesture] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
   const [recentEntries, setRecentEntries] = useState<RecentEntry[]>(() =>
     readJson<RecentEntry[]>(RECENT_KEY, []),
   );
@@ -299,6 +304,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         a.pause();
         setIsPlaying(false);
         previewCapRef.current = null;
+        setIsPreview(false);
         window.dispatchEvent(new CustomEvent("heartify:preview-cap-reached", {
           detail: { title: currentTrack?.title, trackId: currentTrack?.id },
         }));
@@ -439,11 +445,13 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         // signed-URL layer for entitled sessions. This surface just gives
         // browsing users an audition before the paywall.
         previewCapRef.current = PREVIEW_SECONDS;
+        setIsPreview(true);
         toast("30-second preview", {
           description: `Sampling "${track.title}" — upgrade to hear the full recitation.`,
         });
       } else {
         previewCapRef.current = null;
+        setIsPreview(false);
       }
       // iOS: warm up the element inside the user gesture. Setting src + calling
       // play() synchronously is what earns the media element its autoplay
@@ -578,6 +586,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const value: PlayerState = {
     currentTrack, queue, isPlaying, isBuffering, isPremiumUser, isPremiumLoading,
     progress, duration, volume, muted, shuffle, repeat, playbackRate,
+    isPreview, previewCapSeconds: PREVIEW_SECONDS,
     recent, playCounts, lastError, needsUserGesture, resumePlayback,
     play, playQueue, togglePlay,
     next: () => goNext(false),

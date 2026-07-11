@@ -3,6 +3,7 @@ import {
   Crown, Shuffle, Repeat, Repeat1, Loader2, Gauge, Hand,
 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -27,8 +28,10 @@ const AudioPlayer = () => {
     shuffle, toggleShuffle, repeat, cycleRepeat,
     playbackRate, setPlaybackRate,
     needsUserGesture, resumePlayback, lastError,
+    isPreview, previewCapSeconds,
   } = usePlayer();
   const [speedOpen, setSpeedOpen] = useState(false);
+  const previewLeft = Math.max(0, Math.ceil(previewCapSeconds - progress));
 
   return (
     <AnimatePresence>
@@ -48,6 +51,18 @@ const AudioPlayer = () => {
               <Hand className="h-3.5 w-3.5" />
               Tap to start playback — your browser blocked autoplay.
             </button>
+          )}
+          {isPreview && (
+            <div className="flex w-full items-center justify-center gap-3 bg-gradient-to-r from-[hsl(var(--gold))]/95 to-[hsl(var(--gold))]/80 px-3 py-1.5 text-xs font-semibold text-black">
+              <Crown className="h-3.5 w-3.5" aria-hidden />
+              <span>Preview · {previewLeft}s left</span>
+              <Link
+                to="/plus"
+                className="rounded-full bg-black/85 px-3 py-0.5 text-[11px] font-bold text-white hover:bg-black"
+              >
+                Upgrade to hear it all
+              </Link>
+            </div>
           )}
           <div className="mx-auto grid h-[88px] max-w-[1800px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 md:px-6">
 
