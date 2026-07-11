@@ -44,15 +44,14 @@ Deno.serve(async (req) => {
   }
 
   if (userId) {
-      const [profileRes, entRes, prefsRes] = await Promise.all([
-        anonClient.from("profiles").select("display_name, avatar_url, locale").eq("user_id", userId).maybeSingle(),
-        anonClient.from("entitlements").select("plan, expires_at").eq("user_id", userId).maybeSingle(),
-        anonClient.from("user_preferences_v2").select("key, value").eq("user_id", userId),
-      ]);
-      profile = profileRes.data;
-      if (entRes.data) entitlement = entRes.data as typeof entitlement;
-      for (const row of prefsRes.data ?? []) preferences[(row as any).key] = (row as any).value;
-    }
+    const [profileRes, entRes, prefsRes] = await Promise.all([
+      anonClient.from("profiles").select("display_name, avatar_url, locale").eq("user_id", userId).maybeSingle(),
+      anonClient.from("entitlements").select("plan, expires_at").eq("user_id", userId).maybeSingle(),
+      anonClient.from("user_preferences_v2").select("key, value").eq("user_id", userId),
+    ]);
+    profile = profileRes.data;
+    if (entRes.data) entitlement = entRes.data as typeof entitlement;
+    for (const row of prefsRes.data ?? []) preferences[(row as any).key] = (row as any).value;
   }
 
   const body = {
