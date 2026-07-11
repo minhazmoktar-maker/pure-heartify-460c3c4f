@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import EmptyState from "@/components/EmptyState";
 import { BookText, Loader2, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { HADITH_COLLECTIONS, fetchArabicSection, fetchHadithSection, type Hadith } from "@/lib/hadithApi";
 import { toast } from "sonner";
