@@ -70,8 +70,11 @@ const AudioPlayer = () => {
             {/* Left — track meta */}
             <div className="flex min-w-0 items-center gap-3">
               <div className="relative h-14 w-14 shrink-0">
-                <img src={currentTrack.cover} alt={currentTrack.title}
-                  className="h-full w-full rounded-md object-cover shadow-card" />
+                <SmartImage
+                  src={currentTrack.cover}
+                  alt={currentTrack.title}
+                  wrapperClassName="h-full w-full rounded-md overflow-hidden shadow-card"
+                />
                 {isBuffering && (
                   <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background/60">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
