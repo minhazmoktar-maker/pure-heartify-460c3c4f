@@ -437,6 +437,39 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
           )}
         </SheetContent>
       </Sheet>
+
+      <ConfirmDialog
+        open={!!confirm}
+        onOpenChange={(o) => !o && setConfirm(null)}
+        tone="destructive"
+        loading={!!busy}
+        title={confirm?.kind === "remove" ? "Remove this video?" : "Ban this channel?"}
+        description={
+          confirm?.kind === "remove" ? (
+            <>
+              This soft-removes <strong className="text-foreground">
+                {confirm.report.video_title ?? confirm.report.video_id}
+              </strong> from Heartify and deletes any curation row. Reversible via the removed-videos table.
+            </>
+          ) : (
+            <>
+              This bans <strong className="text-foreground">
+                {confirm?.report.channel_title ?? confirm?.report.channel_id}
+              </strong> from the platform and blocks the creator pattern from future imports.
+            </>
+          )
+        }
+        confirmLabel={confirm?.kind === "remove" ? "Remove video" : "Ban channel"}
+        onConfirm={async () => {
+          if (!confirm) return;
+          try {
+            if (confirm.kind === "remove") await removeVideo(confirm.report);
+            else await banChannel(confirm.report);
+          } finally {
+            setConfirm(null);
+          }
+        }}
+      />
     </div>
   );
 }
