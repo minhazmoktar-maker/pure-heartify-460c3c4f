@@ -51,16 +51,8 @@ export default function Library() {
         description="Searchable library of Islamic topics: worship, ethics, family, finance, theology, history."
         path="/library"
       />
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-3">
-          <Link to="/">
-            <Button variant="ghost" size="icon" aria-label="Back">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <BookOpen className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold">Library</h1>
-        </div>
+      <div className="container mx-auto px-4 pt-4">
+        <PageHeader title="Library" subtitle="Searchable halal knowledge hub." icon={BookOpen} backHref="/" />
       </div>
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <div className="flex flex-col md:flex-row gap-3 mb-6">
