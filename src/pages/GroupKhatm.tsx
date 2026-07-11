@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Plus, Users, BookOpen, Loader2, Sparkles } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { z } from "zod";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
