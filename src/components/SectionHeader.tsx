@@ -29,6 +29,7 @@ export default function SectionHeader({
   actionLabel,
   actionTo,
   onAction,
+  actions,
   className,
   as: Heading = "h2",
   align = "start",
