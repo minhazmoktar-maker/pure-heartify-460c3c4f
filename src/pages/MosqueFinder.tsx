@@ -4,6 +4,8 @@ import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import EmptyState from "@/components/EmptyState";
 import { MapPin, Loader2, Navigation, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
