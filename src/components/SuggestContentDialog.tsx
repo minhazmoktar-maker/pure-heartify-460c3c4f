@@ -139,7 +139,15 @@ export default function SuggestContentDialog({ trigger }: Props) {
           </button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        className="max-w-lg"
+        onKeyDown={(e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !submitting) {
+            e.preventDefault();
+            submit();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Lightbulb className="h-4 w-4 text-primary" /> Suggest halal content
