@@ -953,16 +953,30 @@ Deno.serve(async (req) => {
     let totalAdded = 0;
     let totalQuota = 0;
 
+    // Bounded parallelism (concurrency=3) keeps latency down without blowing
+    // through the daily quota — each worker still respects the shared caps.
+    const CONCURRENCY = 3;
+    async function runPool<T>(items: T[], worker: (item: T) => Promise<{ added: number; quota: number }>, quotaCap: number) {
+      let cursor = 0;
+      let stop = false;
+      async function next() {
+        while (!stop) {
+          const i = cursor++;
+          if (i >= items.length) return;
+          if (!activeKeys().length) { stop = true; return; }
+          if (totalQuota > quotaCap) { stop = true; return; }
+          const r = await worker(items[i]);
+          totalAdded += r.added;
+          totalQuota += r.quota;
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, next));
+    }
+
     if (mode === "channels" || mode === "both") {
       await ensureChannelsSeeded();
       const stale = await pickStaleChannels(channelsPerRun);
-      for (const ch of stale) {
-        if (!activeKeys().length) break;
-        const r = await ingestChannel(ch);
-        totalAdded += r.added;
-        totalQuota += r.quota;
-        if (totalQuota > perRunQuotaCap * 0.75) break;
-      }
+      await runPool(stale, ingestChannel, perRunQuotaCap * 0.75);
     }
 
     if (mode === "discovery" || mode === "both") {
@@ -971,13 +985,8 @@ Deno.serve(async (req) => {
         for (const q of qs) allQueries.push([sec, q]);
       }
       allQueries.sort(() => Math.random() - 0.5);
-      for (const [sec, q] of allQueries.slice(0, discoveryQueries)) {
-        if (!activeKeys().length) break;
-        const r = await ingestDiscoveryQuery(sec, q);
-        totalAdded += r.added;
-        totalQuota += r.quota;
-        if (totalQuota > perRunQuotaCap) break;
-      }
+      const slice = allQueries.slice(0, discoveryQueries);
+      await runPool(slice, ([sec, q]) => ingestDiscoveryQuery(sec, q), perRunQuotaCap);
     }
 
     const rejectedCount = rejectionBuffer.length;
