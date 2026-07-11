@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { shareContent } from "@/lib/share";
+import EmptyState from "@/components/EmptyState";
 
 type Dua = {
   id: string;
