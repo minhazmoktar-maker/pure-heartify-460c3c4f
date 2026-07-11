@@ -55,10 +55,30 @@ function fmt(hours: number) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-Deno.serve((req) => {
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // Cheap DoS defence: 120 req/min per identity (user or IP). Endpoint is
+  // pure math but still consumes function invocations against the budget.
   const url = new URL(req.url);
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (supabaseUrl && serviceKey) {
+    const admin = createClient(supabaseUrl, serviceKey);
+    const limited = await enforceRateLimit(admin, {
+      identity: getClientIdentity(req, null),
+      action: "prayer-times",
+      limit: 120,
+      windowSeconds: 60,
+    });
+    if (limited) {
+      return new Response(JSON.stringify({ error: "rate_limited" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+
   const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams));
   if (!parsed.success) {
     return new Response(JSON.stringify({ error: parsed.error.flatten().fieldErrors }), {
