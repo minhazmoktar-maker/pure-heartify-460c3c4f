@@ -4,6 +4,7 @@ import type { Track } from "@/data/audio";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { cn } from "@/lib/utils";
 import ReportAudioDialog from "@/components/ReportAudioDialog";
+import SmartImage from "@/components/SmartImage";
 
 interface TrackRowProps {
   track: Track;
