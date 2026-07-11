@@ -72,21 +72,15 @@ export default function PublicProfile() {
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <PageSkeleton variant="detail" />
         ) : notFound || !profile ? (
-          <Card>
-            <CardContent className="py-12 text-center space-y-3">
-              <h1 className="text-xl font-semibold">Profile not found</h1>
-              <p className="text-sm text-muted-foreground">
-                No user with handle <span className="font-mono">@{handle}</span>.
-              </p>
-              <Button asChild variant="outline">
-                <Link to="/">Go home</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={UserX}
+            title="Profile not found"
+            description={`No Heartify member with handle @${handle}. They may have changed their handle or made their profile private.`}
+            actionLabel="Go home"
+            actionHref="/"
+          />
         ) : (
           <>
             <Card>
