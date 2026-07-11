@@ -208,6 +208,7 @@ const App = () => (
             <MobileBridge />
             <ReferralBridge />
             <AdhanNotifier />
+            <GatedPreviewGuard />
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 <Route path="/" element={<Index />} />
