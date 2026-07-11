@@ -92,19 +92,15 @@ export default function PublicAyah() {
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <PageSkeleton variant="detail" />
         ) : notFound || !arabic ? (
-          <Card>
-            <CardContent className="py-12 text-center space-y-3">
-              <h1 className="text-xl font-semibold">Verse not found</h1>
-              <p className="text-sm text-muted-foreground">
-                Sūrah {surahN}, verse {verseN} could not be loaded.
-              </p>
-              <Button asChild variant="outline"><Link to="/quran">Browse the Qur'an</Link></Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={BookX}
+            title="Verse not found"
+            description={`Sūrah ${surahN}, verse ${verseN} could not be loaded. Try browsing the Qur'an from the start.`}
+            actionLabel="Browse the Qur'an"
+            actionHref="/quran"
+          />
         ) : (
           <>
             <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
