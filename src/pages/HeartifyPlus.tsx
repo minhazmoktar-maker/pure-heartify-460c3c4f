@@ -208,6 +208,13 @@ export default function HeartifyPlus() {
   const { user } = useAuth();
   const { isPremium, entitlement, loading: entLoading } = useEntitlement();
   const { alreadyOnList, join } = usePlusWaitlist();
+  const { locale, preferences } = useLocale();
+  const currency = currencyForCountry(
+    preferences.country_code ?? preferences.detected_country,
+  );
+  const formatPrice = (usd: number) =>
+    usd === 0 ? formatCurrency(0, locale, currency, { maximumFractionDigits: 0 }) : formatCurrency(usd, locale, currency);
+
 
   const [email, setEmail] = useState(user?.email ?? "");
   const [tier, setTier] = useState<PreferredTier>("plus");
