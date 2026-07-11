@@ -4,25 +4,14 @@
  * Prefer these over ad-hoc `toLocaleString()` calls.
  */
 
-const memo = new Map<string, Intl.Format>();
+const memo = new Map<string, unknown>();
 
-type FormatCtor =
-  | typeof Intl.NumberFormat
-  | typeof Intl.DateTimeFormat
-  | typeof Intl.ListFormat
-  | typeof Intl.RelativeTimeFormat;
-
-function cached<T extends Intl.Format>(
-  Ctor: FormatCtor,
-  key: string,
-  locale: string,
-  options?: object,
-): T {
-  const cacheKey = `${Ctor.name}|${locale}|${key}`;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function cached<T>(Ctor: any, key: string, locale: string, options?: object): T {
+  const cacheKey = `${Ctor?.name ?? "Fmt"}|${locale}|${key}`;
   const hit = memo.get(cacheKey);
   if (hit) return hit as T;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const inst = new (Ctor as any)(locale, options);
+  const inst = new Ctor(locale, options);
   memo.set(cacheKey, inst);
   return inst as T;
 }
