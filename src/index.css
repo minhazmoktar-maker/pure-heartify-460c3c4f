@@ -249,6 +249,39 @@
   @media (prefers-reduced-motion: reduce) {
     .animate-shake { animation: none; }
   }
+
+  /* Unified admin/data table polish — sticky header, subtle zebra rows,
+     row-level hover and focus-visible highlight so keyboard users can see
+     which row is active. Apply `.heartify-table` on the <table>. */
+  .heartify-table {
+    @apply w-full text-sm border-separate border-spacing-0;
+  }
+  .heartify-table thead th {
+    @apply sticky top-0 z-10 bg-muted/60 backdrop-blur px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground border-b border-border/70;
+  }
+  .heartify-table tbody td {
+    @apply px-4 py-3 border-b border-border/40 align-middle;
+  }
+  .heartify-table tbody tr {
+    transition: background-color 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .heartify-table tbody tr:nth-child(even) td { background-color: hsl(var(--muted) / 0.18); }
+  .heartify-table tbody tr:hover td { background-color: hsl(var(--muted) / 0.5); }
+  .heartify-table tbody tr:focus-within td {
+    background-color: hsl(var(--primary) / 0.08);
+    box-shadow: inset 2px 0 0 0 hsl(var(--primary));
+  }
+  .heartify-table tbody tr:last-child td { border-bottom: 0; }
+
+  /* Compact role / plan chip. Colors are driven by tone modifier classes. */
+  .heartify-chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold;
+  }
+  .heartify-chip--gold      { @apply bg-gold/20 text-gold; }
+  .heartify-chip--muted     { @apply bg-muted text-muted-foreground; }
+  .heartify-chip--primary   { @apply bg-primary/15 text-primary; }
+  .heartify-chip--warning   { @apply bg-amber-500/15 text-amber-600 dark:text-amber-400; }
+  .heartify-chip--danger    { @apply bg-destructive/15 text-destructive; }
 }
 
 @layer components {
