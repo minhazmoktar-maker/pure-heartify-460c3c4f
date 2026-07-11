@@ -193,6 +193,12 @@ Deno.serve(async (req) => {
   }
   p.severity = (p.severity ?? "warn").toLowerCase();
 
+  const emoji = SEV_EMOJI[p.severity] ?? "•";
+  const kindLabel = KIND_LABEL[p.kind] ?? p.kind;
+  const title = `${emoji} [${p.severity.toUpperCase()}] ${kindLabel}`;
+  const timestamp = new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC";
+  const results: Record<string, unknown> = {};
+
   // Persist to production_alerts when requested (service-role only)
   if (p.persist) {
     try {
@@ -203,11 +209,6 @@ Deno.serve(async (req) => {
     }
   }
 
-  const emoji = SEV_EMOJI[p.severity] ?? "•";
-  const kindLabel = KIND_LABEL[p.kind] ?? p.kind;
-  const title = `${emoji} [${p.severity.toUpperCase()}] ${kindLabel}`;
-  const timestamp = new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC";
-  const results: Record<string, unknown> = {};
 
   // ── Slack ────────────────────────────────────────────────
   if (SLACK_WEBHOOK_URL) {
