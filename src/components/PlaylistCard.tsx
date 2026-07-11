@@ -40,9 +40,8 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
       aria-label={`Play ${playlist.title}${isLocked ? " (locked)" : ""}`}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), handlePlay())}
       className={cn(
-        "group cursor-pointer overflow-hidden rounded-xl bg-card shadow-card transition-all hover:shadow-card-hover",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        isLocked && "opacity-70 cursor-not-allowed"
+        "card-interactive group cursor-pointer overflow-hidden rounded-xl bg-card shadow-card",
+        isLocked && "opacity-70 cursor-not-allowed hover:translate-y-0 hover:shadow-card"
       )}
     >
       <div className="relative aspect-square overflow-hidden">

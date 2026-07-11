@@ -13,7 +13,7 @@ const VideoCard = ({ video, index }: VideoCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
-      className="group cursor-pointer"
+      className="card-interactive group cursor-pointer rounded-xl"
     >
       {/* Thumbnail */}
       <div className="relative overflow-hidden rounded-xl">
