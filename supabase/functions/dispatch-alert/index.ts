@@ -166,6 +166,18 @@ function renderEmailHtml(p: Payload, title: string, timestamp: string): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  // 60 alerts/min per identity. Client fire-and-forgets on frontend errors —
+  // a bug loop or malicious page could spam Slack/email/DB otherwise.
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const limited = await enforceRateLimit(admin, {
+    identity: getClientIdentity(req, null),
+    action: "dispatch-alert", limit: 60, windowSeconds: 60,
+  });
+  if (limited) return new Response(JSON.stringify({ error: "rate_limited" }), {
+    status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+
+
   let p: Payload;
   try {
     p = await req.json();
