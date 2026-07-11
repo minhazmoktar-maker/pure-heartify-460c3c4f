@@ -13,6 +13,7 @@ import { toast } from "@/components/ui/use-toast";
 import { CheckCircle2, XCircle, AlertTriangle, Eye, Search } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import SEO from "@/components/SEO";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 type Candidate = {
   id: string;
@@ -62,6 +63,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [drawer, setDrawer] = useState<Candidate | AuditRow | null>(null);
   const [newChannelId, setNewChannelId] = useState("");
   const [busy, setBusy] = useState(false);
+  const [rejectTarget, setRejectTarget] = useState<Candidate | null>(null);
 
   const reload = async () => {
     const [c, a, l, v] = await Promise.all([
