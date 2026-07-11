@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Users, Flame, Share2, LogOut, Trophy, Plus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTeamStreaks, type TeamStreak } from "@/hooks/useTeamStreaks";
 import { shareContent } from "@/lib/share";
