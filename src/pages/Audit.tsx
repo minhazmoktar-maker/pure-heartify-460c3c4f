@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, ShieldCheck, AlertTriangle, ImageOff } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+import { Loader2, ShieldCheck, AlertTriangle, ImageOff, CheckCircle2 } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { toast } from "@/components/ui/use-toast";
 import SEO from "@/components/SEO";
@@ -112,6 +112,16 @@ const AuditPage = () => {
           </div>
         )}
 
+        {!report && !err && !loading && (
+          <div className="mt-8">
+            <EmptyState
+              icon={ShieldCheck}
+              title="No audit yet"
+              description="Run a dry-run to scan the catalog for halal-policy violations and broken thumbnails. Nothing is removed until you choose to auto-remove."
+            />
+          </div>
+        )}
+
         {report && (
           <div className="mt-8 space-y-6">
             <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -125,33 +135,36 @@ const AuditPage = () => {
 
             <section>
               <h2 className="mb-2 text-sm font-semibold text-foreground">Reasons</h2>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(report.by_reason).length === 0 && (
-                  <span className="text-sm text-muted-foreground">No violations 🎉</span>
-                )}
-                {Object.entries(report.by_reason).map(([reason, count]) => (
-                  <Badge key={reason} variant="secondary" className="gap-1">
-                    <AlertTriangle className="h-3 w-3" /> {reason}: {count}
-                  </Badge>
-                ))}
-              </div>
+              {Object.entries(report.by_reason).length === 0 ? (
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" /> No violations detected.
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(report.by_reason).map(([reason, count]) => (
+                    <span key={reason} className="heartify-chip heartify-chip--warning gap-1">
+                      <AlertTriangle className="h-3 w-3" /> {reason}: {count}
+                    </span>
+                  ))}
+                </div>
+              )}
             </section>
 
             {report.sample_flagged.length > 0 && (
               <section>
                 <h2 className="mb-2 text-sm font-semibold text-foreground">Sample flagged items</h2>
                 <div className="overflow-hidden rounded-lg border border-border">
-                  <table className="min-w-full text-xs">
-                    <thead className="bg-muted/40 text-left text-muted-foreground">
-                      <tr><th className="p-2">Reason</th><th className="p-2">Rule</th><th className="p-2">Title</th><th className="p-2">Channel</th></tr>
+                  <table className="heartify-table min-w-full text-xs">
+                    <thead>
+                      <tr><th>Reason</th><th>Rule</th><th>Title</th><th>Channel</th></tr>
                     </thead>
                     <tbody>
                       {report.sample_flagged.map((f) => (
-                        <tr key={f.id} className="border-t border-border">
-                          <td className="p-2"><Badge variant="outline">{f.reason}</Badge></td>
-                          <td className="p-2 font-mono text-[10px] text-muted-foreground">{f.rule}</td>
-                          <td className="p-2">{f.title}</td>
-                          <td className="p-2 text-muted-foreground">{f.channel_title}</td>
+                        <tr key={f.id} tabIndex={0}>
+                          <td><span className="heartify-chip heartify-chip--danger">{f.reason}</span></td>
+                          <td className="font-mono text-[10px] text-muted-foreground">{f.rule}</td>
+                          <td>{f.title}</td>
+                          <td className="text-muted-foreground">{f.channel_title}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -159,6 +172,7 @@ const AuditPage = () => {
                 </div>
               </section>
             )}
+
 
             {report.broken_thumbnails.length > 0 && (
               <section>
