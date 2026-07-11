@@ -252,8 +252,31 @@ export default function DhikrCircles() {
         </header>
 
         {loading ? (
-          <div className="flex items-center justify-center py-12 text-muted-foreground">
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading circles…
+          <div
+            className="grid gap-4 sm:grid-cols-2"
+            role="status"
+            aria-label="Loading circles"
+          >
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="space-y-3 rounded-xl border border-border/50 p-4"
+              >
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                </div>
+                <Skeleton className="h-2 w-full rounded-full" />
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-8 w-24 rounded-full" />
+                </div>
+              </div>
+            ))}
+            <span className="sr-only">Loading circles…</span>
           </div>
         ) : activeSorted.length === 0 ? (
           <EmptyState
