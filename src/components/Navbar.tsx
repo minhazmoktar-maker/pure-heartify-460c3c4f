@@ -75,6 +75,7 @@ const Navbar = () => {
                   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
                   { to: "/profile?tab=streak", label: "Daily dose & streak", icon: Flame },
                   { to: "/profile?tab=interests", label: "My interests", icon: ListMusic },
+                  { to: "/offline", label: "Offline downloads", icon: Download },
                   { to: "/profile", label: "Profile & settings", icon: Settings },
                 ].map(({ to, label, icon: Icon }) => (
                   <SheetClose asChild key={to}>
