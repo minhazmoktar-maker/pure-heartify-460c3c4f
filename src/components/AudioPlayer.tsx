@@ -194,8 +194,10 @@ const AudioPlayer = () => {
                   type="range" min={0} max={1} step={0.01} value={muted ? 0 : volume}
                   onChange={(e) => setVolume(Number(e.target.value))}
                   aria-label="Volume"
-                  className="w-24 accent-primary"
+                  className="heartify-range w-24"
+                  style={{ ["--fill" as string]: `${(muted ? 0 : volume) * 100}%` }}
                 />
+
               </div>
             </div>
           </div>
