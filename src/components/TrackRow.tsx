@@ -67,7 +67,7 @@ const TrackRow = ({ track, index, queue, showAlbum = false }: TrackRowProps) => 
         )}
       </span>
 
-      <img src={track.cover} alt="" className="h-11 w-11 rounded object-cover" loading="lazy" />
+      <SmartImage src={track.cover} alt="" wrapperClassName="h-11 w-11 shrink-0 rounded overflow-hidden" />
 
       <div className="min-w-0 flex-1">
         <p className={cn(
