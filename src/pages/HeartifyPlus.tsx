@@ -359,7 +359,7 @@ export default function HeartifyPlus() {
                   <p className="mt-2 text-xs text-muted-foreground">{t.tagline}</p>
                   <div className="mt-4 flex items-baseline gap-1">
                     <span className="font-heading text-3xl font-bold text-foreground">
-                      {t.price}
+                      {formatPrice(t.priceUsd)}
                     </span>
                     <span className="text-xs text-muted-foreground">/ {t.period}</span>
                   </div>
