@@ -105,6 +105,20 @@ real security boundaries.
 - **Keep the matrix flat**. Prefer many small permissions over role
   branches — new features then compose naturally.
 
+## Role resolution (edge functions)
+
+`authorize()` in `supabase/functions/_shared/authz.ts` resolves the caller's
+role by querying two REST endpoints in parallel:
+
+1. `platform_owners?user_id=eq.<uid>` — owner check.
+2. `user_roles?user_id=eq.<uid>&role=in.(admin,moderator)` — privileged
+   tiers.
+
+The highest-ranked hit wins: `owner > admin > moderator > user`. On any
+network or REST failure the function fails closed to `user`. All four roles
+in `ROLES` are honored — a moderator token successfully authorizes any
+permission in the moderator set (`hide_video`, `approve_content`, etc.).
+
 ## Testing
 
 `src/lib/__tests__/permissions.test.ts` verifies:
@@ -116,5 +130,10 @@ real security boundaries.
 - Anonymous / null principals are always denied.
 - Owner-only permissions are refused to admins.
 - `requirePermission` throws `AuthorizationError` correctly.
+
+`src/lib/__tests__/authz-parity.test.ts` mechanically compares the edge
+matrix in `_shared/authz.ts` against the client matrix in `permissions.ts`.
+Any drift (missing/extra permission, wrong role membership, dropped
+moderator branch) fails the build.
 
 Add regression tests here whenever the matrix changes.
