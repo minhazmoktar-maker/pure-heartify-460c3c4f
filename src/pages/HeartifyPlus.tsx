@@ -26,6 +26,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
+import { celebrateUpgrade } from "@/lib/celebrate";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlusWaitlist, type PreferredTier } from "@/hooks/usePlusWaitlist";
