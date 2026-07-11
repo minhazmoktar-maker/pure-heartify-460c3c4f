@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 
 type DreamKind = "good" | "bad" | "neutral";
 type Dream = {
