@@ -74,6 +74,13 @@ Deno.serve(async (req) => {
 
   if (!isOwner && !isAdmin) return json({ error: "forbidden" }, 403);
 
+  // 120 log writes/min/actor — protects the audit table from being flooded.
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const limited = await enforceRateLimit(admin, {
+    identity: user.id, action: "log-privileged-action", limit: 120, windowSeconds: 60,
+  });
+  if (limited) return json({ error: "rate_limited" }, 429);
+
   let body: Record<string, unknown> = {};
   try {
     body = await req.json();
