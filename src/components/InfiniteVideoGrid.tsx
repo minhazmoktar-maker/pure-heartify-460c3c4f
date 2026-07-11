@@ -1,4 +1,5 @@
 import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -37,9 +38,19 @@ const InfiniteVideoGrid = ({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Loading halal content…</p>
+      <div
+        className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        aria-label="Loading halal content"
+        role="status"
+      >
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="space-y-2">
+            <Skeleton className="aspect-video w-full rounded-xl" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        ))}
+        <span className="sr-only">Loading halal content…</span>
       </div>
     );
   }

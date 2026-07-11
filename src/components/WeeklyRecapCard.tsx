@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, Heart, Sparkles, BookOpen, Flame, Loader2, Share2 } from "lucide-react";
+import { CalendarDays, Clock, Heart, Sparkles, BookOpen, Flame, Share2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useWeeklyRecap } from "@/hooks/useWeeklyRecap";
 import { useFeatureFlag } from "@/hooks/useFeatureFlag";
 import { shareContent } from "@/lib/share";
@@ -33,8 +34,20 @@ export function WeeklyRecapCard() {
 
   if (loading) {
     return (
-      <Card className="p-5 flex items-center justify-center min-h-[140px]">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-label="Loading recap" />
+      <Card className="p-5 space-y-4" aria-label="Loading weekly recap" role="status">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-5 w-5 rounded" />
+          <Skeleton className="h-4 w-32" />
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2 rounded-lg border border-border/40 p-3">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-5 w-10" />
+            </div>
+          ))}
+        </div>
+        <Skeleton className="h-9 w-full rounded-md" />
       </Card>
     );
   }

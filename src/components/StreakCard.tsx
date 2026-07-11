@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Flame, Snowflake, Trophy, Loader2, Share2 } from "lucide-react";
+import { Flame, Snowflake, Trophy, Share2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useStreak } from "@/hooks/useStreak";
 import { shareContent } from "@/lib/share";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,8 +25,19 @@ export function StreakCard() {
 
   if (s.loading) {
     return (
-      <Card className="p-5 flex items-center justify-center min-h-[140px]">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      <Card className="p-5 space-y-4" aria-label="Loading streak" role="status">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-40" />
+          </div>
+          <Skeleton className="h-9 w-12 rounded-md" />
+        </div>
+        <Skeleton className="h-2 w-full rounded-full" />
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-8 w-20 rounded-md" />
+        </div>
       </Card>
     );
   }
