@@ -2,6 +2,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3.23.8";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 
 const DhikrSchema = z.object({
   dhikr_key: z.string().min(1).max(120),
