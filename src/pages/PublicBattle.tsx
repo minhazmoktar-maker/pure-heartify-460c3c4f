@@ -30,10 +30,14 @@ export default function PublicBattle() {
         <SEO title="Battle not found — Heartify" description="This battle page could not be found." path={`/battle/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
-          <Card><CardContent className="py-12 text-center space-y-3">
-            <h1 className="text-xl font-semibold">Battle not found</h1>
-            <Button asChild variant="outline"><Link to="/">Home</Link></Button>
-          </CardContent></Card>
+          <EmptyState
+            icon={SearchX}
+            title="Battle not found"
+            description="This ghazwah page doesn't exist. Browse all battles from the Sīrah."
+            actionLabel="Study the Sīrah"
+            actionHref="/seerah"
+            tone="muted"
+          />
         </main>
       </div>
     );
