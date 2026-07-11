@@ -263,8 +263,8 @@ export default function GroupKhatmDetail() {
               )}
             </div>
             {group.completed_at && (
-              <span className="rounded bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-500">
-                Completed 🎉
+              <span className="heartify-chip heartify-chip--primary">
+                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> Completed
               </span>
             )}
           </div>
