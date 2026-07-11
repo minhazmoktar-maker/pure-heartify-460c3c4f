@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, BookMarked, Plus, Trash2, Heart, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import SectionHeader from "@/components/SectionHeader";
 import EmptyState from "@/components/EmptyState";
 import { toast } from "sonner";
 
