@@ -199,6 +199,13 @@ export default function Achievements() {
           </div>
         </header>
 
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard label="Unlocked" value={unlockedCount} icon={Trophy} tone="primary" />
+          <StatCard label="Salah streak" value={stats.salahStreak} icon={Flame} hint="days" />
+          <StatCard label="Dhikr total" value={stats.dhikrTotal.toLocaleString()} icon={CircleDot} />
+          <StatCard label="Surahs read" value={stats.surahsRead} icon={BookOpen} />
+        </div>
+
         <div className="mb-6 grid gap-4 md:grid-cols-2">
           <StreakCard />
           <WeeklyRecapCard />
