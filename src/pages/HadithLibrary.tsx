@@ -96,11 +96,27 @@ export default function HadithLibrary() {
         </Card>
 
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-12 text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading hadith…
+          <div className="space-y-4" role="status" aria-label="Loading hadith">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-lg border border-border bg-card p-4">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <Skeleton className="mt-4 ml-auto h-4 w-3/4" />
+                <Skeleton className="mt-2 h-3 w-full" />
+                <Skeleton className="mt-2 h-3 w-5/6" />
+              </div>
+            ))}
+            <span className="sr-only">Loading hadith…</span>
           </div>
         ) : filtered.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">No hadith match your search in this book.</p>
+          <EmptyState
+            icon={BookText}
+            tone="muted"
+            title="No matching hadith"
+            description="Nothing in this book matches your search. Try a different keyword or open another collection."
+          />
         ) : (
           <div className="space-y-4">
             {filtered.map((h) => {
