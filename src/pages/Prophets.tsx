@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Search, Users, Check, RotateCcw } from "lucide-react";
+import SectionHeader from "@/components/SectionHeader";
 
 type Prophet = {
   id: string;
