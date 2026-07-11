@@ -19,16 +19,17 @@ const FREE: Entitlement = { plan: "free", expiresAt: null, features: {}, isPremi
  */
 export function useEntitlement() {
   const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
   const [entitlement, setEntitlement] = useState<Entitlement>(FREE);
   const [loading, setLoading] = useState<boolean>(true);
 
   const refresh = useCallback(async () => {
-    if (!user) { setEntitlement(FREE); setLoading(false); return; }
+    if (!userId) { setEntitlement(FREE); setLoading(false); return; }
     setLoading(true);
     const { data, error } = await supabase
       .from("entitlements")
       .select("plan, expires_at, features")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .maybeSingle();
     if (error || !data) { setEntitlement(FREE); setLoading(false); return; }
     const notExpired = !data.expires_at || new Date(data.expires_at).getTime() > Date.now();
@@ -39,7 +40,7 @@ export function useEntitlement() {
       isPremium: data.plan !== "free" && notExpired,
     });
     setLoading(false);
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -47,22 +48,20 @@ export function useEntitlement() {
   }, [authLoading, refresh]);
 
   // Realtime — react instantly when an admin grants/revokes the caller.
-  // Ref indirection so re-creating `refresh` doesn't re-subscribe (which
-  // would throw "cannot add callbacks after subscribe()" on HMR).
   const refreshRef = useRef(refresh);
   useEffect(() => { refreshRef.current = refresh; }, [refresh]);
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     const channel = supabase
-      .channel(`entitlements:${user.id}:${Math.random().toString(36).slice(2)}`)
+      .channel(`entitlements:${userId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "entitlements", filter: `user_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "entitlements", filter: `user_id=eq.${userId}` },
         () => { void refreshRef.current(); },
       )
       .subscribe();
     return () => { void supabase.removeChannel(channel); };
-  }, [user]);
+  }, [userId]);
 
   return { entitlement, isPremium: entitlement.isPremium, loading, refresh };
 }
