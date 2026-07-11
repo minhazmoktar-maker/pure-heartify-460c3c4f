@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import PageSkeleton from "./components/PageSkeleton";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -191,8 +191,8 @@ const Zakat = lazy(() => import("./pages/Zakat.tsx"));
 const queryClient = new QueryClient();
 
 const RouteFallback = () => (
-  <div className="flex min-h-screen items-center justify-center bg-background">
-    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+  <div className="min-h-dvh bg-background">
+    <PageSkeleton variant="default" />
   </div>
 );
 
