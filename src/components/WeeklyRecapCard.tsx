@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, Heart, Sparkles, BookOpen, Flame, Loader2, Share2 } from "lucide-react";
+import { CalendarDays, Clock, Heart, Sparkles, BookOpen, Flame, Share2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useWeeklyRecap } from "@/hooks/useWeeklyRecap";
 import { useFeatureFlag } from "@/hooks/useFeatureFlag";
 import { shareContent } from "@/lib/share";
