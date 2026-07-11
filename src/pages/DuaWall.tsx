@@ -139,7 +139,7 @@ export default function DuaWall() {
         {loading ? (
           <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
         ) : duas.length === 0 ? (
-          <Card><CardContent className="py-10 text-center text-sm text-muted-foreground">No du'as yet — be the first to share.</CardContent></Card>
+          <EmptyState icon={Heart} title="No du'as yet" description="Be the first to share a du'a and let the ummah say āmīn." />
         ) : (
           <ul className="space-y-3">
             {duas.map((d) => {
