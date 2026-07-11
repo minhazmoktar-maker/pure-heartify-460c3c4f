@@ -71,9 +71,7 @@ export default function PublicStreak() {
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <PageSkeleton variant="detail" />
         ) : (
           <>
             <Card className="overflow-hidden border-orange-500/30 bg-gradient-to-br from-orange-500/10 via-background to-background">
