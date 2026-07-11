@@ -307,6 +307,7 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>
