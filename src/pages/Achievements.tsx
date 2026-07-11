@@ -9,6 +9,7 @@ import { Award, Flame, BookOpen, CircleDot, ListChecks, Sparkles, Trophy, Lock, 
 import { Link } from "react-router-dom";
 import StreakCard from "@/components/StreakCard";
 import BadgeShelf from "@/components/BadgeShelf";
+import StatCard from "@/components/StatCard";
 import ReferralCard from "@/components/ReferralCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import Leaderboard from "@/components/Leaderboard";
@@ -197,6 +198,13 @@ export default function Achievements() {
             <GiftDialog freezesAvailable={streak.freezes} />
           </div>
         </header>
+
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard label="Unlocked" value={unlockedCount} icon={Trophy} tone="primary" />
+          <StatCard label="Salah streak" value={stats.salahStreak} icon={Flame} hint="days" />
+          <StatCard label="Dhikr total" value={stats.dhikrTotal.toLocaleString()} icon={CircleDot} />
+          <StatCard label="Surahs read" value={stats.surahsRead} icon={BookOpen} />
+        </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-2">
           <StreakCard />
