@@ -114,22 +114,18 @@ const Bookmarks = () => {
       <Navbar />
 
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-        <header className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
-            <Bookmark className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">Bookmarks</h1>
-            <p className="text-sm text-muted-foreground">
-              {counts.all} saved item{counts.all === 1 ? "" : "s"} · private, stored on this device.
-            </p>
-          </div>
-          {items.length > 0 && (
+        <SectionHeader
+          title="Bookmarks"
+          description={`${counts.all} saved item${counts.all === 1 ? "" : "s"} · private, stored on this device.`}
+          icon={Bookmark}
+          className="mb-6"
+          actions={items.length > 0 ? (
             <Button variant="ghost" size="sm" onClick={clearAll} className="text-destructive hover:text-destructive">
               <Trash2 className="mr-2 h-4 w-4" /> Clear
             </Button>
-          )}
-        </header>
+          ) : undefined}
+        />
+
 
         <div className="mb-4">
           <div className="relative">
