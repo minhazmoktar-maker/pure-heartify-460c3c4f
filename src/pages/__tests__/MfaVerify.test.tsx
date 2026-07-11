@@ -27,6 +27,7 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 
 vi.mock("@/components/ui/use-toast", () => ({ toast: vi.fn() }));
+vi.mock("@/components/SEO", () => ({ default: () => null, SEO: () => null }));
 
 import MfaVerify from "@/pages/MfaVerify";
 
