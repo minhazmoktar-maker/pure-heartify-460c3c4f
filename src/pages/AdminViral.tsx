@@ -96,48 +96,71 @@ export default function AdminViral() {
         </header>
 
         {loading || !stats ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
+          <PageSkeleton variant="list" />
         ) : (
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               <Stat icon={<Gift className="h-4 w-4" />} label="Referrals redeemed" value={`${stats.referrals_redeemed}/${stats.referrals_total}`} />
-              <Stat icon={<Flag className="h-4 w-4 text-amber-500" />} label="Suspicious codes (1h)" value={stats.suspicious_click_codes} />
+              <Stat
+                icon={<Flag className="h-4 w-4" />}
+                label="Suspicious codes (1h)"
+                value={
+                  <span className={`heartify-chip ${stats.suspicious_click_codes > 0 ? "heartify-chip--danger" : "heartify-chip--muted"}`}>
+                    {stats.suspicious_click_codes}
+                  </span>
+                }
+              />
               <Stat icon={<BookOpen className="h-4 w-4" />} label="Khatm groups" value={`${stats.active_khatm_groups} active · ${stats.completed_khatm_groups} done`} />
               <Stat label="Active streaks (≥1)" value={stats.streaks_active} />
             </div>
 
             <Card className="p-5 space-y-4">
               <h2 className="font-semibold text-foreground">Feature flags</h2>
-              {flags.map((f) => (
-                <div key={f.key} className="flex flex-wrap items-center gap-3 border-t border-border pt-3 first:border-t-0 first:pt-0">
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium text-foreground">{f.key}</div>
-                    <div className="text-xs text-muted-foreground">{f.description}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor={`ro-${f.key}`} className="text-xs">Rollout %</Label>
-                    <Input
-                      id={`ro-${f.key}`}
-                      type="number"
-                      min={0}
-                      max={100}
-                      className="h-8 w-20"
-                      defaultValue={f.rollout_percent}
-                      onBlur={(e) => {
-                        const v = Math.max(0, Math.min(100, Number(e.target.value) || 0));
-                        if (v !== f.rollout_percent) void setFlag(f.key, { rollout_percent: v });
-                      }}
+              {flags.length === 0 ? (
+                <EmptyState
+                  icon={ToggleLeft}
+                  title="No feature flags yet"
+                  description="Flags will appear here once seeded from a migration."
+                  tone="muted"
+                />
+              ) : (
+                flags.map((f) => (
+                  <div key={f.key} className="flex flex-wrap items-center gap-3 border-t border-border pt-3 first:border-t-0 first:pt-0">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-foreground">{f.key}</span>
+                        <span className={`heartify-chip ${f.enabled ? "heartify-chip--primary" : "heartify-chip--muted"}`}>
+                          {f.enabled ? "on" : "off"}
+                        </span>
+                        {f.enabled && f.rollout_percent < 100 && (
+                          <span className="heartify-chip heartify-chip--warning">{f.rollout_percent}% rollout</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{f.description}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor={`ro-${f.key}`} className="text-xs">Rollout %</Label>
+                      <Input
+                        id={`ro-${f.key}`}
+                        type="number"
+                        min={0}
+                        max={100}
+                        className="h-8 w-20"
+                        defaultValue={f.rollout_percent}
+                        onBlur={(e) => {
+                          const v = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                          if (v !== f.rollout_percent) void setFlag(f.key, { rollout_percent: v });
+                        }}
+                      />
+                    </div>
+                    <Switch
+                      checked={f.enabled}
+                      onCheckedChange={(v) => setFlag(f.key, { enabled: v })}
+                      aria-label={`Toggle ${f.key}`}
                     />
                   </div>
-                  <Switch
-                    checked={f.enabled}
-                    onCheckedChange={(v) => setFlag(f.key, { enabled: v })}
-                    aria-label={`Toggle ${f.key}`}
-                  />
-                </div>
-              ))}
+                ))
+              )}
             </Card>
           </>
         )}
