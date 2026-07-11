@@ -21,6 +21,7 @@ import {
   type LanguageCode,
 } from "@/i18n";
 import { detectCountry, detectLanguage } from "@/i18n/detect";
+import { detectTimezone } from "@/lib/intl";
 
 export interface LocalePreferences {
   ui_language: LanguageCode;
