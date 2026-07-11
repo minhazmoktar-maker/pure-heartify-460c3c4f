@@ -3643,6 +3643,7 @@ export type Database = {
         }
       }
       grant_referral_tier_rewards: { Args: never; Returns: Json }
+      has_active_entitlement: { Args: { _user_id: string }; Returns: boolean }
       has_active_premium: { Args: { _user_id: string }; Returns: boolean }
       has_min_role: {
         Args: { _min_tier: string; _user_id: string }
