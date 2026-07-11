@@ -12,6 +12,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
 import { enforceRateLimit } from "../_shared/rateLimit.ts";
+import { verifyTurnstile } from "../_shared/turnstile.ts";
 
 const BodySchema = z.object({
   video_id: z.string().min(1).max(64).optional(),
