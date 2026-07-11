@@ -686,6 +686,7 @@ const App = () => (
                 <Route path="/zuhd" element={<Navigate to="/library/zuhd" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </RouteTransition>
             </Suspense>
           </BrowserRouter>
         </PlayerProvider>
