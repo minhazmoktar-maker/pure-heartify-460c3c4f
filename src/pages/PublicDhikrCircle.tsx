@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Loader2, Sparkles, Users } from "lucide-react";
+import { Sparkles, Users } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,20 +64,22 @@ export default function PublicDhikrCircle() {
 
   if (loading) {
     return (
-      <main className="flex min-h-dvh items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </main>
+      <div className="min-h-dvh bg-background">
+        <PageSkeleton variant="detail" className="max-w-lg" />
+      </div>
     );
   }
 
   if (!circle) {
     return (
-      <main className="container mx-auto max-w-lg px-4 py-16 text-center">
-        <h1 className="text-xl font-semibold">Circle not found</h1>
-        <p className="mt-2 text-muted-foreground">This dhikr circle may have been removed.</p>
-        <Button asChild className="mt-4">
-          <Link to="/dhikr/circles">Browse circles</Link>
-        </Button>
+      <main className="container mx-auto max-w-lg px-4 py-16">
+        <EmptyState
+          icon={Sparkles}
+          title="Circle not found"
+          description="This dhikr circle may have been removed or closed by its organiser. Explore public circles to join one that's active."
+          actionLabel="Browse circles"
+          actionHref="/dhikr/circles"
+        />
       </main>
     );
   }

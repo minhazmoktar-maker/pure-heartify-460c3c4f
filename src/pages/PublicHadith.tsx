@@ -4,7 +4,9 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, ScrollText, Share2 } from "lucide-react";
+import { ScrollText, Share2 } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
 
@@ -99,21 +101,15 @@ export default function PublicHadith() {
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
+          <PageSkeleton variant="detail" />
         ) : notFound ? (
-          <Card>
-            <CardContent className="py-12 text-center space-y-3">
-              <h1 className="text-xl font-semibold">Hadith not found</h1>
-              <p className="text-sm text-muted-foreground">
-                {col.label} #{num} could not be loaded.
-              </p>
-              <Button asChild variant="outline">
-                <Link to="/hadith">Browse the Hadith library</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={ScrollText}
+            title="Hadith not found"
+            description={`${col.label} #${num} could not be loaded. Return to the Hadith library to explore other narrations.`}
+            actionLabel="Browse Hadith library"
+            actionHref="/hadith"
+          />
         ) : (
           <>
             <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">

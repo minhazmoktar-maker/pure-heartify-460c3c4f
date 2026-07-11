@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, CalendarDays, Clock, Flame, Heart, Loader2, Sparkles } from "lucide-react";
+import { BookOpen, CalendarDays, Clock, Flame, Heart, Sparkles, CalendarX } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 
 interface PublicRecap {
   handle: string;
@@ -45,21 +47,25 @@ export default function PublicWeeklyRecap() {
 
   if (loading) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="min-h-dvh bg-background">
+        <PageSkeleton variant="detail" className="max-w-lg" />
       </div>
     );
   }
 
   if (notFound || !recap) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background p-6 text-center">
+      <div className="min-h-dvh bg-background">
         <SEO title="Recap not found — Heartify" description="This weekly recap link is not available." path={`/w/${handle}/${week}`} />
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Recap not found</h1>
-          <p className="text-muted-foreground mt-2">The user may not have a public handle yet.</p>
-          <Button asChild className="mt-4"><Link to="/">Go home</Link></Button>
-        </div>
+        <main className="container mx-auto max-w-lg px-4 py-16">
+          <EmptyState
+            icon={CalendarX}
+            title="Recap not found"
+            description="This weekly recap link may have expired, or the member doesn't have a public handle yet."
+            actionLabel="Go home"
+            actionHref="/"
+          />
+        </main>
       </div>
     );
   }

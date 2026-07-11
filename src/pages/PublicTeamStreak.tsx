@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Flame, Loader2, Users } from "lucide-react";
+import { Flame, Users, UsersRound } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 
 interface PublicTeam {
   id: string;
@@ -39,21 +41,25 @@ export default function PublicTeamStreak() {
 
   if (loading) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="min-h-dvh bg-background">
+        <PageSkeleton variant="detail" className="max-w-lg" />
       </div>
     );
   }
 
   if (notFound || !team) {
     return (
-      <div className="min-h-dvh grid place-items-center bg-background text-center p-6">
+      <div className="min-h-dvh bg-background">
         <SEO title="Team not found — Heartify" description="This team streak link is not available." path={`/t/${id}`} />
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Team not found</h1>
-          <p className="text-muted-foreground mt-2">This link may have expired.</p>
-          <Button asChild className="mt-4"><Link to="/">Go home</Link></Button>
-        </div>
+        <main className="container mx-auto max-w-lg px-4 py-16">
+          <EmptyState
+            icon={UsersRound}
+            title="Team not found"
+            description="This team streak link may have expired or the group is now private. Start your own to keep a shared streak with friends."
+            actionLabel="Go home"
+            actionHref="/"
+          />
+        </main>
       </div>
     );
   }
