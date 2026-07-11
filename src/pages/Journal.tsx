@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, BookMarked, Plus, Trash2, Heart, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import SectionHeader from "@/components/SectionHeader";
 import EmptyState from "@/components/EmptyState";
 import { toast } from "sonner";
 
@@ -132,15 +133,13 @@ const Journal = () => {
           Back home
         </Link>
 
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
-            <BookMarked className="h-6 w-6 text-primary" />
-          </div>
-          <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">Journal</h1>
-            <p className="text-sm text-muted-foreground">Private niyyah, shukr, and tafakkur — stored on this device.</p>
-          </div>
-        </div>
+        <SectionHeader
+          title="Journal"
+          description="Private niyyah, shukr, and tafakkur — stored on this device."
+          icon={BookMarked}
+          className="mb-6"
+        />
+
 
         {/* Stats */}
         <div className="mb-6 grid grid-cols-3 gap-3">

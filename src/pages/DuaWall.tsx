@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { Heart, Loader2, Send, Share2, Trash2, Users } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Navbar from "@/components/Navbar";
+import SectionHeader from "@/components/SectionHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -99,11 +100,13 @@ export default function DuaWall() {
       </Helmet>
       <Navbar />
       <main className="container mx-auto max-w-3xl px-4 pb-24 pt-24">
-        <header className="mb-6">
-          <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground"><Users className="h-4 w-4" /> Community</div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Du'a Wall</h1>
-          <p className="mt-1 text-muted-foreground">Share what you're praying for. Say Ameen to lift each other before Allah.</p>
-        </header>
+        <SectionHeader
+          title="Du'a Wall"
+          description="Share what you're praying for. Say Ameen to lift each other before Allah."
+          icon={Users}
+          className="mb-6"
+        />
+
 
         <Card className="mb-6">
           <CardHeader><CardTitle className="text-base">Post a du'a</CardTitle></CardHeader>
