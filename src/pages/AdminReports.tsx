@@ -258,8 +258,18 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
           {STATUS_TABS.map((s) => (
             <TabsContent key={s.value} value={s.value} className="mt-4">
               {loading ? (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Loading reports…
+                <div className="space-y-3" role="status" aria-label="Loading reports">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="rounded-lg border border-border bg-card p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                        <Skeleton className="h-5 w-24 rounded-full" />
+                      </div>
+                      <Skeleton className="mt-3 h-4 w-2/3" />
+                      <Skeleton className="mt-2 h-3 w-1/2" />
+                    </div>
+                  ))}
+                  <span className="sr-only">Loading reports…</span>
                 </div>
               ) : currentList.length === 0 ? (
                 <EmptyState
