@@ -165,15 +165,30 @@ export default function MosqueFinder() {
         </Card>
 
         {loading && (
-          <div className="flex items-center justify-center gap-2 py-8 text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading nearby mosques…
+          <div className="space-y-3" role="status" aria-label="Loading nearby mosques">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="rounded-lg border border-border bg-card p-4">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="h-10 w-10 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <span className="sr-only">Loading nearby mosques…</span>
           </div>
         )}
 
         {!loading && loc && mosques.length === 0 && (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No mosques found within {radiusKm} km. Try increasing the radius.
-          </p>
+          <EmptyState
+            icon={MapPin}
+            tone="muted"
+            title="No mosques within range"
+            description={`We couldn't find any masājid within ${radiusKm} km. Try increasing the search radius.`}
+          />
         )}
 
         {!loading && mosques.length > 0 && (
