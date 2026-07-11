@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Loader2, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useLeaderboard, type LeaderboardMetric, type LeaderboardScope } from "@/hooks/useLeaderboard";
 import { useAuth } from "@/contexts/AuthContext";
 
