@@ -4,7 +4,9 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, BookOpen, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, Share2, ChevronLeft, ChevronRight, BookX } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
 

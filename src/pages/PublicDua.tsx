@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Heart, Loader2, Share2, Sparkles } from "lucide-react";
+import { Heart, Loader2, Share2, Sparkles, MessageCircleOff } from "lucide-react";
+import PageSkeleton from "@/components/PageSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { formatDistanceToNow } from "date-fns";
 import SEO from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
