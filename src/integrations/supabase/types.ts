@@ -701,6 +701,9 @@ export type Database = {
           category: string
           channel_title: string
           content_language: string | null
+          embedding: string | null
+          embedding_model: string | null
+          embedding_updated_at: string | null
           halal_score: number
           id: string
           ingested_at: string
@@ -734,6 +737,9 @@ export type Database = {
           category?: string
           channel_title: string
           content_language?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
+          embedding_updated_at?: string | null
           halal_score?: number
           id?: string
           ingested_at?: string
@@ -767,6 +773,9 @@ export type Database = {
           category?: string
           channel_title?: string
           content_language?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
+          embedding_updated_at?: string | null
           halal_score?: number
           id?: string
           ingested_at?: string
@@ -3725,6 +3734,24 @@ export type Database = {
           member_count: number
           member_limit: number
           name: string
+        }[]
+      }
+      match_curated_videos: {
+        Args: {
+          category_filter?: string
+          exclude_premium?: boolean
+          match_count?: number
+          query_embedding: string
+        }
+        Returns: {
+          category: string
+          channel_title: string
+          halal_score: number
+          published_at: string
+          similarity: number
+          thumbnail_url: string
+          title: string
+          video_id: string
         }[]
       }
       nightly_reaudit_sweep: { Args: never; Returns: Json }

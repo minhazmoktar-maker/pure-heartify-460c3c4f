@@ -14,6 +14,7 @@ import { getSearchProvider } from "../_shared/search/providers.ts";
 import { detectIntent } from "../_shared/search/intent.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
+import { embedOne, toPgVector } from "../_shared/embed.ts";
 
 const NORMALIZE = (s: string) =>
   s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
@@ -101,6 +102,31 @@ Deno.serve(async (req) => {
       userId,
       intent,
     });
+
+    // Semantic recall: blend in vector matches for the query so we surface
+    // conceptually-related videos even when keywords do not overlap. Best-effort
+    // and additive — never blocks the lexical result.
+    let semanticHits: Array<Record<string, unknown>> = [];
+    if (useAi && q.length >= 3) {
+      const vec = await embedOne(q);
+      if (vec) {
+        const { data: matches } = await admin.rpc("match_curated_videos", {
+          query_embedding: toPgVector(vec) as unknown as number[],
+          match_count: Math.min(limit, 30),
+          category_filter: category,
+          exclude_premium: false,
+        });
+        semanticHits = (matches ?? []) as Array<Record<string, unknown>>;
+      }
+    }
+    const seen = new Set(hits.map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string));
+    for (const m of semanticHits) {
+      const id = (m.video_id ?? m.id) as string;
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        hits.push({ ...m, _source: "semantic" });
+      }
+    }
 
     // Server-side premium gate for search results.
     const viewerIsPremium = await hasActivePremium(userId);

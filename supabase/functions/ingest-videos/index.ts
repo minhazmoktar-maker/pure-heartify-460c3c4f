@@ -594,7 +594,41 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
     console.error(`upsert failed ${res.status}: ${await res.text()}`);
     return 0;
   }
+  // Fire-and-forget: embed the newly-inserted videos so semantic recall works.
+  // Errors are logged inside embedNewVideos; never blocks ingest.
+  embedNewVideos(rows).catch((e) => console.warn("[embed] batch failed:", e));
   return rows.length;
+}
+
+// Embed a batch of newly ingested rows and store the vectors on curated_videos.
+async function embedNewVideos(rows: Record<string, unknown>[]) {
+  const { embedTexts, toPgVector } = await import("../_shared/embed.ts");
+  const items = rows
+    .map((r) => ({
+      video_id: String(r.video_id ?? ""),
+      text: `${r.title ?? ""}\n${r.channel_title ?? ""}\n${r.category ?? ""}`.trim(),
+    }))
+    .filter((r) => r.video_id && r.text.length > 0);
+  if (!items.length) return;
+  // OpenAI text-embedding-3-small caps at 300k tokens/req; batch of 100 is safe.
+  for (let i = 0; i < items.length; i += 100) {
+    const slice = items.slice(i, i + 100);
+    const vecs = await embedTexts(slice.map((s) => s.text));
+    if (!vecs) continue;
+    await Promise.all(
+      slice.map((s, idx) =>
+        sbFetch(`curated_videos?video_id=eq.${encodeURIComponent(s.video_id)}`, {
+          method: "PATCH",
+          headers: { "Prefer": "return=headers-only" },
+          body: JSON.stringify({
+            embedding: toPgVector(vecs[idx]),
+            embedding_model: "openai/text-embedding-3-small",
+            embedding_updated_at: new Date().toISOString(),
+          }),
+        }).catch(() => {}),
+      ),
+    );
+  }
 }
 
 async function logIngestion(query: string, sectionId: string | null, found: number, added: number, quota: number) {
@@ -919,16 +953,30 @@ Deno.serve(async (req) => {
     let totalAdded = 0;
     let totalQuota = 0;
 
+    // Bounded parallelism (concurrency=3) keeps latency down without blowing
+    // through the daily quota — each worker still respects the shared caps.
+    const CONCURRENCY = 3;
+    async function runPool<T>(items: T[], worker: (item: T) => Promise<{ added: number; quota: number }>, quotaCap: number) {
+      let cursor = 0;
+      let stop = false;
+      async function next() {
+        while (!stop) {
+          const i = cursor++;
+          if (i >= items.length) return;
+          if (!activeKeys().length) { stop = true; return; }
+          if (totalQuota > quotaCap) { stop = true; return; }
+          const r = await worker(items[i]);
+          totalAdded += r.added;
+          totalQuota += r.quota;
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, next));
+    }
+
     if (mode === "channels" || mode === "both") {
       await ensureChannelsSeeded();
       const stale = await pickStaleChannels(channelsPerRun);
-      for (const ch of stale) {
-        if (!activeKeys().length) break;
-        const r = await ingestChannel(ch);
-        totalAdded += r.added;
-        totalQuota += r.quota;
-        if (totalQuota > perRunQuotaCap * 0.75) break;
-      }
+      await runPool(stale, ingestChannel, perRunQuotaCap * 0.75);
     }
 
     if (mode === "discovery" || mode === "both") {
@@ -937,13 +985,8 @@ Deno.serve(async (req) => {
         for (const q of qs) allQueries.push([sec, q]);
       }
       allQueries.sort(() => Math.random() - 0.5);
-      for (const [sec, q] of allQueries.slice(0, discoveryQueries)) {
-        if (!activeKeys().length) break;
-        const r = await ingestDiscoveryQuery(sec, q);
-        totalAdded += r.added;
-        totalQuota += r.quota;
-        if (totalQuota > perRunQuotaCap) break;
-      }
+      const slice = allQueries.slice(0, discoveryQueries);
+      await runPool(slice, ([sec, q]) => ingestDiscoveryQuery(sec, q), perRunQuotaCap);
     }
 
     const rejectedCount = rejectionBuffer.length;

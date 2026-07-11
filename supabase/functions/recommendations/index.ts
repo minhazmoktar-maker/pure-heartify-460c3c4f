@@ -20,6 +20,7 @@ import { gatherSignals } from "../_shared/recommendations/signals.ts";
 import { fetchCandidates } from "../_shared/recommendations/candidates.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
+import { toPgVector } from "../_shared/embed.ts";
 
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -88,6 +89,63 @@ Deno.serve(async (req) => {
     const provider = getRecommendationProvider();
     const signals = await gatherSignals(admin, userId);
     const candidates = await fetchCandidates(admin, signals, categoryFilter);
+
+    // Semantic recall: expand the candidate pool with videos similar to the
+    // user's most-signal-heavy anchor (favorite > recently watched > top trend).
+    // Additive to the lexical pool, best-effort, ignored on failure.
+    try {
+      const anchorIds = [
+        ...Array.from(signals.favoriteVideoIds).slice(0, 1),
+        ...Array.from(signals.watchedVideoIds).slice(0, 1),
+        ...Array.from(signals.trendingIds).slice(0, 1),
+      ];
+      if (anchorIds.length) {
+        const { data: anchors } = await admin
+          .from("curated_videos")
+          .select("embedding")
+          .in("video_id", anchorIds)
+          .not("embedding", "is", null)
+          .limit(3);
+        const vecs = ((anchors ?? []) as Array<{ embedding: number[] | string }>)
+          .map((r) => (typeof r.embedding === "string" ? JSON.parse(r.embedding) : r.embedding))
+          .filter((v): v is number[] => Array.isArray(v) && v.length === 1536);
+        if (vecs.length) {
+          // Simple centroid.
+          const centroid = new Array(1536).fill(0);
+          for (const v of vecs) for (let i = 0; i < 1536; i++) centroid[i] += v[i];
+          for (let i = 0; i < 1536; i++) centroid[i] /= vecs.length;
+          const { data: neighbors } = await admin.rpc("match_curated_videos", {
+            query_embedding: toPgVector(centroid) as unknown as number[],
+            match_count: 60,
+            category_filter: categoryFilter,
+            exclude_premium: false,
+          });
+          const existing = new Set(candidates.map((c) => c.video_id));
+          for (const n of (neighbors ?? []) as Array<Record<string, unknown>>) {
+            const id = n.video_id as string;
+            if (!id || existing.has(id)) continue;
+            existing.add(id);
+            candidates.push({
+              video_id: id,
+              title: (n.title as string) ?? "",
+              channel_title: (n.channel_title as string) ?? null,
+              category: (n.category as string) ?? null,
+              thumbnail_url: (n.thumbnail_url as string) ?? null,
+              halal_score: (n.halal_score as number) ?? null,
+              published_at: (n.published_at as string) ?? null,
+              is_trusted_channel: null,
+              view_count: null,
+              moderation_confidence: null,
+              moderation_state: "approved",
+              content_language: null,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("[rec] semantic recall skipped:", (e as Error).message);
+    }
+
     const recommendations = await provider.recommend(signals, candidates, {
       limit,
       surface,
