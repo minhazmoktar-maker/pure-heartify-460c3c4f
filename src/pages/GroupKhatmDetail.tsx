@@ -370,7 +370,13 @@ export default function GroupKhatmDetail() {
             <Sparkles className="h-4 w-4 text-primary" aria-hidden /> Activity
           </h2>
           {events.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No activity yet — be the first!</p>
+            <EmptyState
+              icon={Users}
+              title="No activity yet"
+              description="Be the first to claim a Juz — every reservation shows up here for the whole circle."
+              tone="muted"
+              className="border-none bg-transparent py-6"
+            />
           ) : (
             <ul className="space-y-2 text-sm">
               {events.map((e) => (
