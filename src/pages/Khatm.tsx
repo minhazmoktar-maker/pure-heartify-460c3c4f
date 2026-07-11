@@ -243,13 +243,18 @@ const Khatm = () => {
         <Card className="mb-6 p-6">
           <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Last 7 sessions</h2>
           {recentLog.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No pages logged yet. Add your first session above.</p>
+            <EmptyState
+              icon={History}
+              title="No pages logged yet"
+              description="Add your first session above and it will appear here."
+              tone="muted"
+            />
           ) : (
             <ul className="divide-y divide-border">
               {recentLog.map((e) => (
                 <li key={e.date} className="flex items-center justify-between py-2 text-sm">
                   <span className="text-foreground">{new Date(e.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
-                  <span className="font-medium text-primary">{e.pages} page{e.pages === 1 ? "" : "s"}</span>
+                  <span className="heartify-chip heartify-chip--primary">{e.pages} page{e.pages === 1 ? "" : "s"}</span>
                 </li>
               ))}
             </ul>
@@ -260,7 +265,7 @@ const Khatm = () => {
           <Button variant="outline" onClick={resetCycle}>
             <RotateCcw className="mr-2 h-4 w-4" /> Start new khatm cycle
           </Button>
-          <Button variant="ghost" onClick={clearAll} className="text-destructive hover:text-destructive">
+          <Button variant="ghost" onClick={() => setConfirmClear(true)} className="text-destructive hover:text-destructive">
             <Trash2 className="mr-2 h-4 w-4" /> Clear all data
           </Button>
           <Link to="/quran" className="ml-auto">
@@ -268,6 +273,16 @@ const Khatm = () => {
           </Link>
         </div>
       </main>
+
+      <ConfirmDialog
+        open={confirmClear}
+        onOpenChange={setConfirmClear}
+        title="Clear all khatm data?"
+        description="This resets your pages read, cycles, and daily log. This cannot be undone."
+        confirmLabel="Clear everything"
+        tone="destructive"
+        onConfirm={clearAll}
+      />
     </div>
   );
 };
