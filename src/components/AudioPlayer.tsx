@@ -28,8 +28,10 @@ const AudioPlayer = () => {
     shuffle, toggleShuffle, repeat, cycleRepeat,
     playbackRate, setPlaybackRate,
     needsUserGesture, resumePlayback, lastError,
+    isPreview, previewCapSeconds,
   } = usePlayer();
   const [speedOpen, setSpeedOpen] = useState(false);
+  const previewLeft = Math.max(0, Math.ceil(previewCapSeconds - progress));
 
   return (
     <AnimatePresence>
