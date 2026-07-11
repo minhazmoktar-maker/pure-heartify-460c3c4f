@@ -257,6 +257,11 @@
     .heartify-range::-webkit-slider-thumb,
     .heartify-range::-moz-range-thumb,
     .heartify-table tbody tr { transition: none !important; }
+    /* Neutralize Tailwind's active:scale-* on buttons/cards */
+    *, *::before, *::after {
+      transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important;
+    }
   }
 
   /* Milestone celebration — a soft one-shot pop when a streak crosses a
