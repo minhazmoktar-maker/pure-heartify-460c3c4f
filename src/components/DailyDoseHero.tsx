@@ -54,7 +54,7 @@ const DailyDoseHero = () => {
   if (isLoading || !data) {
     return (
       <section className="mx-auto mt-6 max-w-[1800px] px-4 md:px-6">
-        <div className="h-48 animate-pulse rounded-2xl border border-border bg-card" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
       </section>
     );
   }
