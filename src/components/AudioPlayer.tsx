@@ -108,15 +108,26 @@ const AudioPlayer = () => {
                   <SkipBack className="h-4 w-4" />
                 </button>
                 <button onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105 active:scale-95 disabled:opacity-60"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.5)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:opacity-60"
                   disabled={isBuffering && !isPlaying}>
-                  {isBuffering ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : isPlaying ? (
-                    <Pause className="h-4 w-4" />
-                  ) : (
-                    <Play className="ml-0.5 h-4 w-4" />
-                  )}
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span
+                      key={isBuffering ? "load" : isPlaying ? "pause" : "play"}
+                      initial={{ opacity: 0, scale: 0.7 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.7 }}
+                      transition={{ duration: 0.14, ease: [0.22, 1, 0.36, 1] }}
+                      className="flex items-center justify-center"
+                    >
+                      {isBuffering ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : isPlaying ? (
+                        <Pause className="h-4 w-4" />
+                      ) : (
+                        <Play className="ml-0.5 h-4 w-4" />
+                      )}
+                    </motion.span>
+                  </AnimatePresence>
                 </button>
                 <button onClick={next} aria-label="Next"
                   className="tap-target text-muted-foreground transition-colors hover:text-foreground">
@@ -136,10 +147,11 @@ const AudioPlayer = () => {
                   {fmt(progress)}
                 </span>
                 <input
-                  type="range" min={0} max={duration || 0} step={1} value={progress}
+                  type="range" min={0} max={duration || 0} step={0.1} value={progress}
                   onChange={(e) => seek(Number(e.target.value))}
                   aria-label="Seek"
-                  className="flex-1 accent-primary"
+                  className="heartify-range flex-1"
+                  style={{ ["--fill" as string]: `${duration ? (progress / duration) * 100 : 0}%` }}
                 />
                 <span className="w-10 text-[10px] tabular-nums text-muted-foreground">
                   {fmt(duration)}
@@ -182,8 +194,10 @@ const AudioPlayer = () => {
                   type="range" min={0} max={1} step={0.01} value={muted ? 0 : volume}
                   onChange={(e) => setVolume(Number(e.target.value))}
                   aria-label="Volume"
-                  className="w-24 accent-primary"
+                  className="heartify-range w-24"
+                  style={{ ["--fill" as string]: `${(muted ? 0 : volume) * 100}%` }}
                 />
+
               </div>
             </div>
           </div>

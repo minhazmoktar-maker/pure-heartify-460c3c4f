@@ -134,3 +134,52 @@
     @apply inline-flex items-center justify-center min-h-[44px] min-w-[44px];
   }
 }
+
+@layer components {
+  /* Branded range slider — used by the audio player scrubber and volume.
+     Fill controlled by `--fill` (percent). Thumb pops on hover/active. */
+  .heartify-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)) 0%,
+      hsl(var(--primary)) var(--fill, 0%),
+      hsl(var(--muted)) var(--fill, 0%),
+      hsl(var(--muted)) 100%
+    );
+    outline: none;
+    cursor: pointer;
+    transition: filter 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .heartify-range:hover { filter: brightness(1.08); }
+  .heartify-range:focus-visible {
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.35);
+  }
+  .heartify-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    border: 2px solid hsl(var(--background));
+    box-shadow: 0 1px 4px hsl(var(--primary) / 0.4);
+    transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .heartify-range:hover::-webkit-slider-thumb { transform: scale(1.25); }
+  .heartify-range:active::-webkit-slider-thumb { transform: scale(1.35); }
+  .heartify-range::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    border: 2px solid hsl(var(--background));
+    box-shadow: 0 1px 4px hsl(var(--primary) / 0.4);
+    transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .heartify-range:hover::-moz-range-thumb { transform: scale(1.25); }
+  .heartify-range:active::-moz-range-thumb { transform: scale(1.35); }
+}
