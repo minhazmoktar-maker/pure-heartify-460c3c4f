@@ -11,6 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 export function StreakCard() {
   const s = useStreak();
   const [handle, setHandle] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState(false);
+  const MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
 
   useEffect(() => {
     let mounted = true;
@@ -22,6 +24,21 @@ export function StreakCard() {
     })();
     return () => { mounted = false; };
   }, []);
+
+  // One-shot celebration when the current streak lands on a milestone day.
+  // Persists a "seen" marker per (user × milestone) so returning users don't
+  // re-trigger the pop on every mount.
+  useEffect(() => {
+    if (s.loading || s.current <= 0) return;
+    if (!MILESTONES.includes(s.current)) return;
+    const key = `streak:milestone-seen:${s.current}`;
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem(key)) return;
+    window.localStorage.setItem(key, "1");
+    setCelebrate(true);
+    const t = window.setTimeout(() => setCelebrate(false), 900);
+    return () => window.clearTimeout(t);
+  }, [s.loading, s.current]);
 
   if (s.loading) {
     return (
@@ -69,7 +86,7 @@ export function StreakCard() {
           </p>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold text-foreground tabular-nums">{s.current}</div>
+          <div className={`text-3xl font-bold text-foreground tabular-nums ${celebrate ? "animate-milestone-pop text-primary" : ""}`}>{s.current}</div>
           <div className="text-xs text-muted-foreground">longest: {s.longest}</div>
         </div>
       </div>

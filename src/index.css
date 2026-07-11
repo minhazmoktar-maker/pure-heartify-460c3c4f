@@ -247,7 +247,47 @@
     animation: heartify-shake 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
   @media (prefers-reduced-motion: reduce) {
-    .animate-shake { animation: none; }
+    .animate-shake,
+    .animate-press,
+    .animate-milestone-pop,
+    .animate-pulse,
+    .animate-bounce,
+    .animate-ping,
+    .animate-spin { animation: none !important; }
+    .heartify-range::-webkit-slider-thumb,
+    .heartify-range::-moz-range-thumb,
+    .heartify-table tbody tr { transition: none !important; }
+    /* Neutralize Tailwind's active:scale-* on buttons/cards */
+    *, *::before, *::after {
+      transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important;
+    }
+  }
+
+  /* Milestone celebration — a soft one-shot pop when a streak crosses a
+     threshold or a khatm juz completes. Reduced-motion collapses to no-op. */
+  @keyframes heartify-milestone-pop {
+    0%   { transform: scale(1);    filter: drop-shadow(0 0 0 hsl(var(--primary) / 0)); }
+    35%  { transform: scale(1.14); filter: drop-shadow(0 0 10px hsl(var(--primary) / 0.55)); }
+    70%  { transform: scale(0.98); }
+    100% { transform: scale(1);    filter: drop-shadow(0 0 0 hsl(var(--primary) / 0)); }
+  }
+  .animate-milestone-pop {
+    animation: heartify-milestone-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Tactile press — used on primary CTAs so tap feels responsive on mobile. */
+  .animate-press {
+    transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .animate-press:active { transform: scale(0.97); }
+
+  /* Minimum 44x44 tap target per WCAG 2.5.5 — apply to icon-only buttons
+     that would otherwise render smaller (e.g. bell, share, close). */
+  .tap-target {
+    @apply relative;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   /* Unified admin/data table polish — sticky header, subtle zebra rows,
@@ -280,6 +320,8 @@
   .heartify-chip--gold      { @apply bg-gold/20 text-gold; }
   .heartify-chip--muted     { @apply bg-muted text-muted-foreground; }
   .heartify-chip--primary   { @apply bg-primary/15 text-primary; }
+  .heartify-chip--success   { @apply bg-emerald-500/15 text-emerald-600 dark:text-emerald-400; }
+  .heartify-chip--info      { @apply bg-sky-500/15 text-sky-600 dark:text-sky-400; }
   .heartify-chip--warning   { @apply bg-amber-500/15 text-amber-600 dark:text-amber-400; }
   .heartify-chip--danger    { @apply bg-destructive/15 text-destructive; }
 }

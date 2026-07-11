@@ -94,7 +94,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
-          className="tap-target relative rounded-full transition-colors hover:bg-secondary"
+          className="tap-target animate-press relative inline-flex items-center justify-center rounded-full transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label={unread > 0 ? `Notifications (${unread} new)` : "Notifications"}
         >
           <Bell className="h-5 w-5 text-foreground" />
