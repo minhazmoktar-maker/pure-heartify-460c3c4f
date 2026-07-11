@@ -1,3 +1,6 @@
+import { createClient } from 'npm:@supabase/supabase-js@2';
+import { enforceRateLimit, getClientIdentity } from '../_shared/rateLimit.ts';
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -8,6 +11,11 @@ const YOUTUBE_API_KEYS: string[] = [
   Deno.env.get("YOUTUBE_API_KEY_2"),
 ].filter((k): k is string => !!k && k.length > 0);
 const BASE_URL = "https://www.googleapis.com/youtube/v3";
+
+const admin = createClient(
+  Deno.env.get('SUPABASE_URL')!,
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+);
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -27,6 +35,29 @@ Deno.serve(async (req) => {
 
   if (!YOUTUBE_API_KEYS.length) {
     return json({ error: "YouTube API key not configured", code: "YOUTUBE_API_KEY_MISSING" }, 500);
+  }
+
+  // Require a valid session; block anonymous scraping of our egress quota.
+  const authHeader = req.headers.get('Authorization');
+  let userId: string | null = null;
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    const { data } = await admin.auth.getClaims(token);
+    userId = data?.claims?.sub ?? null;
+  }
+  if (!userId) {
+    return json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401);
+  }
+
+  // Per-user rate limit: 30 searches / minute.
+  const limited = await enforceRateLimit(admin, {
+    identity: getClientIdentity(req, userId),
+    action: 'youtube-proxy',
+    limit: 30,
+    windowSeconds: 60,
+  });
+  if (limited) {
+    return json({ error: 'Rate limit exceeded', code: 'RATE_LIMITED' }, 429);
   }
 
   try {
