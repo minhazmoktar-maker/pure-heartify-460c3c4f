@@ -70,7 +70,14 @@ Deno.serve(async (req) => {
   }
   const body = parsed.data;
 
+  // CAPTCHA (fail-open if TURNSTILE_SECRET_KEY not set).
+  const captcha = await verifyTurnstile(body.captcha_token ?? null, req);
+  if (!captcha.ok) {
+    return json({ error: "captcha_failed", reason: captcha.reason }, 400);
+  }
+
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
 
   // Rate limit: 5 per minute, 20 per hour.
   const minLimit = await enforceRateLimit(admin, {
