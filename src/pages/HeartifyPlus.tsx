@@ -213,8 +213,12 @@ export default function HeartifyPlus() {
     setSubmitting(true);
     const res = await join({ email, preferredTier: tier, source: "plus_page" });
     setSubmitting(false);
-    if (res.ok) toast.success("You're on the waitlist — we'll email you at launch, in shāʾ Allāh.");
-    else toast.error(res.error ?? "Could not add you to the waitlist. Try again.");
+    if (res.ok) {
+      celebrateUpgrade();
+      toast.success("You're on the waitlist — we'll email you at launch, in shāʾ Allāh.");
+    } else {
+      toast.error(res.error ?? "Could not add you to the waitlist. Try again.");
+    }
   };
 
   const handleTierCTA = (tierId: Tier["id"]) => {
