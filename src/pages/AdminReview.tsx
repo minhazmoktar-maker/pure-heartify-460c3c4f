@@ -298,7 +298,10 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsContent>
 
           <TabsContent value="flagged" className="space-y-2">
-            {flaggedCh.length === 0 && <p className="text-sm text-muted-foreground p-4">No flagged channels.</p>}
+            {flaggedCh.length === 0 && (
+              <EmptyState icon={Flag} tone="muted" title="No flagged channels"
+                description="Automated rechecks haven't surfaced any regressions. Run a recheck to re-scan approved channels immediately." />
+            )}
             {flaggedCh.map((c) => (
               <Card key={c.id}>
                 <CardContent className="p-4 flex items-center justify-between">
@@ -335,7 +338,10 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsContent>
 
           <TabsContent value="videos" className="space-y-2">
-            {videoCandidates.length === 0 && <p className="text-sm text-muted-foreground p-4">No video candidates.</p>}
+            {videoCandidates.length === 0 && (
+              <EmptyState icon={Film} tone="muted" title="No video candidates"
+                description="User-suggested videos and pipeline uploads will appear here for triage." />
+            )}
             {videoCandidates.map((v) => (
               <Card key={v.id}>
                 <CardContent className="p-4 flex items-center justify-between">
@@ -350,12 +356,19 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
           </TabsContent>
 
           <TabsContent value="audit" className="space-y-2 max-h-[600px] overflow-auto">
+            {audit.length === 0 && (
+              <EmptyState icon={ScrollText} tone="muted" title="No audit events yet"
+                description="Approvals, rejections and rechecks will be logged here for full traceability." />
+            )}
             {audit.map((r) => (
               <div key={r.id} className="flex items-center justify-between text-sm p-2 border-b">
-                <div>
-                  <Badge variant={r.action === "approved" ? "default" : r.action === "rejected" ? "destructive" : "outline"}>
-                    {r.action}
-                  </Badge>{" "}
+                <div className="flex items-center gap-2">
+                  <span className={`heartify-chip ${
+                    r.action === "approved" ? "heartify-chip--primary"
+                    : r.action === "rejected" ? "heartify-chip--danger"
+                    : r.action === "removed" ? "heartify-chip--warning"
+                    : "heartify-chip--muted"
+                  }`}>{r.action}</span>
                   <span className="font-mono text-xs">{r.youtube_channel_id}</span>
                 </div>
                 <div className="text-xs text-muted-foreground flex items-center gap-2">
@@ -365,6 +378,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
               </div>
             ))}
           </TabsContent>
+
         </Tabs>
       </div>
 
