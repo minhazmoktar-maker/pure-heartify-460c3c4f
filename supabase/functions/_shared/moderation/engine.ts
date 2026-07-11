@@ -40,6 +40,7 @@ export async function runPipeline(
         confidence: 0,
         risk: 90,
         reasoning: `Stage ${stage.name} threw: ${(e as Error).message}`,
+        signals: { flags: ["stage_error"] },
       });
     }
   }
@@ -99,12 +100,23 @@ export function decideState(
   flags: string[] = [],
 ): PipelineOutcome["final_state"] {
   if (ruleHits.some((h) => h.severity === "hard")) return "blocked";
-  // Adversarial content — never reject silently, always escalate for a human.
-  if (flags.includes("prompt_injection_attempt")) return "human_review_required";
-  // AI produced unparseable / low-quality output — do NOT auto-reject; escalate.
-  if (flags.includes("parse_failed") || flags.includes("low_quality_reasoning")) {
+  // Adversarial / low-quality / stage-error output — never reject silently, always escalate.
+  if (
+    flags.includes("prompt_injection_attempt") ||
+    flags.includes("parse_failed") ||
+    flags.includes("low_quality_reasoning") ||
+    flags.includes("stage_error")
+  ) {
     return "human_review_required";
   }
+  if (confidence < t.reject_below_confidence) return "rejected";
+  if (confidence >= t.auto_approve_min_confidence && risk <= t.auto_approve_max_risk) {
+    return "auto_approved";
+  }
+  if (confidence >= t.ai_review_min_confidence) return "ai_review_required";
+  if (confidence >= t.human_review_min_confidence) return "human_review_required";
+  return "rejected";
+}
   if (confidence < t.reject_below_confidence) return "rejected";
   if (confidence >= t.auto_approve_min_confidence && risk <= t.auto_approve_max_risk) {
     return "auto_approved";
