@@ -3,7 +3,7 @@ import {
   Crown, Sparkles, Download, Radio, Headphones, BookOpen, ShieldCheck,
   Search, Play, ChevronRight, Clock3, Flame, ListMusic,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import FadeIn from "@/components/FadeIn";
 import { usePlayer } from "@/contexts/PlayerContext";
 import PlaylistCard from "@/components/PlaylistCard";
 import TrackRow from "@/components/TrackRow";
@@ -179,8 +179,8 @@ const AudioSection = () => {
         </div>
       ) : !isPremiumUser ? (
         FEATURE_FLAGS.PREMIUM_UPGRADE_CTA ? (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          <FadeIn
+            y={10}
             className="mb-10 overflow-hidden rounded-3xl bg-gradient-hero p-6 md:p-10 shadow-card-hover"
           >
             <div className="flex flex-col gap-6">
@@ -223,7 +223,7 @@ const AudioSection = () => {
                 Premium is granted server-side. Payment checkout is coming soon — until then, contact an admin.
               </p>
             </div>
-          </motion.div>
+          </FadeIn>
         ) : null
       ) : (
         <div
