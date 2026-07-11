@@ -1,6 +1,8 @@
 // Server-computed prayer times. Pure function, no DB. Cacheable per (date, lat, lng, method).
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
+import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 
 const QuerySchema = z.object({
   lat: z.coerce.number().min(-90).max(90),
