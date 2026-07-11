@@ -116,8 +116,10 @@ export default function PublicKhatmGroup() {
             <div>
               <CheckCircle2 className={`h-5 w-5 mx-auto ${group.completed_at ? "text-emerald-500" : "text-muted-foreground"}`} />
               <div className="mt-1 text-2xl font-bold text-foreground">{pct}%</div>
-              <div className="text-xs text-muted-foreground">
-                {group.completed_at ? "Completed 🎉" : "In progress"}
+              <div className="mt-1">
+                <span className={`heartify-chip ${group.completed_at ? "heartify-chip--primary" : "heartify-chip--muted"}`}>
+                  {group.completed_at ? "Completed" : "In progress"}
+                </span>
               </div>
             </div>
           </div>
