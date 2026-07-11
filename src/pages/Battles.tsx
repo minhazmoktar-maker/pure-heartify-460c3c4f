@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Swords, RotateCcw, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Swords, RotateCcw, CheckCircle2, SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 
 type Battle = { id: string; name: string; year: string; place: string; outcome: string; summary: string; lesson: string };
 
