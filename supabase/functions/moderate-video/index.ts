@@ -38,6 +38,18 @@ Deno.serve(async (req) => {
   const v = body.video;
   if (!v?.video_id || !v?.title) return json({ error: "video.video_id and video.title required" }, 400);
 
+  // Rate limit — moderation is compute-heavy and calls out to AI providers.
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const rlLimited = await enforceRateLimit(admin, {
+    identity: getClientIdentity(req, null),
+    action: "moderate-video",
+    limit: 30,
+    windowSeconds: 60,
+  });
+  if (rlLimited) return json({ error: "rate_limited" }, 429);
+
+
+
   // Only privileged actors may write non-system audit entries.
   let actorId: string | null = null;
   let actorKind: "system" | "admin" | "owner" | "recheck" | "override" = "system";
