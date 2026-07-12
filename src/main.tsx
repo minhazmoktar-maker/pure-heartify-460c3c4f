@@ -33,6 +33,16 @@ if (isPreviewHost || isInIframe) {
   navigator.serviceWorker?.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
 } else if ("serviceWorker" in navigator) {
   import("virtual:pwa-register").then(({ registerSW }) => registerSW({ immediate: true })).catch(() => {});
+  // Route the user when they click a Web-Push notification (see public/push-handler.js)
+  navigator.serviceWorker?.addEventListener("message", (event) => {
+    const data = event.data as { type?: string; url?: string } | undefined;
+    if (data?.type === "navigate" && typeof data.url === "string") {
+      try {
+        const target = new URL(data.url, window.location.origin);
+        if (target.origin === window.location.origin) window.location.assign(target.pathname + target.search + target.hash);
+      } catch { /* noop */ }
+    }
+  });
 }
 
 createRoot(document.getElementById("root")!).render(

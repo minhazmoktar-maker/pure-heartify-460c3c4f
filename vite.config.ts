@@ -38,6 +38,9 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/~oauth/, /^\/api/, /^\/functions/],
+        // Web-Push + notificationclick handlers live in /public/push-handler.js
+        // so the same generated SW handles both offline caching and push.
+        importScripts: ["/push-handler.js"],
         runtimeCaching: [
           {
             // HTML navigations: try network, fall back to cache so the home feed

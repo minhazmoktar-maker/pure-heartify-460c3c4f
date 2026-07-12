@@ -18,6 +18,10 @@
     <link rel="dns-prefetch" href="https://i.ytimg.com" />
     <link rel="dns-prefetch" href="https://www.youtube.com" />
 
+    <!-- LCP preloads: app icon + social image often win first-paint on landing/share links -->
+    <link rel="preload" as="image" href="/app-icon-1024.png" fetchpriority="high" />
+    <link rel="modulepreload" href="/src/main.tsx" />
+
     <!-- Perf: fonts as non-blocking <link> (was @import in CSS, blocks render) -->
     <link
       rel="preload"
