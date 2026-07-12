@@ -36,11 +36,14 @@ export default function AdminAppeals() {
 
   useEffect(() => { load(); }, []);
 
-  const resolve = async (id: string, status: "approved" | "denied", resolution: string) => {
+  const resolve = async (id: string, status: "approved" | "denied", resolution: string): Promise<void> => {
     const { error } = await supabase.from("appeals").update({ status, resolution }).eq("id", id);
-    if (error) return toast({ title: error.message, variant: "destructive" });
+    if (error) {
+      toast({ title: error.message, variant: "destructive" });
+      return;
+    }
     toast({ title: `Appeal ${status}` });
-    load();
+    await load();
   };
 
   return (
