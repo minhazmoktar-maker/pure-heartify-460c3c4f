@@ -87,6 +87,40 @@ Deno.serve(async (req) => {
     const excludeWatched = body.excludeWatched !== false;
     const sessionId = body.sessionId ? String(body.sessionId) : null;
 
+    // Read-through cache — anonymous cold-start only (no userId, no session,
+    // no category filter). Keeps the hottest global surface warm without
+    // leaking per-user signals across callers. 60s TTL.
+    const cacheable = !userId && !sessionId && !categoryFilter;
+    if (cacheable) {
+      const cacheKey = `rec:anon:${surface}:${limit}:${excludeWatched ? 1 : 0}`;
+      const { value, hit } = await readThrough(cacheKey, 60, async () => {
+        return await computeRecommendations({
+          userId, limit, surface, categoryFilter, excludeWatched, sessionId,
+        });
+      });
+      return json(value, 200, { "X-Cache": hit ? "HIT" : "MISS" });
+    }
+
+    const value = await computeRecommendations({
+      userId, limit, surface, categoryFilter, excludeWatched, sessionId,
+    });
+    return json(value);
+  } catch (e) {
+    return json({ error: (e as Error).message }, 500);
+  }
+});
+
+interface ComputeArgs {
+  userId: string | null;
+  limit: number;
+  surface: string;
+  categoryFilter: string | null;
+  excludeWatched: boolean;
+  sessionId: string | null;
+}
+
+async function computeRecommendations(args: ComputeArgs) {
+  const { userId, limit, surface, categoryFilter, excludeWatched, sessionId } = args;
     const provider = getRecommendationProvider();
     const signals = await gatherSignals(admin, userId);
     const candidates = await fetchCandidates(admin, signals, categoryFilter);
