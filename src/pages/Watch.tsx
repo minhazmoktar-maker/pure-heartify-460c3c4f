@@ -7,6 +7,9 @@ import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
 import { ReportButton } from "@/components/ReportButton";
+import CommentThread from "@/components/CommentThread";
+import AddToPlaylistDialog from "@/components/AddToPlaylistDialog";
+import NotInterestedMenu from "@/components/NotInterestedMenu";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 import type { YouTubeVideo } from "@/services/youtube";
@@ -308,7 +311,10 @@ const Watch = () => {
                       channelTitle={currentVideo.channelTitle}
                     />
                   )}
+                  {videoId && <AddToPlaylistDialog videoId={videoId} />}
+                  {videoId && <NotInterestedMenu videoId={videoId} />}
                   {videoId && <AdminVideoRemoveButton videoId={videoId} title={currentVideo.title} />}
+
 
                 </>
               )}
@@ -327,7 +333,9 @@ const Watch = () => {
               <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
             </button>
           )}
+          {videoId && <CommentThread videoId={videoId} />}
         </div>
+
 
         <aside className="mt-6 shrink-0 lg:mt-0 lg:w-[380px] xl:w-[420px]">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">

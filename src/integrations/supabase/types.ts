@@ -59,6 +59,59 @@ export type Database = {
         }
         Relationships: []
       }
+      appeals: {
+        Row: {
+          created_at: string
+          decision_id: string | null
+          id: string
+          reason: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          subject_kind: string
+          subject_ref: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision_id?: string | null
+          id?: string
+          reason: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          subject_kind: string
+          subject_ref: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision_id?: string | null
+          id?: string
+          reason?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          subject_kind?: string
+          subject_ref?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appeals_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "moderation_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       approved_channels: {
         Row: {
           approved_by: string | null
@@ -449,6 +502,35 @@ export type Database = {
         }
         Relationships: []
       }
+      channel_follows: {
+        Row: {
+          channel_id: string
+          created_at: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          follower_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_follows_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "approved_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       channel_trust_events: {
         Row: {
           actor_id: string | null
@@ -695,6 +777,38 @@ export type Database = {
           uploads_playlist_id?: string | null
         }
         Relationships: []
+      }
+      comment_reactions: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_reactions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "video_comments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       curated_videos: {
         Row: {
@@ -1814,6 +1928,74 @@ export type Database = {
           email?: string
           notes?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      playlist_items: {
+        Row: {
+          added_at: string
+          id: string
+          playlist_id: string
+          position: number
+          video_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          playlist_id: string
+          position?: number
+          video_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          playlist_id?: string
+          position?: number
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlists: {
+        Row: {
+          cover_video_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          items_count: number
+          owner_id: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          cover_video_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          items_count?: number
+          owner_id: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          cover_video_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          items_count?: number
+          owner_id?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
         }
         Relationships: []
       }
@@ -2976,6 +3158,51 @@ export type Database = {
           },
         ]
       }
+      user_blocks: {
+        Row: {
+          blocked_user_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_user_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_user_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      user_hidden_videos: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       user_interests: {
         Row: {
           created_at: string
@@ -3221,6 +3448,59 @@ export type Database = {
         }
         Relationships: []
       }
+      video_comments: {
+        Row: {
+          body: string
+          created_at: string
+          deleted_at: string | null
+          edited_at: string | null
+          id: string
+          likes_count: number
+          parent_id: string | null
+          replies_count: number
+          status: string
+          updated_at: string
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          likes_count?: number
+          parent_id?: string | null
+          replies_count?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          deleted_at?: string | null
+          edited_at?: string | null
+          id?: string
+          likes_count?: number
+          parent_id?: string | null
+          replies_count?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "video_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_reports: {
         Row: {
           channel_id: string | null
@@ -3443,6 +3723,23 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      transparency_appeals: {
+        Row: {
+          appeals: number | null
+          period: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
+      transparency_report: {
+        Row: {
+          decisions: number | null
+          period: string | null
+          stage: string | null
+          state: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {
@@ -3702,6 +3999,23 @@ export type Database = {
         Returns: {
           hits: number
           query: string
+        }[]
+      }
+      get_transparency_appeals: {
+        Args: never
+        Returns: {
+          appeals: number
+          period: string
+          status: string
+        }[]
+      }
+      get_transparency_report: {
+        Args: never
+        Returns: {
+          decisions: number
+          period: string
+          stage: string
+          state: string
         }[]
       }
       get_trending_searches: {

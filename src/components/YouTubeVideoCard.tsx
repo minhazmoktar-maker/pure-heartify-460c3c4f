@@ -5,6 +5,7 @@ import type { YouTubeVideo } from "@/services/youtube";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/contexts/AuthContext";
 import TrustBadges from "@/components/TrustBadges";
+import NotInterestedMenu from "@/components/NotInterestedMenu";
 
 interface YouTubeVideoCardProps {
   video: YouTubeVideo;
@@ -65,7 +66,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         <span className="absolute right-2 top-2 rounded-md bg-foreground/70 px-1.5 py-0.5 text-xs font-medium text-background">
           {video.category}
         </span>
-        <div className="absolute left-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="absolute left-2 top-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={handleBookmark}
             aria-label={liked ? "Remove bookmark" : "Bookmark video"}
@@ -74,6 +75,9 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           >
             <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
           </button>
+          <div className="rounded-full bg-background/80 backdrop-blur-sm">
+            <NotInterestedMenu videoId={video.id} compact />
+          </div>
         </div>
         <div className="absolute inset-0 flex items-center justify-center bg-primary/10 opacity-0 transition-opacity group-hover:opacity-100">
           <Play className="h-10 w-10 fill-primary-foreground text-primary-foreground drop-shadow-lg" />
