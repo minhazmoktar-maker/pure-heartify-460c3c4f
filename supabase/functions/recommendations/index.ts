@@ -21,6 +21,7 @@ import { fetchCandidates } from "../_shared/recommendations/candidates.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
 import { toPgVector } from "../_shared/embed.ts";
+import { readThrough } from "../_shared/cache.ts";
 
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
