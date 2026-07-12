@@ -311,7 +311,10 @@ const Watch = () => {
                       channelTitle={currentVideo.channelTitle}
                     />
                   )}
+                  {videoId && <AddToPlaylistDialog videoId={videoId} />}
+                  {videoId && <NotInterestedMenu videoId={videoId} />}
                   {videoId && <AdminVideoRemoveButton videoId={videoId} title={currentVideo.title} />}
+
 
                 </>
               )}
@@ -330,7 +333,9 @@ const Watch = () => {
               <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
             </button>
           )}
+          {videoId && <CommentThread videoId={videoId} />}
         </div>
+
 
         <aside className="mt-6 shrink-0 lg:mt-0 lg:w-[380px] xl:w-[420px]">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
