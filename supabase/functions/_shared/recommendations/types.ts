@@ -37,6 +37,17 @@ export interface UserSignals {
   trendingIds: Set<string>;                  // globally trending, last 14d
   contentLanguages: string[];                // preferred content languages
   diversityLevel: number;                    // 0..100, higher = more out-of-language content
+  context: RecommendationContext;            // time-of-day / Ramadan / weekday
+}
+
+/** Ambient context — purely time/calendar-driven, no PII. */
+export interface RecommendationContext {
+  hour: number;               // 0..23, viewer-local best-effort (UTC fallback)
+  dayOfWeek: number;          // 0=Sun..6=Sat
+  isRamadan: boolean;
+  isLastTen: boolean;         // last 10 nights of Ramadan
+  isJummuah: boolean;         // Friday
+  timeBucket: "fajr" | "morning" | "midday" | "afternoon" | "maghrib" | "night";
 }
 
 export interface Recommendation {
@@ -60,7 +71,8 @@ export interface RecommendationReason {
     | "session_continuity"
     | "cold_start_popular"
     | "diversity_boost"
-    | "language_match";
+    | "language_match"
+    | "context_boost";
   weight: number;
   detail?: string;
 }

@@ -14,6 +14,7 @@ export interface RecommendationReason {
   detail?: string;
 }
 
+
 export interface RecommendedVideo {
   video: {
     video_id: string;
