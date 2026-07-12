@@ -4001,6 +4001,23 @@ export type Database = {
           query: string
         }[]
       }
+      get_transparency_appeals: {
+        Args: never
+        Returns: {
+          appeals: number
+          period: string
+          status: string
+        }[]
+      }
+      get_transparency_report: {
+        Args: never
+        Returns: {
+          decisions: number
+          period: string
+          stage: string
+          state: string
+        }[]
+      }
       get_trending_searches: {
         Args: { _limit?: number; _window_hours?: number }
         Returns: {
