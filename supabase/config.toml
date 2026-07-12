@@ -1,3 +1,6 @@
 project_id = "tbgxtwgliumqqtuppztu"
 [functions.send-push]
 verify_jwt = true
+
+[functions.og-image]
+verify_jwt = false
