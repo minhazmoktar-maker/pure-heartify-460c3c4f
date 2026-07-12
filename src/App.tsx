@@ -271,6 +271,7 @@ const App = () => (
                 <Route path="/pricing" element={<Navigate to="/plus" replace />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/settings/notifications" element={<NotificationSettings />} />
                 <Route path="/channels" element={<Channels />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/library/:slug" element={<LibraryEntry />} />
