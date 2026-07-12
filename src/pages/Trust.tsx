@@ -1,5 +1,5 @@
-import { SEO } from "@/components/SEO";
-import { PageHeader } from "@/components/PageHeader";
+import SEO from "@/components/SEO";
+import PageHeader from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Shield, Lock, Eye, FileCheck, Users, AlertCircle } from "lucide-react";
 
