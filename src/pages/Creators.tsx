@@ -57,7 +57,7 @@ const Creators = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("channel_candidates")
-        .select("id, channel_title, channel_handle, status, created_at, youtube_channel_id")
+        .select("id, title, handle, status, created_at, youtube_channel_id")
         .eq("submitted_by", user!.id)
         .order("created_at", { ascending: false })
         .limit(50);
