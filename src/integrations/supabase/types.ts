@@ -3363,6 +3363,14 @@ export type Database = {
     }
     Functions: {
       _analytics_assert_admin: { Args: never; Returns: undefined }
+      _user_scoped_columns: {
+        Args: never
+        Returns: {
+          column_name: string
+          mode: string
+          table_name: string
+        }[]
+      }
       add_anon_ameen: {
         Args: { _dua_id: string; _fp: string }
         Returns: number
@@ -3537,6 +3545,7 @@ export type Database = {
       }
       end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
+      export_user_data: { Args: { _uid: string }; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
       get_channel_trust_history: {
@@ -3792,6 +3801,7 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: boolean
       }
+      scrub_user_data: { Args: { _uid: string }; Returns: Json }
       search_autocomplete: {
         Args: { _limit?: number; _prefix: string }
         Returns: {
