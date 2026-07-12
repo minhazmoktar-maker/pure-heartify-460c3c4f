@@ -13,6 +13,7 @@ import NextSalahWidget from "@/components/NextSalahWidget";
 import StreakCard from "@/components/StreakCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import StreakAtRiskBanner from "@/components/StreakAtRiskBanner";
+import RamadanBanner from "@/components/RamadanBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
@@ -69,6 +70,7 @@ const Index = () => {
       <HeroSection />
 
       <NextSalahWidget />
+      <RamadanBanner />
 
       {user && (
         <div className="mx-auto max-w-[1800px] space-y-3 px-4 pt-2 md:px-6">
