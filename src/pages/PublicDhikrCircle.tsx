@@ -91,20 +91,12 @@ export default function PublicDhikrCircle() {
 
   return (
     <>
-      <Helmet>
-        <title>{circle.title} — Dhikr Circle · Heartify</title>
-        <meta
-          name="description"
-          content={`Join ${circle.member_count} others in reciting ${circle.phrase}. ${circle.current_count.toLocaleString()} of ${circle.target_count.toLocaleString()} completed.`}
-        />
-        <meta property="og:title" content={`${circle.title} — Dhikr Circle`} />
-        <meta
-          property="og:description"
-          content={`${circle.current_count.toLocaleString()} / ${circle.target_count.toLocaleString()} ${circle.phrase}`}
-        />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
-      </Helmet>
+      <SEO
+        type="article"
+        title={`${circle.title} — Dhikr Circle · Heartify`}
+        description={`Join ${circle.member_count} others reciting ${circle.phrase}. ${circle.current_count.toLocaleString()} of ${circle.target_count.toLocaleString()} completed.`}
+        path={`/c/${id}`}
+      />
       <main className="container mx-auto max-w-2xl px-4 py-10">
         <Card>
           <CardHeader>
