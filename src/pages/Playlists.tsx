@@ -24,7 +24,7 @@ export default function Playlists() {
   if (!user) {
     return (
       <>
-        <SEO title="Playlists — Heartify" description="Save halal videos into your own playlists." />
+        <SEO path="/playlists" title="Playlists — Heartify" description="Save halal videos into your own playlists." />
         <PageHeader title="Playlists" subtitle="Sign in to build your own collections." />
         <div className="container mx-auto max-w-2xl px-4 py-8 text-center">
           <Link to="/login" className="text-primary hover:underline">Sign in</Link>
@@ -35,7 +35,7 @@ export default function Playlists() {
 
   return (
     <>
-      <SEO title="Your Playlists — Heartify" description="Your saved halal video playlists." />
+      <SEO path="/playlists" title="Your Playlists — Heartify" description="Your saved halal video playlists." />
       <PageHeader title="Playlists" subtitle="Build collections of videos to revisit and share." />
       <div className="container mx-auto max-w-4xl px-4 pb-16">
         <div className="mb-6 flex items-center justify-between">

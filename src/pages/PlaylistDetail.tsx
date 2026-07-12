@@ -30,10 +30,9 @@ export default function PlaylistDetail() {
 
   return (
     <>
-      <SEO
+      <SEO path="/playlists"
         title={`${playlist.title} — Playlist — Heartify`}
         description={playlist.description ?? `A halal video playlist on Heartify.`}
-        noIndex={playlist.visibility !== "public"}
       />
       <PageHeader
         title={playlist.title}

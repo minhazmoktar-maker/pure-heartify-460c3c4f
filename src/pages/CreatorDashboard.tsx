@@ -54,7 +54,7 @@ export default function CreatorDashboard() {
   if (!user) {
     return (
       <div className="container mx-auto max-w-2xl px-4 py-16 text-center">
-        <SEO title="Creator dashboard — Heartify" description="Manage your approved channel on Heartify." />
+        <SEO path="/creators/dashboard" title="Creator dashboard — Heartify" description="Manage your approved channel on Heartify." />
         <p>Please <Link to="/login" className="text-primary underline">sign in</Link>.</p>
       </div>
     );
@@ -62,7 +62,7 @@ export default function CreatorDashboard() {
 
   return (
     <>
-      <SEO title="Creator dashboard — Heartify" description="Follower counts, moderation, and recent activity for your approved channel." noIndex />
+      <SEO path="/creators/dashboard" title="Creator dashboard — Heartify" description="Follower counts, moderation, and recent activity for your approved channel." />
       <PageHeader
         title="Creator dashboard"
         subtitle="Follower counts, trust score, and moderation status for channels you own on Heartify."

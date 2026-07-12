@@ -42,10 +42,10 @@ export default function Transparency() {
 
   return (
     <>
-      <SEO
+      <SEO path="/transparency"
         title="Transparency Report — Heartify"
         description="Real moderation and appeals numbers from the last 18 months. We publish this so you can hold us accountable."
-        keywords={["transparency", "moderation report", "halal content moderation"]}
+        keywords={"transparency", "moderation report", "halal content moderation".split(",").join(", ")}
       />
       <PageHeader
         title="Transparency Report"
