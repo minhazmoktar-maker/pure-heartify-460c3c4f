@@ -36,7 +36,9 @@ export function useFeatureFlag(key: string, defaultValue = false): boolean {
   }, [key, user?.id, defaultValue]);
 
   return enabled;
+}
 
 /** Legacy no-op export kept for compatibility; server-evaluated flags don't need cache invalidation. */
 export function invalidateFeatureFlags(): void {}
+
 
