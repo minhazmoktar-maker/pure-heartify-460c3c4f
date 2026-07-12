@@ -155,7 +155,13 @@ const Index = () => {
       <footer className="border-t border-border bg-card py-8">
         <div className="mx-auto max-w-[1800px] px-4 text-center md:px-6 space-y-2">
           <p className="text-sm text-muted-foreground">© 2026 HalalTube — Curated halal content for the Ummah ✦</p>
-          <a href="/privacy" className="text-xs text-muted-foreground hover:text-foreground underline">Privacy Policy</a>
+          <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <a href="/privacy" className="hover:text-foreground underline">Privacy</a>
+            <a href="/terms" className="hover:text-foreground underline">Terms</a>
+            <a href="/trust" className="hover:text-foreground underline">Trust &amp; Security</a>
+            <a href="/status" className="hover:text-foreground underline">System Status</a>
+            <a href="/about" className="hover:text-foreground underline">About</a>
+          </nav>
         </div>
       </footer>
 
