@@ -11,11 +11,11 @@ export async function track(
   user_id?: string | null,
 ): Promise<void> {
   try {
-    const { error } = await supabase.from("analytics_events").insert({
+    const { error } = await supabase.from("analytics_events").insert([{
       event_name,
       user_id: user_id ?? null,
-      properties,
-    });
+      properties: properties as never,
+    }]);
     if (error && import.meta.env.DEV) {
       console.warn("[analytics] rejected", event_name, error.message);
     }
