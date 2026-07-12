@@ -1,7 +1,11 @@
 import { createContext, useContext, useRef, useState, useCallback, type ReactNode } from "react";
 
 interface FeedDiversityValue {
-  /** Mutable set of video IDs already shown in earlier sections (cross-section dedup). */
+  /**
+   * Legacy: cross-section dedup set. Kept for backwards compatibility with
+   * any consumer that still reads it, but sections no longer filter against
+   * it — each row must be able to reach its own 100-item target.
+   */
   seenVideoIds: React.MutableRefObject<Set<string>>;
   /** Max videos allowed per channel within a single section. */
   perChannelCap: number;
