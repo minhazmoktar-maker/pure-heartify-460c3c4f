@@ -283,7 +283,7 @@ export default function HeartifyPlus() {
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-xs text-[hsl(var(--cream))]/80">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
-                <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> 100% halal, always
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Trying our best to keep it halal
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
                 <InfinityIcon className="h-3.5 w-3.5" aria-hidden /> Unlimited offline
