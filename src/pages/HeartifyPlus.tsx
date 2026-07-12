@@ -252,7 +252,7 @@ export default function HeartifyPlus() {
     <div className="min-h-dvh bg-background">
       <SEO
         title="Heartify+ — Halal streaming without limits"
-        description="Unlimited offline Qur'an audio, exclusive reciters, guided Khatm programs, family seats & Kids Mode. Every feature 100% halal."
+        description="Unlimited offline Qur'an audio, exclusive reciters, guided Khatm programs, family seats & Kids Mode. We try our best to keep every feature halal — no music, no women on camera."
         path="/plus"
       />
       <Navbar />
