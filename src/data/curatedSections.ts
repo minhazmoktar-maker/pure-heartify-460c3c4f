@@ -13,7 +13,7 @@ export interface CuratedSection {
   maxResults: number;
 }
 
-export const CURATED_SECTIONS: CuratedSection[] = [
+const _SECTIONS: CuratedSection[] = [
   {
     id: "top-100",
     title: "Top 100 Halal Videos",
