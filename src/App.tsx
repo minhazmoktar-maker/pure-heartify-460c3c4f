@@ -24,6 +24,8 @@ import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
 
 const About = lazy(() => import("./pages/About.tsx"));
+const Trust = lazy(() => import("./pages/Trust.tsx"));
+const Status = lazy(() => import("./pages/Status.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const AdabPage = lazy(() => import("./pages/AdabPage.tsx"));
 const AdhanIqamah = lazy(() => import("./pages/AdhanIqamah.tsx"));
@@ -229,6 +231,8 @@ const App = () => (
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/trust" element={<Trust />} />
+                <Route path="/status" element={<Status />} />
                 <Route path="/plus" element={<HeartifyPlus />} />
                 <Route path="/plus/join" element={<PlusInvite />} />
                 <Route path="/offline" element={<OfflineLibrary />} />
