@@ -122,16 +122,14 @@ Deno.serve(async (req) => {
           "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
           "apikey": SUPABASE_SERVICE_ROLE_KEY,
           "Accept": "application/json",
-          "Prefer": "count=exact",
         },
       });
       if (!res.ok) {
         console.error(`DB query failed: ${res.status} ${await res.text()}`);
-        return { items: [] as Array<Record<string, unknown>>, totalCount: 0, ok: false };
+        return { items: [] as Array<Record<string, unknown>>, ok: false };
       }
-      const totalCount = parseInt(res.headers.get("content-range")?.split("/")?.[1] ?? "0", 10);
       const items = await res.json();
-      return { items, totalCount, ok: true };
+      return { items, ok: true };
     };
 
     const { value: payload, hit } = cacheable
@@ -140,7 +138,12 @@ Deno.serve(async (req) => {
 
     if (!payload.ok) return json({ items: [], nextCursor: null, total: 0 });
 
-    const items = payload.items;
+    // Post-fetch blocklist filter (see BLOCKED_TOKENS above).
+    const filtered = (payload.items as Array<Record<string, unknown>>).filter((v) => {
+      const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
+      return !BLOCKED_TOKENS.some((tok) => t.includes(tok));
+    });
+    const items = filtered.slice(0, limit);
     const nextCursor = items.length === limit
       ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
       : null;
@@ -160,7 +163,7 @@ Deno.serve(async (req) => {
           isPremiumOnly: v.is_premium_only ?? false,
         })),
         nextCursor,
-        total: payload.totalCount || items.length,
+        total: items.length,
         viewer: { isPremium },
       },
       200,
