@@ -196,9 +196,28 @@ const WomensFiqh = lazy(() => import("./pages/WomensFiqh.tsx"));
 const WomensPurity = lazy(() => import("./pages/WomensPurity.tsx"));
 const WuduGuide = lazy(() => import("./pages/WuduGuide.tsx"));
 const Zakat = lazy(() => import("./pages/Zakat.tsx"));
+const NotificationSettings = lazy(() => import("./pages/NotificationSettings.tsx"));
 
 
-const queryClient = new QueryClient();
+// Global React Query defaults — Phase 3 tuning.
+// - 5-min freshness cuts refetches on route switches (feed, dua, prayer)
+// - 30-min gcTime keeps cached data alive across quick nav bounces
+// - retry=1 stops 5xx storms
+// - refetchOnWindowFocus off — the app is a media surface, not a dashboard
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: "always",
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 const RouteFallback = () => (
   <div className="min-h-dvh bg-background">
