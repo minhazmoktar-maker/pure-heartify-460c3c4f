@@ -22,7 +22,7 @@ const HeroSection = () => {
       <div className="relative mx-auto max-w-[1800px] px-4 py-14 md:px-6 md:py-20">
         <FadeIn y={30} duration={0.7} className="max-w-2xl">
           <span className="inline-block rounded-full bg-gold/20 px-3 py-1 text-xs font-semibold text-gold">
-            ✦ 100% Halal · Zero music · Zero women on camera
+            ✦ Trying our best to keep it halal · No music · No women on camera
           </span>
           <h1 className="mt-4 font-heading text-3xl font-bold leading-tight text-cream md:text-5xl">
             Halal video, audio &amp; Qur&apos;an.{" "}

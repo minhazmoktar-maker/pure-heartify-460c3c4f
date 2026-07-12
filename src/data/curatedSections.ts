@@ -13,7 +13,7 @@ export interface CuratedSection {
   maxResults: number;
 }
 
-export const CURATED_SECTIONS: CuratedSection[] = [
+const _SECTIONS: CuratedSection[] = [
   {
     id: "top-100",
     title: "Top 100 Halal Videos",
@@ -567,4 +567,11 @@ export const CURATED_SECTIONS: CuratedSection[] = [
     maxResults: 12,
   },
 ];
+
+// Boost every home section to ~100 videos so "For You" feels endless.
+export const CURATED_SECTIONS: CuratedSection[] = _SECTIONS.map((s) => ({
+  ...s,
+  maxResults: 100,
+}));
+
 

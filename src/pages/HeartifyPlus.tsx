@@ -252,7 +252,7 @@ export default function HeartifyPlus() {
     <div className="min-h-dvh bg-background">
       <SEO
         title="Heartify+ — Halal streaming without limits"
-        description="Unlimited offline Qur'an audio, exclusive reciters, guided Khatm programs, family seats & Kids Mode. Every feature 100% halal."
+        description="Unlimited offline Qur'an audio, exclusive reciters, guided Khatm programs, family seats & Kids Mode. We try our best to keep every feature halal — no music, no women on camera."
         path="/plus"
       />
       <Navbar />
@@ -283,7 +283,7 @@ export default function HeartifyPlus() {
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-xs text-[hsl(var(--cream))]/80">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
-                <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> 100% halal, always
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Trying our best to keep it halal
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
                 <InfinityIcon className="h-3.5 w-3.5" aria-hidden /> Unlimited offline
@@ -477,7 +477,7 @@ export default function HeartifyPlus() {
                 </li>
                 <li className="flex items-start gap-2">
                   <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                  100% halal — same moderation pipeline as the free tier
+                  Trying our best to keep it halal — same moderation pipeline as the free tier
                 </li>
               </ul>
             </div>

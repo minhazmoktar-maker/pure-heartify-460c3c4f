@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose 
 import NotificationsBell from "@/components/NotificationsBell";
 import SuggestContentDialog from "@/components/SuggestContentDialog";
 import UpgradeCTA from "@/components/UpgradeCTA";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useRole } from "@/hooks/useRole";
 import { useScrolled } from "@/hooks/useScrolled";
 import { cn } from "@/lib/utils";
@@ -163,6 +164,7 @@ const Navbar = () => {
             <ShieldCheck className="h-4 w-4 text-primary" />
             Channels
           </Link>
+          <LanguageSwitcher />
           <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}

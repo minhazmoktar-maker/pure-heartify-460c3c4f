@@ -105,7 +105,7 @@ const SearchResults = () => {
               That search isn&apos;t available on Heartify
             </h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-              To keep the platform 100% halal, we don&apos;t index results for
+              To keep the platform halal — no music, no women on camera — we don&apos;t index results for
               &ldquo;{query}&rdquo;. Try a reciter, surah, or topic instead.
             </p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">

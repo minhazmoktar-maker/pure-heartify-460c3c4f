@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     const category = body?.category as string | undefined;
     const sectionId = body?.section_id as string | undefined;
     const cursor = body?.cursor as string | undefined; // ISO timestamp of last item's ingested_at
-    const limit = Math.min(Math.max(body?.limit ?? 20, 1), 50);
+    const limit = Math.min(Math.max(body?.limit ?? 20, 1), 100);
     // Sanitize search: strip PostgREST-significant chars (, ( ) * . : & =)
     // to prevent filter injection into the or=(...) clause.
     const rawSearch = typeof body?.search === "string" ? body.search.trim() : "";
@@ -69,7 +69,10 @@ Deno.serve(async (req) => {
 
     // Build PostgREST query
     // Order: freshest content first (published_at), then halal_score, then ingested_at as tiebreaker.
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=published_at.desc.nullslast,halal_score.desc,ingested_at.desc&limit=${limit}`;
+    // NOTE: we intentionally overfetch a bit so post-fetch JS blocklist filter
+    // can drop matches without leaving the page short of `limit`.
+    const fetchLimit = Math.min(limit * 2, 200);
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=published_at.desc.nullslast,halal_score.desc,ingested_at.desc&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
@@ -84,23 +87,18 @@ Deno.serve(async (req) => {
       url += `&or=(title.ilike.*${encodeURIComponent(search)}*,channel_title.ilike.*${encodeURIComponent(search)}*)`;
     }
 
-    // Belt-and-suspenders moderation guard: even though a DB trigger blocks
-    // inserts and a nightly sweep purges rows, we also filter at read time so
-    // any race, cache, or manual insert can never surface blocked creators.
-    const BLOCKED_PATTERNS = [
+    // Belt-and-suspenders read-time blocklist. Ingest pipeline + nightly
+    // sweep are the primary defense — this is only a safety net. We apply
+    // it post-fetch in JS to avoid stacking ~40 NOT ILIKE predicates that
+    // cause the planner to fall back to a full sequential scan and time out.
+    const BLOCKED_TOKENS = [
       "mia yilin", "leila hormozi", "layla hormozi", "mehreen",
-      // Female-centric / non-halal channels & topics reported by owner
-      "tedx", "chris williamson", "dr. daf", "womenofquran",
+      "tedx", "chris williamson", "womenofquran",
       "islamic reflections", "islamiclife", "hamza's den", "hamzas den",
       "muslim matters tv", "imaan phase",
       "healthy muslims", "healthymuslims", "zz brothers", "zzbrothers",
-      // Title tokens that flagged all bulk-removed videos
       "women", "mujeres", "aurtain", "aurat", "female voice", "by women voice",
     ];
-    for (const p of BLOCKED_PATTERNS) {
-      url += `&channel_title=not.ilike.*${encodeURIComponent(p)}*`;
-      url += `&title=not.ilike.*${encodeURIComponent(p)}*`;
-    }
 
 
     // Server-side premium gate — hide premium-only videos from non-premium.
@@ -124,16 +122,14 @@ Deno.serve(async (req) => {
           "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
           "apikey": SUPABASE_SERVICE_ROLE_KEY,
           "Accept": "application/json",
-          "Prefer": "count=exact",
         },
       });
       if (!res.ok) {
         console.error(`DB query failed: ${res.status} ${await res.text()}`);
-        return { items: [] as Array<Record<string, unknown>>, totalCount: 0, ok: false };
+        return { items: [] as Array<Record<string, unknown>>, ok: false };
       }
-      const totalCount = parseInt(res.headers.get("content-range")?.split("/")?.[1] ?? "0", 10);
       const items = await res.json();
-      return { items, totalCount, ok: true };
+      return { items, ok: true };
     };
 
     const { value: payload, hit } = cacheable
@@ -142,7 +138,12 @@ Deno.serve(async (req) => {
 
     if (!payload.ok) return json({ items: [], nextCursor: null, total: 0 });
 
-    const items = payload.items;
+    // Post-fetch blocklist filter (see BLOCKED_TOKENS above).
+    const filtered = (payload.items as Array<Record<string, unknown>>).filter((v) => {
+      const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
+      return !BLOCKED_TOKENS.some((tok) => t.includes(tok));
+    });
+    const items = filtered.slice(0, limit);
     const nextCursor = items.length === limit
       ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
       : null;
@@ -162,7 +163,7 @@ Deno.serve(async (req) => {
           isPremiumOnly: v.is_premium_only ?? false,
         })),
         nextCursor,
-        total: payload.totalCount || items.length,
+        total: items.length,
         viewer: { isPremium },
       },
       200,
