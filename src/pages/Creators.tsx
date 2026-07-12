@@ -103,9 +103,9 @@ const Creators = () => {
               Every video and channel here flows through the same moderation pipeline as our own ingestion. Nothing goes live until it passes review — jazākum Allāhu khayran for keeping the platform halal.
             </p>
           </div>
-          <SuggestContentDialog>
-            <Button size="lg" className="rounded-full">Suggest content</Button>
-          </SuggestContentDialog>
+          <SuggestContentDialog
+            trigger={<Button size="lg" className="rounded-full">Suggest content</Button>}
+          />
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-3">
