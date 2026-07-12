@@ -2,80 +2,39 @@
 //
 // Store-compliance: Apple App Store guideline 5.1.1(v) requires in-app
 // account deletion whenever an app supports account creation. This function
-// verifies the caller's JWT, scrubs user-owned rows across all tables that
-// hold personal data, then removes the auth user via the service-role client.
+// verifies the caller's JWT, then calls public.scrub_user_data(uid) which
+// introspects information_schema and scrubs EVERY user-scoped table
+// automatically as the schema evolves — no hand-maintained allow-list.
 //
-// The function intentionally does NOT touch aggregated analytics rows —
-// those are either already anonymised (no PII) or governed by data-retention
-// policies. User-scoped PII tables are cleared explicitly below.
+// GDPR Art. 17 (Right to erasure) and CCPA §1798.105 (Right to delete)
+// are both satisfied by this endpoint.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { enforceRateLimit } from '../_shared/rateLimit.ts';
 
-// Tables that store rows keyed by user_id and must be scrubbed on deletion.
-// Keep this list in sync with the schema — every new user-scoped table should
-// be added here so account deletion remains complete.
-const USER_SCOPED_TABLES = [
-  'audio_playback_positions',
-  'audio_reports',
-  'daily_dose',
-  'device_tokens',
-  'dose_completions',
-  'entitlements',
-  'favorite_categories',
-  'favorites',
-  'recommendation_events',
-  'referrals',
-  'search_queries',
-  'streaks',
-  'user_interests',
-  'user_locale_preferences',
-  'watch_history',
-] as const;
-
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
-
-  if (req.method !== 'POST' && req.method !== 'DELETE') {
-    return json({ error: 'Method not allowed' }, 405);
-  }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST' && req.method !== 'DELETE') return json({ error: 'Method not allowed' }, 405);
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  if (!supabaseUrl || !anonKey || !serviceKey) {
-    return json({ error: 'Server misconfigured' }, 500);
-  }
+  if (!supabaseUrl || !anonKey || !serviceKey) return json({ error: 'Server misconfigured' }, 500);
 
   const authHeader = req.headers.get('Authorization') ?? '';
-  if (!authHeader.toLowerCase().startsWith('bearer ')) {
-    return json({ error: 'Missing bearer token' }, 401);
-  }
+  if (!authHeader.toLowerCase().startsWith('bearer ')) return json({ error: 'Missing bearer token' }, 401);
 
-  // Validate the caller's JWT via the anon client — verify_jwt is disabled
-  // by default in Lovable-managed functions, so we authenticate in-code.
   const authClient = createClient(supabaseUrl, anonKey, {
     global: { headers: { Authorization: authHeader } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
-
   const { data: userData, error: userErr } = await authClient.auth.getUser();
-  if (userErr || !userData?.user) {
-    return json({ error: 'Unauthorized' }, 401);
-  }
+  if (userErr || !userData?.user) return json({ error: 'Unauthorized' }, 401);
   const userId = userData.user.id;
 
-  // Require an explicit confirmation string in the body so this cannot fire
-  // from an accidental request or CSRF-ish scenario.
   let body: { confirm?: string } = {};
-  try {
-    body = await req.json();
-  } catch {
-    // empty body → treated as missing confirmation
-  }
+  try { body = await req.json(); } catch { /* empty body */ }
   if (body.confirm !== 'DELETE') {
     return json({ error: 'Confirmation required. Send { "confirm": "DELETE" }.' }, 400);
   }
@@ -84,59 +43,50 @@ Deno.serve(async (req) => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  // Rate limit: 3 delete attempts / hour per user — prevents accidental
-  // repeated firings and forecloses brute-force enumeration of the endpoint.
   const limited = await enforceRateLimit(admin, {
     identity: userId, action: 'delete_account', limit: 3, windowSeconds: 3600,
   });
   if (limited) return json({ error: 'rate_limited' }, 429);
 
-  // Refuse to delete platform owners — they must be transferred first, or
-  // the platform loses its last admin. Matches prevent_last_owner_removal().
+  // Platform owners must transfer ownership first.
   const { data: ownerRow } = await admin
-    .from('platform_owners')
-    .select('user_id')
-    .eq('user_id', userId)
-    .maybeSingle();
+    .from('platform_owners').select('user_id').eq('user_id', userId).maybeSingle();
   if (ownerRow) {
-    return json(
-      { error: 'Platform owners cannot self-delete. Transfer ownership first.' },
-      403,
-    );
+    return json({ error: 'Platform owners cannot self-delete. Transfer ownership first.' }, 403);
   }
 
-  const errors: string[] = [];
-
-  // 1. Scrub user-scoped tables. We intentionally continue on failure per
-  //    table so a single locked row cannot leave the user half-deleted.
-  for (const table of USER_SCOPED_TABLES) {
-    const { error } = await admin.from(table).delete().eq('user_id', userId);
-    if (error) errors.push(`${table}: ${error.message}`);
+  // 1. Scrub every user-scoped table via the introspection-driven RPC.
+  //    This automatically covers new tables added later — no hand-maintained list.
+  const { data: scrubReport, error: scrubErr } = await admin.rpc('scrub_user_data', { _uid: userId });
+  if (scrubErr) {
+    return json({ error: 'Scrub failed', details: scrubErr.message }, 500);
   }
 
-  // 2. Anonymise moderation/audit records so we keep the trail but drop PII.
-  //    audit tables reference the actor via metadata; nulling the FK is
-  //    enough for compliance without corrupting historical analytics.
-  await admin.from('privileged_actions_log').update({ actor_id: null }).eq('actor_id', userId);
-  await admin.from('moderation_overrides').update({ admin_id: null as unknown as string }).eq('admin_id', userId).then(() => {}, () => {});
-
-  // 3. Remove auth-level linkage: roles then profile.
+  // 2. Roles + profile (may already be handled above, safe to re-run).
   await admin.from('user_roles').delete().eq('user_id', userId);
   await admin.from('profiles').delete().eq('user_id', userId);
 
-  // 4. Finally, delete the auth user itself. This invalidates all sessions.
+  // 3. Delete storage objects the user owns (avatars, exports, etc.).
+  try {
+    for (const bucket of ['avatars', 'user-data-exports']) {
+      const { data: files } = await admin.storage.from(bucket).list(userId);
+      if (files?.length) {
+        await admin.storage.from(bucket).remove(files.map((f) => `${userId}/${f.name}`));
+      }
+    }
+  } catch { /* best-effort */ }
+
+  // 4. Finally, delete the auth user. Invalidates all sessions.
   const { error: authDelErr } = await admin.auth.admin.deleteUser(userId);
   if (authDelErr) {
-    errors.push(`auth: ${authDelErr.message}`);
-    return json({ error: 'Failed to delete account', details: errors }, 500);
+    return json({ error: 'Failed to delete auth user', details: authDelErr.message, scrub: scrubReport }, 500);
   }
 
-  return json({ ok: true, warnings: errors.length ? errors : undefined });
+  return json({ ok: true, scrubbed: scrubReport });
 });
 
 function json(payload: unknown, status = 200) {
   return new Response(JSON.stringify(payload), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 }

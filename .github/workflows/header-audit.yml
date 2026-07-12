@@ -1,0 +1,60 @@
+name: Security header audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * *" # daily
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl published site
+        id: fetch
+        run: |
+          set -euo pipefail
+          URL="${AUDIT_URL:-https://pure-heartify.lovable.app/}"
+          echo "Auditing $URL"
+          curl -sI --max-time 20 -L "$URL" | tee /tmp/headers.txt
+        env:
+          AUDIT_URL: ${{ vars.AUDIT_URL }}
+
+      - name: Assert required headers
+        run: |
+          set -euo pipefail
+          required=(
+            "strict-transport-security"
+            "x-frame-options"
+            "x-content-type-options"
+            "referrer-policy"
+            "permissions-policy"
+          )
+          missing=0
+          for h in "${required[@]}"; do
+            if grep -qi "^${h}:" /tmp/headers.txt; then
+              echo "OK  $h"
+            else
+              echo "MISS $h"
+              missing=$((missing+1))
+            fi
+          done
+          # HSTS must have a long max-age
+          if grep -qi "^strict-transport-security:.*max-age=[0-9]\{7,\}" /tmp/headers.txt; then
+            echo "OK  HSTS max-age >= 1e7 seconds"
+          else
+            echo "MISS HSTS max-age must be >= 10,000,000 seconds"
+            missing=$((missing+1))
+          fi
+          # X-Frame-Options must be DENY or SAMEORIGIN
+          if grep -qiE "^x-frame-options:\s*(deny|sameorigin)" /tmp/headers.txt; then
+            echo "OK  X-Frame-Options is DENY/SAMEORIGIN"
+          else
+            echo "MISS X-Frame-Options must be DENY or SAMEORIGIN"
+            missing=$((missing+1))
+          fi
+          if [ "$missing" -gt 0 ]; then
+            echo "::error::$missing required security header(s) missing"
+            exit 1
+          fi
