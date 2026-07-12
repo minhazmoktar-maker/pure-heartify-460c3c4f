@@ -32,7 +32,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePlusWaitlist, type PreferredTier } from "@/hooks/usePlusWaitlist";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/contexts/LocaleContext";
-import { currencyForCountry, formatCurrency } from "@/lib/intl";
+import { formatCurrency } from "@/lib/intl";
 
 
 interface Tier {
@@ -208,12 +208,14 @@ export default function HeartifyPlus() {
   const { user } = useAuth();
   const { isPremium, entitlement, loading: entLoading } = useEntitlement();
   const { alreadyOnList, join } = usePlusWaitlist();
-  const { locale, preferences } = useLocale();
-  const currency = currencyForCountry(
-    preferences.country_code ?? preferences.detected_country,
-  );
+  const { locale } = useLocale();
+  // Prices are billed in USD. We display USD explicitly (localized formatting
+  // only) rather than swapping the currency symbol, because we do not apply
+  // FX conversion — showing "₹4.99" for a $4.99 tier misleads users.
   const formatPrice = (usd: number) =>
-    usd === 0 ? formatCurrency(0, locale, currency, { maximumFractionDigits: 0 }) : formatCurrency(usd, locale, currency);
+    usd === 0
+      ? formatCurrency(0, locale, "USD", { maximumFractionDigits: 0 })
+      : formatCurrency(usd, locale, "USD");
 
 
   const [email, setEmail] = useState(user?.email ?? "");
