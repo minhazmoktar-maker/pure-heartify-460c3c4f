@@ -78,12 +78,12 @@ const Onboarding = () => {
     if (!user) return;
     await supabase.from("profiles").upsert(
       {
-        id: user.id,
+        user_id: user.id,
         preferred_reciter: picks.reciter ?? null,
         preferred_locale: picks.locale ?? null,
         daily_reminder_hour: picks.hour ?? null,
       },
-      { onConflict: "id" },
+      { onConflict: "user_id" },
     );
   };
 
