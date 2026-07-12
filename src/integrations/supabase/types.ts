@@ -1730,6 +1730,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_enabled: boolean
+          id: string
+          in_app_enabled: boolean
+          kind: string
+          push_enabled: boolean
+          quiet_hours_end: number | null
+          quiet_hours_start: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          in_app_enabled?: boolean
+          kind: string
+          push_enabled?: boolean
+          quiet_hours_end?: number | null
+          quiet_hours_start?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          in_app_enabled?: boolean
+          kind?: string
+          push_enabled?: boolean
+          quiet_hours_end?: number | null
+          quiet_hours_start?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       nudges: {
         Row: {
           created_at: string
@@ -2025,10 +2064,14 @@ export type Database = {
           bio: string | null
           country_code: string | null
           created_at: string
+          daily_reminder_hour: number | null
           display_name: string | null
           handle: string | null
           id: string
+          onboarding_completed_at: string | null
           preferences: Json | null
+          preferred_locale: string | null
+          preferred_reciter: string | null
           timezone: string | null
           updated_at: string
           user_id: string
@@ -2038,10 +2081,14 @@ export type Database = {
           bio?: string | null
           country_code?: string | null
           created_at?: string
+          daily_reminder_hour?: number | null
           display_name?: string | null
           handle?: string | null
           id?: string
+          onboarding_completed_at?: string | null
           preferences?: Json | null
+          preferred_locale?: string | null
+          preferred_reciter?: string | null
           timezone?: string | null
           updated_at?: string
           user_id: string
@@ -2051,10 +2098,14 @@ export type Database = {
           bio?: string | null
           country_code?: string | null
           created_at?: string
+          daily_reminder_hour?: number | null
           display_name?: string | null
           handle?: string | null
           id?: string
+          onboarding_completed_at?: string | null
           preferences?: Json | null
+          preferred_locale?: string | null
+          preferred_reciter?: string | null
           timezone?: string | null
           updated_at?: string
           user_id?: string
@@ -3275,6 +3326,39 @@ export type Database = {
         }
         Relationships: []
       }
+      web_push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          last_seen_at: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          last_seen_at?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          last_seen_at?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       weekly_recaps: {
         Row: {
           created_at: string
@@ -3844,6 +3928,10 @@ export type Database = {
           title: string
           video_id: string
         }[]
+      }
+      seed_default_notification_prefs: {
+        Args: { _user_id: string }
+        Returns: undefined
       }
       send_nudge_by_handle: {
         Args: { _handle: string; _kind: string; _message: string }
