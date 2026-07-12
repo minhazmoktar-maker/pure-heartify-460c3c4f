@@ -22,11 +22,16 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import AdminRoute from "./components/AdminRoute";
 import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
+import AgeGate from "./components/AgeGate";
+import CookieConsent from "./components/CookieConsent";
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
 const Status = lazy(() => import("./pages/Status.tsx"));
 const Creators = lazy(() => import("./pages/Creators.tsx"));
+const Contact = lazy(() => import("./pages/Contact.tsx"));
+const ExportData = lazy(() => import("./pages/ExportData.tsx"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
 const AdabPage = lazy(() => import("./pages/AdabPage.tsx"));
 const AdhanIqamah = lazy(() => import("./pages/AdhanIqamah.tsx"));
@@ -218,6 +223,8 @@ const App = () => (
             <GatedPreviewGuard />
             <OfflineSweeper />
             <BackToTop />
+            <AgeGate />
+            <CookieConsent />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
@@ -234,6 +241,9 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
                 <Route path="/status" element={<Status />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/account/export-data" element={<ExportData />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/creators" element={<Creators />} />
                 <Route path="/plus" element={<HeartifyPlus />} />
                 <Route path="/plus/join" element={<PlusInvite />} />

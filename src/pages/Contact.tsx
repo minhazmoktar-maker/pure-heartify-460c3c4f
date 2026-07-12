@@ -29,7 +29,7 @@ export default function Contact() {
       // Best-effort: store in analytics_events (already has user_id-agnostic policy for inserts).
       await supabase.from("analytics_events").insert([{
         event_name: "contact_submitted",
-        properties: parsed.data as unknown as Record<string, unknown>,
+        properties: parsed.data as unknown as import("@/integrations/supabase/types").Json,
       }]);
       toast.success("Thanks — we'll get back to you shortly.");
       setForm({ name: "", email: "", topic: "general", message: "" });
