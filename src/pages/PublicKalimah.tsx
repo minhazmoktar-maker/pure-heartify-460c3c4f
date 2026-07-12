@@ -30,6 +30,7 @@ export default function PublicKalimah() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`Kalimah ${num} — ${k.translit} (${k.name_en}) · Heartify`}
         description={`${k.translit}: ${k.translation}`}
         path={`/kalimah/${num}`}

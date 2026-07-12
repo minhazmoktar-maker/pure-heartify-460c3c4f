@@ -32,7 +32,7 @@ export default function PublicSignOfHour() {
   if (!s) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Sign not found — Heartify" description="This sign of the Hour could not be found." path={`/sign-of-hour/${slug}`} />
+        <SEO type="article" title="Sign not found — Heartify" description="This sign of the Hour could not be found." path={`/sign-of-hour/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -62,6 +62,7 @@ export default function PublicSignOfHour() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${s.translit} — ${s.title} · Signs of the Hour · Heartify`}
         description={`${s.translit} (${s.arabic}) — ${s.summary.slice(0, 140)}`}
         path={`/sign-of-hour/${s.slug}`}

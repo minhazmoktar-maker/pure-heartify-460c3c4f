@@ -19,7 +19,7 @@ export default function PublicAdhkarSet() {
   if (!set) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Adhkār set not found — Heartify" description="This adhkār collection could not be found." path={`/adhkar-set/${id}`} />
+        <SEO type="article" title="Adhkār set not found — Heartify" description="This adhkār collection could not be found." path={`/adhkar-set/${id}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -49,6 +49,7 @@ export default function PublicAdhkarSet() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${set.title} — Sunnah adhkār · Heartify`}
         description={`${set.description} ${set.items.length} authentic remembrances with Arabic, transliteration and meaning.`}
         path={`/adhkar-set/${set.id}`}

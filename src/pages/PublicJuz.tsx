@@ -30,6 +30,7 @@ export default function PublicJuz() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`Juzʾ ${num} — ${j.translit} (${j.name_ar}) · Heartify`}
         description={`Juzʾ ${num} of 30 covering ${j.start} → ${j.end}. ${j.summary}`}
         path={`/juz/${num}`}

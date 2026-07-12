@@ -29,7 +29,7 @@ export default function PublicHisn() {
   if (!dua) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Du'ā not found — Heartify" description="This du'ā could not be found." path={`/hisn/${id}`} />
+        <SEO type="article" title="Du'ā not found — Heartify" description="This du'ā could not be found." path={`/hisn/${id}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -47,6 +47,7 @@ export default function PublicHisn() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${dua.title} — Heartify`}
         description={`${dua.title}: ${dua.english}`}
         path={`/hisn/${dua.id}`}

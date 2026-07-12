@@ -38,6 +38,7 @@ export default function PublicIslamicEvent() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${e.translit} (${e.en}) — ${LABEL[e.category]} · Heartify`}
         description={`${e.translit} — ${e.when}. ${e.summary}`}
         path={`/event/${e.slug}`}

@@ -31,6 +31,7 @@ export default function PublicMadhhab() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${m.name} Madhhab — ${m.founder} · Heartify`}
         description={`The ${m.name} school of Sunni fiqh, founded by ${m.founder} (${m.lifespan}). ${m.summary}`}
         path={`/madhhab/${m.slug}`}

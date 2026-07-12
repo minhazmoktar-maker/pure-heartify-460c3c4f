@@ -30,6 +30,7 @@ export default function PublicProphet() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${prophet.translit} (${prophet.en}) — Prophet in Islam · Heartify`}
         description={`${prophet.translit} (${prophet.en}): ${prophet.summary} Learn about the 25 prophets named in the Qur'ān on Heartify.`}
         path={`/prophet/${prophet.slug}`}

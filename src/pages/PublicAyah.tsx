@@ -85,6 +85,7 @@ export default function PublicAyah() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`Qur'an ${ref} — Heartify`}
         description={`${ref}: ${excerpt}${excerpt.length >= 140 ? '…' : ''}`}
         path={`/ayah/${surahN}/${verseN}`}

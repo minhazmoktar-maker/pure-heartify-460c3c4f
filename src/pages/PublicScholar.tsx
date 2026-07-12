@@ -19,7 +19,7 @@ export default function PublicScholar() {
   if (!s) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Scholar not found — Heartify" description="This scholar could not be found." path={`/scholar/${slug}`} />
+        <SEO type="article" title="Scholar not found — Heartify" description="This scholar could not be found." path={`/scholar/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -49,6 +49,7 @@ export default function PublicScholar() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${s.translit} (${s.name_ar}) — ${s.field} · Heartify`}
         description={`${s.translit} (${s.lifespan}) — ${s.summary}`}
         path={`/scholar/${s.slug}`}
