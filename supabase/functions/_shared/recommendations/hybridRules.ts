@@ -149,6 +149,11 @@ function scoreCandidate(
     );
   }
 
+  // Ambient context boost (time-of-day, Ramaḍān, Jummuʿah).
+  const ctx = contextBoost(candidate, s.context);
+  if (ctx.raw > 0) score += push("context_boost", ctx.raw, W.context, ctx.detail);
+
+
   // Cold-start fallback: signed-out or brand-new users get a light popularity nudge.
   if (!s.userId && s.trendingIds.has(candidate.video_id)) {
     reasons.push({ code: "cold_start_popular", weight: 0.05, detail: "no user history yet" });
