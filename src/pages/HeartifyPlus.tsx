@@ -477,7 +477,7 @@ export default function HeartifyPlus() {
                 </li>
                 <li className="flex items-start gap-2">
                   <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
-                  100% halal — same moderation pipeline as the free tier
+                  Trying our best to keep it halal — same moderation pipeline as the free tier
                 </li>
               </ul>
             </div>
