@@ -1,73 +1,94 @@
+# Guarantee 100 videos per "For You" section + automated verification
 
-# Multi-Platform Expansion Plan (Web · iOS · Android · watchOS · TV · Auto)
+## Goal
+Every For You section renders exactly 100 unique halal videos on first load, after refresh, and after scroll — and this is verified by an automated test that fails loudly if any section falls short.
 
-**Guiding rule:** every change is **additive**. No existing route, component, API, RLS policy, or user flow is removed, renamed, or gated behind a flag. If a change would alter current behavior, it does not ship in this phase.
+## Why the current build falls short
+Verification earlier this session showed most rows landing between 2 and 85 videos. Three compounding causes:
 
----
+1. `CuratedSectionRow` filters against a **global** `seenVideoIds` set from `FeedDiversityContext`, so later sections lose items that appeared in earlier ones.
+2. `useCuratedSection` fetches at most `queryBudget` (1 or 3) of a section's queries and stops the moment it *hits* `maxResults` — no overfetch, no backfill when a topic is narrow.
+3. The `feed` edge function returns a single page; the row never asks for more even when it received fewer than 100 items.
 
-## Phase 1 — Platform-neutral API surface (backend, additive only)
+## What we'll build
 
-Goal: give constrained clients (Apple Watch, complications, widgets) tiny, cacheable JSON endpoints without touching existing tables or edge functions.
+### 1. Scope dedup to inside a section (not across sections)
+`FeedDiversityContext` keeps its per-channel cap, but the cross-section `seenVideoIds` global set is removed from the "reach 100" path. Each section dedupes internally by `video.id` so it can still hit 100 even if adjacent rows use the same video. The channel cap stays (prevents one channel dominating a row).
 
-New edge functions (all read-only, JWT-optional, aggressively cacheable):
-- `client-bootstrap` — one call returns: user profile summary, entitlement, feature flags, preferred locale, timezone. Replaces N round-trips on cold start for watch/widget.
-- `prayer-times` — server-computed daily prayer times for a lat/lng + method. Pure function, no DB write. Cached per (date, lat_rounded, method).
-- `qibla` — bearing for lat/lng. Pure math.
-- `daily-adhkar` — today's morning/evening adhkar payload, already-translated, ~5 KB.
-- `dua-shortcuts` — small curated list of top duas with Arabic + transliteration + translation.
-- `user-sync-pull` / `user-sync-push` — delta sync for bookmarks, favorites, streaks, dhikr counts, reading progress, salah log. Uses `updated_at` cursors. Watch/widget-friendly (< 20 KB typical).
+### 2. Backfill loop in `CuratedSectionRow` until length === 100
+Replace the current single-fetch flow with a loop that keeps pulling until the section has 100 unique videos or all sources are exhausted:
 
-No existing function is modified. Web/mobile keep calling what they call today.
+```text
+target = 100
+result = []
+seen   = new Set()
 
-## Phase 2 — Cross-device state tables (new tables, no migrations to existing tables)
+// a) DB feed pagination
+while result.length < target and feed.hasNextPage:
+    page = feed.fetchNext()
+    push unique + channel-capped items
 
-New tables, each with the standard 4-step migration (CREATE → GRANT → RLS → POLICY) and `auth.uid()` scoping:
-- `dhikr_sessions` (user_id, dhikr_key, count, target, completed_at)
-- `salah_log` (user_id, date, prayer, prayed_at, on_time, source)
-- `reading_progress` (user_id, resource_type, resource_id, position, updated_at) — unified across mushaf, articles, library entries
-- `device_registrations` (user_id, platform, device_id, app_version, capabilities jsonb, last_seen_at) — lets us target watch vs phone vs TV for push
-- `user_preferences_v2` (user_id, key, value jsonb) — thin KV so new clients can add settings without schema churn
+// b) YouTube fallback across ALL section.queries (not just 3)
+for q in section.queries:
+    if result.length >= target: break
+    ytVideos = fetchHalalVideos(q, perQuery=50)
+    push unique + channel-capped + halalScore>=minScore items
 
-Existing `favorites`, `watch_history`, `streaks`, `entitlements`, `profiles`, `device_tokens` are **untouched**. New tables sit alongside them.
+// c) Adjacent-query backfill for narrow topics
+if result.length < target:
+    for q in ADJACENT_QUERIES[section.id] ?? GENERIC_HALAL_QUERIES:
+        ytVideos = fetchHalalVideos(q, 50)
+        push unique + channel-capped items (relaxed minScore floor, e.g. minScore-10)
+        if result.length >= target: break
 
-## Phase 3 — Shared TypeScript packages (web repo only, no runtime change)
+return result.slice(0, target)
+```
 
-Extract pure-logic modules under `src/lib/shared/` so a future React Native / SwiftUI bridge can mirror them:
-- `src/lib/shared/prayer.ts` — prayer time math (already partially exists; consolidate).
-- `src/lib/shared/qibla.ts` — bearing math.
-- `src/lib/shared/entitlement.ts` — plan → capability map (already in `useEntitlement`; extract the pure part).
-- `src/lib/shared/sync.ts` — delta-sync client using the new endpoints.
-- `src/lib/shared/types.ts` — DTOs used by every platform.
+Adjacent queries live in a new map in `src/data/adjacentQueries.ts`, keyed by section id, falling back to a shared `GENERIC_HALAL_QUERIES` list (e.g. "islamic reminder", "quran recitation", "seerah lecture", "halal podcast").
 
-Existing hooks (`useEntitlement`, `usePrayerTimes`, etc.) re-export from these shared modules. **Public API of every hook stays identical.**
+### 3. Update `useCuratedSection` to support backfill
+- Remove the hard `queryBudget` cap of 1/3. Instead take an optional `desiredCount` and keep looping through `section.queries` until reached or exhausted.
+- Deduplicate by `video.id` inside the hook.
+- Keep the trust/halalScore sort, then slice to `desiredCount`.
 
-## Phase 4 — watchOS-readiness contract (documentation + fixtures)
+### 4. Drive the DB feed to full pages
+`useInfiniteFeed` already supports pagination. `CuratedSectionRow` will call `fetchNextPage()` in a `useEffect` while `videos.length < 100 && hasNextPage && !isFetchingNextPage`, with a safety cap (e.g. max 6 pages) to avoid runaway loops on empty sections.
 
-- `docs/PLATFORM_API.md` — freeze the contract of every new endpoint above (request, response, cache headers, size budget).
-- `docs/WATCHOS_ROADMAP.md` — how a future Swift/WatchKit app consumes the endpoints, complications spec (prayer countdown, next prayer, dhikr counter), Smart Stack widgets, offline cache strategy, background refresh cadence.
-- `docs/DEVICE_MATRIX.md` — capability flags per platform (web, iOS, Android, watchOS, tvOS, CarPlay, Android Auto, Wear OS) so `client-bootstrap` returns the right feature set.
-- Sample JSON fixtures under `docs/fixtures/` so the watch team can build against real payloads before the Swift app exists.
+### 5. Automated verification (Playwright + Vitest runner)
+New test at `src/test/for-you-sections.e2e.test.ts` that:
+- Logs in via injected Supabase session (`LOVABLE_BROWSER_*` env).
+- Loads `/`, waits for For You.
+- Scrolls to bottom, waiting for each section's loader to disappear.
+- For each `<section>` inside `<main>`, reads `data-section-id` and `data-video-count` attributes we'll add to `CuratedSectionRow`.
+- Asserts `count === 100` for every section, and asserts uniqueness by scraping `data-video-id` on each card and checking `Set(size) === 100`.
+- Reloads once, re-asserts (covers "after refresh").
+- Then scrolls the horizontal rail of one section end-to-end and re-asserts count is still 100 (covers "after scroll/pagination").
 
-## Phase 5 — Guardrails (CI-only, no user impact)
+The test is skipped automatically when `LOVABLE_BROWSER_AUTH_STATUS !== "injected"` so CI without a session is a soft-pass. Run via `bunx vitest run src/test/for-you-sections.e2e.test.ts`.
 
-- Add a typecheck-time check that `src/integrations/supabase/client.ts` and existing edge functions are not modified in this branch's diff (prevents accidental regression).
-- Extend the Playwright suite with a "no-regression" smoke test that hits the top 20 existing routes and asserts 200 + core selectors present.
+### 6. Small DOM instrumentation
+Add to `CuratedSectionRow`'s root `<section>`:
+- `data-section-id={section.id}`
+- `data-video-count={videos.length}`
+- `data-loading={isLoading || backfilling}`
 
----
+And on each card wrapper: `data-video-id={video.id}`. This is the stable contract the test relies on.
 
-## What is explicitly NOT in this plan
-- No changes to premium gating, moderation pipeline, streaming/player, admin consoles, or any existing page.
-- No renaming of routes, tables, columns, or hooks.
-- No client-side feature flags that hide existing UI.
-- No Swift, Kotlin, or native code — those live in separate repos when the time comes; this repo just publishes the contract.
+## Files touched
 
-## Rollout order
-1. Phase 2 migrations (new tables only).
-2. Phase 1 edge functions.
-3. Phase 3 shared modules + re-exports.
-4. Phase 4 docs + fixtures.
-5. Phase 5 CI guardrails.
+```text
+src/contexts/FeedDiversityContext.tsx         # drop global seen set from filter path (keep for optional UX)
+src/components/CuratedSectionRow.tsx          # backfill loop, in-section dedup, DOM instrumentation
+src/hooks/useCuratedSection.ts                # remove query budget, add desiredCount + full dedup
+src/data/adjacentQueries.ts       (new)       # per-section adjacent queries + GENERIC_HALAL_QUERIES
+src/test/for-you-sections.e2e.test.ts (new)   # Playwright-driven verification
+```
 
-Each phase ends with a clean typecheck and a Playwright smoke run against the existing routes to prove nothing regressed.
+No backend/edge-function changes required — `feed` already paginates and caps at 100 per page, which is what we need.
 
-**Approve to proceed with Phase 2 (new tables) first, or tell me to reorder.**
+## Acceptance criteria
+- Every For You section renders exactly 100 videos on `/` after initial load.
+- Same after a hard refresh (`location.reload()`).
+- Same after horizontal scroll to the end of a section's rail.
+- Every section's 100 IDs are unique (no in-section duplicates).
+- The new automated test passes locally and prints per-section counts on failure so regressions are immediately diagnosable.
