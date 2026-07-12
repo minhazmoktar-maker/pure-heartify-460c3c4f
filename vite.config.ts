@@ -1,10 +1,27 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { execSync } from "node:child_process";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
+const appVersion =
+  process.env.VITE_APP_VERSION ??
+  process.env.GITHUB_SHA ??
+  (() => {
+    try {
+      return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+        .toString()
+        .trim();
+    } catch {
+      return `dev-${Date.now()}`;
+    }
+  })();
+
 export default defineConfig(({ mode }) => ({
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(appVersion),
+  },
   server: {
     host: "::",
     port: 8080,
