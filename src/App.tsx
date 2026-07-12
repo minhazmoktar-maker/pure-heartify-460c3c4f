@@ -234,6 +234,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
                 <Route path="/status" element={<Status />} />
+                <Route path="/creators" element={<Creators />} />
                 <Route path="/plus" element={<HeartifyPlus />} />
                 <Route path="/plus/join" element={<PlusInvite />} />
                 <Route path="/offline" element={<OfflineLibrary />} />
