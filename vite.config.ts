@@ -78,6 +78,9 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
   },
   build: {
+    // 'hidden' emits source maps for Sentry symbolication without exposing
+    // //# sourceMappingURL comments in shipped JS.
+    sourcemap: "hidden",
     // Perf: split large vendor bundles so route chunks stay small and cache well.
     rollupOptions: {
       output: {
