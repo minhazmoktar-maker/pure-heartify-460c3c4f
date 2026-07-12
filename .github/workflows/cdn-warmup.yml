@@ -1,0 +1,55 @@
+name: CDN warmup
+
+# Keeps the hottest anonymous surfaces warm in every edge region so cold-start
+# users always hit sub-second responses. Runs every 5 minutes plus on-demand.
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  warmup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    strategy:
+      fail-fast: false
+      matrix:
+        url:
+          - https://pure-heartify.lovable.app/
+          - https://pure-heartify.lovable.app/about
+          - https://pure-heartify.lovable.app/trust
+          - https://pure-heartify.lovable.app/status
+          - https://pure-heartify.lovable.app/sitemap.xml
+          - https://pure-heartify.lovable.app/robots.txt
+          - https://pure-heartify.lovable.app/llms.txt
+    steps:
+      - name: Ping ${{ matrix.url }}
+        run: |
+          for i in 1 2 3; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -A "HeartifyWarmup/1.0" "${{ matrix.url }}") || code=000
+            echo "attempt $i -> HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 5
+          done
+          echo "warmup failed for ${{ matrix.url }}" >&2
+          exit 1
+
+  edge-warmup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Warm feed edge function (anonymous, home page 1)
+        env:
+          ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          FN_URL: ${{ secrets.SUPABASE_FUNCTIONS_URL }}
+        run: |
+          if [ -z "$FN_URL" ] || [ -z "$ANON_KEY" ]; then
+            echo "SUPABASE_FUNCTIONS_URL / SUPABASE_ANON_KEY not set — skipping edge warmup"
+            exit 0
+          fi
+          curl -s -o /dev/null -w "feed: %{http_code}\n" \
+            -H "apikey: $ANON_KEY" -H "Content-Type: application/json" \
+            -X POST "$FN_URL/feed" -d '{"limit":20}'
+          curl -s -o /dev/null -w "rec:  %{http_code}\n" \
+            -H "apikey: $ANON_KEY" -H "Content-Type: application/json" \
+            -X POST "$FN_URL/recommendations" -d '{"limit":24,"surface":"home"}'
