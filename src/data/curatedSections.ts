@@ -565,6 +565,7 @@ const _SECTIONS: CuratedSection[] = [
     ],
     minScore: 75,
     maxResults: 12,
+  },
 ];
 
 // Boost every home section to ~100 videos so "For You" feels endless.
