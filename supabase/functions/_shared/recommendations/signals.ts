@@ -63,6 +63,7 @@ export async function gatherSignals(
     trendingIds: new Set(),
     contentLanguages: [],
     diversityLevel: 50,
+    context: buildContext(),
   };
 
   const nowMs = Date.now();
