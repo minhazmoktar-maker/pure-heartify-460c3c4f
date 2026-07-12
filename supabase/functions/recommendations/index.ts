@@ -223,7 +223,7 @@ async function computeRecommendations(args: ComputeArgs) {
         .catch(() => {});
     }
 
-    return json({
+    return {
       recommendations: filteredRecs,
       provider: provider.name,
       generatedAt: new Date().toISOString(),
@@ -237,15 +237,12 @@ async function computeRecommendations(args: ComputeArgs) {
         topChannels: Array.from(signals.channelAffinity.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5),
         trendingPoolSize: signals.trendingIds.size,
       },
-    });
-  } catch (e) {
-    return json({ error: (e as Error).message }, 500);
-  }
-});
+    };
+}
 
-function json(body: unknown, status = 200) {
+function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json", ...extra },
   });
 }
