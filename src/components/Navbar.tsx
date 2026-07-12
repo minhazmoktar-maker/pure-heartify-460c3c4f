@@ -164,6 +164,7 @@ const Navbar = () => {
             <ShieldCheck className="h-4 w-4 text-primary" />
             Channels
           </Link>
+          <LanguageSwitcher />
           <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
