@@ -111,44 +111,63 @@ Deno.serve(async (req) => {
 
 
 
-    const res = await fetch(url, {
-      headers: {
-        "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-        "apikey": SUPABASE_SERVICE_ROLE_KEY,
-        "Accept": "application/json",
-        "Prefer": "count=exact",
-      },
-    });
+    // Read-through cache — anonymous, non-search requests only. Signed-in
+    // callers have per-user premium gating and cannot share bytes safely.
+    const cacheable = !callerId && !search;
+    const cacheKey = cacheable
+      ? `feed:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}`
+      : "";
 
-    if (!res.ok) {
-      console.error(`DB query failed: ${res.status} ${await res.text()}`);
-      return json({ items: [], nextCursor: null, total: 0 });
-    }
+    const produce = async () => {
+      const res = await fetch(url, {
+        headers: {
+          "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          "apikey": SUPABASE_SERVICE_ROLE_KEY,
+          "Accept": "application/json",
+          "Prefer": "count=exact",
+        },
+      });
+      if (!res.ok) {
+        console.error(`DB query failed: ${res.status} ${await res.text()}`);
+        return { items: [] as Array<Record<string, unknown>>, totalCount: 0, ok: false };
+      }
+      const totalCount = parseInt(res.headers.get("content-range")?.split("/")?.[1] ?? "0", 10);
+      const items = await res.json();
+      return { items, totalCount, ok: true };
+    };
 
-    const totalCount = parseInt(res.headers.get("content-range")?.split("/")?.[1] ?? "0", 10);
-    const items = await res.json();
+    const { value: payload, hit } = cacheable
+      ? await readThrough(cacheKey, 60, produce)
+      : { value: await produce(), hit: false };
 
+    if (!payload.ok) return json({ items: [], nextCursor: null, total: 0 });
+
+    const items = payload.items;
     const nextCursor = items.length === limit
-      ? items[items.length - 1].ingested_at
+      ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
       : null;
 
-    return json({
-      items: items.map((v: Record<string, unknown>) => ({
-        id: v.video_id,
-        title: v.title,
-        videoUrl: `https://www.youtube.com/watch?v=${v.video_id}`,
-        thumbnailUrl: v.thumbnail_url,
-        channelTitle: v.channel_title,
-        category: v.category,
-        halalScore: v.halal_score,
-        publishedAt: v.published_at ?? v.ingested_at,
-        isTrustedChannel: v.is_trusted_channel,
-        isPremiumOnly: v.is_premium_only ?? false,
-      })),
-      nextCursor,
-      total: totalCount || items.length,
-      viewer: { isPremium },
-    });
+    return json(
+      {
+        items: items.map((v: Record<string, unknown>) => ({
+          id: v.video_id,
+          title: v.title,
+          videoUrl: `https://www.youtube.com/watch?v=${v.video_id}`,
+          thumbnailUrl: v.thumbnail_url,
+          channelTitle: v.channel_title,
+          category: v.category,
+          halalScore: v.halal_score,
+          publishedAt: v.published_at ?? v.ingested_at,
+          isTrustedChannel: v.is_trusted_channel,
+          isPremiumOnly: v.is_premium_only ?? false,
+        })),
+        nextCursor,
+        total: payload.totalCount || items.length,
+        viewer: { isPremium },
+      },
+      200,
+      { "X-Cache": hit ? "HIT" : "MISS" },
+    );
   } catch (error) {
     console.error("Feed error:", error);
     return json({ error: "Internal server error" }, 500);
