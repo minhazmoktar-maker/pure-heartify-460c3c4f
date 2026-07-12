@@ -7,6 +7,9 @@ import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
 import { ReportButton } from "@/components/ReportButton";
+import CommentThread from "@/components/CommentThread";
+import AddToPlaylistDialog from "@/components/AddToPlaylistDialog";
+import NotInterestedMenu from "@/components/NotInterestedMenu";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 import type { YouTubeVideo } from "@/services/youtube";
