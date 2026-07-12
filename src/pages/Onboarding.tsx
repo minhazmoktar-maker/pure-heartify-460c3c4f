@@ -111,7 +111,7 @@ const Onboarding = () => {
     await supabase
       .from("profiles")
       .update({ onboarding_completed_at: new Date().toISOString() })
-      .eq("id", user.id);
+      .eq("user_id", user.id);
     await qc.invalidateQueries({ queryKey: ["user-interests", user.id] });
     await qc.invalidateQueries({ queryKey: ["daily-dose", user.id] });
     growth.onboardingCompleted([picks.primary!, picks.secondary!, picks.exploration!]);
