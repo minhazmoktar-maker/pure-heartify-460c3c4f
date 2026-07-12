@@ -49,7 +49,7 @@ export default function Transparency() {
       />
       <PageHeader
         title="Transparency Report"
-        description="Real moderation and appeals numbers, updated live. We publish this so you can hold us accountable."
+        subtitle="Real moderation and appeals numbers, updated live. We publish this so you can hold us accountable."
       />
 
       <div className="container mx-auto max-w-5xl px-4 pb-16">

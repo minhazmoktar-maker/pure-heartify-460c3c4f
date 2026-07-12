@@ -65,7 +65,7 @@ export default function CreatorDashboard() {
       <SEO title="Creator dashboard — Heartify" description="Follower counts, moderation, and recent activity for your approved channel." noIndex />
       <PageHeader
         title="Creator dashboard"
-        description="Follower counts, trust score, and moderation status for channels you own on Heartify."
+        subtitle="Follower counts, trust score, and moderation status for channels you own on Heartify."
       />
       <div className="container mx-auto max-w-5xl px-4 pb-16">
         {loading ? (

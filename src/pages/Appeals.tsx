@@ -48,7 +48,7 @@ export default function Appeals() {
       />
       <PageHeader
         title="Appeals"
-        description="If a video, comment, or account action seems wrong, tell us — a real reviewer will read it."
+        subtitle="If a video, comment, or account action seems wrong, tell us — a real reviewer will read it."
       />
       <div className="container mx-auto grid max-w-5xl gap-8 px-4 pb-16 lg:grid-cols-[1fr_1.2fr]">
         <section className="rounded-xl border border-border bg-card p-5">

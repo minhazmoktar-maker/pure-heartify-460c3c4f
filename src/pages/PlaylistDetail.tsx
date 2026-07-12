@@ -37,7 +37,7 @@ export default function PlaylistDetail() {
       />
       <PageHeader
         title={playlist.title}
-        description={playlist.description ?? undefined}
+        subtitle={playlist.description ?? undefined}
       />
       <div className="container mx-auto max-w-4xl px-4 pb-16">
         <p className="mb-6 text-xs text-muted-foreground">
