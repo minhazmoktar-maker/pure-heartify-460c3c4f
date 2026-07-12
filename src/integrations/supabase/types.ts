@@ -1271,6 +1271,222 @@ export type Database = {
         }
         Relationships: []
       }
+      event_schemas: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_name: string
+          is_active: boolean
+          property_types: Json
+          required_properties: string[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_name: string
+          is_active?: boolean
+          property_types?: Json
+          required_properties?: string[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_name?: string
+          is_active?: boolean
+          property_types?: Json
+          required_properties?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      experiment_exposures: {
+        Row: {
+          anon_key: string | null
+          context: Json
+          created_at: string
+          experiment_id: string
+          id: number
+          user_id: string | null
+          variant_key: string
+        }
+        Insert: {
+          anon_key?: string | null
+          context?: Json
+          created_at?: string
+          experiment_id: string
+          id?: number
+          user_id?: string | null
+          variant_key: string
+        }
+        Update: {
+          anon_key?: string | null
+          context?: Json
+          created_at?: string
+          experiment_id?: string
+          id?: number
+          user_id?: string | null
+          variant_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiment_exposures_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "admin_experiment_results"
+            referencedColumns: ["experiment_id"]
+          },
+          {
+            foreignKeyName: "experiment_exposures_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "experiments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experiment_guardrails: {
+        Row: {
+          created_at: string
+          direction: string
+          experiment_id: string
+          id: string
+          metric: string
+          threshold: number
+          triggered: boolean
+          triggered_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          experiment_id: string
+          id?: string
+          metric: string
+          threshold: number
+          triggered?: boolean
+          triggered_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          experiment_id?: string
+          id?: string
+          metric?: string
+          threshold?: number
+          triggered?: boolean
+          triggered_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiment_guardrails_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "admin_experiment_results"
+            referencedColumns: ["experiment_id"]
+          },
+          {
+            foreignKeyName: "experiment_guardrails_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "experiments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experiment_variants: {
+        Row: {
+          created_at: string
+          experiment_id: string
+          id: string
+          is_control: boolean
+          key: string
+          payload: Json
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          experiment_id: string
+          id?: string
+          is_control?: boolean
+          key: string
+          payload?: Json
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          experiment_id?: string
+          id?: string
+          is_control?: boolean
+          key?: string
+          payload?: Json
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiment_variants_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "admin_experiment_results"
+            referencedColumns: ["experiment_id"]
+          },
+          {
+            foreignKeyName: "experiment_variants_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "experiments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experiments: {
+        Row: {
+          audience_rules: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ended_at: string | null
+          id: string
+          key: string
+          name: string
+          primary_metric: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["experiment_status"]
+          traffic_allocation: number
+          updated_at: string
+        }
+        Insert: {
+          audience_rules?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          key: string
+          name: string
+          primary_metric?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["experiment_status"]
+          traffic_allocation?: number
+          updated_at?: string
+        }
+        Update: {
+          audience_rules?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          key?: string
+          name?: string
+          primary_metric?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["experiment_status"]
+          traffic_allocation?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       favorite_categories: {
         Row: {
           created_at: string
@@ -1324,33 +1540,50 @@ export type Database = {
       }
       feature_flags: {
         Row: {
+          cohort_id: string | null
           created_at: string
           description: string | null
           enabled: boolean
           key: string
+          kill_switch: boolean
           rollout_percent: number
+          targeting_rules: Json
           updated_at: string
           updated_by: string | null
         }
         Insert: {
+          cohort_id?: string | null
           created_at?: string
           description?: string | null
           enabled?: boolean
           key: string
+          kill_switch?: boolean
           rollout_percent?: number
+          targeting_rules?: Json
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
+          cohort_id?: string | null
           created_at?: string
           description?: string | null
           enabled?: boolean
           key?: string
+          kill_switch?: boolean
           rollout_percent?: number
+          targeting_rules?: Json
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "feature_flags_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "user_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gifts: {
         Row: {
@@ -3179,6 +3412,62 @@ export type Database = {
         }
         Relationships: []
       }
+      user_cohort_members: {
+        Row: {
+          added_at: string
+          cohort_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          cohort_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          cohort_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_cohort_members_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "user_cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_cohorts: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          name: string
+          rules: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          name: string
+          rules?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          name?: string
+          rules?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_hidden_videos: {
         Row: {
           created_at: string
@@ -3355,6 +3644,48 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      variant_assignments: {
+        Row: {
+          anon_key: string | null
+          assigned_at: string
+          experiment_id: string
+          id: string
+          user_id: string | null
+          variant_key: string
+        }
+        Insert: {
+          anon_key?: string | null
+          assigned_at?: string
+          experiment_id: string
+          id?: string
+          user_id?: string | null
+          variant_key: string
+        }
+        Update: {
+          anon_key?: string | null
+          assigned_at?: string
+          experiment_id?: string
+          id?: string
+          user_id?: string | null
+          variant_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "variant_assignments_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "admin_experiment_results"
+            referencedColumns: ["experiment_id"]
+          },
+          {
+            foreignKeyName: "variant_assignments_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "experiments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_audit_log: {
         Row: {
@@ -3680,6 +4011,17 @@ export type Database = {
       }
     }
     Views: {
+      admin_experiment_results: {
+        Row: {
+          experiment_id: string | null
+          experiment_key: string | null
+          exposures: number | null
+          status: Database["public"]["Enums"]["experiment_status"] | null
+          unique_users: number | null
+          variant_key: string | null
+        }
+        Relationships: []
+      }
       leaderboard_public: {
         Row: {
           computed_at: string | null
@@ -3759,6 +4101,16 @@ export type Database = {
       add_reciter_alias: {
         Args: { _alias: string; _alias_type?: string; _reciter_id: string }
         Returns: boolean
+      }
+      admin_retention_cohorts: {
+        Args: never
+        Returns: {
+          cohort_size: number
+          cohort_week: string
+          d1: number
+          d30: number
+          d7: number
+        }[]
       }
       analytics_active_users: {
         Args: { _from: string; _to: string }
@@ -3860,6 +4212,10 @@ export type Database = {
         Args: { _from: string; _to: string }
         Returns: Json
       }
+      assign_experiment_variant: {
+        Args: { _anon_key: string; _experiment_key: string }
+        Returns: string
+      }
       backfill_reciter_alias_variants: { Args: never; Returns: number }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
@@ -3926,6 +4282,10 @@ export type Database = {
       }
       end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
+      evaluate_feature_flag: {
+        Args: { _key: string; _user_id: string }
+        Returns: boolean
+      }
       export_user_data: { Args: { _uid: string }; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
@@ -3999,6 +4359,16 @@ export type Database = {
         Returns: {
           hits: number
           query: string
+        }[]
+      }
+      get_retention_cohorts: {
+        Args: never
+        Returns: {
+          cohort_size: number
+          cohort_week: string
+          d1: number
+          d30: number
+          d7: number
         }[]
       }
       get_transparency_appeals: {
@@ -4080,6 +4450,10 @@ export type Database = {
       }
       is_household_owner: {
         Args: { _household_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_in_cohort: {
+        Args: { _cohort_id: string; _user_id: string }
         Returns: boolean
       }
       is_khatm_member: {
@@ -4287,6 +4661,12 @@ export type Database = {
     Enums: {
       app_role: "admin" | "moderator" | "user"
       channel_risk_level: "low" | "medium" | "high" | "critical"
+      experiment_status:
+        | "draft"
+        | "running"
+        | "paused"
+        | "completed"
+        | "archived"
       moderation_stage:
         | "ingest"
         | "rule_engine"
@@ -4445,6 +4825,13 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "moderator", "user"],
       channel_risk_level: ["low", "medium", "high", "critical"],
+      experiment_status: [
+        "draft",
+        "running",
+        "paused",
+        "completed",
+        "archived",
+      ],
       moderation_stage: [
         "ingest",
         "rule_engine",
