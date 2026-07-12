@@ -5,6 +5,7 @@ import type { YouTubeVideo } from "@/services/youtube";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/contexts/AuthContext";
 import TrustBadges from "@/components/TrustBadges";
+import NotInterestedMenu from "@/components/NotInterestedMenu";
 
 interface YouTubeVideoCardProps {
   video: YouTubeVideo;
