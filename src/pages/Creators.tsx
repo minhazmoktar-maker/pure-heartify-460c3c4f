@@ -175,10 +175,10 @@ const Creators = () => {
                 <li key={c.id} className="flex items-center gap-3 p-3">
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium text-foreground">
-                      {c.channel_title ?? c.channel_handle ?? c.youtube_channel_id}
+                      {c.title ?? c.handle ?? c.youtube_channel_id}
                     </div>
                     <div className="truncate text-xs text-muted-foreground">
-                      {c.channel_handle ? `@${c.channel_handle} · ` : ""}
+                      {c.handle ? `@${c.handle} · ` : ""}
                       {new Date(c.created_at).toLocaleDateString()}
                     </div>
                   </div>
