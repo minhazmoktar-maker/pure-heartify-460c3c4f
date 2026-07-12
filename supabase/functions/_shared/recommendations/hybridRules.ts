@@ -32,7 +32,38 @@ const W = {
   freshness:       Number(Deno.env.get("REC_W_FRESH")    ?? 0.08),
   session:         Number(Deno.env.get("REC_W_SESSION")  ?? 0.04),
   language:        Number(Deno.env.get("REC_W_LANGUAGE") ?? 0.10),
+  context:         Number(Deno.env.get("REC_W_CONTEXT")  ?? 0.12),
 };
+
+/**
+ * Contextual boost — matches ambient signals (time of day, Ramadan, Jummuah)
+ * to categories/keywords that are most valuable in that moment. Purely
+ * calendar-driven, no PII, safe for anonymous users.
+ */
+function contextBoost(
+  candidate: RecommendationCandidate,
+  ctx: UserSignals["context"],
+): { raw: number; detail?: string } {
+  const hay = `${candidate.title ?? ""} ${candidate.category ?? ""}`.toLowerCase();
+  const has = (kw: string) => hay.includes(kw);
+  let raw = 0;
+  const notes: string[] = [];
+
+  if (ctx.isRamadan && (has("quran") || has("tafsir") || has("ramadan") || has("fasting") || has("taraweeh"))) {
+    raw += ctx.isLastTen ? 1 : 0.7;
+    notes.push(ctx.isLastTen ? "last ten nights" : "Ramaḍān");
+  }
+  if (ctx.isJummuah && (has("jumu") || has("friday") || has("khutbah") || has("kahf"))) {
+    raw += 0.6; notes.push("Jumuʿah");
+  }
+  if (ctx.timeBucket === "fajr" && (has("morning") || has("adhkar") || has("dua") || has("quran"))) {
+    raw += 0.4; notes.push("morning adhkār");
+  }
+  if (ctx.timeBucket === "night" && (has("evening") || has("adhkar") || has("sleep") || has("witr"))) {
+    raw += 0.4; notes.push("evening adhkār");
+  }
+  return { raw: Math.min(1, raw), detail: notes.length ? notes.join(" · ") : undefined };
+}
 
 const DIVERSITY_LAMBDA = Number(Deno.env.get("REC_DIVERSITY_LAMBDA") ?? 0.35);
 const MAX_PER_CHANNEL   = Number(Deno.env.get("REC_MAX_PER_CHANNEL") ?? 2);
