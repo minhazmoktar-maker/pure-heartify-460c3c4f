@@ -14,6 +14,7 @@ export default function Trust() {
       <SEO
         title="Trust & Security — Heartify"
         description="How Heartify protects your data, moderates content, and safeguards your ibādah journey."
+        path="/trust"
       />
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <PageHeader
