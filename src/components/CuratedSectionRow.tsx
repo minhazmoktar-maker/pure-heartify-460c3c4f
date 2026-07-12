@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Loader2, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { type CuratedSection } from "@/data/curatedSections";
@@ -13,22 +13,36 @@ interface Props {
   section: CuratedSection;
 }
 
+const TARGET = 100;
+const MAX_FEED_PAGES = 6;
+
 const CuratedSectionRow = ({ section }: Props) => {
   const [shouldLoad, setShouldLoad] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Try DB-backed feed first
-  const { data: feedData, isLoading: feedLoading } = useInfiniteFeed({
+  // DB-backed feed (paginated). We fetch pages until we reach TARGET or run out.
+  const {
+    data: feedData,
+    isLoading: feedLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useInfiniteFeed({
     sectionId: section.id,
-    limit: section.maxResults,
+    limit: TARGET,
     enabled: shouldLoad,
   });
 
-  // Fallback to YouTube API if DB is empty
-  const dbVideos = feedData?.pages?.[0]?.items ?? [];
-  const useYouTubeFallback = shouldLoad && !feedLoading && dbVideos.length === 0;
+  const dbVideos = useMemo(
+    () => (feedData?.pages ?? []).flatMap((p) => p.items),
+    [feedData],
+  );
+
+  // Fall back to YouTube fetcher only if DB truly has nothing for this section.
+  const useYouTubeFallback =
+    shouldLoad && !feedLoading && dbVideos.length === 0 && !hasNextPage;
 
   const { data: ytVideos, isLoading: ytLoading } = useCuratedSection(
     section,
@@ -36,22 +50,47 @@ const CuratedSectionRow = ({ section }: Props) => {
   );
 
   const rawVideos = dbVideos.length > 0 ? dbVideos : (ytVideos ?? []);
-  const { seenVideoIds, perChannelCap, resetKey } = useFeedDiversity();
 
-  // Cross-section dedup + per-channel cap
-  const perChannel = new Map<string, number>();
-  const videos = rawVideos.filter((v) => {
-    if (seenVideoIds.current.has(v.id)) return false;
-    const key = (v.channelTitle || "unknown").toLowerCase().trim();
-    const count = perChannel.get(key) ?? 0;
-    if (count >= perChannelCap) return false;
-    perChannel.set(key, count + 1);
-    seenVideoIds.current.add(v.id);
-    return true;
-  });
-  // resetKey triggers re-eval if user toggles diversity mode
-  void resetKey;
-  const isLoading = feedLoading || (useYouTubeFallback && ytLoading);
+  // Diversity context still supplies the per-channel cap. The global
+  // seenVideoIds set is intentionally NOT applied here so each section can
+  // independently reach 100 items even if adjacent sections share videos.
+  const { perChannelCap } = useFeedDiversity();
+
+  // In-section dedup + per-channel cap.
+  const videos = useMemo(() => {
+    const seen = new Set<string>();
+    const perChannel = new Map<string, number>();
+    const out: typeof rawVideos = [];
+    for (const v of rawVideos) {
+      if (seen.has(v.id)) continue;
+      const key = (v.channelTitle || "unknown").toLowerCase().trim();
+      const count = perChannel.get(key) ?? 0;
+      if (count >= perChannelCap) continue;
+      seen.add(v.id);
+      perChannel.set(key, count + 1);
+      out.push(v);
+      if (out.length >= TARGET) break;
+    }
+    return out;
+  }, [rawVideos, perChannelCap]);
+
+  // Auto-paginate the DB feed until we hit TARGET or run out of pages.
+  useEffect(() => {
+    if (!shouldLoad) return;
+    if (videos.length >= TARGET) return;
+    if (!hasNextPage || isFetchingNextPage) return;
+    const pagesLoaded = feedData?.pages?.length ?? 0;
+    if (pagesLoaded >= MAX_FEED_PAGES) return;
+    void fetchNextPage();
+  }, [shouldLoad, videos.length, hasNextPage, isFetchingNextPage, fetchNextPage, feedData]);
+
+  const backfilling =
+    shouldLoad &&
+    videos.length < TARGET &&
+    (isFetchingNextPage || (hasNextPage ?? false));
+
+  const isLoading =
+    feedLoading || (useYouTubeFallback && ytLoading) || backfilling;
 
   useEffect(() => {
     const node = sectionRef.current;
@@ -75,9 +114,15 @@ const CuratedSectionRow = ({ section }: Props) => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
   };
 
-  if (!shouldLoad || isLoading) {
+  if (!shouldLoad || (isLoading && videos.length === 0)) {
     return (
-      <section ref={sectionRef} className="py-6">
+      <section
+        ref={sectionRef}
+        className="py-6"
+        data-section-id={section.id}
+        data-video-count={0}
+        data-loading="true"
+      >
         <h2 className="text-lg font-bold text-foreground">{section.icon} {section.title}</h2>
         <div className="mt-3 flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -87,10 +132,26 @@ const CuratedSectionRow = ({ section }: Props) => {
     );
   }
 
-  if (!videos?.length) return null;
+  if (!videos?.length) {
+    return (
+      <section
+        ref={sectionRef}
+        className="py-6 hidden"
+        data-section-id={section.id}
+        data-video-count={0}
+        data-loading="false"
+      />
+    );
+  }
 
   return (
-    <section ref={sectionRef} className="py-6">
+    <section
+      ref={sectionRef}
+      className="py-6"
+      data-section-id={section.id}
+      data-video-count={videos.length}
+      data-loading={backfilling ? "true" : "false"}
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-foreground">{section.icon} {section.title}</h2>
@@ -114,7 +175,11 @@ const CuratedSectionRow = ({ section }: Props) => {
 
       <div ref={scrollRef} className="mt-4 flex gap-4 overflow-x-auto pb-2 scrollbar-hide scroll-smooth">
         {videos.map((video, index) => (
-          <div key={video.id} className="w-[280px] shrink-0 sm:w-[300px]">
+          <div
+            key={video.id}
+            className="w-[280px] shrink-0 sm:w-[300px]"
+            data-video-id={video.id}
+          >
             <YouTubeVideoCard video={video} index={index} />
             {isTrustedChannel(video.channelTitle) && (
               <Badge variant="secondary" className="mt-1.5 gap-1 text-[10px]">
