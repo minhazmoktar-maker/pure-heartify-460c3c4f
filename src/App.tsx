@@ -197,6 +197,12 @@ const WomensPurity = lazy(() => import("./pages/WomensPurity.tsx"));
 const WuduGuide = lazy(() => import("./pages/WuduGuide.tsx"));
 const Zakat = lazy(() => import("./pages/Zakat.tsx"));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings.tsx"));
+const Playlists = lazy(() => import("./pages/Playlists.tsx"));
+const PlaylistDetail = lazy(() => import("./pages/PlaylistDetail.tsx"));
+const Appeals = lazy(() => import("./pages/Appeals.tsx"));
+const Transparency = lazy(() => import("./pages/Transparency.tsx"));
+const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
+const AdminAppeals = lazy(() => import("./pages/AdminAppeals.tsx"));
 
 
 // Global React Query defaults — Phase 3 tuning.
@@ -272,6 +278,13 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/settings/notifications" element={<NotificationSettings />} />
+                <Route path="/playlists" element={<Playlists />} />
+                <Route path="/p/:id" element={<PlaylistDetail />} />
+                <Route path="/appeals" element={<Appeals />} />
+                <Route path="/appeals/:decisionId" element={<Appeals />} />
+                <Route path="/transparency" element={<Transparency />} />
+                <Route path="/creators/dashboard" element={<CreatorDashboard />} />
+                <Route path="/admin/appeals" element={<AdminRoute><AdminAppeals /></AdminRoute>} />
                 <Route path="/channels" element={<Channels />} />
                 <Route path="/library" element={<Library />} />
                 <Route path="/library/:slug" element={<LibraryEntry />} />
