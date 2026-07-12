@@ -6,12 +6,35 @@
  * this stays stable.
  */
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
-import type { UserSignals } from "./types.ts";
+import type { RecommendationContext, UserSignals } from "./types.ts";
 
 const AFFINITY_HALF_LIFE_DAYS = 14;
 
 function decayWeight(daysAgo: number): number {
   return Math.pow(0.5, daysAgo / AFFINITY_HALF_LIFE_DAYS);
+}
+
+function buildContext(now: Date = new Date()): RecommendationContext {
+  const hour = now.getUTCHours();
+  const dow = now.getUTCDay();
+  const bucket: RecommendationContext["timeBucket"] =
+    hour < 6 ? "fajr" :
+    hour < 11 ? "morning" :
+    hour < 14 ? "midday" :
+    hour < 17 ? "afternoon" :
+    hour < 20 ? "maghrib" : "night";
+  let isRamadan = false;
+  let isLastTen = false;
+  try {
+    const parts = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", {
+      day: "numeric", month: "numeric",
+    }).formatToParts(now);
+    const g = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? 0);
+    const m = g("month"); const d = g("day");
+    isRamadan = m === 9;
+    isLastTen = isRamadan && d >= 21;
+  } catch { /* ignore */ }
+  return { hour, dayOfWeek: dow, isRamadan, isLastTen, isJummuah: dow === 5, timeBucket: bucket };
 }
 
 function normalize(map: Map<string, number>): Map<string, number> {
