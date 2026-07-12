@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SuggestContentDialog } from "@/components/SuggestContentDialog";
+import SuggestContentDialog from "@/components/SuggestContentDialog";
 import { cn } from "@/lib/utils";
 
 type Status = "pending" | "approved" | "rejected" | string;
