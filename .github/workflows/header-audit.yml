@@ -30,6 +30,7 @@ jobs:
             "x-content-type-options"
             "referrer-policy"
             "permissions-policy"
+            "content-security-policy-report-only"
           )
           missing=0
           for h in "${required[@]}"; do

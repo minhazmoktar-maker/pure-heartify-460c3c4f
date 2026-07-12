@@ -28,7 +28,7 @@ export default function PublicMiracle() {
   if (!m) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Miracle not found — Heartify" description="This miracle could not be found." path={`/miracle/${slug}`} />
+        <SEO type="article" title="Miracle not found — Heartify" description="This miracle could not be found." path={`/miracle/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -58,6 +58,7 @@ export default function PublicMiracle() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${m.translit} — Muʿjizāt · Heartify`}
         description={`${m.translit} — a miracle of the Prophet Muḥammad ﷺ at ${m.place}: ${m.summary}`}
         path={`/miracle/${m.slug}`}

@@ -30,6 +30,7 @@ export default function PublicSalah() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${s.translit} (${s.en}) — The ${s.fard}-rakʿah Prayer · Heartify`}
         description={`${s.translit}: ${s.when}. ${s.virtue}`}
         path={`/salah/${s.slug}`}

@@ -30,6 +30,7 @@ export default function PublicMasjid() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${m.translit} (${m.en}) — ${m.city}, ${m.country} · Heartify`}
         description={`${m.translit} in ${m.city}, ${m.country}. ${m.summary}`}
         path={`/masjid/${m.slug}`}

@@ -34,9 +34,15 @@ export function initSentry() {
     return;
   }
 
+  const release =
+    (import.meta.env.VITE_APP_VERSION as string | undefined) ??
+    (import.meta.env.VITE_GIT_SHA as string | undefined) ??
+    undefined;
+
   Sentry.init({
     dsn,
     environment: env,
+    release,
     tracesSampleRate: env === "production" ? 0.1 : 1.0,
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: env === "production" ? 0.1 : 0,

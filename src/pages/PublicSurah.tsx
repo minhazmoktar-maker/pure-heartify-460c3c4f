@@ -84,6 +84,7 @@ export default function PublicSurah() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${title} — Heartify`}
         description={meta ? `Read Sūrah ${meta.englishName} (${meta.englishNameTranslation}), ${meta.revelationType}, ${meta.numberOfAyahs} verses.` : `Sūrah ${n} of the Noble Qur'an.`}
         path={`/surah/${n}`}

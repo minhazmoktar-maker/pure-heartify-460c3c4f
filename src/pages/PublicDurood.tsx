@@ -19,7 +19,7 @@ export default function PublicDurood() {
   if (!d) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Durood not found — Heartify" description="This form of ṣalawāt was not found." path={`/durood/${slug}`} />
+        <SEO type="article" title="Durood not found — Heartify" description="This form of ṣalawāt was not found." path={`/durood/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -49,6 +49,7 @@ export default function PublicDurood() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${d.title} — Ṣalawāt on the Prophet ﷺ · Heartify`}
         description={`${d.translit} — ${d.meaning.slice(0, 140)}`}
         path={`/durood/${d.slug}`}

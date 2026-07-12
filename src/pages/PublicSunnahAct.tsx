@@ -31,7 +31,7 @@ export default function PublicSunnahAct() {
   if (!s) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Sunnah not found — Heartify" description="This Sunnah act could not be found." path={`/sunnah/${slug}`} />
+        <SEO type="article" title="Sunnah not found — Heartify" description="This Sunnah act could not be found." path={`/sunnah/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -61,6 +61,7 @@ export default function PublicSunnahAct() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${s.title} — Revive a Sunnah of the Prophet ﷺ · Heartify`}
         description={`${s.reward} How: ${s.how} (${s.ref})`}
         path={`/sunnah/${s.slug}`}

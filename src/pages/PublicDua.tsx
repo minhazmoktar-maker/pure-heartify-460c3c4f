@@ -101,6 +101,7 @@ export default function PublicDuaPage() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={dua ? `Say Āmīn to this du'a · Heartify` : "Du'a — Heartify"}
         description={dua ? dua.body.slice(0, 150) : "Community du'a on Heartify."}
         path={`/d/${id ?? ""}`}

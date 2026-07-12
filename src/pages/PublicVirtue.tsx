@@ -20,7 +20,7 @@ export default function PublicVirtue() {
   if (!v) {
     return (
       <div className="min-h-dvh bg-background">
-        <SEO title="Virtue not found — Heartify" description="This virtue page could not be found." path={`/virtue/${slug}`} />
+        <SEO type="article" title="Virtue not found — Heartify" description="This virtue page could not be found." path={`/virtue/${slug}`} />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-8">
           <EmptyState
@@ -50,6 +50,7 @@ export default function PublicVirtue() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
+        type="article"
         title={`${v.translit} — ${v.en} · Prophetic Virtues · Heartify`}
         description={`${v.translit} (${v.ar}) — ${v.summary.slice(0, 140)}`}
         path={`/virtue/${v.slug}`}
