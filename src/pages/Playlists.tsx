@@ -25,7 +25,7 @@ export default function Playlists() {
     return (
       <>
         <SEO title="Playlists — Heartify" description="Save halal videos into your own playlists." />
-        <PageHeader title="Playlists" description="Sign in to build your own collections." />
+        <PageHeader title="Playlists" subtitle="Sign in to build your own collections." />
         <div className="container mx-auto max-w-2xl px-4 py-8 text-center">
           <Link to="/login" className="text-primary hover:underline">Sign in</Link>
         </div>
@@ -36,7 +36,7 @@ export default function Playlists() {
   return (
     <>
       <SEO title="Your Playlists — Heartify" description="Your saved halal video playlists." />
-      <PageHeader title="Playlists" description="Build collections of videos to revisit and share." />
+      <PageHeader title="Playlists" subtitle="Build collections of videos to revisit and share." />
       <div className="container mx-auto max-w-4xl px-4 pb-16">
         <div className="mb-6 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">

@@ -45,7 +45,7 @@ export default function AdminAppeals() {
 
   return (
     <>
-      <PageHeader title="Appeals" description="Review and resolve user appeals." />
+      <PageHeader title="Appeals" subtitle="Review and resolve user appeals." />
       <div className="container mx-auto max-w-5xl px-4 pb-16">
         {loading ? (
           <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
