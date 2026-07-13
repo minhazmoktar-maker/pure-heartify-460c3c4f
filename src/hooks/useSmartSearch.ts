@@ -57,18 +57,40 @@ export function useSmartSearch(rawQuery: string) {
     return () => clearTimeout(t);
   }, [rawQuery]);
 
+  // Locale-aware search: preferences are best-effort — if the provider isn't
+  // mounted (SSR, tests) we fall through with an empty list, which the edge
+  // fn treats as "no locale hint".
+  let contentLanguages: string[] = [];
+  let uiLanguage = "en";
+  try {
+    // Lazy import to avoid a hard dep during SSR/tests.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    const { useLocale } = require("@/contexts/LocaleContext");
+    const loc = useLocale();
+    contentLanguages = loc.preferences.content_languages ?? [];
+    uiLanguage = loc.preferences.ui_language ?? "en";
+  } catch { /* provider not mounted */ }
+  const langKey = contentLanguages.join(",");
+
   const searchQ = useQuery({
-    queryKey: ["smart-search", debounced],
+    queryKey: ["smart-search", debounced, langKey, uiLanguage],
     enabled: debounced.length > 0,
     staleTime: 30_000,
     queryFn: async (): Promise<SearchResponse> => {
       const { data, error } = await supabase.functions.invoke("search", {
-        body: { q: debounced, limit: 60, useAi: true },
+        body: {
+          q: debounced,
+          limit: 60,
+          useAi: true,
+          content_languages: contentLanguages,
+          ui_language: uiLanguage,
+        },
       });
       if (error) throw error;
       return data as SearchResponse;
     },
   });
+
 
   const autoQ = useQuery({
     queryKey: ["smart-autocomplete", rawQuery],
