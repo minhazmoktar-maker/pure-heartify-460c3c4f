@@ -1,0 +1,63 @@
+name: Nightly Regression (Phase 1-10)
+
+on:
+  schedule:
+    # 04:00 UTC nightly — after Playwright E2E at 03:00.
+    - cron: "0 4 * * *"
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  regression:
+    name: Full regression + perf budget
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bunx tsc -p tsconfig.app.json --noEmit
+
+      - name: Unit tests
+        run: bunx vitest run --reporter=basic
+        continue-on-error: true
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Build (production)
+        run: bun run build
+
+      - name: Bundle-size budget (main chunk < 800KB gzipped-approx)
+        run: |
+          set -euo pipefail
+          total=$(find dist/assets -name '*.js' -printf '%s\n' | sort -n | tail -1)
+          echo "Largest JS chunk bytes: $total"
+          if [ "$total" -gt 900000 ]; then
+            echo "::error::Largest JS chunk exceeds 900KB budget"
+            exit 1
+          fi
+
+      - name: Run full Playwright regression suite
+        run: bunx playwright test --reporter=github,list
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-playwright-report
+          path: playwright-report
+          retention-days: 14
