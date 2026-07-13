@@ -122,8 +122,9 @@ Deno.serve(async (req) => {
     // Read-through cache — anonymous, non-search requests only. Signed-in
     // callers have per-user premium gating and cannot share bytes safely.
     const cacheable = !callerId && !search;
+    const langKey = contentLanguages.length ? contentLanguages.join(",") : "-";
     const cacheKey = cacheable
-      ? `feed:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}`
+      ? `feed:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${langKey}`
       : "";
 
     const produce = async () => {
@@ -153,10 +154,30 @@ Deno.serve(async (req) => {
       const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
       return !BLOCKED_TOKENS.some((tok) => t.includes(tok));
     });
-    const items = filtered.slice(0, limit);
+
+    // Locale-aware soft re-rank: matching content_language items surface first
+    // (and un-tagged items are treated as neutral so we never starve pages
+    // in markets whose curation hasn't been language-tagged yet).
+    let ordered = filtered;
+    if (contentLanguages.length) {
+      const langSet = new Set(contentLanguages);
+      const matches: Array<Record<string, unknown>> = [];
+      const untagged: Array<Record<string, unknown>> = [];
+      const others: Array<Record<string, unknown>> = [];
+      for (const v of filtered) {
+        const cl = (v.content_language as string | null)?.toLowerCase() ?? null;
+        if (!cl) untagged.push(v);
+        else if (langSet.has(cl)) matches.push(v);
+        else others.push(v);
+      }
+      ordered = [...matches, ...untagged, ...others];
+    }
+
+    const items = ordered.slice(0, limit);
     const nextCursor = items.length === limit
       ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
       : null;
+
 
     return json(
       {
