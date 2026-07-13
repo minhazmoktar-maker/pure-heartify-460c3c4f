@@ -29,6 +29,7 @@ export default defineConfig(({ mode }) => ({
     hmr: { overlay: false },
   },
   plugins: [
+    mcpPlugin(),
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
