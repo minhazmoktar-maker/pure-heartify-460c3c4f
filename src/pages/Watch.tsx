@@ -10,6 +10,7 @@ import { ReportButton } from "@/components/ReportButton";
 import CommentThread from "@/components/CommentThread";
 import AddToPlaylistDialog from "@/components/AddToPlaylistDialog";
 import NotInterestedMenu from "@/components/NotInterestedMenu";
+import { WatchLaterButton, ShareAtTimeButton } from "@/components/WatchExtras";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 import type { YouTubeVideo } from "@/services/youtube";
@@ -26,6 +27,11 @@ const Watch = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const startTimeParam = (() => {
+    const sp = new URLSearchParams(location.search);
+    const t = Number(sp.get("t"));
+    return Number.isFinite(t) && t > 0 ? Math.floor(t) : 0;
+  })();
   const stateVideo = (location.state as { video?: YouTubeVideo } | null)?.video;
   const { data: videos } = useYouTubeVideos("All");
   const { user } = useAuth();
@@ -205,7 +211,7 @@ const Watch = () => {
               {playerActivated ? (
                 <iframe
                   ref={iframeRef}
-                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1&origin=${window.location.origin}`}
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1${startTimeParam ? `&start=${startTimeParam}` : ""}&origin=${window.location.origin}`}
                   title={currentVideo?.title ?? "Video"}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -312,6 +318,8 @@ const Watch = () => {
                     />
                   )}
                   {videoId && <AddToPlaylistDialog videoId={videoId} />}
+                  {videoId && <WatchLaterButton videoId={videoId} />}
+                  {videoId && <ShareAtTimeButton videoId={videoId} />}
                   {videoId && <NotInterestedMenu videoId={videoId} />}
                   {videoId && <AdminVideoRemoveButton videoId={videoId} title={currentVideo.title} />}
 

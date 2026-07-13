@@ -24,6 +24,12 @@ import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
 import AgeGate from "./components/AgeGate";
 import CookieConsent from "./components/CookieConsent";
+import CommandPalette from "./components/CommandPalette";
+import { KidsModeProvider } from "./contexts/KidsModeContext";
+
+const Shorts = lazy(() => import("./pages/Shorts.tsx"));
+const Mushaf = lazy(() => import("./pages/Mushaf.tsx"));
+const Redeem = lazy(() => import("./pages/Redeem.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
@@ -242,6 +248,7 @@ const App = () => (
       <ThemeProvider>
         <AuthProvider>
           <LocaleProvider>
+          <KidsModeProvider>
           <PlayerProvider>
           <Toaster />
           <Sonner />
@@ -254,11 +261,16 @@ const App = () => (
             <BackToTop />
             <AgeGate />
             <CookieConsent />
+            <CommandPalette />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
+                <Route path="/shorts" element={<Shorts />} />
+                <Route path="/mushaf" element={<Mushaf />} />
+                <Route path="/mushaf/:page" element={<Mushaf />} />
+                <Route path="/redeem" element={<Redeem />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/section/:sectionId" element={<SectionAll />} />
                 <Route path="/login" element={<Login />} />
@@ -749,6 +761,7 @@ const App = () => (
             </Suspense>
           </BrowserRouter>
         </PlayerProvider>
+          </KidsModeProvider>
           </LocaleProvider>
       </AuthProvider>
     </ThemeProvider>

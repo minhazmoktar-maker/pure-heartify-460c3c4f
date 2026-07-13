@@ -1630,6 +1630,42 @@ export type Database = {
           },
         ]
       }
+      gift_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          issued_by: string | null
+          months: number
+          note: string | null
+          redeemed_at: string | null
+          redeemed_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          issued_by?: string | null
+          months?: number
+          note?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          issued_by?: string | null
+          months?: number
+          note?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Relationships: []
+      }
       gifts: {
         Row: {
           created_at: string
@@ -4618,6 +4654,7 @@ export type Database = {
         Returns: number
       }
       record_streak_activity: { Args: never; Returns: Json }
+      redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
       refresh_leaderboards: { Args: never; Returns: undefined }
       revoke_entitlement: {
