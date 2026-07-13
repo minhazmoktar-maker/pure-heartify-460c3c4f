@@ -101,6 +101,7 @@ const Navbar = () => {
                   { to: "/profile?tab=interests", label: "My interests", icon: ListMusic },
                   { to: "/offline", label: "Offline downloads", icon: Download },
                   { to: "/profile", label: "Profile & settings", icon: Settings },
+                  { to: "/changelog", label: unseenChangelog ? "What's new •" : "What's new", icon: Sparkles },
                 ].map(({ to, label, icon: Icon }) => (
                   <SheetClose asChild key={to}>
                     <Link to={to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">
