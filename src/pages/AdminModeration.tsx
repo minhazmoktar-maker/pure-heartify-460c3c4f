@@ -46,7 +46,7 @@ export default function AdminModeration() {
           </Button>
         </header>
 
-        <Tabs defaultValue="reports">
+        <Tabs defaultValue="sla">
           <TabsList>
             <TabsTrigger value="sla">
               <GaugeCircle className="mr-2 h-4 w-4" /> SLA
