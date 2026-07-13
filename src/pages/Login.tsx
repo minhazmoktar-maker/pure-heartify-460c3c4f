@@ -47,14 +47,15 @@ const Login = () => {
       setErrors({ email: " ", password: "Invalid email or password." });
       toast.error("Invalid email or password.");
     } else {
-      navigate("/");
+      navigate(nextPath ?? "/");
     }
   };
 
   const handleOAuth = async (provider: "google" | "apple") => {
     setLoading(true);
+    const redirectBase = window.location.origin;
     const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
+      redirect_uri: nextPath ? `${redirectBase}${nextPath}` : redirectBase,
     });
     if (result.error) {
       toast.error(`${provider === "google" ? "Google" : "Apple"} sign-in failed. Please try again.`);
