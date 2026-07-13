@@ -35,7 +35,7 @@ export default function Changelog() {
             const meta = TAG_META[entry.tag ?? "new"];
             const Icon = meta.icon;
             return (
-              <FadeIn key={entry.id} delay={i * 40} as="li" className="relative">
+              <FadeIn key={entry.id} index={i} as="li" className="relative">
                 <span className="absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-background ring-2 ring-primary/60">
                   <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 </span>
