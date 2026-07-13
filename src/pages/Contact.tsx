@@ -26,14 +26,18 @@ export default function Contact() {
     }
     setBusy(true);
     try {
-      // Best-effort: store in analytics_events (already has user_id-agnostic policy for inserts).
-      await supabase.from("analytics_events").insert([{
-        event_name: "contact_submitted",
-        properties: parsed.data as unknown as import("@/integrations/supabase/types").Json,
+      const { error } = await supabase.from("contact_messages").insert([{
+        name: parsed.data.name,
+        email: parsed.data.email,
+        topic: parsed.data.topic,
+        message: parsed.data.message,
+        user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : null,
       }]);
+      if (error) throw error;
       toast.success("Thanks — we'll get back to you shortly.");
       setForm({ name: "", email: "", topic: "general", message: "" });
-    } catch {
+    } catch (err) {
+      console.error("contact submit failed", err);
       toast.error("Could not send. Email us directly at hello@heartify.app.");
     } finally {
       setBusy(false);
