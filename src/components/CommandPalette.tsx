@@ -9,6 +9,8 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import { DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Home, Search, Compass, BookOpen, Heart, ListVideo, Gift, Baby,
   Sparkles, Video, User, Bookmark, Bell, Settings, Play, Star,
