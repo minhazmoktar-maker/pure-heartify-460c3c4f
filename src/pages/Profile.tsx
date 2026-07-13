@@ -274,6 +274,19 @@ const Profile = () => {
             </div>
 
             <div className="pt-4">
+              <ThemeModeSetting />
+            </div>
+
+            <div className="pt-4">
+              <SoundSetting />
+            </div>
+
+            <div className="pt-4">
+              <AppIconPicker />
+            </div>
+
+
+            <div className="pt-4">
               <HandleClaimCard />
             </div>
 
