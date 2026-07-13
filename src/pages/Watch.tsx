@@ -10,6 +10,7 @@ import { ReportButton } from "@/components/ReportButton";
 import CommentThread from "@/components/CommentThread";
 import AddToPlaylistDialog from "@/components/AddToPlaylistDialog";
 import NotInterestedMenu from "@/components/NotInterestedMenu";
+import { WatchLaterButton, ShareAtTimeButton } from "@/components/WatchExtras";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 import type { YouTubeVideo } from "@/services/youtube";
