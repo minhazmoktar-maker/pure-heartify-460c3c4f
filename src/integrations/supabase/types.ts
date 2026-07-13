@@ -4487,6 +4487,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_dhikr_circle_member: {
+        Args: { _circle_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_household_owner: {
         Args: { _household_id: string; _user_id: string }
         Returns: boolean
