@@ -24,6 +24,12 @@ import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
 import AgeGate from "./components/AgeGate";
 import CookieConsent from "./components/CookieConsent";
+import CommandPalette from "./components/CommandPalette";
+import { KidsModeProvider } from "./contexts/KidsModeContext";
+
+const Shorts = lazy(() => import("./pages/Shorts.tsx"));
+const Mushaf = lazy(() => import("./pages/Mushaf.tsx"));
+const Redeem = lazy(() => import("./pages/Redeem.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
