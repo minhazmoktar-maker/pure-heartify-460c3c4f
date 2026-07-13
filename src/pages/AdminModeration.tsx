@@ -1,7 +1,7 @@
 import PageSkeleton from "@/components/PageSkeleton";
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { FileWarning, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { FileWarning, Loader2, ShieldAlert, ShieldCheck, GaugeCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const AdminReports = lazy(() => import("./AdminReports"));
 const AdminReview = lazy(() => import("./AdminReview"));
 const ModerationLog = lazy(() => import("./ModerationLog"));
+const AdminSLA = lazy(() => import("./AdminSLA"));
 
 /**
  * Unified moderation console consolidating:
