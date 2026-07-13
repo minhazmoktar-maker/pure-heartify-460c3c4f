@@ -201,18 +201,97 @@ var prayer_times_default = defineTool6({
   }
 });
 
+// src/lib/mcp/tools/list-dhikr-sessions.ts
+import { createClient as createClient6 } from "npm:@supabase/supabase-js@^2.103.0";
+import { defineTool as defineTool7 } from "npm:@lovable.dev/mcp-js@0.20.1";
+import { z as z5 } from "npm:zod@^4.4.3";
+function sb6(ctx) {
+  return createClient6(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
+    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+}
+var list_dhikr_sessions_default = defineTool7({
+  name: "list_dhikr_sessions",
+  title: "List recent dhikr sessions",
+  description: "Return the signed-in user's recent dhikr sessions, most recent first. Supports pagination via limit + offset.",
+  inputSchema: {
+    limit: z5.number().int().min(1).max(100).default(25).describe("Max sessions to return (1\u2013100)."),
+    offset: z5.number().int().min(0).max(1e4).default(0).describe("Rows to skip for pagination."),
+    dhikr_key: z5.string().min(1).nullable().default(null).describe("Optional filter by dhikr key.")
+  },
+  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  handler: async ({ limit, offset, dhikr_key }, ctx) => {
+    if (!ctx.isAuthenticated())
+      return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
+    let q = sb6(ctx).from("dhikr_sessions").select("id, dhikr_key, count, target, source, completed_at", { count: "exact" }).eq("user_id", ctx.getUserId()).order("completed_at", { ascending: false }).range(offset, offset + limit - 1);
+    if (dhikr_key) q = q.eq("dhikr_key", dhikr_key);
+    const { data, error, count } = await q;
+    if (error) return { content: [{ type: "text", text: error.message }], isError: true };
+    const rows = data ?? [];
+    return {
+      content: [{ type: "text", text: JSON.stringify({ total: count ?? rows.length, rows }, null, 2) }],
+      structuredContent: { total: count ?? rows.length, limit, offset, sessions: rows }
+    };
+  }
+});
+
+// src/lib/mcp/tools/list-salah-logs.ts
+import { createClient as createClient7 } from "npm:@supabase/supabase-js@^2.103.0";
+import { defineTool as defineTool8 } from "npm:@lovable.dev/mcp-js@0.20.1";
+import { z as z6 } from "npm:zod@^4.4.3";
+function sb7(ctx) {
+  return createClient7(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
+    global: { headers: { Authorization: `Bearer ${ctx.getToken()}` } },
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+}
+var list_salah_logs_default = defineTool8({
+  name: "list_salah_logs",
+  title: "List recent salah logs",
+  description: "Return the signed-in user's recent salah (prayer) logs, most recent first. Supports pagination and optional prayer-name filter.",
+  inputSchema: {
+    limit: z6.number().int().min(1).max(100).default(25).describe("Max rows to return (1\u2013100)."),
+    offset: z6.number().int().min(0).max(1e4).default(0).describe("Rows to skip for pagination."),
+    prayer: z6.enum(["fajr", "dhuhr", "asr", "maghrib", "isha"]).nullable().default(null).describe("Optional filter by prayer name.")
+  },
+  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  handler: async ({ limit, offset, prayer }, ctx) => {
+    if (!ctx.isAuthenticated())
+      return { content: [{ type: "text", text: "Not authenticated" }], isError: true };
+    let q = sb7(ctx).from("salah_log").select("*", { count: "exact" }).eq("user_id", ctx.getUserId()).order("created_at", { ascending: false }).range(offset, offset + limit - 1);
+    if (prayer) q = q.eq("prayer", prayer);
+    const { data, error, count } = await q;
+    if (error) return { content: [{ type: "text", text: error.message }], isError: true };
+    const rows = data ?? [];
+    return {
+      content: [{ type: "text", text: JSON.stringify({ total: count ?? rows.length, rows }, null, 2) }],
+      structuredContent: { total: count ?? rows.length, limit, offset, logs: rows }
+    };
+  }
+});
+
 // src/lib/mcp/index.ts
 var projectRef = "tbgxtwgliumqqtuppztu";
 var mcp_default = defineMcp({
   name: "heartify-mcp",
   title: "Heartify",
   version: "0.1.0",
-  instructions: "Tools for Heartify \u2014 a scholar-moderated Islamic content and worship-tracking app. Use `get_profile` and `get_streak` to read the signed-in user's account, `list_favorites` for their saved videos, `log_dhikr_session` and `log_salah` to record acts of worship, and `get_prayer_times` for salah timings by location.",
+  instructions: "Tools for Heartify \u2014 a scholar-moderated Islamic content and worship-tracking app. Read tools: `get_profile`, `get_streak`, `list_favorites`, `list_dhikr_sessions`, `list_salah_logs`, `get_prayer_times`. Write tools: `log_dhikr_session`, `log_salah`. All reads/writes are scoped to the signed-in user via RLS.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated"
   }),
-  tools: [get_profile_default, get_streak_default, list_favorites_default, log_dhikr_default, log_salah_default, prayer_times_default]
+  tools: [
+    get_profile_default,
+    get_streak_default,
+    list_favorites_default,
+    list_dhikr_sessions_default,
+    list_salah_logs_default,
+    log_dhikr_default,
+    log_salah_default,
+    prayer_times_default
+  ]
 });
 
 // lovable-mcp-supabase-entry.ts
