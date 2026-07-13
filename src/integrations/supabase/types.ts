@@ -4666,9 +4666,6 @@ export type Database = {
       }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
-      unaccent: { Args: { "": string }; Returns: string }
       unread_notification_count: { Args: never; Returns: number }
       upsert_reciter: {
         Args: {
