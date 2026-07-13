@@ -1,0 +1,69 @@
+name: Weekly dependency + secret rotation
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  audit:
+    name: bun audit + gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: oven-sh/setup-bun@v2
+        with: { bun-version: latest }
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: bun audit (high+)
+        run: |
+          set +e
+          bun audit --prod > audit.txt 2>&1
+          code=$?
+          cat audit.txt
+          # Fail only on high/critical; log lows/moderates.
+          if grep -qiE 'high|critical' audit.txt; then
+            echo "::error::High or critical vulnerabilities detected"
+            exit 1
+          fi
+          exit 0
+      - name: gitleaks (secrets scan)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-path: .gitleaks.toml
+
+  rotation-reminder:
+    name: Open rotation reminder issue
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const today = new Date().toISOString().slice(0, 10);
+            const title = `🔐 Weekly secret rotation checklist — ${today}`;
+            const body = [
+              'Automated reminder. Rotate the following on schedule:',
+              '',
+              '- [ ] `LOVABLE_API_KEY` (AI Gateway) — 90d',
+              '- [ ] `IMAGE_PROXY_SIGNING_KEY` — 30d',
+              '- [ ] `AUDIT_CRON_TOKEN` — 90d',
+              '- [ ] VAPID keypair (only if compromised)',
+              '- [ ] Supabase anon key (only if compromised)',
+              '',
+              'When done, close this issue. Next reminder ships next Monday.',
+            ].join('\n');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['security', 'rotation'],
+            });
