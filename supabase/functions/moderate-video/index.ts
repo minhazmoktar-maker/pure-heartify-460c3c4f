@@ -50,29 +50,46 @@ Deno.serve(async (req) => {
 
 
 
-  // Only privileged actors may write non-system audit entries.
-  let actorId: string | null = null;
-  let actorKind: "system" | "admin" | "owner" | "recheck" | "override" = "system";
-  if (body.actor_kind && body.actor_kind !== "system") {
-    const authz = await authorize(req, "approve_content");
-    if (authz instanceof Response) return authz;
-    actorId = authz.principal.id;
-    actorKind = authz.principal.role === "owner" ? "owner" : "admin";
-    if (body.actor_kind === "recheck" || body.actor_kind === "override") {
-      actorKind = body.actor_kind;
-    }
+  // Every caller must be an authenticated admin/owner with approve_content.
+  // Client-supplied title/description for an EXISTING video is untrusted —
+  // an attacker could otherwise force-approve a real video by sending clean
+  // metadata. We re-derive metadata server-side from curated_videos when a
+  // row exists and only fall back to the caller-supplied fields for videos
+  // not yet in our catalog (ingestion path).
+  const authz = await authorize(req, "approve_content");
+  if (authz instanceof Response) return authz;
+  const actorId: string | null = authz.principal.id;
+  let actorKind: "system" | "admin" | "owner" | "recheck" | "override" =
+    authz.principal.role === "owner" ? "owner" : "admin";
+  if (body.actor_kind === "recheck" || body.actor_kind === "override" || body.actor_kind === "system") {
+    actorKind = body.actor_kind;
   }
+
+  // Look up existing curated row for prev state AND authoritative metadata.
+  const prevRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/curated_videos?video_id=eq.${encodeURIComponent(v.video_id)}&select=moderation_state,title,description,channel_title,channel_id,category,tags`,
+    { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } },
+  );
+  const existingRow = prevRes.ok ? ((await prevRes.json())[0] ?? null) : null;
+  const prev = existingRow?.moderation_state ?? null;
+
+  // If the video already exists in our catalog, trust our stored fields over
+  // whatever the caller sent. This closes the metadata-spoofing bypass.
+  const trustedVideo: VideoContext = existingRow
+    ? {
+        ...v,
+        title: existingRow.title ?? v.title,
+        description: existingRow.description ?? v.description,
+        channel_title: existingRow.channel_title ?? v.channel_title,
+        channel_id: existingRow.channel_id ?? v.channel_id,
+        category: existingRow.category ?? v.category,
+        tags: existingRow.tags ?? v.tags,
+      }
+    : v;
 
   const thresholds = await loadThresholds(SUPABASE_URL, SERVICE_KEY);
   const pipeline = defaultPipeline(SUPABASE_URL, SERVICE_KEY);
-  const outcome = await runPipeline(v, pipeline, thresholds);
-
-  // Look up previous state for audit continuity.
-  const prevRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/curated_videos?video_id=eq.${encodeURIComponent(v.video_id)}&select=moderation_state`,
-    { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } },
-  );
-  const prev = prevRes.ok ? ((await prevRes.json())[0]?.moderation_state ?? null) : null;
+  const outcome = await runPipeline(trustedVideo, pipeline, thresholds);
 
   const written = await persistDecision(SUPABASE_URL, SERVICE_KEY, outcome, {
     id: actorId, kind: actorKind,
