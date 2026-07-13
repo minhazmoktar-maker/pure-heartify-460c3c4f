@@ -169,6 +169,15 @@ const Navbar = () => {
           </Link>
           <LanguageSwitcher />
           <button
+            onClick={toggleKids}
+            aria-pressed={kidsOn}
+            aria-label={kidsOn ? "Turn Kids mode off" : "Turn Kids mode on"}
+            title={kidsOn ? "Kids mode ON — safe content only" : "Kids mode OFF"}
+            className={`tap-target rounded-full transition-colors ${kidsOn ? "bg-primary/15 text-primary" : "hover:bg-secondary"}`}
+          >
+            <Baby className="h-5 w-5" />
+          </button>
+          <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             className="tap-target rounded-full hover:bg-secondary transition-colors"
