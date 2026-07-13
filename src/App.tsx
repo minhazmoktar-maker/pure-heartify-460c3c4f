@@ -267,6 +267,10 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
+                <Route path="/shorts" element={<Shorts />} />
+                <Route path="/mushaf" element={<Mushaf />} />
+                <Route path="/mushaf/:page" element={<Mushaf />} />
+                <Route path="/redeem" element={<Redeem />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/section/:sectionId" element={<SectionAll />} />
                 <Route path="/login" element={<Login />} />
