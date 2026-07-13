@@ -155,7 +155,38 @@ Deno.serve(async (req) => {
         );
       }
     }
+
+    // Locale-aware soft re-rank: hydrate content_language for the current
+    // page and float caller-preferred languages to the top. Untagged videos
+    // are treated as neutral to avoid starving markets whose catalog isn't
+    // fully tagged yet. If lookup fails we silently keep lexical order.
+    if (contentLanguages.length && filteredHits.length > 0) {
+      const ids = filteredHits
+        .map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string)
+        .filter(Boolean);
+      const { data: langRows } = await admin
+        .from("curated_videos")
+        .select("video_id, content_language")
+        .in("video_id", ids);
+      const langById = new Map(
+        (langRows ?? []).map((r) => [r.video_id as string, (r.content_language as string | null)?.toLowerCase() ?? null]),
+      );
+      const langSet = new Set(contentLanguages);
+      const matches: typeof filteredHits = [];
+      const untagged: typeof filteredHits = [];
+      const others: typeof filteredHits = [];
+      for (const h of filteredHits) {
+        const id = (h.video_id ?? h.id) as string;
+        const cl = langById.get(id) ?? null;
+        if (!cl) untagged.push(h);
+        else if (langSet.has(cl)) matches.push(h);
+        else others.push(h);
+      }
+      filteredHits = [...matches, ...untagged, ...others];
+    }
+
     const [{ data: trending }, { data: related }] = await Promise.all([
+
       admin.rpc("get_trending_searches", { _limit: 10, _window_hours: 168 }),
       q ? admin.rpc("get_related_searches", { _query: q, _limit: 6 }) : Promise.resolve({ data: [] }),
     ]);
