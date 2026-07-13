@@ -22,6 +22,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { isAdmin, isOwner } = useRole();
   const scrolled = useScrolled(8);
+  const { enabled: kidsOn, toggle: toggleKids } = useKidsMode();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
