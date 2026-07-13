@@ -17,7 +17,10 @@ export default function PageSkeleton({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-6xl animate-in fade-in duration-300 px-4 py-6 sm:px-6",
+        // Phase 10 — motion-matched: subtle fade-up + staggered children via
+        // the shimmer class on each Skeleton (Tailwind's animate-pulse).
+        "mx-auto w-full max-w-6xl px-4 py-6 sm:px-6",
+        "animate-in fade-in slide-in-from-bottom-1 duration-500",
         className,
       )}
       role="status"
