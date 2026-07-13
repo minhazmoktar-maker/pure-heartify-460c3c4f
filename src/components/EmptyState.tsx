@@ -2,11 +2,14 @@ import { LucideIcon, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import FadeIn from "@/components/FadeIn";
+import EmptyIllustration, { type EmptyIllustrationVariant } from "@/components/EmptyIllustration";
 
 type Tone = "default" | "muted" | "gold";
 
 interface EmptyStateProps {
   icon?: LucideIcon;
+  /** Optional illustration — takes precedence over `icon` when set. */
+  illustration?: EmptyIllustrationVariant;
   title: string;
   description?: string;
   actionLabel?: string;
