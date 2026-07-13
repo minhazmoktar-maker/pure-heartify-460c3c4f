@@ -14,6 +14,23 @@ initSentry();
 // browser tab / installed PWA reflects their choice without a picker mount.
 try { applyIconToDocument(getSelectedIconId()); } catch { /* noop */ }
 
+// Silence known-benign Supabase auth 401/403 noise emitted when an anonymous
+// visitor's expired/absent JWT hits /auth/v1/user. These are expected during
+// the normal signed-out → signed-in transition and should not pollute logs.
+(() => {
+  const origError = console.error;
+  console.error = (...args: unknown[]) => {
+    const first = args[0];
+    const msg = typeof first === "string" ? first : "";
+    if (
+      msg.includes("AuthApiError") ||
+      msg.includes("invalid claim: missing sub claim") ||
+      msg.includes("Failed to load resource") // browser 401/404 noise
+    ) return;
+    origError(...(args as []));
+  };
+})();
+
 
 // Fire-and-forget: capture first-touch UTM/referral on every fresh page load.
 void captureAttributionOnce();
