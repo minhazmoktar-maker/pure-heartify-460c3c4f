@@ -14,6 +14,7 @@ import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
 import NotFound from "./pages/NotFound.tsx";
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
 import { MobileBridge } from "./components/MobileBridge";
 import ReferralBridge from "./components/ReferralBridge";
 import AdhanNotifier from "./components/AdhanNotifier";
@@ -277,6 +278,7 @@ const App = () => (
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/section/:sectionId" element={<SectionAll />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />

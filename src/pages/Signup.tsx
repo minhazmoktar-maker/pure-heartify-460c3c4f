@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Mail, Lock, Loader2, User } from "lucide-react";
@@ -13,8 +13,16 @@ type Errors = { displayName?: string; email?: string; password?: string; policy?
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function safeNext(raw: string | null): string | null {
+  if (!raw) return null;
+  if (!raw.startsWith("/") || raw.startsWith("//")) return null;
+  return raw;
+}
+
 const Signup = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNext(searchParams.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -40,11 +48,12 @@ const Signup = () => {
     setErrors(v);
     if (Object.keys(v).length) return;
     setLoading(true);
+    const redirectBase = window.location.origin;
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: nextPath ? `${redirectBase}${nextPath}` : redirectBase,
         data: { full_name: displayName.trim() },
       },
     });
@@ -66,8 +75,9 @@ const Signup = () => {
     }
     setLoading(true);
     growth.signedUp(provider);
+    const redirectBase = window.location.origin;
     const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
+      redirect_uri: nextPath ? `${redirectBase}${nextPath}` : redirectBase,
     });
     if (result.error) {
       toast.error(`${provider === "google" ? "Google" : "Apple"} sign-up failed. Please try again.`);
@@ -196,7 +206,7 @@ const Signup = () => {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+          <Link to={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"} className="font-medium text-primary hover:underline">Sign in</Link>
         </p>
       </div>
     </div>

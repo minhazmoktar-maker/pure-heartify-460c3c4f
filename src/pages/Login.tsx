@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Mail, Lock, Loader2 } from "lucide-react";
@@ -11,8 +11,17 @@ type Errors = { email?: string; password?: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Same-origin relative path only — never accept absolute or protocol-relative URLs.
+function safeNext(raw: string | null): string | null {
+  if (!raw) return null;
+  if (!raw.startsWith("/") || raw.startsWith("//")) return null;
+  return raw;
+}
+
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNext(searchParams.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,14 +47,15 @@ const Login = () => {
       setErrors({ email: " ", password: "Invalid email or password." });
       toast.error("Invalid email or password.");
     } else {
-      navigate("/");
+      navigate(nextPath ?? "/");
     }
   };
 
   const handleOAuth = async (provider: "google" | "apple") => {
     setLoading(true);
+    const redirectBase = window.location.origin;
     const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
+      redirect_uri: nextPath ? `${redirectBase}${nextPath}` : redirectBase,
     });
     if (result.error) {
       toast.error(`${provider === "google" ? "Google" : "Apple"} sign-in failed. Please try again.`);
@@ -147,7 +157,7 @@ const Login = () => {
 
         <p className="text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Link to="/signup" className="font-medium text-primary hover:underline">Sign up</Link>
+          <Link to={nextPath ? `/signup?next=${encodeURIComponent(nextPath)}` : "/signup"} className="font-medium text-primary hover:underline">Sign up</Link>
         </p>
 
         <p className="text-center text-xs text-muted-foreground">

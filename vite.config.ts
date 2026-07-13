@@ -4,6 +4,7 @@ import path from "path";
 import { execSync } from "node:child_process";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/supabase/vite";
 
 const appVersion =
   process.env.VITE_APP_VERSION ??
@@ -28,6 +29,7 @@ export default defineConfig(({ mode }) => ({
     hmr: { overlay: false },
   },
   plugins: [
+    mcpPlugin(),
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
