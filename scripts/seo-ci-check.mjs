@@ -15,12 +15,12 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const errors: string[] = [];
-function fail(msg: string) {
+const errors = [];
+function fail(msg) {
   errors.push(msg);
   console.error("✗", msg);
 }
-function ok(msg: string) {
+function ok(msg) {
   console.log("✓", msg);
 }
 
