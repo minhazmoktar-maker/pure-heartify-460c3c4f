@@ -1038,21 +1038,27 @@ export type Database = {
       device_tokens: {
         Row: {
           created_at: string
+          device_id: string | null
           id: string
+          last_seen_at: string
           platform: string
           token: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          device_id?: string | null
           id?: string
+          last_seen_at?: string
           platform: string
           token: string
           user_id: string
         }
         Update: {
           created_at?: string
+          device_id?: string | null
           id?: string
+          last_seen_at?: string
           platform?: string
           token?: string
           user_id?: string
@@ -4141,6 +4147,8 @@ export type Database = {
         Args: { _alias: string; _alias_type?: string; _reciter_id: string }
         Returns: boolean
       }
+      admin_content_freshness: { Args: never; Returns: Json }
+      admin_moderation_sla: { Args: never; Returns: Json }
       admin_retention_cohorts: {
         Args: never
         Returns: {
