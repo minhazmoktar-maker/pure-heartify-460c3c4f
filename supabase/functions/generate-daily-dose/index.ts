@@ -153,27 +153,48 @@ Deno.serve(async (req) => {
         .limit(500);
       const exclude = (history ?? []).map((h: any) => h.video_id);
 
+      // Regional Daily Dose: prefer languages from the user's locale prefs,
+      // or seed from regional_language_mix if the user hasn't overridden.
+      const preferredLangs = await resolvePreferredLanguages(admin, userId);
+
       // 4. Pick 70/20/10 → 2 primary, 1 secondary or exploration
-      const p = await pickFromSection(admin, primary, exclude, 2);
+      const p = await pickFromSection(admin, primary, exclude, 2, preferredLangs);
       const exIds = [...exclude, ...p.map((v) => v.video_id)];
       const secondaryRoll = Math.random() < 0.67; // 70/(70+10) roughly → use secondary 67% of remaining slot
-      const s = await pickFromSection(admin, secondaryRoll ? secondary : exploration, exIds, 1);
+      const s = await pickFromSection(
+        admin,
+        secondaryRoll ? secondary : exploration,
+        exIds,
+        1,
+        preferredLangs,
+      );
       const picks = [...p, ...s].filter(Boolean);
 
-      // Fallback if pools were thin
+      // Fallback if pools were thin — still honour regional language preference.
       if (picks.length < 3) {
         const { data: top } = await admin
           .from("curated_videos")
-          .select("video_id,title,channel_title,thumbnail_url,section_id,halal_score")
+          .select("video_id,title,channel_title,thumbnail_url,section_id,halal_score,content_language")
           .order("halal_score", { ascending: false })
-          .limit(60);
-        const fill = (top ?? []).filter(
+          .limit(80);
+        const remaining: Vid[] = (top ?? []).filter(
           (v: Vid) => !exclude.includes(v.video_id) && !picks.find((p) => p.video_id === v.video_id),
         );
-        while (picks.length < 3 && fill.length) {
-          picks.push(fill.shift()!);
+        if (preferredLangs.length) {
+          const langs = new Set(preferredLangs.map((l) => l.toLowerCase()));
+          remaining.sort((a, b) => {
+            const al = ((a as any).content_language as string | null)?.toLowerCase() ?? null;
+            const bl = ((b as any).content_language as string | null)?.toLowerCase() ?? null;
+            const am = al && langs.has(al) ? 0 : al ? 2 : 1;
+            const bm = bl && langs.has(bl) ? 0 : bl ? 2 : 1;
+            return am - bm;
+          });
+        }
+        while (picks.length < 3 && remaining.length) {
+          picks.push(remaining.shift()!);
         }
       }
+
 
       const videoIds = picks.map((v) => v.video_id);
       const totalMinutes = picks.length * ASSUMED_MIN_PER_VIDEO;
