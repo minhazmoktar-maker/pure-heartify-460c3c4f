@@ -67,6 +67,16 @@ Deno.serve(async (req) => {
     const limit = Math.min(Math.max(Number(body.limit ?? 40), 1), 100);
     const offset = Math.max(Number(body.offset ?? 0), 0);
     const useAi = body.useAi !== false && q.length >= 3;
+    // Locale hints — soft signals used to re-rank, never to hard-filter
+    // (a Turkish user searching "quran" still gets great English results).
+    const contentLanguages: string[] = Array.isArray(body.content_languages)
+      ? (body.content_languages as unknown[])
+          .filter((l): l is string => typeof l === "string")
+          .map((l) => l.toLowerCase().replace(/[^a-z]/g, "").slice(0, 3))
+          .filter((l) => l.length >= 2 && l.length <= 3)
+          .slice(0, 8)
+      : [];
+
 
     let intent = useAi ? await detectIntent(q) : null;
 
