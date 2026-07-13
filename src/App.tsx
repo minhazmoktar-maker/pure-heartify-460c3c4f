@@ -756,6 +756,7 @@ const App = () => (
             </Suspense>
           </BrowserRouter>
         </PlayerProvider>
+          </KidsModeProvider>
           </LocaleProvider>
       </AuthProvider>
     </ThemeProvider>
