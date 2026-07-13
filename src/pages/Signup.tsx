@@ -48,11 +48,12 @@ const Signup = () => {
     setErrors(v);
     if (Object.keys(v).length) return;
     setLoading(true);
+    const redirectBase = window.location.origin;
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: nextPath ? `${redirectBase}${nextPath}` : redirectBase,
         data: { full_name: displayName.trim() },
       },
     });
@@ -74,8 +75,9 @@ const Signup = () => {
     }
     setLoading(true);
     growth.signedUp(provider);
+    const redirectBase = window.location.origin;
     const result = await lovable.auth.signInWithOAuth(provider, {
-      redirect_uri: window.location.origin,
+      redirect_uri: nextPath ? `${redirectBase}${nextPath}` : redirectBase,
     });
     if (result.error) {
       toast.error(`${provider === "google" ? "Google" : "Apple"} sign-up failed. Please try again.`);
