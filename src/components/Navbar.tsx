@@ -8,6 +8,8 @@ import NotificationsBell from "@/components/NotificationsBell";
 import SuggestContentDialog from "@/components/SuggestContentDialog";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useKidsMode } from "@/contexts/KidsModeContext";
+import { Baby } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import { useScrolled } from "@/hooks/useScrolled";
 import { cn } from "@/lib/utils";
