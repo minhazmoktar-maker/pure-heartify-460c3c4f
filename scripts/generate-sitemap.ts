@@ -125,6 +125,8 @@ const core: Entry[] = [
   { path: "/hijri-calendar", changefreq: "weekly", priority: "0.7" },
   { path: "/islamic-events", changefreq: "weekly", priority: "0.7" },
   { path: "/sacred-mosques", changefreq: "weekly", priority: "0.7" },
+  { path: "/fatwa", changefreq: "weekly", priority: "0.8" },
+  { path: "/digital-purification", changefreq: "monthly", priority: "0.8" },
   { path: "/about", changefreq: "monthly", priority: "0.6" },
   { path: "/contact", changefreq: "monthly", priority: "0.5" },
   { path: "/login", changefreq: "monthly", priority: "0.4" },

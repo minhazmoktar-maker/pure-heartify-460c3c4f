@@ -73,6 +73,7 @@ const EatingSunnah = lazy(() => import("./pages/EatingSunnah.tsx"));
 const FarewellSermon = lazy(() => import("./pages/FarewellSermon.tsx"));
 const Fasting = lazy(() => import("./pages/Fasting.tsx"));
 const Fatwa = lazy(() => import("./pages/Fatwa.tsx"));
+const DigitalPurification = lazy(() => import("./pages/DigitalPurification.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const Ghusl = lazy(() => import("./pages/Ghusl.tsx"));
 const Glossary = lazy(() => import("./pages/Glossary.tsx"));
@@ -397,6 +398,7 @@ const App = () => (
                 <Route path="/wudu" element={<WuduGuide />} />
                 <Route path="/salah-guide" element={<SalahGuide />} />
                 <Route path="/fatwa" element={<Fatwa />} />
+                <Route path="/digital-purification" element={<DigitalPurification />} />
                 <Route path="/ruqya" element={<Ruqya />} />
                 <Route path="/nawawi-40" element={<Nawawi40 />} />
                 <Route path="/prophets" element={<Prophets />} />

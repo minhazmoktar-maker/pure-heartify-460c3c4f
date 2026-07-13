@@ -61,8 +61,22 @@ const Fatwa = () => {
       <Helmet>
         <title>Fatwa Q&A Library | Heartify</title>
         <meta name="description" content="Curated fatwas across salah, fasting, zakat, marriage, finance, food, and daily interaction." />
-        <link rel="canonical" href="/fatwa" />
+        <link rel="canonical" href="https://pure-heartify.lovable.app/fatwa" />
+        <meta property="og:url" content="https://pure-heartify.lovable.app/fatwa" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FATWAS.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: f.scholar ? `${f.a} — ${f.scholar}` : f.a,
+            },
+          })),
+        })}</script>
       </Helmet>
+
 
       <main className="container mx-auto max-w-3xl px-4 py-8">
         <header className="mb-6 flex items-center gap-3">

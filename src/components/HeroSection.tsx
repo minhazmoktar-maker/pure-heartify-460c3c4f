@@ -28,13 +28,13 @@ const HeroSection = () => {
             Halal video, audio &amp; Qur&apos;an.{" "}
             <span className="text-gradient-gold">Nothing else.</span>
           </h1>
-          <p className="mt-4 text-sm leading-relaxed text-cream/80 md:text-base">
+          <p className="mt-4 text-sm leading-relaxed text-cream md:text-base">
             Every video passes a scholar-guided moderation pipeline. No music.
             No ads. No tracking. Just recitation, tafsir, seerah and reminders
             you can trust.
           </p>
 
-          <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-medium text-cream/85 md:text-sm">
+          <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-medium text-cream md:text-sm">
             <li className="inline-flex items-center gap-1.5">
               <span aria-hidden className="text-gold">✓</span> Scholar-moderated
             </li>
@@ -48,6 +48,7 @@ const HeroSection = () => {
               <span aria-hidden className="text-gold">✓</span> Verified reciters
             </li>
           </ul>
+
 
           <button className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-accent-foreground shadow-lg transition-all hover:brightness-110">
             <Play className="h-4 w-4" />
