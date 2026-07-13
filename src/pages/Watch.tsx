@@ -318,6 +318,8 @@ const Watch = () => {
                     />
                   )}
                   {videoId && <AddToPlaylistDialog videoId={videoId} />}
+                  {videoId && <WatchLaterButton videoId={videoId} />}
+                  {videoId && <ShareAtTimeButton videoId={videoId} />}
                   {videoId && <NotInterestedMenu videoId={videoId} />}
                   {videoId && <AdminVideoRemoveButton videoId={videoId} title={currentVideo.title} />}
 
