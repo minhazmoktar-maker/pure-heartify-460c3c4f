@@ -431,6 +431,7 @@ const App = () => (
 
                 <Route path="/admin" element={<Navigate to="/admin/console" replace />} />
                 <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
+                <Route path="/admin/sla" element={<AdminRoute><AdminSLA /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
 
                 <Route path="/admin/moderation-log" element={<Navigate to="/admin/moderation" replace />} />
