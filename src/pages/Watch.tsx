@@ -27,6 +27,11 @@ const Watch = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const startTimeParam = (() => {
+    const sp = new URLSearchParams(location.search);
+    const t = Number(sp.get("t"));
+    return Number.isFinite(t) && t > 0 ? Math.floor(t) : 0;
+  })();
   const stateVideo = (location.state as { video?: YouTubeVideo } | null)?.video;
   const { data: videos } = useYouTubeVideos("All");
   const { user } = useAuth();
