@@ -50,9 +50,13 @@ export async function setAppIcon(id: string): Promise<void> {
   const variant = APP_ICON_VARIANTS.find((v) => v.id === id) ?? APP_ICON_VARIANTS[0];
   try { localStorage.setItem(STORAGE_KEY, variant.id); } catch { /* noop */ }
   applyIconToDocument(variant.id);
-  // Native icon change — best-effort, only present when the app is packaged.
+  // Native icon change — best-effort, only present when the app is packaged
+  // with the optional capacitor-app-icon plugin. Wrapped in a runtime require
+  // so bundlers don't require the module at build time.
   try {
-    const mod = await import(/* @vite-ignore */ "capacitor-app-icon").catch(() => null);
+    // deno-lint-ignore no-explicit-any
+    const dyn = (0, eval)("import") as (m: string) => Promise<any>;
+    const mod = await dyn("capacitor-app-icon").catch(() => null);
     // deno-lint-ignore no-explicit-any
     const plugin: any = mod?.AppIcon ?? mod?.default ?? null;
     if (plugin?.change) await plugin.change({ name: variant.id, suppressNotification: true });
