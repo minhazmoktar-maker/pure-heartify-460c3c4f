@@ -57,19 +57,9 @@ export function useSmartSearch(rawQuery: string) {
     return () => clearTimeout(t);
   }, [rawQuery]);
 
-  // Locale-aware search: preferences are best-effort — if the provider isn't
-  // mounted (SSR, tests) we fall through with an empty list, which the edge
-  // fn treats as "no locale hint".
-  let contentLanguages: string[] = [];
-  let uiLanguage = "en";
-  try {
-    // Lazy import to avoid a hard dep during SSR/tests.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-    const { useLocale } = require("@/contexts/LocaleContext");
-    const loc = useLocale();
-    contentLanguages = loc.preferences.content_languages ?? [];
-    uiLanguage = loc.preferences.ui_language ?? "en";
-  } catch { /* provider not mounted */ }
+  const { preferences } = useLocale();
+  const contentLanguages = preferences.content_languages ?? [];
+  const uiLanguage = preferences.ui_language ?? "en";
   const langKey = contentLanguages.join(",");
 
   const searchQ = useQuery({
@@ -90,6 +80,7 @@ export function useSmartSearch(rawQuery: string) {
       return data as SearchResponse;
     },
   });
+
 
 
   const autoQ = useQuery({
