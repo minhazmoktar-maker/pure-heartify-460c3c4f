@@ -37,6 +37,7 @@ const TONE_STYLES: Record<Tone, { icon: string; button: string }> = {
 
 export default function EmptyState({
   icon: Icon = Sparkles,
+  illustration,
   title,
   description,
   actionLabel,
