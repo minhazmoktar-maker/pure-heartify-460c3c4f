@@ -261,6 +261,7 @@ const App = () => (
             <BackToTop />
             <AgeGate />
             <CookieConsent />
+            <CommandPalette />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
