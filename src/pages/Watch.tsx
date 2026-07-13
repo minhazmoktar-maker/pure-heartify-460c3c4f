@@ -211,7 +211,7 @@ const Watch = () => {
               {playerActivated ? (
                 <iframe
                   ref={iframeRef}
-                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1&origin=${window.location.origin}`}
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1${startTimeParam ? `&start=${startTimeParam}` : ""}&origin=${window.location.origin}`}
                   title={currentVideo?.title ?? "Video"}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
