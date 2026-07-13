@@ -118,18 +118,27 @@ async function fetchWithRetry(
   return { ok: false, status: 0, body: "", attempts, error: lastErr };
 }
 
+function escapeHtml(v: unknown): string {
+  return String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function renderEmailHtml(p: Payload, title: string, timestamp: string): string {
   const color = SEV_COLOR[p.severity] ?? "#111827";
   const kindLabel = KIND_LABEL[p.kind] ?? p.kind;
   const ctxBlock = p.context && Object.keys(p.context).length
     ? `<h3 style="margin:24px 0 8px;font-size:14px;color:#374151">Context</h3>
        <pre style="background:#f3f4f6;padding:12px;border-radius:6px;font-size:12px;line-height:1.5;overflow:auto;white-space:pre-wrap;word-break:break-word">${
-      JSON.stringify(p.context, null, 2).replace(/</g, "&lt;").slice(0, 4000)
+      escapeHtml(JSON.stringify(p.context, null, 2).slice(0, 4000))
     }</pre>`
     : "";
   const routeBlock = p.route
     ? `<tr><td style="padding:6px 0;color:#6b7280;width:110px">Route</td><td style="padding:6px 0;color:#111827;font-family:monospace;font-size:13px">${
-      String(p.route).replace(/</g, "&lt;")
+      escapeHtml(p.route)
     }</td></tr>`
     : "";
   return `<!doctype html>
@@ -137,31 +146,32 @@ function renderEmailHtml(p: Payload, title: string, timestamp: string): string {
 <body style="margin:0;padding:24px;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#111827">
   <table role="presentation" width="100%" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)">
     <tr><td style="background:${color};padding:16px 24px;color:#ffffff">
-      <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;opacity:.85">${p.severity} alert</div>
-      <div style="font-size:20px;font-weight:600;margin-top:4px">${title}</div>
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;opacity:.85">${escapeHtml(p.severity)} alert</div>
+      <div style="font-size:20px;font-weight:600;margin-top:4px">${escapeHtml(title)}</div>
     </td></tr>
     <tr><td style="padding:24px">
-      <p style="margin:0 0 16px;font-size:15px;line-height:1.6">${String(p.message).replace(/</g, "&lt;")}</p>
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6">${escapeHtml(p.message)}</p>
       <table role="presentation" style="width:100%;font-size:13px;border-top:1px solid #e5e7eb;margin-top:8px">
-        <tr><td style="padding:6px 0;color:#6b7280;width:110px">Type</td><td style="padding:6px 0;color:#111827">${kindLabel}</td></tr>
-        <tr><td style="padding:6px 0;color:#6b7280">Status</td><td style="padding:6px 0;color:${color};font-weight:600">${p.severity.toUpperCase()}</td></tr>
-        <tr><td style="padding:6px 0;color:#6b7280">Time</td><td style="padding:6px 0;color:#111827">${timestamp}</td></tr>
+        <tr><td style="padding:6px 0;color:#6b7280;width:110px">Type</td><td style="padding:6px 0;color:#111827">${escapeHtml(kindLabel)}</td></tr>
+        <tr><td style="padding:6px 0;color:#6b7280">Status</td><td style="padding:6px 0;color:${color};font-weight:600">${escapeHtml(p.severity.toUpperCase())}</td></tr>
+        <tr><td style="padding:6px 0;color:#6b7280">Time</td><td style="padding:6px 0;color:#111827">${escapeHtml(timestamp)}</td></tr>
         ${routeBlock}
       </table>
       ${ctxBlock}
       <div style="margin-top:28px;text-align:center">
-        <a href="${ADMIN_ALERTS_URL}" style="display:inline-block;background:${color};color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;font-weight:600;font-size:14px">
+        <a href="${escapeHtml(ADMIN_ALERTS_URL)}" style="display:inline-block;background:${color};color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;font-weight:600;font-size:14px">
           Open Admin Alerts →
         </a>
       </div>
       <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;text-align:center">
         You receive this email because it matches the severity threshold
-        (<code>${ALERT_EMAIL_MIN_SEVERITY}</code>+). Change with the <code>ALERT_EMAIL_MIN_SEVERITY</code> secret.
+        (<code>${escapeHtml(ALERT_EMAIL_MIN_SEVERITY)}</code>+). Change with the <code>ALERT_EMAIL_MIN_SEVERITY</code> secret.
       </p>
     </td></tr>
   </table>
 </body></html>`;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
