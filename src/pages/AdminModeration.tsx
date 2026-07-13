@@ -48,6 +48,9 @@ export default function AdminModeration() {
 
         <Tabs defaultValue="reports">
           <TabsList>
+            <TabsTrigger value="sla">
+              <GaugeCircle className="mr-2 h-4 w-4" /> SLA
+            </TabsTrigger>
             <TabsTrigger value="reports">
               <FileWarning className="mr-2 h-4 w-4" /> Reports
             </TabsTrigger>
@@ -58,6 +61,12 @@ export default function AdminModeration() {
               <ShieldAlert className="mr-2 h-4 w-4" /> Audit log
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="sla" className="mt-4">
+            <Suspense fallback={<Fallback />}>
+              <AdminSLA embedded />
+            </Suspense>
+          </TabsContent>
 
           <TabsContent value="reports" className="mt-4">
             <Suspense fallback={<Fallback />}>
