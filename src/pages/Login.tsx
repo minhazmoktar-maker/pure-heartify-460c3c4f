@@ -157,7 +157,7 @@ const Login = () => {
 
         <p className="text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Link to="/signup" className="font-medium text-primary hover:underline">Sign up</Link>
+          <Link to={nextPath ? `/signup?next=${encodeURIComponent(nextPath)}` : "/signup"} className="font-medium text-primary hover:underline">Sign up</Link>
         </p>
 
         <p className="text-center text-xs text-muted-foreground">
