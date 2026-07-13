@@ -90,6 +90,10 @@ export default function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
+      <VisuallyHidden>
+        <DialogTitle>Command palette</DialogTitle>
+        <DialogDescription>Search and navigate to any page.</DialogDescription>
+      </VisuallyHidden>
       <CommandInput placeholder="Type a command or search…" />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
