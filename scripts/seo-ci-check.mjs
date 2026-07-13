@@ -65,7 +65,7 @@ if (jsonLdBlocks.length === 0) {
     try {
       JSON.parse(raw.trim());
     } catch (e) {
-      fail(`invalid JSON-LD: ${(e as Error).message}`);
+      fail(`invalid JSON-LD: ${e.message}`);
     }
   }
   ok(`${jsonLdBlocks.length} JSON-LD block(s) parse cleanly`);
