@@ -447,6 +447,13 @@ export default function HeartifyPlus() {
           <div className="mt-6">
             <HouseholdPanel />
           </div>
+          <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/30 p-4 text-sm">
+            <span className="font-medium text-foreground">Have a gift code? </span>
+            <a href="/redeem" className="text-primary underline hover:no-underline">
+              Redeem it here
+            </a>
+            <span className="text-muted-foreground"> to add months of Heartify+ to your account.</span>
+          </div>
         </section>
 
         {/* Waitlist */}
