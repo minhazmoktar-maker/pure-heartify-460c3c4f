@@ -5,9 +5,15 @@ import "./index.css";
 import { initSentry } from "./lib/sentry";
 import { captureAttributionOnce } from "./lib/attribution";
 import { growth } from "./lib/growthEvents";
+import { applyIconToDocument, getSelectedIconId } from "./lib/appIcon";
 
 // Bootstrap error reporting FIRST so early crashes are captured.
 initSentry();
+
+// Phase 10 — apply the user's saved app-icon variant on every boot so the
+// browser tab / installed PWA reflects their choice without a picker mount.
+try { applyIconToDocument(getSelectedIconId()); } catch { /* noop */ }
+
 
 // Fire-and-forget: capture first-touch UTM/referral on every fresh page load.
 void captureAttributionOnce();
