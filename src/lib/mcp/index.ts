@@ -5,6 +5,8 @@ import listFavorites from "./tools/list-favorites";
 import logDhikr from "./tools/log-dhikr";
 import logSalah from "./tools/log-salah";
 import getPrayerTimes from "./tools/prayer-times";
+import listDhikrSessions from "./tools/list-dhikr-sessions";
+import listSalahLogs from "./tools/list-salah-logs";
 
 // Direct Supabase issuer — never the .lovable.cloud proxy. See knowledge: cloud-auth-oauth-server.
 const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unset";
@@ -15,12 +17,21 @@ export default defineMcp({
   version: "0.1.0",
   instructions:
     "Tools for Heartify — a scholar-moderated Islamic content and worship-tracking app. " +
-    "Use `get_profile` and `get_streak` to read the signed-in user's account, " +
-    "`list_favorites` for their saved videos, `log_dhikr_session` and `log_salah` to " +
-    "record acts of worship, and `get_prayer_times` for salah timings by location.",
+    "Read tools: `get_profile`, `get_streak`, `list_favorites`, `list_dhikr_sessions`, " +
+    "`list_salah_logs`, `get_prayer_times`. Write tools: `log_dhikr_session`, `log_salah`. " +
+    "All reads/writes are scoped to the signed-in user via RLS.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [getProfile, getStreak, listFavorites, logDhikr, logSalah, getPrayerTimes],
+  tools: [
+    getProfile,
+    getStreak,
+    listFavorites,
+    listDhikrSessions,
+    listSalahLogs,
+    logDhikr,
+    logSalah,
+    getPrayerTimes,
+  ],
 });
