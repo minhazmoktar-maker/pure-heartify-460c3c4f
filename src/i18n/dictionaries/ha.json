@@ -1,0 +1,23 @@
+{
+  "app.name": "Heartify",
+  "nav.home": "Gida",
+  "nav.browse": "Bincika",
+  "nav.listen": "Saurara",
+  "nav.profile": "Bayani",
+  "nav.search": "Nema",
+  "common.save": "Ajiye",
+  "common.cancel": "Soke",
+  "common.loading": "Ana lodawa…",
+  "common.error": "Wani abu ya faru",
+  "language.title": "Harshe & Yanki",
+  "language.ui": "Harshen manhaja",
+  "language.content": "Harsunan abun ciki",
+  "language.country": "Ƙasa ko yanki",
+  "language.auto": "Keɓance ta atomatik ta yanki",
+  "language.autoHint": "Ba da shawarar abun ciki bisa harshenka da ƙasarka. Kana iya sauya duk abin da kake so.",
+  "language.diversity": "Bambancin abun ciki",
+  "language.diversityHint": "Manyan ƙimomi suna nuna ƙarin abun ciki wanda ba na harshen ka na farko ba.",
+  "language.detected": "An gano: {value}",
+  "language.saved": "An ajiye zaɓuɓɓuka",
+  "language.rtl": "Tsari daga dama zuwa hagu"
+}

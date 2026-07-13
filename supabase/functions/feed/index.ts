@@ -62,6 +62,14 @@ Deno.serve(async (req) => {
     const sectionId = body?.section_id as string | undefined;
     const cursor = body?.cursor as string | undefined; // ISO timestamp of last item's ingested_at
     const limit = Math.min(Math.max(body?.limit ?? 20, 1), 100);
+    // Locale-aware filtering: soft filter to caller's content languages.
+    // Sanitized to 2-3 char ISO codes to prevent injection.
+    const rawLangs = Array.isArray(body?.content_languages) ? body.content_languages : [];
+    const contentLanguages = rawLangs
+      .filter((l: unknown): l is string => typeof l === "string")
+      .map((l: string) => l.toLowerCase().replace(/[^a-z]/g, "").slice(0, 3))
+      .filter((l: string) => l.length >= 2 && l.length <= 3)
+      .slice(0, 8);
     // Sanitize search: strip PostgREST-significant chars (, ( ) * . : & =)
     // to prevent filter injection into the or=(...) clause.
     const rawSearch = typeof body?.search === "string" ? body.search.trim() : "";
@@ -71,7 +79,8 @@ Deno.serve(async (req) => {
     // Order: freshest content first (published_at), then halal_score, then ingested_at as tiebreaker.
     // NOTE: we intentionally overfetch a bit so post-fetch JS blocklist filter
     // can drop matches without leaving the page short of `limit`.
-    const fetchLimit = Math.min(limit * 2, 200);
+    // Overfetch more when locale-boosting so we can re-rank without starving pages.
+    const fetchLimit = Math.min(limit * (contentLanguages.length ? 3 : 2), 300);
     let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=published_at.desc.nullslast,halal_score.desc,ingested_at.desc&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
@@ -86,6 +95,7 @@ Deno.serve(async (req) => {
     if (search) {
       url += `&or=(title.ilike.*${encodeURIComponent(search)}*,channel_title.ilike.*${encodeURIComponent(search)}*)`;
     }
+
 
     // Belt-and-suspenders read-time blocklist. Ingest pipeline + nightly
     // sweep are the primary defense — this is only a safety net. We apply
@@ -112,8 +122,9 @@ Deno.serve(async (req) => {
     // Read-through cache — anonymous, non-search requests only. Signed-in
     // callers have per-user premium gating and cannot share bytes safely.
     const cacheable = !callerId && !search;
+    const langKey = contentLanguages.length ? contentLanguages.join(",") : "-";
     const cacheKey = cacheable
-      ? `feed:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}`
+      ? `feed:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${langKey}`
       : "";
 
     const produce = async () => {
@@ -143,10 +154,30 @@ Deno.serve(async (req) => {
       const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
       return !BLOCKED_TOKENS.some((tok) => t.includes(tok));
     });
-    const items = filtered.slice(0, limit);
+
+    // Locale-aware soft re-rank: matching content_language items surface first
+    // (and un-tagged items are treated as neutral so we never starve pages
+    // in markets whose curation hasn't been language-tagged yet).
+    let ordered = filtered;
+    if (contentLanguages.length) {
+      const langSet = new Set(contentLanguages);
+      const matches: Array<Record<string, unknown>> = [];
+      const untagged: Array<Record<string, unknown>> = [];
+      const others: Array<Record<string, unknown>> = [];
+      for (const v of filtered) {
+        const cl = (v.content_language as string | null)?.toLowerCase() ?? null;
+        if (!cl) untagged.push(v);
+        else if (langSet.has(cl)) matches.push(v);
+        else others.push(v);
+      }
+      ordered = [...matches, ...untagged, ...others];
+    }
+
+    const items = ordered.slice(0, limit);
     const nextCursor = items.length === limit
       ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
       : null;
+
 
     return json(
       {

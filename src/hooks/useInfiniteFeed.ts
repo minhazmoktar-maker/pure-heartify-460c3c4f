@@ -1,6 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { YouTubeVideo, HalalCategory } from "@/services/youtube";
+import { useLocale } from "@/contexts/LocaleContext";
 
 interface FeedPage {
   items: YouTubeVideo[];
@@ -22,6 +23,7 @@ async function fetchFeedPage(opts: {
   search?: string;
   cursor?: string;
   limit: number;
+  contentLanguages: string[];
 }): Promise<FeedPage> {
   const { data, error } = await supabase.functions.invoke("feed", {
     body: {
@@ -30,6 +32,7 @@ async function fetchFeedPage(opts: {
       search: opts.search,
       cursor: opts.cursor,
       limit: opts.limit,
+      content_languages: opts.contentLanguages,
     },
   });
 
@@ -49,8 +52,12 @@ export function useInfiniteFeed({
   limit = 20,
   enabled = true,
 }: UseFeedOptions = {}) {
+  const { preferences } = useLocale();
+  const contentLanguages = preferences.content_languages ?? [];
+  const langKey = contentLanguages.join(",");
+
   return useInfiniteQuery<FeedPage>({
-    queryKey: ["feed", category, sectionId, search, limit],
+    queryKey: ["feed", category, sectionId, search, limit, langKey],
     queryFn: ({ pageParam }) =>
       fetchFeedPage({
         category: category === "All" ? undefined : category,
@@ -58,6 +65,7 @@ export function useInfiniteFeed({
         search,
         cursor: pageParam as string | undefined,
         limit,
+        contentLanguages,
       }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,

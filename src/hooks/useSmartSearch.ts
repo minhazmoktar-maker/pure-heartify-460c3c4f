@@ -12,6 +12,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useLocale } from "@/contexts/LocaleContext";
+
 
 export interface SmartHit {
   id: string;
@@ -57,18 +59,31 @@ export function useSmartSearch(rawQuery: string) {
     return () => clearTimeout(t);
   }, [rawQuery]);
 
+  const { preferences } = useLocale();
+  const contentLanguages = preferences.content_languages ?? [];
+  const uiLanguage = preferences.ui_language ?? "en";
+  const langKey = contentLanguages.join(",");
+
   const searchQ = useQuery({
-    queryKey: ["smart-search", debounced],
+    queryKey: ["smart-search", debounced, langKey, uiLanguage],
     enabled: debounced.length > 0,
     staleTime: 30_000,
     queryFn: async (): Promise<SearchResponse> => {
       const { data, error } = await supabase.functions.invoke("search", {
-        body: { q: debounced, limit: 60, useAi: true },
+        body: {
+          q: debounced,
+          limit: 60,
+          useAi: true,
+          content_languages: contentLanguages,
+          ui_language: uiLanguage,
+        },
       });
       if (error) throw error;
       return data as SearchResponse;
     },
   });
+
+
 
   const autoQ = useQuery({
     queryKey: ["smart-autocomplete", rawQuery],

@@ -67,6 +67,16 @@ Deno.serve(async (req) => {
     const limit = Math.min(Math.max(Number(body.limit ?? 40), 1), 100);
     const offset = Math.max(Number(body.offset ?? 0), 0);
     const useAi = body.useAi !== false && q.length >= 3;
+    // Locale hints — soft signals used to re-rank, never to hard-filter
+    // (a Turkish user searching "quran" still gets great English results).
+    const contentLanguages: string[] = Array.isArray(body.content_languages)
+      ? (body.content_languages as unknown[])
+          .filter((l): l is string => typeof l === "string")
+          .map((l) => l.toLowerCase().replace(/[^a-z]/g, "").slice(0, 3))
+          .filter((l) => l.length >= 2 && l.length <= 3)
+          .slice(0, 8)
+      : [];
+
 
     let intent = useAi ? await detectIntent(q) : null;
 
@@ -145,7 +155,38 @@ Deno.serve(async (req) => {
         );
       }
     }
+
+    // Locale-aware soft re-rank: hydrate content_language for the current
+    // page and float caller-preferred languages to the top. Untagged videos
+    // are treated as neutral to avoid starving markets whose catalog isn't
+    // fully tagged yet. If lookup fails we silently keep lexical order.
+    if (contentLanguages.length && filteredHits.length > 0) {
+      const ids = filteredHits
+        .map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string)
+        .filter(Boolean);
+      const { data: langRows } = await admin
+        .from("curated_videos")
+        .select("video_id, content_language")
+        .in("video_id", ids);
+      const langById = new Map(
+        (langRows ?? []).map((r) => [r.video_id as string, (r.content_language as string | null)?.toLowerCase() ?? null]),
+      );
+      const langSet = new Set(contentLanguages);
+      const matches: typeof filteredHits = [];
+      const untagged: typeof filteredHits = [];
+      const others: typeof filteredHits = [];
+      for (const h of filteredHits) {
+        const id = (h.video_id ?? h.id) as string;
+        const cl = langById.get(id) ?? null;
+        if (!cl) untagged.push(h);
+        else if (langSet.has(cl)) matches.push(h);
+        else others.push(h);
+      }
+      filteredHits = [...matches, ...untagged, ...others];
+    }
+
     const [{ data: trending }, { data: related }] = await Promise.all([
+
       admin.rpc("get_trending_searches", { _limit: 10, _window_hours: 168 }),
       q ? admin.rpc("get_related_searches", { _query: q, _limit: 6 }) : Promise.resolve({ data: [] }),
     ]);
