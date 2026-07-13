@@ -248,6 +248,7 @@ const App = () => (
       <ThemeProvider>
         <AuthProvider>
           <LocaleProvider>
+          <KidsModeProvider>
           <PlayerProvider>
           <Toaster />
           <Sonner />
