@@ -79,9 +79,13 @@ export default function EmptyState({
         className,
       )}
     >
-      <div className={cn("flex h-12 w-12 items-center justify-center rounded-full", styles.icon)}>
-        <Icon className="h-6 w-6" />
-      </div>
+      {illustration ? (
+        <EmptyIllustration variant={illustration} className="mb-1 h-24 w-24" />
+      ) : (
+        <div className={cn("flex h-12 w-12 items-center justify-center rounded-full", styles.icon)}>
+          <Icon className="h-6 w-6" />
+        </div>
+      )}
       <h3 className="text-base font-semibold text-foreground">{title}</h3>
       {description && (
         <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
