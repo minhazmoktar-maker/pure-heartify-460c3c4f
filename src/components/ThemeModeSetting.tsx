@@ -23,8 +23,10 @@ export default function ThemeModeSetting() {
         </p>
       </div>
       <div className="grid grid-cols-3 gap-2">
-        {OPTIONS.map(({ id, label, icon: Icon, hint }) => {
+        {OPTIONS.map((opt) => {
+          const { id, label, icon: Icon } = opt;
           const active = mode === id;
+          const hint = "hint" in opt ? opt.hint : undefined;
           return (
             <button
               key={id}
@@ -35,7 +37,7 @@ export default function ThemeModeSetting() {
                 "flex flex-col items-center gap-1 rounded-xl border p-3 text-xs transition-colors",
                 active ? "border-primary bg-primary/5 text-primary" : "border-border text-foreground hover:bg-secondary",
               )}
-              title={"hint" in (id === "auto" ? { hint } : {}) ? hint : label}
+              title={hint ?? label}
             >
               <Icon className="h-5 w-5" />
               <span className="font-medium">{label}</span>
