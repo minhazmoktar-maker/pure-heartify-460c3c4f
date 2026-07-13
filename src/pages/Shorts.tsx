@@ -5,7 +5,7 @@ import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 import { Loader2, Volume2, VolumeX } from "lucide-react";
 
 export default function Shorts() {
-  const { data: videos, isLoading } = useYouTubeVideos("Reminders");
+  const { data: videos, isLoading } = useYouTubeVideos("Lectures");
   const [muted, setMuted] = useState(true);
   const [active, setActive] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
