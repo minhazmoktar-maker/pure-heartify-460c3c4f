@@ -1,0 +1,23 @@
+{
+  "app.name": "Heartify",
+  "nav.home": "Mwanzo",
+  "nav.browse": "Vinjari",
+  "nav.listen": "Sikiliza",
+  "nav.profile": "Wasifu",
+  "nav.search": "Tafuta",
+  "common.save": "Hifadhi",
+  "common.cancel": "Ghairi",
+  "common.loading": "Inapakia…",
+  "common.error": "Kuna tatizo",
+  "language.title": "Lugha na Eneo",
+  "language.ui": "Lugha ya programu",
+  "language.content": "Lugha za maudhui",
+  "language.country": "Nchi au eneo",
+  "language.auto": "Ubinafsishaji wa kiotomatiki kwa eneo",
+  "language.autoHint": "Pendekeza maudhui kulingana na lugha na nchi yako. Unaweza kubadilisha chochote.",
+  "language.diversity": "Utofauti wa maudhui",
+  "language.diversityHint": "Thamani za juu huonyesha maudhui zaidi nje ya lugha yako kuu.",
+  "language.detected": "Imegunduliwa: {value}",
+  "language.saved": "Mapendeleo yamehifadhiwa",
+  "language.rtl": "Mpangilio wa kulia kwenda kushoto"
+}

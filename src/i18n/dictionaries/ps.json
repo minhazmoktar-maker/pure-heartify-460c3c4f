@@ -1,0 +1,23 @@
+{
+  "app.name": "هارټیفای",
+  "nav.home": "کور",
+  "nav.browse": "لټون",
+  "nav.listen": "اورېدل",
+  "nav.profile": "پېژندپاڼه",
+  "nav.search": "لټون",
+  "common.save": "خوندي کړئ",
+  "common.cancel": "لغوه کول",
+  "common.loading": "بار کیږي…",
+  "common.error": "یو څه سم نه دي",
+  "language.title": "ژبه او سیمه",
+  "language.ui": "د اپلیکیشن ژبه",
+  "language.content": "د محتوا ژبې",
+  "language.country": "هېواد یا سیمه",
+  "language.auto": "د سیمې پر بنسټ اتوماتیک شخصي کول",
+  "language.autoHint": "ستاسو د ژبې او هېواد پر بنسټ محتوا وړاندیز کول. تاسو کولی شئ هرڅه بدل کړئ.",
+  "language.diversity": "د محتوا تنوع",
+  "language.diversityHint": "لوړې ارزښتونه ستاسو د لومړني ژبې څخه بهر ډیر محتوا ښکاره کوي.",
+  "language.detected": "کشف شو: {value}",
+  "language.saved": "غوره توبونه خوندي شول",
+  "language.rtl": "له ښیې څخه کیڼ اړخ ته ترتیب"
+}
