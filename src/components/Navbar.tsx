@@ -1,6 +1,7 @@
 import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll, Download } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { hasUnseenChangelog } from "@/data/changelog";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
@@ -17,12 +18,16 @@ import { cn } from "@/lib/utils";
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [unseenChangelog, setUnseenChangelog] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { isAdmin, isOwner } = useRole();
   const scrolled = useScrolled(8);
   const { enabled: kidsOn, toggle: toggleKids } = useKidsMode();
+
+  useEffect(() => { setUnseenChangelog(hasUnseenChangelog()); }, []);
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +101,7 @@ const Navbar = () => {
                   { to: "/profile?tab=interests", label: "My interests", icon: ListMusic },
                   { to: "/offline", label: "Offline downloads", icon: Download },
                   { to: "/profile", label: "Profile & settings", icon: Settings },
+                  { to: "/changelog", label: unseenChangelog ? "What's new •" : "What's new", icon: Sparkles },
                 ].map(({ to, label, icon: Icon }) => (
                   <SheetClose asChild key={to}>
                     <Link to={to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">

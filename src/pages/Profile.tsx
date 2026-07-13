@@ -7,6 +7,9 @@ import PageSkeleton from "@/components/PageSkeleton";
 import ReferralCard from "@/components/ReferralCard";
 import HandleClaimCard from "@/components/HandleClaimCard";
 import LanguageSettings from "@/components/LanguageSettings";
+import AppIconPicker from "@/components/AppIconPicker";
+import ThemeModeSetting from "@/components/ThemeModeSetting";
+import SoundSetting from "@/components/SoundSetting";
 import MfaStatusCard from "@/components/MfaStatusCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import { useAuth } from "@/contexts/AuthContext";
@@ -269,6 +272,19 @@ const Profile = () => {
             <div className="pt-4">
               <LanguageSettings />
             </div>
+
+            <div className="pt-4">
+              <ThemeModeSetting />
+            </div>
+
+            <div className="pt-4">
+              <SoundSetting />
+            </div>
+
+            <div className="pt-4">
+              <AppIconPicker />
+            </div>
+
 
             <div className="pt-4">
               <HandleClaimCard />

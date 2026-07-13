@@ -87,8 +87,15 @@ const Dhikr = () => {
       const newTodayCompleted = s.todayCompleted + (justCompleted ? 1 : 0);
       let newStreak = s.streak;
       if (justCompleted && s.todayCompleted === 0) newStreak = s.streak + 1;
+      // Sound + haptics — Phase 10. Tap on every increment, chime on goal,
+      // warm swell when the streak advances. Lazy import so first paint stays cheap.
+      import("@/lib/soundHaptics").then((m) => {
+        if (delta < 0) return m.soundNudge();
+        if (justCompleted && s.todayCompleted === 0) return m.soundStreakSave();
+        if (justCompleted) return m.soundGoal();
+        return m.soundTap();
+      }).catch(() => {});
       if (justCompleted) {
-        // Lazy import to avoid cost on component mount
         import("@/lib/celebrate").then((m) => m.celebrateSmall()).catch(() => {});
       }
       return {

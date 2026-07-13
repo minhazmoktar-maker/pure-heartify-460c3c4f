@@ -2,11 +2,14 @@ import { LucideIcon, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import FadeIn from "@/components/FadeIn";
+import EmptyIllustration, { type EmptyIllustrationVariant } from "@/components/EmptyIllustration";
 
 type Tone = "default" | "muted" | "gold";
 
 interface EmptyStateProps {
   icon?: LucideIcon;
+  /** Optional illustration — takes precedence over `icon` when set. */
+  illustration?: EmptyIllustrationVariant;
   title: string;
   description?: string;
   actionLabel?: string;
@@ -34,6 +37,7 @@ const TONE_STYLES: Record<Tone, { icon: string; button: string }> = {
 
 export default function EmptyState({
   icon: Icon = Sparkles,
+  illustration,
   title,
   description,
   actionLabel,
@@ -75,9 +79,13 @@ export default function EmptyState({
         className,
       )}
     >
-      <div className={cn("flex h-12 w-12 items-center justify-center rounded-full", styles.icon)}>
-        <Icon className="h-6 w-6" />
-      </div>
+      {illustration ? (
+        <EmptyIllustration variant={illustration} className="mb-1 h-24 w-24" />
+      ) : (
+        <div className={cn("flex h-12 w-12 items-center justify-center rounded-full", styles.icon)}>
+          <Icon className="h-6 w-6" />
+        </div>
+      )}
       <h3 className="text-base font-semibold text-foreground">{title}</h3>
       {description && (
         <p className="max-w-sm text-sm text-muted-foreground">{description}</p>

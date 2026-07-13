@@ -30,6 +30,7 @@ import { KidsModeProvider } from "./contexts/KidsModeContext";
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
 const Mushaf = lazy(() => import("./pages/Mushaf.tsx"));
 const Redeem = lazy(() => import("./pages/Redeem.tsx"));
+const Changelog = lazy(() => import("./pages/Changelog.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
@@ -271,6 +272,7 @@ const App = () => (
                 <Route path="/mushaf" element={<Mushaf />} />
                 <Route path="/mushaf/:page" element={<Mushaf />} />
                 <Route path="/redeem" element={<Redeem />} />
+                <Route path="/changelog" element={<Changelog />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/section/:sectionId" element={<SectionAll />} />
                 <Route path="/login" element={<Login />} />
