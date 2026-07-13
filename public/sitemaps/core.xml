@@ -300,6 +300,32 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/sacred-mosques"/>
   </url>
   <url>
+    <loc>https://pure-heartify.lovable.app/fatwa</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pure-heartify.lovable.app/fatwa?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://pure-heartify.lovable.app/fatwa?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://pure-heartify.lovable.app/fatwa?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pure-heartify.lovable.app/fatwa?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pure-heartify.lovable.app/fatwa?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://pure-heartify.lovable.app/fatwa?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pure-heartify.lovable.app/fatwa?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/fatwa"/>
+  </url>
+  <url>
+    <loc>https://pure-heartify.lovable.app/digital-purification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pure-heartify.lovable.app/digital-purification?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://pure-heartify.lovable.app/digital-purification?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://pure-heartify.lovable.app/digital-purification?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pure-heartify.lovable.app/digital-purification?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pure-heartify.lovable.app/digital-purification?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://pure-heartify.lovable.app/digital-purification?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pure-heartify.lovable.app/digital-purification?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/digital-purification"/>
+  </url>
+  <url>
     <loc>https://pure-heartify.lovable.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
