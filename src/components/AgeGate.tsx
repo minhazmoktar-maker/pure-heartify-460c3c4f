@@ -1,23 +1,60 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const STORAGE_KEY = "heartify.ageGate.v1";
 const MIN_AGE = 13; // COPPA / most app stores
 
+// Public / SEO / share / legal surfaces that must never be gated.
+// Anything the crawler or a share-link recipient could hit before signing in.
+const PUBLIC_PREFIXES = [
+  "/privacy",
+  "/terms",
+  "/legal",
+  "/about",
+  "/trust",
+  "/contact",
+  "/appeals",
+  "/share",
+  "/s/",
+  "/embed",
+  "/reset-password",
+  "/forgot-password",
+  "/auth",
+  "/login",
+  "/signup",
+  "/sitemap",
+  "/robots",
+];
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith(p));
+}
+
 export default function AgeGate() {
+  const { user, loading: authLoading } = useAuth();
+  const location = useLocation();
   const [visible, setVisible] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const [dob, setDob] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Never gate signed-in users or public/SEO routes.
+    if (authLoading) return;
+    if (user) { setVisible(false); setBlocked(false); return; }
+    if (isPublicPath(location.pathname)) { setVisible(false); setBlocked(false); return; }
     try {
       const v = localStorage.getItem(STORAGE_KEY);
-      if (!v) setVisible(true);
-      else if (JSON.parse(v).blocked) setBlocked(true);
+      if (!v) { setVisible(true); return; }
+      const parsed = JSON.parse(v);
+      if (parsed?.blocked) setBlocked(true);
+      else setVisible(false);
     } catch {
-      setVisible(true);
+      // If we can't read storage, don't hard-block the app — allow through.
+      setVisible(false);
     }
-  }, []);
+  }, [user, authLoading, location.pathname]);
 
   const confirm = () => {
     if (!dob) {
@@ -47,6 +84,14 @@ export default function AgeGate() {
     setVisible(false);
   };
 
+  const resetGate = () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+    setBlocked(false);
+    setDob("");
+    setError(null);
+    setVisible(true);
+  };
+
   if (blocked) {
     return (
       <div className="fixed inset-0 z-[90] flex items-center justify-center bg-background p-6">
@@ -56,6 +101,12 @@ export default function AgeGate() {
             You need to be at least {MIN_AGE} years old to use this service.
             Please come back when you're old enough — jazakAllahu khayran.
           </p>
+          <button
+            onClick={resetGate}
+            className="mt-4 text-xs text-muted-foreground underline hover:text-foreground"
+          >
+            Entered the wrong date? Try again.
+          </button>
         </div>
       </div>
     );
