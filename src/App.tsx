@@ -402,6 +402,7 @@ const App = () => (
                 <Route path="/salah-guide" element={<SalahGuide />} />
                 <Route path="/fatwa" element={<Fatwa />} />
                 <Route path="/digital-purification" element={<DigitalPurification />} />
+                <Route path="/quotes" element={<Quotes />} />
                 <Route path="/ruqya" element={<Ruqya />} />
                 <Route path="/nawawi-40" element={<Nawawi40 />} />
                 <Route path="/prophets" element={<Prophets />} />
