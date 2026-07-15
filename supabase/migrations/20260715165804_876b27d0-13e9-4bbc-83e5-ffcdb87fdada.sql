@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Anyone can read comment reactions" ON public.comment_reactions; REVOKE SELECT ON public.comment_reactions FROM anon;
