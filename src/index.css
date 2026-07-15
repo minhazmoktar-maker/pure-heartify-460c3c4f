@@ -123,14 +123,6 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight text-foreground;
   }
-    font-feature-settings: "ss01", "cv11";
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight text-foreground;
-  }
   h1 { line-height: 1.15; letter-spacing: -0.02em; }
   h2 { line-height: 1.2;  letter-spacing: -0.015em; }
   h3 { line-height: 1.25; letter-spacing: -0.01em; }
