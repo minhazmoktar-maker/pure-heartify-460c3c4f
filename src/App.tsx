@@ -75,6 +75,7 @@ const FarewellSermon = lazy(() => import("./pages/FarewellSermon.tsx"));
 const Fasting = lazy(() => import("./pages/Fasting.tsx"));
 const Fatwa = lazy(() => import("./pages/Fatwa.tsx"));
 const DigitalPurification = lazy(() => import("./pages/DigitalPurification.tsx"));
+const Quotes = lazy(() => import("./pages/Quotes.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const Ghusl = lazy(() => import("./pages/Ghusl.tsx"));
 const Glossary = lazy(() => import("./pages/Glossary.tsx"));
