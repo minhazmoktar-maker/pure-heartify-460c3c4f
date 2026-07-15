@@ -26,6 +26,8 @@ import BackToTop from "./components/BackToTop";
 import AgeGate from "./components/AgeGate";
 import CookieConsent from "./components/CookieConsent";
 import CommandPalette from "./components/CommandPalette";
+import BottomTabBar from "./components/BottomTabBar";
+import ScrollRestoration from "./components/ScrollRestoration";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
@@ -257,6 +259,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollRestoration />
             <MobileBridge />
             <ReferralBridge />
             <AdhanNotifier />
@@ -266,6 +269,7 @@ const App = () => (
             <AgeGate />
             <CookieConsent />
             <CommandPalette />
+            <BottomTabBar />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>

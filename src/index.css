@@ -112,6 +112,20 @@
     font-feature-settings: "ss01", "cv11";
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    /* Reserve space for the mobile BottomTabBar (Phase 2 spine).
+       Hidden on md+ where the desktop Navbar is the primary nav. */
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+  @media (min-width: 768px) {
+    body { padding-bottom: 0; }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight text-foreground;
+  }
+    font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
