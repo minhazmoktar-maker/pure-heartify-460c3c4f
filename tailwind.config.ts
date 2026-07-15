@@ -75,9 +75,44 @@ export default {
         },
       },
       borderRadius: {
+        // Legacy (kept so shadcn ui/* keeps working; do not use in new code)
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        // Locked design system radii
+        card: "var(--radius-card)",
+        pill: "var(--radius-pill)",
+      },
+      // Locked design system — spacing (see docs/DESIGN_SYSTEM.md)
+      spacing: {
+        "ds-xs": "4px",
+        "ds-sm": "8px",
+        "ds-md": "16px",
+        "ds-lg": "32px",
+      },
+      // Locked design system — elevations
+      boxShadow: {
+        e0: "var(--shadow-e0)",
+        e1: "var(--shadow-e1)",
+        e2: "var(--shadow-e2)",
+      },
+      // Locked design system — motion
+      transitionDuration: {
+        micro: "var(--duration-micro)",
+        short: "var(--duration-short)",
+        medium: "var(--duration-medium)",
+      },
+      transitionTimingFunction: {
+        standard: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
+      // Locked design system — 6 type roles
+      fontSize: {
+        display: ["clamp(2.25rem, 4vw, 3.5rem)", { lineHeight: "1.05", fontWeight: "700", letterSpacing: "-0.02em" }],
+        title: ["1.5rem", { lineHeight: "1.2", fontWeight: "600", letterSpacing: "-0.01em" }],
+        heading: ["1.125rem", { lineHeight: "1.3", fontWeight: "600" }],
+        body: ["1rem", { lineHeight: "1.6", fontWeight: "400" }],
+        caption: ["0.875rem", { lineHeight: "1.5", fontWeight: "400" }],
+        micro: ["0.75rem", { lineHeight: "1.4", fontWeight: "500" }],
       },
       keyframes: {
         "accordion-down": {

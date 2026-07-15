@@ -1,0 +1,22 @@
+name: design-lint
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "scripts/design-lint.mjs"
+      - "docs/DESIGN_SYSTEM.md"
+  push:
+    branches: [main]
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      # Baseline / report mode during Phase 1 rollout. Flip to enforce
+      # (drop --report) once Phase 2 migrates product surfaces to tokens.
+      - name: design-lint (report)
+        run: node scripts/design-lint.mjs --report
