@@ -182,6 +182,7 @@ const Index = () => {
 
       <AudioPlayer />
     </div>
+    </PullToRefresh>
   );
 };
 
