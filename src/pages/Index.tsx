@@ -215,7 +215,7 @@ const Index = () => {
         </div>
       </footer>
 
-      <AudioPlayer />
+      <Suspense fallback={null}><AudioPlayer /></Suspense>
     </div>
     </PullToRefresh>
   );
