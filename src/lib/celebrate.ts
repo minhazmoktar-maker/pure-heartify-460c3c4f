@@ -1,4 +1,4 @@
-// design-lint-disable — brand/canvas/chart palette requires literal hex colors
+// design-lint-disable-file — brand/canvas/chart palette requires literal hex colors
 import confetti from "canvas-confetti";
 
 const REDUCED = () =>

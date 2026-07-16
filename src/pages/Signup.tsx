@@ -1,4 +1,4 @@
-// design-lint-disable — brand/canvas/chart palette requires literal hex colors
+// design-lint-disable-file — brand/canvas/chart palette requires literal hex colors
 import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
