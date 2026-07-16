@@ -29,7 +29,14 @@ const ICONS: Record<SpineId, React.ComponentType<{ className?: string }>> = {
 
 export default function BottomTabBar() {
   const { pathname } = useLocation();
-  if (!shouldShowBottomBar(pathname)) return null;
+  const visible = shouldShowBottomBar(pathname);
+  useEffect(() => {
+    if (visible) {
+      document.body.classList.add("has-bottom-bar");
+      return () => document.body.classList.remove("has-bottom-bar");
+    }
+  }, [visible]);
+  if (!visible) return null;
   const activeSpine = resolveSpine(pathname);
 
   return (
