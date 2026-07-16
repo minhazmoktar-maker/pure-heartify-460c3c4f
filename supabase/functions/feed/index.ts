@@ -190,10 +190,15 @@ Deno.serve(async (req) => {
     // of the previous ±3-position jitter that made every viewer's feed
     // nearly identical. Anonymous users still get a per-device seeded
     // shuffle so distinct devices don't converge on one page order.
-    if (sort === "fresh" && !search) {
+    // Personalization runs for both "fresh" and "recent" sorts. "recent" is the
+    // "Recently Added" surface — we keep newest-approved-first as the anchor
+    // but still honor blocked creators, dismissals, hidden videos, and give a
+    // mild affinity boost so the ordering is personal rather than identical
+    // across users.
+    if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
       const weekBucket = Math.floor(Date.now() / (7 * 86400000));
-      const seedStr = `${identity}:${weekBucket}:${category ?? "all"}`;
+      const seedStr = `${identity}:${weekBucket}:${category ?? "all"}:${sort}`;
       // FNV-1a hash → deterministic [0,1)
       const hash01 = (s: string): number => {
         let h = 2166136261 >>> 0;
@@ -202,6 +207,7 @@ Deno.serve(async (req) => {
       };
 
       if (callerId) {
+
         // Signed-in: gather signals (best-effort, timeboxed) and apply a
         // compact re-ranker on top of the freshness-sorted page.
         //
