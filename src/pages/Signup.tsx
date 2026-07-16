@@ -128,6 +128,8 @@ const Signup = () => {
           <AuthField
             icon={User}
             autoComplete="name"
+            autoCapitalize="words"
+            enterKeyHint="next"
             placeholder="Display name"
             value={displayName}
             onChange={(e) => {
