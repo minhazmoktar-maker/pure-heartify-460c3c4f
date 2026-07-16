@@ -134,7 +134,7 @@ const Nikah = () => {
             <Link to="/" aria-label="Back to home"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <Heart className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Nikah Planner</h1>
+          <h1 className="text-heading font-semibold">Nikah Planner</h1>
         </div>
       </header>
 
@@ -143,14 +143,14 @@ const Nikah = () => {
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-sm">Checklist</CardTitle></CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{doneCount}/{s.tasks.length}</div>
+              <div className="text-title font-bold">{doneCount}/{s.tasks.length}</div>
               <Progress value={progress} className="mt-2 h-2" />
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-sm">Budget</CardTitle></CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-title font-bold">
                 {s.currency} {spent.toFixed(0)} <span className="text-sm text-muted-foreground">/ {s.budget}</span>
               </div>
               <Progress value={budgetPct} className="mt-2 h-2" />
@@ -159,8 +159,8 @@ const Nikah = () => {
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-sm">Confirmed guests</CardTitle></CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{rsvpYes}<span className="text-sm text-muted-foreground"> / {s.guests.length}</span></div>
-              <p className="mt-2 text-xs text-muted-foreground">Tap RSVP to cycle status</p>
+              <div className="text-title font-bold">{rsvpYes}<span className="text-sm text-muted-foreground"> / {s.guests.length}</span></div>
+              <p className="mt-2 text-micro text-muted-foreground">Tap RSVP to cycle status</p>
             </CardContent>
           </Card>
         </div>
@@ -192,7 +192,7 @@ const Nikah = () => {
           <TabsContent value="checklist">
             <Card><CardContent className="pt-6 space-y-2">
               {s.tasks.map((t) => (
-                <label key={t.id} className="flex cursor-pointer items-center gap-3 rounded-md border p-3 hover:bg-accent">
+                <label key={t.id} className="flex cursor-pointer items-center gap-3 rounded-card border p-3 hover:bg-accent">
                   <Checkbox checked={t.done} onCheckedChange={() => toggleTask(t.id)} />
                   <span className={t.done ? "line-through text-muted-foreground" : ""}>{t.label}</span>
                 </label>
@@ -204,7 +204,7 @@ const Nikah = () => {
             <Card><CardContent className="pt-6 space-y-3">
               <div className="flex flex-wrap gap-2">
                 <Input placeholder="Guest name" value={guestName} onChange={(e) => setGuestName(e.target.value)} className="flex-1 min-w-[180px]" />
-                <select value={guestSide} onChange={(e) => setGuestSide(e.target.value as any)} className="rounded-md border bg-background px-3 text-sm">
+                <select value={guestSide} onChange={(e) => setGuestSide(e.target.value as any)} className="rounded-card border bg-background px-3 text-sm">
                   <option value="bride">Bride side</option>
                   <option value="groom">Groom side</option>
                 </select>
@@ -213,10 +213,10 @@ const Nikah = () => {
               {s.guests.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No guests added yet.</p>
               ) : (
-                <ul className="divide-y rounded-md border">
+                <ul className="divide-y rounded-card border">
                   {s.guests.map((g) => (
                     <li key={g.id} className="flex items-center gap-2 p-3">
-                      <span className="flex-1">{g.name} <span className="text-xs text-muted-foreground">({g.side})</span></span>
+                      <span className="flex-1">{g.name} <span className="text-micro text-muted-foreground">({g.side})</span></span>
                       <Button size="sm" variant="outline" onClick={() => cycleRsvp(g.id)}>
                         {g.rsvp === "yes" && <Check className="mr-1 h-3 w-3 text-primary" />}
                         {g.rsvp.toUpperCase()}
@@ -239,7 +239,7 @@ const Nikah = () => {
               {s.expenses.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No expenses recorded.</p>
               ) : (
-                <ul className="divide-y rounded-md border">
+                <ul className="divide-y rounded-card border">
                   {s.expenses.map((e) => (
                     <li key={e.id} className="flex items-center gap-2 p-3">
                       <span className="flex-1">{e.label}</span>
@@ -249,7 +249,7 @@ const Nikah = () => {
                   ))}
                 </ul>
               )}
-              <div className="rounded-md bg-muted p-3 text-sm">
+              <div className="rounded-card bg-muted p-3 text-sm">
                 Spent <b>{s.currency} {spent.toFixed(2)}</b> of <b>{s.currency} {s.budget}</b> ({budgetPct}%)
               </div>
             </CardContent></Card>

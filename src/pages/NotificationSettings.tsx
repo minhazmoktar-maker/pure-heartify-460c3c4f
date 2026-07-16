@@ -101,20 +101,20 @@ export default function NotificationSettings() {
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8 md:py-12">
         <header className="mb-6">
-          <h1 className="text-3xl font-bold">Notifications</h1>
+          <h1 className="text-title font-bold">Notifications</h1>
           <p className="mt-1 text-muted-foreground">
             Pick exactly what you want, exactly where you want it.
           </p>
         </header>
 
         {/* Browser push status */}
-        <section className="mb-8 rounded-xl border border-border bg-card p-5">
+        <section className="mb-8 rounded-card border border-border bg-card p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               {push.status === "granted" ? <Bell className="h-5 w-5 text-primary" /> : <BellOff className="h-5 w-5 text-muted-foreground" />}
               <div>
                 <div className="font-semibold">Browser push</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-micro text-muted-foreground">
                   {push.status === "granted"
                     ? "Enabled on this device."
                     : push.status === "denied"
@@ -135,8 +135,8 @@ export default function NotificationSettings() {
         </section>
 
         {/* Matrix */}
-        <section className="overflow-hidden rounded-xl border border-border bg-card">
-          <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-border bg-muted/40 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <section className="overflow-hidden rounded-card border border-border bg-card">
+          <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-border bg-muted/40 px-5 py-3 text-micro font-semibold uppercase tracking-wider text-muted-foreground">
             <div>Notification</div>
             <div className="flex items-center gap-1 justify-self-center"><Smartphone className="h-3.5 w-3.5" />Push</div>
             <div className="flex items-center gap-1 justify-self-center"><Mail className="h-3.5 w-3.5" />Email</div>
@@ -154,7 +154,7 @@ export default function NotificationSettings() {
                 >
                   <div>
                     <div className="font-medium text-foreground">{k.title}</div>
-                    <div className="text-xs text-muted-foreground">{k.description}</div>
+                    <div className="text-micro text-muted-foreground">{k.description}</div>
                   </div>
                   <Switch
                     checked={p?.push_enabled ?? true}

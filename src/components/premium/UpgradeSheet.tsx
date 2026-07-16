@@ -26,10 +26,10 @@ export default function UpgradeSheet({ open, onOpenChange, feature }: UpgradeShe
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl">
         <SheetHeader className="text-left">
-          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--gold))]/15 text-[hsl(var(--gold))]">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-pill bg-[hsl(var(--gold))]/15 text-[hsl(var(--gold))]">
             <Sparkles className="h-5 w-5" aria-hidden />
           </div>
-          <SheetTitle className="font-heading text-xl">
+          <SheetTitle className="font-heading text-heading">
             {feature ? `${feature} is a Heartify+ feature` : "Unlock Heartify+"}
           </SheetTitle>
           <SheetDescription>

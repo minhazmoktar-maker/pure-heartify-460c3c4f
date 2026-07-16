@@ -94,14 +94,14 @@ export default function NotificationsBell({ isAdmin }: Props) {
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
-          className="tap-target animate-press relative inline-flex items-center justify-center rounded-full transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="tap-target animate-press relative inline-flex items-center justify-center rounded-pill transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label={unread > 0 ? `Notifications (${unread} new)` : "Notifications"}
         >
           <Bell className="h-5 w-5 text-foreground" />
           {unread > 0 && (
             <span
               aria-hidden
-              className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground"
+              className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-pill bg-destructive px-1 text-[10px] font-bold text-destructive-foreground"
             >
               {unread > 9 ? "9+" : unread}
             </span>
@@ -130,7 +130,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium">Premium is active</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-micro text-muted-foreground">
                       Plan: {entitlement.plan}
                       {entitlement.expiresAt ? ` · until ${new Date(entitlement.expiresAt).toLocaleDateString()}` : " · no expiry"}
                     </p>
@@ -150,7 +150,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
                     <p className="text-sm font-medium">
                       {pendingReports} report{pendingReports === 1 ? "" : "s"} awaiting review
                     </p>
-                    <p className="text-xs text-muted-foreground">Open the moderation queue →</p>
+                    <p className="text-micro text-muted-foreground">Open the moderation queue →</p>
                   </div>
                 </Link>
               )}
@@ -178,9 +178,9 @@ export default function NotificationsBell({ isAdmin }: Props) {
                     <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{n.title}</p>
-                      {n.body && <p className="text-xs text-muted-foreground">{n.body}</p>}
+                      {n.body && <p className="text-micro text-muted-foreground">{n.body}</p>}
                       {ctaUrl && (
-                        <p className="mt-1 text-xs font-semibold text-primary">
+                        <p className="mt-1 text-micro font-semibold text-primary">
                           {ctaLabel} →
                         </p>
                       )}
@@ -197,7 +197,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
               {myReports.length === 0 && notif.items.length === 0 && !isAdmin && (
                 <div className="flex flex-col items-center gap-2 p-8 text-center text-muted-foreground">
                   <Inbox className="h-8 w-8 opacity-40" />
-                  <p className="text-xs">You're all caught up.</p>
+                  <p className="text-micro">You're all caught up.</p>
                 </div>
               )}
 
@@ -221,7 +221,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
                       <p className="text-sm font-medium">
                         Your report was {r.status}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">
+                      <p className="truncate text-micro text-muted-foreground">
                         {r.resolution ?? `Video ${r.video_id}`}
                       </p>
                       <p className="text-[10px] text-muted-foreground">
@@ -239,7 +239,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
           {notif.unread > 0 ? (
             <button
               onClick={() => void notif.markAllRead()}
-              className="text-xs font-semibold text-primary hover:underline"
+              className="text-micro font-semibold text-primary hover:underline"
             >
               Mark all read
             </button>
@@ -249,7 +249,7 @@ export default function NotificationsBell({ isAdmin }: Props) {
           <Link
             to="/profile"
             onClick={() => setOpen(false)}
-            className="text-xs font-semibold text-primary hover:underline"
+            className="text-micro font-semibold text-primary hover:underline"
           >
             Manage preferences
           </Link>

@@ -135,7 +135,7 @@ export default function GroupKhatmList() {
       <main className="container mx-auto max-w-3xl px-4 py-6 space-y-6">
         <header className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Group Khatm</h1>
+            <h1 className="text-title font-bold text-foreground">Group Khatm</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               30 members, 30 Juz. Read together, complete the Quran together.
             </p>
@@ -182,10 +182,10 @@ export default function GroupKhatmList() {
                     placeholder="e.g., for the shifa of ..."
                   />
                 </div>
-                <div className="flex items-center justify-between rounded-lg border border-border p-3">
+                <div className="flex items-center justify-between rounded-card border border-border p-3">
                   <div>
                     <Label htmlFor="kg-public" className="text-sm">Public listing</Label>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-micro text-muted-foreground">
                       Anyone can discover this group. Off = invite link only.
                     </p>
                   </div>
@@ -225,7 +225,7 @@ export default function GroupKhatmList() {
                 className="block transition-transform hover:-translate-y-0.5"
               >
                 <Card className="p-4 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-primary/10 text-primary">
                     <BookOpen className="h-5 w-5" aria-hidden />
                   </div>
                   <div className="min-w-0 flex-1">

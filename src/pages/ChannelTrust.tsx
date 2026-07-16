@@ -153,7 +153,7 @@ const ChannelTrust = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
+            <h1 className="text-title font-bold flex items-center gap-2">
               <ShieldCheck className="h-6 w-6 text-primary" />
               Channel Trust & Reputation
             </h1>
@@ -199,13 +199,13 @@ const ChannelTrust = () => {
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <div className="font-medium truncate">{c?.title ?? p.youtube_channel_id ?? p.channel_id}</div>
-                          <div className="text-xs text-muted-foreground truncate">
+                          <div className="text-micro text-muted-foreground truncate">
                             {p.total_videos} videos · {p.approved_videos} approved · {p.rejected_videos} rejected
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           <Badge className={riskColor[p.risk_level]}>{p.risk_level}</Badge>
-                          <div className="text-lg font-semibold w-12 text-right">{Number(p.trust_score).toFixed(0)}</div>
+                          <div className="text-heading font-semibold w-12 text-right">{Number(p.trust_score).toFixed(0)}</div>
                           <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); recomputeOne(p.channel_id); }}>
                             <RefreshCcw className="h-3.5 w-3.5" />
                           </Button>
@@ -234,7 +234,7 @@ const ChannelTrust = () => {
               )}
               <div className="max-h-[52vh] overflow-auto space-y-2">
                 {history.map((ev, i) => (
-                  <div key={i} className="text-xs border rounded p-2">
+                  <div key={i} className="text-micro border rounded p-2">
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium capitalize">{ev.source.replace(/_/g, " ")}</span>
                       <span className={ev.delta >= 0 ? "text-emerald-500" : "text-red-500"}>
@@ -262,15 +262,15 @@ const ChannelTrust = () => {
 const StatCard = ({ label, value, tone }: { label: string; value: string; tone?: "warn" | "danger" }) => (
   <Card>
     <CardContent className="p-4">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className={`text-2xl font-semibold ${tone === "danger" ? "text-red-500" : tone === "warn" ? "text-orange-500" : ""}`}>{value}</div>
+      <div className="text-micro text-muted-foreground">{label}</div>
+      <div className={`text-title font-semibold ${tone === "danger" ? "text-red-500" : tone === "warn" ? "text-orange-500" : ""}`}>{value}</div>
     </CardContent>
   </Card>
 );
 
 const Sparkline = ({ events }: { events: TrustEvent[] }) => {
   const pts = [...events].reverse().map((e) => Number(e.score_after ?? 0));
-  if (pts.length < 2) return <div className="h-16 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">Not enough history yet.</div>;
+  if (pts.length < 2) return <div className="h-16 rounded bg-muted flex items-center justify-center text-micro text-muted-foreground">Not enough history yet.</div>;
   const w = 300, h = 64;
   const min = Math.min(...pts), max = Math.max(...pts);
   const span = Math.max(1, max - min);

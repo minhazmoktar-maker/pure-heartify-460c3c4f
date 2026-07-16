@@ -33,17 +33,17 @@ const QuranSciences = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Ulum al-Qur'an — Sciences of the Qur'an" description="Introduction to the classical sciences of the Qur'an: revelation, Makki/Madani, abrogation, exegesis, qira'at, and i'jaz." path="/quran-sciences" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><BookOpen className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Sciences of the Qur'an</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><BookOpen className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Sciences of the Qur'an</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Studied</span><span className="text-sm font-medium">{count} / {TOPICS.length}</span></div><Progress value={(count / TOPICS.length) * 100} /></Card>
         <div className="flex gap-2"><Input placeholder="Search topics…" value={q} onChange={e => setQ(e.target.value)} /><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>
         {filtered.map(t => (
           <Card key={t.id} className="p-5 cursor-pointer hover:border-primary transition" onClick={() => persist({ ...done, [t.id]: !done[t.id] })}>
             <div className="flex items-start justify-between gap-3 mb-1">
-              <h2 className="font-semibold text-lg">{t.term}</h2>
+              <h2 className="font-semibold text-heading">{t.term}</h2>
               {done[t.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
             </div>
-            <div className="text-xl text-right font-arabic mb-2 text-muted-foreground">{t.arabic}</div>
+            <div className="text-heading text-right font-arabic mb-2 text-muted-foreground">{t.arabic}</div>
             <p className="text-sm mb-1">{t.summary}</p>
             <p className="text-sm text-muted-foreground">{t.detail}</p>
           </Card>

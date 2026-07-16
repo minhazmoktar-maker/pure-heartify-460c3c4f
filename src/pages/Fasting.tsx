@@ -149,11 +149,11 @@ const Fasting = () => {
         </Link>
 
         <header className="mb-8 flex items-center gap-3">
-          <div className="rounded-full bg-primary/10 p-3">
+          <div className="rounded-pill bg-primary/10 p-3">
             <Moon className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">Fasting tracker</h1>
+            <h1 className="font-heading text-title font-bold text-foreground md:text-title">Fasting tracker</h1>
             <p className="text-sm text-muted-foreground">Sawm log · Suhoor & Iftar · streak & history</p>
           </div>
         </header>
@@ -167,8 +167,8 @@ const Fasting = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{suhoorEnd ?? "—"}</p>
-              <p className="text-xs text-muted-foreground">at Fajr</p>
+              <p className="text-title font-bold">{suhoorEnd ?? "—"}</p>
+              <p className="text-micro text-muted-foreground">at Fajr</p>
             </CardContent>
           </Card>
           <Card>
@@ -178,8 +178,8 @@ const Fasting = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{iftar ?? "—"}</p>
-              <p className="text-xs text-muted-foreground">at Maghrib</p>
+              <p className="text-title font-bold">{iftar ?? "—"}</p>
+              <p className="text-micro text-muted-foreground">at Maghrib</p>
             </CardContent>
           </Card>
           <Card>
@@ -189,8 +189,8 @@ const Fasting = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{streak} <span className="text-sm font-normal text-muted-foreground">days</span></p>
-              <p className="text-xs text-muted-foreground">{totalFasts} total · {ramadanFasts} Ramadan</p>
+              <p className="text-title font-bold">{streak} <span className="text-sm font-normal text-muted-foreground">days</span></p>
+              <p className="text-micro text-muted-foreground">{totalFasts} total · {ramadanFasts} Ramadan</p>
             </CardContent>
           </Card>
         </div>
@@ -205,7 +205,7 @@ const Fasting = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <label className="mb-2 block text-micro font-medium uppercase tracking-wide text-muted-foreground">
                 Fast type
               </label>
               <div className="flex flex-wrap gap-2">
@@ -214,7 +214,7 @@ const Fasting = () => {
                     key={t}
                     onClick={() => setType(t)}
                     className={cn(
-                      "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                      "rounded-pill border px-3 py-1.5 text-micro font-medium transition-colors",
                       type === t
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border text-muted-foreground hover:text-foreground",
@@ -227,14 +227,14 @@ const Fasting = () => {
             </div>
 
             <div>
-              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <label className="mb-2 block text-micro font-medium uppercase tracking-wide text-muted-foreground">
                 Niyyah / note (optional)
               </label>
               <input
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="e.g., For the sake of Allah, seeking His pleasure"
-                className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                className="w-full rounded-card border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
               />
             </div>
 
@@ -270,7 +270,7 @@ const Fasting = () => {
                   key={d.date}
                   title={`${d.date}${d.done ? " · " + TYPE_META[d.type!].label : ""}`}
                   className={cn(
-                    "aspect-square rounded-sm border",
+                    "aspect-square rounded-card border",
                     d.done ? "border-primary bg-primary" : "border-border bg-secondary/40",
                   )}
                 />
@@ -299,7 +299,7 @@ const Fasting = () => {
                           day: "numeric",
                         })}
                       </p>
-                      {e.note && <p className="text-xs text-muted-foreground">{e.note}</p>}
+                      {e.note && <p className="text-micro text-muted-foreground">{e.note}</p>}
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className={TYPE_META[e.type].color}>

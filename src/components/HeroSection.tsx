@@ -21,10 +21,10 @@ const HeroSection = () => {
 
       <div className="relative mx-auto max-w-[1800px] px-4 py-14 md:px-6 md:py-20">
         <FadeIn y={30} duration={0.7} className="max-w-2xl">
-          <span className="inline-block rounded-full bg-gold/20 px-3 py-1 text-xs font-semibold text-gold">
+          <span className="inline-block rounded-pill bg-gold/20 px-3 py-1 text-micro font-semibold text-gold">
             ✦ Trying our best to keep it halal · No music · No women on camera
           </span>
-          <h1 className="mt-4 font-heading text-3xl font-bold leading-tight text-cream md:text-5xl">
+          <h1 className="mt-4 font-heading text-title font-bold leading-tight text-cream md:text-display">
             Halal video, audio &amp; Qur&apos;an.{" "}
             <span className="text-gradient-gold">Nothing else.</span>
           </h1>
@@ -34,7 +34,7 @@ const HeroSection = () => {
             you can trust.
           </p>
 
-          <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-medium text-cream md:text-sm">
+          <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-micro font-medium text-cream md:text-sm">
             <li className="inline-flex items-center gap-1.5">
               <span aria-hidden className="text-gold">✓</span> Scholar-moderated
             </li>
@@ -50,7 +50,7 @@ const HeroSection = () => {
           </ul>
 
 
-          <button className="mt-6 inline-flex items-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-semibold text-accent-foreground shadow-lg transition-all hover:brightness-110">
+          <button className="mt-6 inline-flex items-center gap-2 rounded-pill bg-gold px-6 py-3 text-sm font-semibold text-accent-foreground shadow-lg transition-all hover:brightness-110">
             <Play className="h-4 w-4" />
             Start Watching
           </button>

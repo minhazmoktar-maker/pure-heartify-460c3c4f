@@ -95,14 +95,14 @@ export default function PlusInvite() {
       />
       <Navbar />
       <main className="mx-auto max-w-lg px-4 py-16">
-        <h1 className="font-heading text-2xl font-bold text-foreground">Family invite</h1>
+        <h1 className="font-heading text-title font-bold text-foreground">Family invite</h1>
 
         {state.kind === "loading" || authLoading ? (
-          <div className="mt-6 flex items-center gap-2 rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+          <div className="mt-6 flex items-center gap-2 rounded-card border border-border bg-card p-6 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Checking your invite…
           </div>
         ) : !user ? (
-          <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+          <div className="mt-6 rounded-card border border-border bg-card p-6">
             <p className="text-sm text-muted-foreground">
               Sign in with the email your family sent the invite to, then this page will let you join.
             </p>
@@ -111,7 +111,7 @@ export default function PlusInvite() {
             </Button>
           </div>
         ) : state.kind === "invalid" ? (
-          <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+          <div className="mt-6 rounded-card border border-border bg-card p-6">
             <div className="flex items-center gap-2 text-destructive">
               <XCircle className="h-5 w-5" /> <span className="font-semibold">Invite unavailable</span>
             </div>
@@ -119,19 +119,19 @@ export default function PlusInvite() {
             <Button asChild variant="outline" className="mt-4"><Link to="/plus">Back to Heartify+</Link></Button>
           </div>
         ) : state.kind === "done" ? (
-          <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+          <div className="mt-6 rounded-card border border-border bg-card p-6">
             <div className="flex items-center gap-2 text-primary">
               <CheckCircle2 className="h-5 w-5" /> <span className="font-semibold">Welcome to the household</span>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">Redirecting you to Heartify+…</p>
           </div>
         ) : (
-          <div className="mt-6 rounded-2xl border border-border bg-card p-6">
+          <div className="mt-6 rounded-card border border-border bg-card p-6">
             <p className="text-sm text-muted-foreground">
               You've been invited to join a Heartify+ family household. This invite was sent to{" "}
               <span className="font-medium text-foreground">{state.invite.invited_email}</span>.
             </p>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-2 text-micro text-muted-foreground">
               Signed in as {user.email}. If this isn't the invited address, sign out and back in with the right account.
             </p>
             <div className="mt-4 flex gap-2">

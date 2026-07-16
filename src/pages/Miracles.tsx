@@ -32,18 +32,18 @@ const Miracles = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Miracles of the Prophet Muḥammad ﷺ — Mu'jizāt" description="Authentic miracles of the Prophet ﷺ: the Qur'an, Isrā' wa'l-Mi'rāj, splitting of the moon, water from his fingers, prophecies fulfilled." path="/miracles" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Sparkles className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Miracles of the Prophet ﷺ</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Sparkles className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Miracles of the Prophet ﷺ</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Studied</span><span className="text-sm font-medium">{count} / {MIRACLES.length}</span></div><Progress value={(count / MIRACLES.length) * 100} /></Card>
         <div className="flex gap-2"><Input placeholder="Search miracles…" value={q} onChange={e => setQ(e.target.value)} /><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>
         {filtered.map(m => (
           <Card key={m.id} className="p-5 cursor-pointer hover:border-primary transition" onClick={() => persist({ ...done, [m.id]: !done[m.id] })}>
             <div className="flex items-start justify-between gap-3 mb-1">
-              <h2 className="font-semibold text-lg">{m.title}</h2>
+              <h2 className="font-semibold text-heading">{m.title}</h2>
               {done[m.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
             </div>
             <p className="text-sm mb-1">{m.summary}</p>
-            <p className="text-xs text-muted-foreground italic">{m.reference}</p>
+            <p className="text-micro text-muted-foreground italic">{m.reference}</p>
           </Card>
         ))}
       </div>

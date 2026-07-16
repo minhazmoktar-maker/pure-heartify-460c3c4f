@@ -86,7 +86,7 @@ export default function PublicProfile() {
             <Card>
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-3xl font-bold text-primary-foreground overflow-hidden">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-pill bg-primary text-title font-bold text-primary-foreground overflow-hidden">
                     {profile.avatar_url ? (
                       <img src={profile.avatar_url} alt={displayName} className="h-full w-full object-cover" />
                     ) : (
@@ -94,9 +94,9 @@ export default function PublicProfile() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h1 className="text-2xl font-bold truncate">{displayName}</h1>
+                    <h1 className="text-title font-bold truncate">{displayName}</h1>
                     <p className="text-sm text-muted-foreground font-mono">@{profile.handle}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-micro text-muted-foreground mt-0.5">
                       Joined {new Date(profile.joined_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -121,14 +121,14 @@ export default function PublicProfile() {
                   <Stat icon={<Users className="h-4 w-4 text-primary" />} label="Referred" value={profile.referrals_redeemed} />
                 </div>
 
-                <div className="rounded-md border bg-muted/30 p-3 text-center">
-                  <p className="text-xs text-muted-foreground">🏆 Badges earned</p>
-                  <p className="text-2xl font-bold text-foreground">{profile.badge_count}</p>
+                <div className="rounded-card border bg-muted/30 p-3 text-center">
+                  <p className="text-micro text-muted-foreground">🏆 Badges earned</p>
+                  <p className="text-title font-bold text-foreground">{profile.badge_count}</p>
                 </div>
               </CardContent>
             </Card>
 
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-micro text-muted-foreground">
               Want your own? <Link to="/signup" className="text-primary underline">Join Heartify</Link>
             </p>
           </>
@@ -140,9 +140,9 @@ export default function PublicProfile() {
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="rounded-md border bg-card p-3 text-center">
+    <div className="rounded-card border bg-card p-3 text-center">
       <div className="flex justify-center mb-1">{icon}</div>
-      <div className="text-lg font-bold">{value.toLocaleString()}</div>
+      <div className="text-heading font-bold">{value.toLocaleString()}</div>
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
     </div>
   );

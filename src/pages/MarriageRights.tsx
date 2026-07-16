@@ -42,7 +42,7 @@ const Marriage = () => {
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>
         <header className="mt-4 mb-6">
-          <div className="flex items-center gap-3"><HeartHandshake className="h-7 w-7 text-primary" /><h1 className="text-3xl font-bold">Marriage Rights in Islam</h1></div>
+          <div className="flex items-center gap-3"><HeartHandshake className="h-7 w-7 text-primary" /><h1 className="text-title font-bold">Marriage Rights in Islam</h1></div>
           <p className="mt-2 text-muted-foreground">A concise guide to spousal rights and duties from the Qur'an and Sunnah.</p>
         </header>
         <Card className="p-4 mb-6">
@@ -57,9 +57,9 @@ const Marriage = () => {
         <div className="grid gap-4">
           {filtered.map(r => (
             <Card key={r.id} className={`p-5 cursor-pointer transition ${read[r.id] ? "bg-primary/5 border-primary/40" : "hover:bg-muted/40"}`} onClick={() => toggle(r.id)}>
-              <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold">{r.title}</h2><Badge variant="outline" className="mt-1">{r.who}</Badge></div>{read[r.id] && <Badge>Read</Badge>}</div>
+              <div className="flex items-start justify-between gap-4"><div><h2 className="text-heading font-semibold">{r.title}</h2><Badge variant="outline" className="mt-1">{r.who}</Badge></div>{read[r.id] && <Badge>Read</Badge>}</div>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground list-disc pl-5">{r.points.map((p,i) => <li key={i}>{p}</li>)}</ul>
-              <p className="mt-2 text-xs text-muted-foreground italic">Source: {r.source}</p>
+              <p className="mt-2 text-micro text-muted-foreground italic">Source: {r.source}</p>
             </Card>
           ))}
         </div>

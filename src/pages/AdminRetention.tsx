@@ -25,7 +25,7 @@ export default function AdminRetention() {
       <div className="container mx-auto max-w-5xl px-4 pb-16">
         <Card className="p-5 overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground">
+            <thead className="text-micro text-muted-foreground">
               <tr>
                 <th className="text-left py-2">Cohort week</th>
                 <th className="text-right">Size</th>

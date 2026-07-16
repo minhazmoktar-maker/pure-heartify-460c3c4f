@@ -76,13 +76,13 @@ export default function PublicStreak() {
           <>
             <Card className="overflow-hidden border-orange-500/30 bg-gradient-to-br from-orange-500/10 via-background to-background">
               <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-orange-500/15 text-orange-500">
+                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-pill bg-orange-500/15 text-orange-500">
                   <Flame className="h-14 w-14" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs uppercase tracking-widest text-muted-foreground">{label}</p>
-                  <h1 className="text-5xl font-black tabular-nums">{nDays}</h1>
-                  <p className="text-lg font-semibold">day{nDays === 1 ? "" : "s"} of consistent worship</p>
+                  <p className="text-micro uppercase tracking-widest text-muted-foreground">{label}</p>
+                  <h1 className="text-display font-black tabular-nums">{nDays}</h1>
+                  <p className="text-heading font-semibold">day{nDays === 1 ? "" : "s"} of consistent worship</p>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   by{" "}
@@ -95,7 +95,7 @@ export default function PublicStreak() {
                   )}
                 </p>
                 {isMilestone && (
-                  <p className="text-xs text-primary">🏆 Milestone unlocked</p>
+                  <p className="text-micro text-primary">🏆 Milestone unlocked</p>
                 )}
               </CardContent>
             </Card>
@@ -112,7 +112,7 @@ export default function PublicStreak() {
               </Button>
             </div>
 
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-micro text-muted-foreground">
               Heartify — build a daily habit of salah, dhikr, and Qur'an.
             </p>
           </>

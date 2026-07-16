@@ -193,13 +193,13 @@ export default function Inheritance() {
             <Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <Scale className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Inheritance Calculator</h1>
+          <h1 className="text-heading font-semibold">Inheritance Calculator</h1>
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl space-y-4 px-4 py-6">
         <Card className="p-4">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-micro text-muted-foreground">
             Estimator based on Qur'an 4:11-12. Covers the most common household case (spouse,
             parents, sons and daughters). Grandparents, half-siblings, grandchildren, and complex
             radd/awl cases are not handled — consult a qualified scholar before acting.
@@ -220,7 +220,7 @@ export default function Inheritance() {
           <div className="flex items-center justify-between">
             <div>
               <Label>Deceased was male</Label>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-micro text-muted-foreground">
                 Affects the spouse's fixed share.
               </p>
             </div>
@@ -249,11 +249,11 @@ export default function Inheritance() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center justify-between rounded-md border border-border/60 p-3">
+            <div className="flex items-center justify-between rounded-card border border-border/60 p-3">
               <Label>Father alive</Label>
               <Switch checked={i.father} onCheckedChange={(v) => setI({ ...i, father: v })} />
             </div>
-            <div className="flex items-center justify-between rounded-md border border-border/60 p-3">
+            <div className="flex items-center justify-between rounded-card border border-border/60 p-3">
               <Label>Mother alive</Label>
               <Switch checked={i.mother} onCheckedChange={(v) => setI({ ...i, mother: v })} />
             </div>
@@ -269,7 +269,7 @@ export default function Inheritance() {
         <Card className="p-4">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-base font-semibold">Distribution</h2>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-micro text-muted-foreground">
               Residue → {result.residueTo}
             </div>
           </div>
@@ -281,7 +281,7 @@ export default function Inheritance() {
                 <div key={s.heir} className="flex items-center justify-between py-2">
                   <div>
                     <div className="text-sm font-medium">{s.heir}</div>
-                    <div className="text-xs text-muted-foreground">{s.fraction}</div>
+                    <div className="text-micro text-muted-foreground">{s.fraction}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-semibold">{fmt(s.amount)}</div>
@@ -294,7 +294,7 @@ export default function Inheritance() {
             </div>
           )}
           {result.notes.length > 0 && (
-            <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+            <ul className="mt-3 space-y-1 text-micro text-muted-foreground">
               {result.notes.map((n, k) => <li key={k}>• {n}</li>)}
             </ul>
           )}

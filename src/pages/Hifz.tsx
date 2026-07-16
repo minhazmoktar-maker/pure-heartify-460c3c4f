@@ -131,7 +131,7 @@ const Hifz = () => {
         <header className="mb-8">
           <div className="flex items-center gap-3">
             <BookOpen className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold tracking-tight">Hifz tracker</h1>
+            <h1 className="text-title font-bold tracking-tight">Hifz tracker</h1>
           </div>
           <p className="mt-2 text-muted-foreground">
             Log memorized ayat surah-by-surah, review on a 7-day cycle, and keep a hifz streak.
@@ -140,34 +140,34 @@ const Hifz = () => {
 
         <div className="grid gap-4 md:grid-cols-3 mb-6">
           <Card className="p-4">
-            <p className="text-xs text-muted-foreground">Total memorized</p>
-            <p className="mt-1 text-2xl font-bold">{totalMemorized.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">/ {TOTAL_AYAT.toLocaleString()}</span></p>
+            <p className="text-micro text-muted-foreground">Total memorized</p>
+            <p className="mt-1 text-title font-bold">{totalMemorized.toLocaleString()} <span className="text-sm font-normal text-muted-foreground">/ {TOTAL_AYAT.toLocaleString()}</span></p>
             <Progress value={percent} className="mt-2 h-2" />
-            <p className="mt-1 text-xs text-muted-foreground">{percent.toFixed(2)}% of the Qur'an</p>
+            <p className="mt-1 text-micro text-muted-foreground">{percent.toFixed(2)}% of the Qur'an</p>
           </Card>
           <Card className="p-4">
-            <p className="text-xs text-muted-foreground">Surahs started</p>
-            <p className="mt-1 text-2xl font-bold">{memorizedSurahs.length} <span className="text-sm font-normal text-muted-foreground">/ 114</span></p>
+            <p className="text-micro text-muted-foreground">Surahs started</p>
+            <p className="mt-1 text-title font-bold">{memorizedSurahs.length} <span className="text-sm font-normal text-muted-foreground">/ 114</span></p>
           </Card>
           <Card className="p-4 flex items-center gap-3">
             <Flame className="h-8 w-8 text-primary" />
             <div>
-              <p className="text-xs text-muted-foreground">Daily hifz streak</p>
-              <p className="text-2xl font-bold">{streak} <span className="text-sm font-normal text-muted-foreground">days</span></p>
+              <p className="text-micro text-muted-foreground">Daily hifz streak</p>
+              <p className="text-title font-bold">{streak} <span className="text-sm font-normal text-muted-foreground">days</span></p>
             </div>
           </Card>
         </div>
 
         <Card className="p-4 mb-6">
-          <h2 className="text-lg font-semibold mb-3">Log memorization</h2>
+          <h2 className="text-heading font-semibold mb-3">Log memorization</h2>
           <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
             <div>
-              <Label htmlFor="surah" className="text-xs">Surah</Label>
+              <Label htmlFor="surah" className="text-micro">Surah</Label>
               <select
                 id="surah"
                 value={selected}
                 onChange={(e) => setSelected(Number(e.target.value))}
-                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-card border border-input bg-background px-3 py-2 text-sm"
               >
                 {SURAH_NAMES.map((n, i) => (
                   <option key={i + 1} value={i + 1}>
@@ -177,7 +177,7 @@ const Hifz = () => {
               </select>
             </div>
             <div>
-              <Label htmlFor="ayat" className="text-xs">Ayat memorized</Label>
+              <Label htmlFor="ayat" className="text-micro">Ayat memorized</Label>
               <Input
                 id="ayat"
                 type="number"
@@ -195,14 +195,14 @@ const Hifz = () => {
               </Button>
             </div>
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-2 text-micro text-muted-foreground">
             Current: {current}/{surahMax} ayat of {SURAH_NAMES[selected - 1]}
           </p>
         </Card>
 
         {dueReview.length > 0 && (
           <Card className="p-4 mb-6 border-primary/30 bg-primary/5">
-            <h2 className="text-lg font-semibold mb-2">Due for review</h2>
+            <h2 className="text-heading font-semibold mb-2">Due for review</h2>
             <p className="text-sm text-muted-foreground mb-3">
               These surahs haven't been reviewed in 7+ days — revise to keep them strong.
             </p>
@@ -219,7 +219,7 @@ const Hifz = () => {
 
         <Card className="p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Your hifz</h2>
+            <h2 className="text-heading font-semibold">Your hifz</h2>
             {memorizedSurahs.length > 0 && (
               <Button size="sm" variant="ghost" onClick={reset}>
                 <Trash2 className="h-4 w-4 mr-1" /> Reset
@@ -241,10 +241,10 @@ const Hifz = () => {
                         <span className="text-sm font-medium truncate">
                           {surah}. {SURAH_NAMES[surah - 1]}
                         </span>
-                        {complete && <Badge variant="secondary" className="text-xs">Complete</Badge>}
+                        {complete && <Badge variant="secondary" className="text-micro">Complete</Badge>}
                       </div>
                       <Progress value={pct} className="mt-1 h-1.5" />
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className="mt-1 text-micro text-muted-foreground">
                         {memorized}/{max} ayat
                         {lastReview && ` · reviewed ${new Date(lastReview).toLocaleDateString()}`}
                       </p>

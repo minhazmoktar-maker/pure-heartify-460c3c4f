@@ -119,7 +119,7 @@ const Dhikr = () => {
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
         <header className="mb-8">
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">Dhikr &amp; Tasbih</h1>
+          <h1 className="font-heading text-title font-bold text-foreground md:text-display">Dhikr &amp; Tasbih</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Tap anywhere on the counter to remember Allah. Your goals and streak stay on this device.
           </p>
@@ -127,14 +127,14 @@ const Dhikr = () => {
 
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           {/* Counter card */}
-          <section className="rounded-2xl border border-border bg-card p-6 md:p-8">
+          <section className="rounded-card border border-border bg-card p-6 md:p-8">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Now reciting</p>
-                <p className="text-lg font-semibold text-foreground">{active.translit}</p>
-                <p className="text-xs text-muted-foreground">{active.meaning}</p>
+                <p className="text-micro uppercase tracking-wide text-muted-foreground">Now reciting</p>
+                <p className="text-heading font-semibold text-foreground">{active.translit}</p>
+                <p className="text-micro text-muted-foreground">{active.meaning}</p>
               </div>
-              <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1.5 text-xs">
+              <div className="flex items-center gap-2 rounded-pill bg-secondary px-3 py-1.5 text-micro">
                 <Target className="h-3.5 w-3.5 text-primary" />
                 <span className="text-foreground">Goal {state.target}</span>
               </div>
@@ -143,15 +143,15 @@ const Dhikr = () => {
             <button
               onClick={() => bump(1)}
               aria-label={`Tap to count ${active.translit}`}
-              className="group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-4 border-primary/30 transition-transform active:scale-95"
+              className="group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-pill bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-4 border-primary/30 transition-transform active:scale-95"
             >
-              <div className="absolute inset-4 rounded-full border border-border/60" />
+              <div className="absolute inset-4 rounded-pill border border-border/60" />
               <div className="text-center">
-                <p dir="rtl" className="font-heading text-4xl text-foreground md:text-5xl leading-relaxed">
+                <p dir="rtl" className="font-heading text-display text-foreground md:text-display leading-relaxed">
                   {active.arabic}
                 </p>
-                <p className="mt-4 text-6xl font-bold tabular-nums text-primary md:text-7xl">{count}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-4 text-display font-bold tabular-nums text-primary md:text-display">{count}</p>
+                <p className="mt-1 text-micro text-muted-foreground">
                   {count >= state.target ? (
                     <span className="inline-flex items-center gap-1 text-primary"><Check className="h-3 w-3" /> Goal reached — keep going</span>
                   ) : (
@@ -162,24 +162,24 @@ const Dhikr = () => {
             </button>
 
             {/* Progress */}
-            <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-secondary">
+            <div className="mt-6 h-2 w-full overflow-hidden rounded-pill bg-secondary">
               <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
             </div>
 
             {/* Controls */}
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <button onClick={() => bump(-1)} className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
+              <button onClick={() => bump(-1)} className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
                 <Minus className="h-3.5 w-3.5" /> Undo
               </button>
-              <button onClick={() => bump(1)} className="inline-flex items-center gap-1 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
+              <button onClick={() => bump(1)} className="inline-flex items-center gap-1 rounded-pill bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
                 <Plus className="h-3.5 w-3.5" /> Count
               </button>
-              <button onClick={reset} className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
+              <button onClick={reset} className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
                 <RotateCcw className="h-3.5 w-3.5" /> Reset
               </button>
             </div>
 
-            <div className="mt-4 flex items-center justify-center gap-3 text-xs text-muted-foreground">
+            <div className="mt-4 flex items-center justify-center gap-3 text-micro text-muted-foreground">
               <label className="flex items-center gap-2">
                 Target
                 <input
@@ -188,29 +188,29 @@ const Dhikr = () => {
                   max={9999}
                   value={state.target}
                   onChange={(e) => setState((s) => ({ ...s, target: Math.max(1, Number(e.target.value) || 1) }))}
-                  className="w-20 rounded-md border border-border bg-background px-2 py-1 text-center text-foreground"
+                  className="w-20 rounded-card border border-border bg-background px-2 py-1 text-center text-foreground"
                 />
               </label>
               {[33, 100, 500].map((n) => (
-                <button key={n} onClick={() => setState((s) => ({ ...s, target: n }))} className="rounded-full border border-border px-2 py-0.5 hover:bg-secondary">{n}</button>
+                <button key={n} onClick={() => setState((s) => ({ ...s, target: n }))} className="rounded-pill border border-border px-2 py-0.5 hover:bg-secondary">{n}</button>
               ))}
             </div>
           </section>
 
           {/* Right column */}
           <aside className="space-y-4">
-            <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="rounded-card border border-border bg-card p-5">
               <div className="flex items-center gap-2">
                 <Flame className="h-4 w-4 text-[hsl(var(--gold))]" />
                 <h2 className="text-sm font-semibold text-foreground">Daily streak</h2>
               </div>
-              <p className="mt-3 text-4xl font-bold text-foreground">{state.streak} <span className="text-sm font-normal text-muted-foreground">days</span></p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-3 text-display font-bold text-foreground">{state.streak} <span className="text-sm font-normal text-muted-foreground">days</span></p>
+              <p className="mt-1 text-micro text-muted-foreground">
                 Complete any dhikr goal today to keep your streak alive. Completed today: {state.todayCompleted}
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="rounded-card border border-border bg-card p-5">
               <h2 className="mb-3 text-sm font-semibold text-foreground">Choose a dhikr</h2>
               <ul className="space-y-1">
                 {PRESETS.map((p) => {
@@ -220,15 +220,15 @@ const Dhikr = () => {
                     <li key={p.id}>
                       <button
                         onClick={() => setState((s) => ({ ...s, activeId: p.id, target: p.target }))}
-                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                        className={`flex w-full items-center justify-between rounded-card px-3 py-2 text-left text-sm transition-colors ${
                           isActive ? "bg-primary/10 text-primary" : "hover:bg-secondary text-foreground"
                         }`}
                       >
                         <span>
                           <span className="font-medium">{p.translit}</span>
-                          <span className="ml-2 text-xs text-muted-foreground">{p.meaning}</span>
+                          <span className="ml-2 text-micro text-muted-foreground">{p.meaning}</span>
                         </span>
-                        <span className="text-xs tabular-nums text-muted-foreground">{c}/{p.target}</span>
+                        <span className="text-micro tabular-nums text-muted-foreground">{c}/{p.target}</span>
                       </button>
                     </li>
                   );

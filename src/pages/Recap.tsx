@@ -81,47 +81,47 @@ const Recap = () => {
         </Link>
 
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+          <div className="flex h-11 w-11 items-center justify-center rounded-card bg-primary/10">
             <CalendarDays className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">Weekly recap</h1>
+            <h1 className="font-heading text-title font-bold text-foreground md:text-title">Weekly recap</h1>
             <p className="text-sm text-muted-foreground">A snapshot of your last 7 days of worship.</p>
           </div>
         </div>
 
         {/* Streak */}
-        <div className="mb-6 flex items-center justify-between rounded-2xl border border-border bg-card p-5">
+        <div className="mb-6 flex items-center justify-between rounded-card border border-border bg-card p-5">
           <div className="flex items-center gap-3">
             <Flame className="h-6 w-6 text-[hsl(var(--gold))]" />
             <div>
               <div className="text-sm text-muted-foreground">Current dhikr streak</div>
-              <div className="font-heading text-2xl font-bold text-foreground">{streak.current} days</div>
+              <div className="font-heading text-title font-bold text-foreground">{streak.current} days</div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Longest</div>
-            <div className="font-heading text-xl font-semibold text-foreground">{streak.longest} days</div>
+            <div className="text-micro uppercase tracking-wide text-muted-foreground">Longest</div>
+            <div className="font-heading text-heading font-semibold text-foreground">{streak.longest} days</div>
           </div>
         </div>
 
         {/* Stats grid */}
         <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
           {stats.map(({ label, value, sub, icon: Icon, color }) => (
-            <div key={label} className="rounded-2xl border border-border bg-card p-4">
+            <div key={label} className="rounded-card border border-border bg-card p-4">
               <Icon className={`mb-2 h-5 w-5 ${color}`} />
-              <div className="font-heading text-2xl font-bold text-foreground">{value}</div>
-              <div className="text-xs font-medium text-foreground">{label}</div>
+              <div className="font-heading text-title font-bold text-foreground">{value}</div>
+              <div className="text-micro font-medium text-foreground">{label}</div>
               <div className="text-[11px] text-muted-foreground">{sub}</div>
             </div>
           ))}
         </div>
 
         {/* Dhikr sparkline */}
-        <div className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-6 rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-heading text-sm font-semibold text-foreground">Dhikr per day</h2>
-            <span className="text-xs text-muted-foreground">last 7 days</span>
+            <span className="text-micro text-muted-foreground">last 7 days</span>
           </div>
           <div className="flex items-end justify-between gap-2 h-32">
             {days.map((d) => {
@@ -144,10 +144,10 @@ const Recap = () => {
         </div>
 
         {/* Prayer heat row */}
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-heading text-sm font-semibold text-foreground">Prayer completion</h2>
-            <span className="text-xs text-muted-foreground">5 = perfect day</span>
+            <span className="text-micro text-muted-foreground">5 = perfect day</span>
           </div>
           <div className="grid grid-cols-7 gap-2">
             {days.map((d) => {
@@ -160,7 +160,7 @@ const Recap = () => {
               return (
                 <div key={d} className="flex flex-col items-center gap-1">
                   <div
-                    className="h-14 w-full rounded-lg border border-border"
+                    className="h-14 w-full rounded-card border border-border"
                     style={{ backgroundColor: `hsl(var(--primary) / ${0.1 + intensity * 0.75})` }}
                     aria-label={`${dayLabel}: ${count}/5 prayers`}
                   />

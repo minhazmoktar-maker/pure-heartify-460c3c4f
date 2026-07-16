@@ -76,7 +76,7 @@ const AdabPage = () => {
         <header className="mt-4 mb-6">
           <div className="flex items-center gap-3">
             <Sparkles className="h-7 w-7 text-primary" />
-            <h1 className="text-3xl font-bold">Prophetic Manners (Adab)</h1>
+            <h1 className="text-title font-bold">Prophetic Manners (Adab)</h1>
           </div>
           <p className="mt-2 text-muted-foreground">
             Islam is refined in the small moments. These are the everyday adab taught by the Prophet ﷺ.
@@ -116,7 +116,7 @@ const AdabPage = () => {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <h2 className="text-xl font-semibold">{a.title}</h2>
+                  <h2 className="text-heading font-semibold">{a.title}</h2>
                   <Badge variant="outline" className="mt-1">{a.category}</Badge>
                 </div>
                 {read[a.id] && <Badge className="shrink-0">Learned</Badge>}
@@ -124,7 +124,7 @@ const AdabPage = () => {
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground leading-relaxed list-disc pl-5">
                 {a.points.map((p, i) => <li key={i}>{p}</li>)}
               </ul>
-              <p className="mt-2 text-xs text-muted-foreground italic">Source: {a.source}</p>
+              <p className="mt-2 text-micro text-muted-foreground italic">Source: {a.source}</p>
             </Card>
           ))}
           {filtered.length === 0 && (

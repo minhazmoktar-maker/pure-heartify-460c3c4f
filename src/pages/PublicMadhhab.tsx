@@ -40,29 +40,29 @@ export default function PublicMadhhab() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-10 pb-10 space-y-6 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Scale className="h-4 w-4 text-primary" />
               School {idx + 1} of 4 · Madhāhib
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-6xl md:text-7xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {m.arabic}
             </p>
-            <h1 className="text-3xl md:text-4xl font-semibold">
+            <h1 className="text-title md:text-display font-semibold">
               The {m.name} School
             </h1>
             <div className="space-y-1">
-              <p className="text-lg text-muted-foreground">
+              <p className="text-heading text-muted-foreground">
                 {m.founder}
               </p>
               <p
                 dir="rtl"
                 lang="ar"
-                className="text-xl text-primary/80"
+                className="text-heading text-primary/80"
                 style={{ fontFamily: "'Amiri', serif" }}
               >
                 {m.founderArabic}
@@ -82,13 +82,13 @@ export default function PublicMadhhab() {
 
             <div className="text-left space-y-3 pt-4 border-t border-border/50">
               <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
+                <p className="text-micro uppercase tracking-widest text-muted-foreground mb-1">
                   Predominant regions
                 </p>
                 <p className="text-sm">{m.regions}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
+                <p className="text-micro uppercase tracking-widest text-muted-foreground mb-1">
                   Methodology (uṣūl)
                 </p>
                 <p className="text-sm">{m.method}</p>

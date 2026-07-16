@@ -22,10 +22,10 @@ export default function AppIconPicker() {
   };
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-5">
+    <section className="rounded-card border border-border bg-card p-5">
       <div className="mb-3">
         <h2 className="text-sm font-semibold text-foreground">App icon</h2>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-micro text-muted-foreground">
           Pick the icon shown on your home screen and browser tab. Native devices update on next app open.
         </p>
       </div>
@@ -38,14 +38,14 @@ export default function AppIconPicker() {
               type="button"
               onClick={() => choose(v.id)}
               className={cn(
-                "group relative flex flex-col items-center gap-2 rounded-xl border p-2 text-xs transition-colors",
+                "group relative flex flex-col items-center gap-2 rounded-card border p-2 text-micro transition-colors",
                 active ? "border-primary bg-primary/5" : "border-border hover:bg-secondary",
               )}
               aria-pressed={active}
               aria-label={`Use ${v.label} icon`}
             >
               <span
-                className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl shadow-sm"
+                className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-card shadow-sm"
                 style={{ backgroundColor: v.swatch }}
               >
                 <img

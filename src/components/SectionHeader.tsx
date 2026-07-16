@@ -44,7 +44,7 @@ export default function SectionHeader({
       )}
     >
       <div className="min-w-0">
-        <Heading className="flex items-center gap-2 font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+        <Heading className="flex items-center gap-2 font-heading text-heading font-bold tracking-tight text-foreground sm:text-title">
           {Icon && <Icon className="h-5 w-5 shrink-0 text-primary" aria-hidden />}
           <span className="truncate">{title}</span>
         </Heading>

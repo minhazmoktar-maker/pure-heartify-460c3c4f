@@ -66,7 +66,7 @@ export function Leaderboard({ scope = "global", groupId = null }: Props) {
                         <span className="w-6 tabular-nums text-muted-foreground">{r.rank}</span>
                         <span className={`truncate ${isMe ? "font-semibold text-foreground" : ""}`}>
                           {r.display_name ?? "Anonymous"}
-                          {isMe && <span className="ml-2 text-xs text-primary">(you)</span>}
+                          {isMe && <span className="ml-2 text-micro text-primary">(you)</span>}
                         </span>
                       </div>
                       <span className="tabular-nums font-mono text-foreground">{r.score.toLocaleString()}</span>

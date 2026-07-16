@@ -75,7 +75,7 @@ export default function SearchSuggestions({ onPick }: { onPick?: (q: string) => 
                 clearRecentSearches();
                 setRecent([]);
               }}
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-micro text-muted-foreground hover:text-foreground"
             >
               Clear
             </button>
@@ -85,7 +85,7 @@ export default function SearchSuggestions({ onPick }: { onPick?: (q: string) => 
               <button
                 key={q}
                 onClick={() => go(q)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
               >
                 {q}
                 <X
@@ -116,7 +116,7 @@ export default function SearchSuggestions({ onPick }: { onPick?: (q: string) => 
             <button
               key={q}
               onClick={() => go(q)}
-              className="rounded-full border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
+              className="rounded-pill border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
             >
               {q}
             </button>
@@ -133,9 +133,9 @@ export default function SearchSuggestions({ onPick }: { onPick?: (q: string) => 
             <button
               key={s.id}
               onClick={() => navigate(`/section/${s.id}`)}
-              className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-left text-sm text-foreground hover:bg-accent transition-colors"
+              className="flex items-center gap-2 rounded-card border border-border bg-card px-3 py-2.5 text-left text-sm text-foreground hover:bg-accent transition-colors"
             >
-              <span className="text-lg">{s.icon}</span>
+              <span className="text-heading">{s.icon}</span>
               <span className="line-clamp-1 font-medium">{s.title}</span>
             </button>
           ))}
@@ -152,7 +152,7 @@ export default function SearchSuggestions({ onPick }: { onPick?: (q: string) => 
               <button
                 key={c.channel_title}
                 onClick={() => go(c.channel_title)}
-                className="rounded-full border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
+                className="rounded-pill border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:bg-accent transition-colors"
               >
                 {c.channel_title}
               </button>

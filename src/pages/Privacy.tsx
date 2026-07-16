@@ -5,7 +5,7 @@ import SEO from "@/components/SEO";
 
 const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
   <section id={id} className="scroll-mt-24">
-    <h2 className="font-heading text-xl font-bold text-foreground">{title}</h2>
+    <h2 className="font-heading text-heading font-bold text-foreground">{title}</h2>
     <div className="mt-3 space-y-3 text-muted-foreground">{children}</div>
   </section>
 );
@@ -32,7 +32,7 @@ const Privacy = () => {
         </Link>
 
         <header>
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
+          <h1 className="font-heading text-title font-bold text-foreground md:text-display">
             Privacy Policy
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -197,9 +197,9 @@ const Privacy = () => {
 
           <section
             id="ai-disclaimer"
-            className="scroll-mt-24 rounded-lg border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.05)] p-5"
+            className="scroll-mt-24 rounded-card border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.05)] p-5"
           >
-            <h2 className="font-heading text-xl font-bold text-foreground">
+            <h2 className="font-heading text-heading font-bold text-foreground">
               6. AI Content Classification & Religious Disclaimer
             </h2>
             <div className="mt-3 space-y-3 text-muted-foreground">
@@ -531,7 +531,7 @@ const Privacy = () => {
           </Section>
 
           <section className="border-t border-border pt-6">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-micro text-muted-foreground">
               This Privacy Policy is provided for informational purposes and does
               not constitute legal advice. HalalTube may adapt this document to
               reflect the specific legal requirements of the jurisdictions in which

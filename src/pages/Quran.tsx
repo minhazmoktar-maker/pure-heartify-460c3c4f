@@ -88,9 +88,9 @@ const SurahIndex = ({ onPick }: { onPick: (n: number) => void }) => {
           {Array.from({ length: 12 }).map((_, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
+              className="flex items-center gap-3 rounded-card border border-border bg-card p-3"
             >
-              <Skeleton className="h-9 w-9 rounded-full" />
+              <Skeleton className="h-9 w-9 rounded-pill" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-2/3" />
                 <Skeleton className="h-3 w-1/3" />
@@ -108,20 +108,20 @@ const SurahIndex = ({ onPick }: { onPick: (n: number) => void }) => {
           <button
             key={s.number}
             onClick={() => onPick(s.number)}
-            className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-primary/50 hover:bg-secondary"
+            className="group flex items-center gap-3 rounded-card border border-border bg-card p-3 text-left transition-colors hover:border-primary/50 hover:bg-secondary"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-pill bg-primary/10 text-sm font-semibold text-primary">
               {s.number}
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold text-foreground">
                 {s.englishName}
               </span>
-              <span className="block truncate text-xs text-muted-foreground">
+              <span className="block truncate text-micro text-muted-foreground">
                 {s.englishNameTranslation} · {s.numberOfAyahs} ayat · {s.revelationType}
               </span>
             </span>
-            <span className="font-arabic text-lg text-foreground" dir="rtl">
+            <span className="font-arabic text-heading text-foreground" dir="rtl">
               {s.name}
             </span>
             <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
@@ -194,7 +194,7 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
       {arabic.data && (
         <header className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-3">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-title font-bold text-foreground">
               {arabic.data.englishName}{" "}
               <span className="text-muted-foreground text-base font-normal">
                 — {arabic.data.englishNameTranslation}
@@ -204,7 +204,7 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
               Surah {arabic.data.number} · {arabic.data.numberOfAyahs} verses · {arabic.data.revelationType}
             </p>
           </div>
-          <p className="font-arabic text-3xl text-foreground" dir="rtl">
+          <p className="font-arabic text-title text-foreground" dir="rtl">
             {arabic.data.name}
           </p>
         </header>
@@ -212,7 +212,7 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
 
       <div className="flex flex-wrap gap-3">
         <div className="min-w-[200px] flex-1">
-          <label className="mb-1 block text-xs font-medium text-muted-foreground">Reciter</label>
+          <label className="mb-1 block text-micro font-medium text-muted-foreground">Reciter</label>
           <Select
             value={prefs.audioEdition}
             onValueChange={(v) => setPrefs({ ...prefs, audioEdition: v })}
@@ -226,7 +226,7 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
           </Select>
         </div>
         <div className="min-w-[200px] flex-1">
-          <label className="mb-1 block text-xs font-medium text-muted-foreground">Translation</label>
+          <label className="mb-1 block text-micro font-medium text-muted-foreground">Translation</label>
           <Select
             value={prefs.translationEdition}
             onValueChange={(v) => setPrefs({ ...prefs, translationEdition: v })}
@@ -240,7 +240,7 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
           </Select>
         </div>
         <div className="min-w-[160px]">
-          <label className="mb-1 block text-xs font-medium text-muted-foreground">
+          <label className="mb-1 block text-micro font-medium text-muted-foreground">
             Arabic size: {prefs.arabicSize}px
           </label>
           <input
@@ -259,7 +259,7 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
       {isLoading && (
         <div className="space-y-3" role="status" aria-label="Loading surah">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="rounded-lg border border-border bg-card p-4">
+            <div key={i} className="rounded-card border border-border bg-card p-4">
               <Skeleton className="ml-auto h-6 w-3/4" />
               <Skeleton className="ml-auto mt-3 h-4 w-1/2" />
               <Skeleton className="mt-2 h-3 w-2/3" />
@@ -279,7 +279,7 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
             <li key={ar.number}>
               <Card className="p-4">
                 <div className="flex items-start gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-pill bg-primary/10 text-micro font-semibold text-primary">
                     {ar.numberInSurah}
                   </span>
                   <div className="min-w-0 flex-1 space-y-2">
@@ -332,11 +332,11 @@ const Quran = () => {
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <div className="mb-6 flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <span className="flex h-10 w-10 items-center justify-center rounded-card bg-primary/10 text-primary">
             <BookOpen className="h-5 w-5" />
           </span>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Quran</h1>
+            <h1 className="text-heading font-bold text-foreground">Quran</h1>
             <p className="text-sm text-muted-foreground">
               {surahNum ? (
                 <button
@@ -359,7 +359,7 @@ const Quran = () => {
         )}
 
         {!surahNum && (
-          <p className="mt-8 text-xs text-muted-foreground">
+          <p className="mt-8 text-micro text-muted-foreground">
             Text and audio from the free{" "}
             <Link to="https://alquran.cloud" className="underline" target="_blank" rel="noreferrer">
               al-quran.cloud

@@ -84,11 +84,11 @@ export default function NudgeButton({ handle, displayName }: Props) {
         </DialogHeader>
         <RadioGroup value={kind} onValueChange={(v) => setKind(v as keyof typeof PRESETS)} className="space-y-2">
           {Object.entries(PRESETS).map(([k, p]) => (
-            <div key={k} className="flex items-start gap-2 rounded-md border p-3">
+            <div key={k} className="flex items-start gap-2 rounded-card border p-3">
               <RadioGroupItem value={k} id={`nudge-${k}`} className="mt-0.5" />
               <Label htmlFor={`nudge-${k}`} className="flex-1 cursor-pointer">
                 <div className="font-medium">{p.label}</div>
-                <div className="text-xs text-muted-foreground">{p.message}</div>
+                <div className="text-micro text-muted-foreground">{p.message}</div>
               </Label>
             </div>
           ))}

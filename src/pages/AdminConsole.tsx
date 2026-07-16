@@ -120,7 +120,7 @@ const AdminConsole = () => {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold">Sign in required</h1>
+          <h1 className="text-title font-bold">Sign in required</h1>
           <p className="mt-2 text-muted-foreground">
             <Link to="/login" className="text-primary underline">Log in</Link> as an admin.
           </p>
@@ -134,7 +134,7 @@ const AdminConsole = () => {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold">Admins only</h1>
+          <h1 className="text-title font-bold">Admins only</h1>
           <p className="mt-2 text-muted-foreground">You don't have admin access.</p>
         </main>
       </div>
@@ -146,7 +146,7 @@ const AdminConsole = () => {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-2xl font-bold">Two-factor authentication required</h1>
+          <h1 className="text-title font-bold">Two-factor authentication required</h1>
           <p className="mt-2 text-muted-foreground">Verifying your session…</p>
         </main>
       </div>
@@ -162,7 +162,7 @@ const AdminConsole = () => {
         <div className="mb-6 flex items-center gap-3">
           <ShieldCheck className="h-7 w-7 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">Moderation Console</h1>
+            <h1 className="text-title font-bold">Moderation Console</h1>
             <p className="text-sm text-muted-foreground">
               Review blocked creators, run sweeps, and log fully-audited overrides.
             </p>
@@ -185,8 +185,8 @@ const AdminConsole = () => {
           </Button>
         </div>
 
-        <section className="mb-8 rounded-xl border bg-card p-4">
-          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+        <section className="mb-8 rounded-card border bg-card p-4">
+          <h2 className="mb-3 flex items-center gap-2 text-heading font-semibold">
             <Ban className="h-5 w-5 text-destructive" /> Blocked creators & patterns ({blocked.length})
           </h2>
 
@@ -208,7 +208,7 @@ const AdminConsole = () => {
             </Button>
           </div>
 
-          <div className="max-h-[420px] overflow-y-auto rounded-lg border">
+          <div className="max-h-[420px] overflow-y-auto rounded-card border">
             <table className="heartify-table w-full text-sm">
               <thead>
                 <tr>
@@ -221,9 +221,9 @@ const AdminConsole = () => {
               <tbody>
                 {blocked.map((b) => (
                   <tr key={b.id} tabIndex={0}>
-                    <td className="font-mono text-xs">{b.pattern}</td>
+                    <td className="font-mono text-micro">{b.pattern}</td>
                     <td className="text-muted-foreground">{b.reason ?? "—"}</td>
-                    <td className="text-xs text-muted-foreground">
+                    <td className="text-micro text-muted-foreground">
                       {new Date(b.created_at).toLocaleDateString()}
                     </td>
                     <td className="text-right">
@@ -257,11 +257,11 @@ const AdminConsole = () => {
 
 
 
-        <section className="rounded-xl border bg-card p-4">
-          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
+        <section className="rounded-card border bg-card p-4">
+          <h2 className="mb-3 flex items-center gap-2 text-heading font-semibold">
             <History className="h-5 w-5 text-primary" /> Audit trail ({overrides.length})
           </h2>
-          <div className="max-h-[420px] overflow-y-auto rounded-lg border">
+          <div className="max-h-[420px] overflow-y-auto rounded-card border">
             <table className="heartify-table w-full text-sm">
               <thead>
                 <tr>
@@ -274,7 +274,7 @@ const AdminConsole = () => {
               <tbody>
                 {overrides.map((o) => (
                   <tr key={o.id} tabIndex={0}>
-                    <td className="text-xs text-muted-foreground">
+                    <td className="text-micro text-muted-foreground">
                       {new Date(o.created_at).toLocaleString()}
                     </td>
                     <td>
@@ -282,7 +282,7 @@ const AdminConsole = () => {
                         {o.action}
                       </span>
                     </td>
-                    <td className="font-mono text-xs">{o.target}</td>
+                    <td className="font-mono text-micro">{o.target}</td>
                     <td className="text-muted-foreground">{o.reason ?? "—"}</td>
                   </tr>
                 ))}

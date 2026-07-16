@@ -50,7 +50,7 @@ const SignsOfHour = () => {
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>
         <header className="mt-4 mb-6">
-          <div className="flex items-center gap-3"><AlertCircle className="h-7 w-7 text-primary" /><h1 className="text-3xl font-bold">Signs of the Day of Judgment</h1></div>
+          <div className="flex items-center gap-3"><AlertCircle className="h-7 w-7 text-primary" /><h1 className="text-title font-bold">Signs of the Day of Judgment</h1></div>
           <p className="mt-2 text-muted-foreground">Minor signs (already occurring) and the major signs still awaited, from authentic hadith.</p>
         </header>
         <Card className="p-4 mb-6">
@@ -65,9 +65,9 @@ const SignsOfHour = () => {
         <div className="grid gap-4">
           {filtered.map(s => (
             <Card key={s.id} className={`p-5 cursor-pointer transition ${read[s.id] ? "bg-primary/5 border-primary/40" : "hover:bg-muted/40"}`} onClick={() => persist({ ...read, [s.id]: !read[s.id] })}>
-              <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold">{s.name}</h2><div className="mt-1 flex flex-wrap gap-2"><Badge variant="outline">{s.category}</Badge><Badge variant={statusColor(s.status) as any}>{s.status}</Badge></div></div>{read[s.id] && <Badge>Read</Badge>}</div>
+              <div className="flex items-start justify-between gap-4"><div><h2 className="text-heading font-semibold">{s.name}</h2><div className="mt-1 flex flex-wrap gap-2"><Badge variant="outline">{s.category}</Badge><Badge variant={statusColor(s.status) as any}>{s.status}</Badge></div></div>{read[s.id] && <Badge>Read</Badge>}</div>
               <p className="mt-3 text-sm text-muted-foreground">{s.description}</p>
-              <p className="mt-2 text-xs text-muted-foreground italic">Source: {s.source}</p>
+              <p className="mt-2 text-micro text-muted-foreground italic">Source: {s.source}</p>
             </Card>
           ))}
         </div>

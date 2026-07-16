@@ -70,7 +70,7 @@ const Parenting = () => {
         <header className="mt-4 mb-6">
           <div className="flex items-center gap-3">
             <Baby className="h-7 w-7 text-primary" />
-            <h1 className="text-3xl font-bold">Islamic Parenting (Tarbiyah)</h1>
+            <h1 className="text-title font-bold">Islamic Parenting (Tarbiyah)</h1>
           </div>
           <p className="mt-2 text-muted-foreground">
             "Each of you is a shepherd, and each of you is responsible for his flock." — Bukhari 893. A stage-by-stage prophetic guide.
@@ -103,7 +103,7 @@ const Parenting = () => {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <h2 className="text-xl font-semibold">{s.title}</h2>
+                  <h2 className="text-heading font-semibold">{s.title}</h2>
                   <div className="mt-1 flex flex-wrap gap-2">
                     <Badge variant="secondary">{s.age}</Badge>
                   </div>
@@ -114,7 +114,7 @@ const Parenting = () => {
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground leading-relaxed list-disc pl-5">
                 {s.practices.map((p, i) => <li key={i}>{p}</li>)}
               </ul>
-              <p className="mt-2 text-xs text-muted-foreground italic">Source: {s.source}</p>
+              <p className="mt-2 text-micro text-muted-foreground italic">Source: {s.source}</p>
             </Card>
           ))}
           {filtered.length === 0 && (

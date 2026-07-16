@@ -53,7 +53,7 @@ export default function EmptyState({
       <Link
         to={actionHref}
         className={cn(
-          "tap-target inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-transform hover:opacity-90 active:scale-[0.97]",
+          "tap-target inline-flex items-center gap-2 rounded-pill px-5 py-2 text-sm font-semibold transition-transform hover:opacity-90 active:scale-[0.97]",
           styles.button,
         )}
       >
@@ -63,7 +63,7 @@ export default function EmptyState({
       <button
         onClick={onAction}
         className={cn(
-          "tap-target inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-transform hover:opacity-90 active:scale-[0.97]",
+          "tap-target inline-flex items-center gap-2 rounded-pill px-5 py-2 text-sm font-semibold transition-transform hover:opacity-90 active:scale-[0.97]",
           styles.button,
         )}
       >
@@ -75,14 +75,14 @@ export default function EmptyState({
   return (
     <FadeIn
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center",
+        "flex flex-col items-center justify-center gap-3 rounded-card border border-dashed border-border bg-card/40 px-6 py-12 text-center",
         className,
       )}
     >
       {illustration ? (
         <EmptyIllustration variant={illustration} className="mb-1 h-24 w-24" />
       ) : (
-        <div className={cn("flex h-12 w-12 items-center justify-center rounded-full", styles.icon)}>
+        <div className={cn("flex h-12 w-12 items-center justify-center rounded-pill", styles.icon)}>
           <Icon className="h-6 w-6" />
         </div>
       )}

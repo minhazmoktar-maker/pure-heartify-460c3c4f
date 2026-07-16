@@ -22,7 +22,7 @@ function StatusPill({ status }: { status: Status }) {
   const s = STATUS_STYLES[status] ?? STATUS_STYLES.pending;
   const Icon = s.icon;
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium", s.className)}>
+    <span className={cn("inline-flex items-center gap-1 rounded-pill border px-2 py-0.5 text-micro font-medium", s.className)}>
       <Icon className="h-3 w-3" /> {s.label}
     </span>
   );
@@ -95,16 +95,16 @@ const Creators = () => {
 
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+            <div className="flex items-center gap-2 text-micro font-semibold uppercase tracking-wider text-primary">
               <Sparkles className="h-4 w-4" /> Creator Studio
             </div>
-            <h1 className="mt-2 font-heading text-3xl font-bold md:text-4xl">Your suggestions</h1>
+            <h1 className="mt-2 font-heading text-title font-bold md:text-display">Your suggestions</h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground md:text-base">
               Every video and channel here flows through the same moderation pipeline as our own ingestion. Nothing goes live until it passes review — jazākum Allāhu khayran for keeping the platform halal.
             </p>
           </div>
           <SuggestContentDialog
-            trigger={<Button size="lg" className="rounded-full">Suggest content</Button>}
+            trigger={<Button size="lg" className="rounded-pill">Suggest content</Button>}
           />
         </div>
 
@@ -114,9 +114,9 @@ const Creators = () => {
             { label: "Approved", value: counts.approved },
             { label: "In review", value: counts.pending },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl border border-border bg-card p-4">
-              <div className="text-2xl font-semibold text-foreground">{s.value}</div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
+            <div key={s.label} className="rounded-card border border-border bg-card p-4">
+              <div className="text-title font-semibold text-foreground">{s.value}</div>
+              <div className="text-micro uppercase tracking-wider text-muted-foreground">{s.label}</div>
             </div>
           ))}
         </div>
@@ -124,28 +124,28 @@ const Creators = () => {
         <section className="mt-10">
           <div className="mb-3 flex items-center gap-2">
             <Youtube className="h-4 w-4 text-primary" />
-            <h2 className="font-heading text-lg font-semibold">Videos</h2>
+            <h2 className="font-heading text-heading font-semibold">Videos</h2>
           </div>
           {isLoading ? (
             <div className="space-y-2">
-              {[0, 1, 2].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+              {[0, 1, 2].map((i) => <Skeleton key={i} className="h-16 w-full rounded-card" />)}
             </div>
           ) : (videosQ.data?.length ?? 0) === 0 ? (
-            <p className="rounded-xl border border-dashed border-border bg-card/50 p-6 text-sm text-muted-foreground">
+            <p className="rounded-card border border-dashed border-border bg-card/50 p-6 text-sm text-muted-foreground">
               You haven't suggested any videos yet.
             </p>
           ) : (
-            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card">
               {videosQ.data!.map((v) => (
                 <li key={v.id} className="flex items-center gap-3 p-3">
                   {v.thumbnail_url ? (
-                    <img src={v.thumbnail_url} alt="" className="h-12 w-20 rounded-md object-cover" loading="lazy" />
+                    <img src={v.thumbnail_url} alt="" className="h-12 w-20 rounded-card object-cover" loading="lazy" />
                   ) : (
-                    <div className="h-12 w-20 rounded-md bg-muted" />
+                    <div className="h-12 w-20 rounded-card bg-muted" />
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium text-foreground">{v.title}</div>
-                    <div className="truncate text-xs text-muted-foreground">
+                    <div className="truncate text-micro text-muted-foreground">
                       {v.channel_title ?? "Unknown channel"} · {new Date(v.created_at).toLocaleDateString()}
                     </div>
                   </div>
@@ -159,25 +159,25 @@ const Creators = () => {
         <section className="mt-10">
           <div className="mb-3 flex items-center gap-2">
             <Radio className="h-4 w-4 text-primary" />
-            <h2 className="font-heading text-lg font-semibold">Channels</h2>
+            <h2 className="font-heading text-heading font-semibold">Channels</h2>
           </div>
           {isLoading ? (
             <div className="space-y-2">
-              {[0, 1].map((i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
+              {[0, 1].map((i) => <Skeleton key={i} className="h-14 w-full rounded-card" />)}
             </div>
           ) : (channelsQ.data?.length ?? 0) === 0 ? (
-            <p className="rounded-xl border border-dashed border-border bg-card/50 p-6 text-sm text-muted-foreground">
+            <p className="rounded-card border border-dashed border-border bg-card/50 p-6 text-sm text-muted-foreground">
               You haven't suggested any channels yet.
             </p>
           ) : (
-            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card">
               {channelsQ.data!.map((c) => (
                 <li key={c.id} className="flex items-center gap-3 p-3">
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium text-foreground">
                       {c.title ?? c.handle ?? c.youtube_channel_id}
                     </div>
-                    <div className="truncate text-xs text-muted-foreground">
+                    <div className="truncate text-micro text-muted-foreground">
                       {c.handle ? `@${c.handle} · ` : ""}
                       {new Date(c.created_at).toLocaleDateString()}
                     </div>
@@ -189,7 +189,7 @@ const Creators = () => {
           )}
         </section>
 
-        <div className="mt-10 rounded-xl border border-border bg-card/50 p-5 text-sm text-muted-foreground">
+        <div className="mt-10 rounded-card border border-border bg-card/50 p-5 text-sm text-muted-foreground">
           Curious how reviews work?{" "}
           <Link to="/trust" className="text-primary underline-offset-4 hover:underline">Read the trust policy →</Link>
         </div>

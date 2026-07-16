@@ -34,7 +34,7 @@ export default function Appeals() {
     return (
       <div className="container mx-auto max-w-xl px-4 py-16 text-center">
         <SEO path="/appeals" title="Appeals — Heartify" description="Appeal a moderation decision." />
-        <p className="text-lg font-semibold">Sign in to file or view appeals</p>
+        <p className="text-heading font-semibold">Sign in to file or view appeals</p>
         <Link to="/login" className="mt-4 inline-block text-primary hover:underline">Sign in</Link>
       </div>
     );
@@ -51,11 +51,11 @@ export default function Appeals() {
         subtitle="If a video, comment, or account action seems wrong, tell us — a real reviewer will read it."
       />
       <div className="container mx-auto grid max-w-5xl gap-8 px-4 pb-16 lg:grid-cols-[1fr_1.2fr]">
-        <section className="rounded-xl border border-border bg-card p-5">
+        <section className="rounded-card border border-border bg-card p-5">
           <h2 className="text-base font-semibold text-foreground">File an appeal</h2>
           <div className="mt-4 space-y-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">What is this about?</label>
+              <label className="mb-1 block text-micro font-medium text-muted-foreground">What is this about?</label>
               <Select value={subjectKind} onValueChange={(v) => setSubjectKind(v as Appeal["subject_kind"])}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -67,11 +67,11 @@ export default function Appeals() {
               </Select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Reference (video ID, comment ID, etc.)</label>
+              <label className="mb-1 block text-micro font-medium text-muted-foreground">Reference (video ID, comment ID, etc.)</label>
               <Input value={subjectRef} onChange={(e) => setSubjectRef(e.target.value)} placeholder="e.g. dQw4w9WgXcQ" />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Why should we reconsider?</label>
+              <label className="mb-1 block text-micro font-medium text-muted-foreground">Why should we reconsider?</label>
               <Textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -80,7 +80,7 @@ export default function Appeals() {
                 maxLength={4000}
                 placeholder="Please share context. Minimum 10 characters."
               />
-              <p className="mt-1 text-xs text-muted-foreground">{reason.length}/4000</p>
+              <p className="mt-1 text-micro text-muted-foreground">{reason.length}/4000</p>
             </div>
             <Button
               className="w-full"
@@ -106,7 +106,7 @@ export default function Appeals() {
           ) : (
             <ul className="space-y-3">
               {appeals.map((a) => (
-                <li key={a.id} className="rounded-lg border border-border bg-card p-4">
+                <li key={a.id} className="rounded-card border border-border bg-card p-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium capitalize">{a.subject_kind} · {a.subject_ref}</span>
                     <Badge className={STATUS_BADGE[a.status]}>{a.status}</Badge>
@@ -118,12 +118,12 @@ export default function Appeals() {
                     </p>
                   )}
                   <div className="mt-2 flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-micro text-muted-foreground">
                       Filed {formatDistanceToNow(new Date(a.created_at), { addSuffix: true })}
                     </p>
                     {a.status === "open" && (
                       <button
-                        className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+                        className="text-micro text-muted-foreground underline-offset-2 hover:underline"
                         onClick={() => withdraw.mutate(a.id)}
                       >
                         Withdraw

@@ -21,16 +21,16 @@ export default function RamadanBanner() {
     <div className="mx-auto max-w-[1800px] px-4 pt-3 md:px-6">
       <Link
         to="/duas"
-        className="group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/5 to-transparent px-4 py-3 transition-colors hover:border-primary/50"
+        className="group relative flex items-center gap-3 overflow-hidden rounded-card border border-primary/30 bg-gradient-to-r from-primary/15 via-primary/5 to-transparent px-4 py-3 transition-colors hover:border-primary/50"
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-card bg-primary/20 text-primary">
           {h.isLastTen ? <Star className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-semibold text-foreground">{title}</div>
-          <div className="truncate text-xs text-muted-foreground">{subtitle}</div>
+          <div className="truncate text-micro text-muted-foreground">{subtitle}</div>
         </div>
-        <span className="hidden shrink-0 text-xs font-medium text-primary group-hover:underline sm:inline">
+        <span className="hidden shrink-0 text-micro font-medium text-primary group-hover:underline sm:inline">
           Open Duʿāʾ Wall →
         </span>
       </Link>

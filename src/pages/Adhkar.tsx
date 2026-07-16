@@ -85,7 +85,7 @@ const Adhkar = () => {
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
         <header className="mb-6">
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
+          <h1 className="font-heading text-title font-bold text-foreground md:text-display">
             Adhkar &amp; Duas
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -104,7 +104,7 @@ const Adhkar = () => {
                 key={c.id}
                 onClick={() => setParams({ c: c.id })}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                  "inline-flex items-center gap-2 rounded-pill border px-4 py-2 text-sm font-medium transition-colors",
                   isActive
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border text-muted-foreground hover:text-foreground",
@@ -118,25 +118,25 @@ const Adhkar = () => {
         </div>
 
         {/* Summary */}
-        <div className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-6 rounded-card border border-border bg-card p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              <p className="text-micro uppercase tracking-wide text-muted-foreground">
                 Today's progress
               </p>
-              <p className="mt-1 text-lg font-semibold text-foreground">
+              <p className="mt-1 text-heading font-semibold text-foreground">
                 {active.title} · {totals.totalDone}/{totals.totalRequired} recited
               </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{active.description}</p>
+              <p className="mt-0.5 text-micro text-muted-foreground">{active.description}</p>
             </div>
             <button
               onClick={resetAll}
-              className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs hover:bg-secondary"
+              className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-3 py-1.5 text-micro hover:bg-secondary"
             >
               <RotateCcw className="h-3 w-3" /> Reset today
             </button>
           </div>
-          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
+          <div className="mt-4 h-2 w-full overflow-hidden rounded-pill bg-secondary">
             <div
               className="h-full bg-primary transition-all"
               style={{ width: `${totals.pct}%` }}
@@ -153,7 +153,7 @@ const Adhkar = () => {
               <li
                 key={item.id}
                 className={cn(
-                  "rounded-2xl border bg-card p-5 transition-colors",
+                  "rounded-card border bg-card p-5 transition-colors",
                   complete ? "border-primary/50" : "border-border",
                 )}
               >
@@ -162,19 +162,19 @@ const Adhkar = () => {
                     <p className="text-sm font-semibold text-foreground">
                       {item.translit}
                     </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
+                    <p className="mt-0.5 text-micro text-muted-foreground">
                       {item.meaning}
                       {item.reference ? ` · ${item.reference}` : ""}
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-foreground">
+                  <span className="shrink-0 rounded-pill bg-secondary px-2.5 py-1 text-micro font-medium text-foreground">
                     {done}/{item.repeat}
                   </span>
                 </div>
 
                 <p
                   dir="rtl"
-                  className="mt-4 font-heading text-2xl leading-loose text-foreground md:text-3xl"
+                  className="mt-4 font-heading text-title leading-loose text-foreground md:text-title"
                 >
                   {item.arabic}
                 </p>
@@ -184,7 +184,7 @@ const Adhkar = () => {
                     onClick={() => bump(item.id, item.repeat)}
                     disabled={complete}
                     className={cn(
-                      "inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
+                      "inline-flex items-center gap-1 rounded-pill px-4 py-2 text-sm font-semibold transition-colors",
                       complete
                         ? "bg-primary/15 text-primary"
                         : "bg-primary text-primary-foreground hover:opacity-90",
@@ -200,7 +200,7 @@ const Adhkar = () => {
                   </button>
                   <button
                     onClick={() => resetOne(item.id)}
-                    className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-2 text-xs hover:bg-secondary"
+                    className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-micro hover:bg-secondary"
                   >
                     <RotateCcw className="h-3 w-3" /> Reset
                   </button>
@@ -210,7 +210,7 @@ const Adhkar = () => {
           })}
         </ul>
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">
+        <p className="mt-8 text-center text-micro text-muted-foreground">
           Prefer a single-dhikr counter? Try the{" "}
           <Link to="/dhikr" className="underline hover:text-foreground">
             tasbih counter

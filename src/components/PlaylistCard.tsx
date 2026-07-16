@@ -40,7 +40,7 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
       aria-label={`Play ${playlist.title}${isLocked ? " (locked)" : ""}`}
       onKeyDown={(e: React.KeyboardEvent) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), handlePlay())}
       className={cn(
-        "card-interactive group cursor-pointer overflow-hidden rounded-xl bg-card shadow-card",
+        "card-interactive group cursor-pointer overflow-hidden rounded-card bg-card shadow-card",
         isLocked && "opacity-70 cursor-not-allowed hover:translate-y-0 hover:shadow-card"
       )}
     >
@@ -48,7 +48,7 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
         <SmartImage
           src={playlist.cover}
           alt={playlist.title}
-          className="transition-transform duration-300 group-hover:scale-105"
+          className="transition-transform duration-short group-hover:scale-105"
         />
         {isLocked ? (
           <div className="absolute inset-0 flex items-center justify-center bg-foreground/40">
@@ -56,13 +56,13 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-foreground/0 opacity-0 transition-all group-hover:bg-foreground/25 group-hover:opacity-100">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary shadow-lg">
+            <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-primary shadow-lg">
               <Play className="ml-0.5 h-5 w-5 fill-primary-foreground text-primary-foreground" />
             </div>
           </div>
         )}
         {playlist.isPremium && (
-          <span className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-accent-foreground">
+          <span className="absolute top-2 right-2 flex items-center gap-1 rounded-pill bg-gold px-2 py-0.5 text-[10px] font-bold text-accent-foreground">
             <Crown className="h-3 w-3" />
             PREMIUM
           </span>
@@ -70,7 +70,7 @@ const PlaylistCard = ({ playlist, index }: PlaylistCardProps) => {
       </div>
       <div className="p-3">
         <h3 className="truncate text-sm font-semibold text-foreground">{playlist.title}</h3>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">{playlist.description}</p>
+        <p className="mt-0.5 truncate text-micro text-muted-foreground">{playlist.description}</p>
         <p className="mt-1 text-[10px] text-muted-foreground">{playlist.trackCount} tracks</p>
       </div>
     </FadeIn>

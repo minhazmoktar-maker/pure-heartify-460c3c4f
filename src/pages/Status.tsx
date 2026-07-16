@@ -119,7 +119,7 @@ export default function Status() {
         <Card className="p-6 mb-6 flex items-center gap-4">
           {iconFor(overall)}
           <div>
-            <div className="text-lg font-semibold">
+            <div className="text-heading font-semibold">
               {overall === "operational" && "All systems operational"}
               {overall === "degraded" && "Some systems degraded"}
               {overall === "down" && "Service disruption detected"}
@@ -140,7 +140,7 @@ export default function Status() {
               </div>
               <div className="flex items-center gap-2">
                 {c.latency !== undefined && (
-                  <span className="text-xs text-muted-foreground tabular-nums">
+                  <span className="text-micro text-muted-foreground tabular-nums">
                     {Math.round(c.latency)}ms
                   </span>
                 )}
@@ -152,7 +152,7 @@ export default function Status() {
           ))}
         </div>
 
-        <p className="text-xs text-muted-foreground mt-8 text-center">
+        <p className="text-micro text-muted-foreground mt-8 text-center">
           For incident history and postmortems, follow{" "}
           <a className="underline" href="mailto:status@heartify.app">status@heartify.app</a>.
         </p>

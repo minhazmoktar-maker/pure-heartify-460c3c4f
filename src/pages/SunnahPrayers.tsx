@@ -42,7 +42,7 @@ const SunnahPrayers = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Sunnah & Nafl Prayers Guide" description="Rawatib, tahajjud, duha, istikharah, tasbih and other voluntary prayers with times, rakats and virtues." path="/sunnah-prayers" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Moon className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Sunnah & Nafl Prayers</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Moon className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Sunnah & Nafl Prayers</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Tracked</span><span className="text-sm font-medium">{count} / {PRAYERS.length}</span></div><Progress value={(count / PRAYERS.length) * 100} /></Card>
         <div className="flex gap-2"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search prayers…" className="pl-9" /></div><Button variant="outline" size="icon" aria-label="Reset" onClick={() => persist({})} title="Reset"><RotateCcw className="w-4 h-4" /></Button></div>
@@ -50,9 +50,9 @@ const SunnahPrayers = () => {
         <div className="grid gap-3 md:grid-cols-2">{filtered.map(p => (
           <Card key={p.id} className={`p-4 cursor-pointer transition ${done[p.id] ? "border-primary/60 bg-primary/5" : ""}`} onClick={() => persist({ ...done, [p.id]: !done[p.id] })}>
             <div className="flex items-start justify-between mb-2"><h3 className="font-semibold">{p.name}</h3><Badge variant="secondary">{p.rakats} rak'ah</Badge></div>
-            <p className="text-xs text-muted-foreground mb-2">{p.time}</p>
+            <p className="text-micro text-muted-foreground mb-2">{p.time}</p>
             <p className="text-sm mb-2">{p.virtue}</p>
-            <p className="text-xs text-muted-foreground">{p.source}</p>
+            <p className="text-micro text-muted-foreground">{p.source}</p>
           </Card>
         ))}</div>
       </div>

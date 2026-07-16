@@ -106,19 +106,19 @@ export default function Prayer() {
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground">Prayer</h1>
+          <h1 className="text-title font-bold text-foreground">Prayer</h1>
           <p className="text-sm text-muted-foreground">Prayer times, Qibla direction, and Adhan reminders.</p>
         </header>
 
         {!settings.location ? (
-          <div className="rounded-2xl border border-border bg-card p-8 text-center">
+          <div className="rounded-card border border-border bg-card p-8 text-center">
             <MapPin className="mx-auto mb-3 h-10 w-10 text-primary" />
-            <h2 className="mb-1 text-lg font-semibold">Set your location</h2>
+            <h2 className="mb-1 text-heading font-semibold">Set your location</h2>
             <p className="mb-4 text-sm text-muted-foreground">We need your location to calculate accurate prayer times and the Qibla direction. It stays on your device.</p>
             <button
               onClick={detectLocation}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
               Use my location
@@ -127,13 +127,13 @@ export default function Prayer() {
         ) : (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Next prayer + list */}
-            <section className="rounded-2xl border border-border bg-card p-6">
+            <section className="rounded-card border border-border bg-card p-6">
               {next && (
-                <div className="mb-4 rounded-xl bg-primary/10 p-4">
-                  <div className="text-xs uppercase tracking-wide text-muted-foreground">Next prayer</div>
+                <div className="mb-4 rounded-card bg-primary/10 p-4">
+                  <div className="text-micro uppercase tracking-wide text-muted-foreground">Next prayer</div>
                   <div className="mt-1 flex items-baseline justify-between">
-                    <div className="text-2xl font-bold text-foreground">{next.label}</div>
-                    <div className="text-lg font-medium text-primary">{formatTime(next.time)}</div>
+                    <div className="text-title font-bold text-foreground">{next.label}</div>
+                    <div className="text-heading font-medium text-primary">{formatTime(next.time)}</div>
                   </div>
                   <div className="mt-1 text-sm text-muted-foreground">in {formatCountdown(next.time.getTime() - now.getTime())}</div>
                 </div>
@@ -151,33 +151,33 @@ export default function Prayer() {
               </ul>
               <button
                 onClick={detectLocation}
-                className="mt-4 inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
+                className="mt-4 inline-flex items-center gap-2 text-micro text-muted-foreground hover:text-foreground"
               >
                 <RefreshCw className="h-3 w-3" /> Update location
               </button>
               {settings.location.label && (
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-micro text-muted-foreground">
                   {settings.location.label} • {settings.location.latitude.toFixed(3)}, {settings.location.longitude.toFixed(3)}
                 </p>
               )}
             </section>
 
             {/* Qibla */}
-            <section className="rounded-2xl border border-border bg-card p-6">
-              <h2 className="mb-4 text-lg font-semibold">Qibla</h2>
+            <section className="rounded-card border border-border bg-card p-6">
+              <h2 className="mb-4 text-heading font-semibold">Qibla</h2>
               {qibla != null && <QiblaCompass bearing={qibla} />}
             </section>
 
             {/* Settings */}
-            <section className="rounded-2xl border border-border bg-card p-6 lg:col-span-2">
-              <h2 className="mb-4 text-lg font-semibold">Settings</h2>
+            <section className="rounded-card border border-border bg-card p-6 lg:col-span-2">
+              <h2 className="mb-4 text-heading font-semibold">Settings</h2>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="text-sm">
                   <span className="mb-1 block text-muted-foreground">Calculation method</span>
                   <select
                     value={settings.method}
                     onChange={(e) => update({ method: e.target.value as MethodKey })}
-                    className="w-full rounded-md border border-border bg-background px-3 py-2"
+                    className="w-full rounded-card border border-border bg-background px-3 py-2"
                   >
                     {(Object.keys(METHOD_LABELS) as MethodKey[]).map((k) => (
                       <option key={k} value={k}>{METHOD_LABELS[k]}</option>
@@ -189,7 +189,7 @@ export default function Prayer() {
                   <select
                     value={settings.madhab}
                     onChange={(e) => update({ madhab: e.target.value as MadhabKey })}
-                    className="w-full rounded-md border border-border bg-background px-3 py-2"
+                    className="w-full rounded-card border border-border bg-background px-3 py-2"
                   >
                     <option value="shafi">Shafi'i / Maliki / Hanbali (standard)</option>
                     <option value="hanafi">Hanafi (later)</option>
@@ -200,7 +200,7 @@ export default function Prayer() {
                   <select
                     value={settings.minutesBefore}
                     onChange={(e) => update({ minutesBefore: Number(e.target.value) })}
-                    className="w-full rounded-md border border-border bg-background px-3 py-2"
+                    className="w-full rounded-card border border-border bg-background px-3 py-2"
                   >
                     <option value={0}>At prayer time</option>
                     <option value={5}>5 minutes before</option>
@@ -214,14 +214,14 @@ export default function Prayer() {
                   {settings.adhanEnabled ? (
                     <button
                       onClick={() => update({ adhanEnabled: false })}
-                      className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 hover:bg-secondary"
+                      className="inline-flex items-center gap-2 rounded-card border border-border px-3 py-2 hover:bg-secondary"
                     >
                       <BellOff className="h-4 w-4" /> Turn off
                     </button>
                   ) : (
                     <button
                       onClick={enableAdhan}
-                      className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-primary-foreground hover:opacity-90"
+                      className="inline-flex items-center gap-2 rounded-card bg-primary px-3 py-2 text-primary-foreground hover:opacity-90"
                     >
                       <Bell className="h-4 w-4" /> Enable
                     </button>
@@ -243,7 +243,7 @@ export default function Prayer() {
                           })
                         }
                         className={cn(
-                          "rounded-full border px-3 py-1 text-xs font-medium capitalize transition-colors",
+                          "rounded-pill border px-3 py-1 text-micro font-medium capitalize transition-colors",
                           active
                             ? "border-primary bg-primary/10 text-primary"
                             : "border-border text-muted-foreground hover:text-foreground",
@@ -254,7 +254,7 @@ export default function Prayer() {
                     );
                   })}
                 </div>
-                <p className="mt-3 text-xs text-muted-foreground">
+                <p className="mt-3 text-micro text-muted-foreground">
                   Reminders fire while Heartify is open in your browser. Background push notifications are coming next.
                 </p>
               </div>

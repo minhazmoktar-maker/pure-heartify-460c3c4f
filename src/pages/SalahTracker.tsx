@@ -129,7 +129,7 @@ export default function SalahTracker() {
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <header className="mb-6">
-          <h1 className="flex items-center gap-2 text-3xl font-bold">
+          <h1 className="flex items-center gap-2 text-title font-bold">
             <ListChecks className="h-7 w-7 text-primary" />
             Salah Tracker
           </h1>
@@ -141,7 +141,7 @@ export default function SalahTracker() {
         <div className="grid gap-6 md:grid-cols-3">
           <Card className="md:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="text-lg">
+              <CardTitle className="text-heading">
                 {isToday ? "Today" : new Date(selectedDate).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
               </CardTitle>
               <div className="flex items-center gap-1">
@@ -158,7 +158,7 @@ export default function SalahTracker() {
                   <button
                     key={p.key}
                     onClick={() => cycle(p.key)}
-                    className="flex w-full items-center justify-between rounded-md border p-3 text-left transition hover:border-primary/60"
+                    className="flex w-full items-center justify-between rounded-card border p-3 text-left transition hover:border-primary/60"
                     aria-label={`${p.label}: ${meta.label}. Tap to change.`}
                   >
                     <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export default function SalahTracker() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
+              <CardTitle className="flex items-center gap-2 text-heading">
                 <Flame className="h-5 w-5 text-orange-500" /> {stats.streak}-day streak
               </CardTitle>
             </CardHeader>
@@ -185,11 +185,11 @@ export default function SalahTracker() {
               <p className="text-muted-foreground">
                 Consecutive days with no missed prayers.
               </p>
-              <div className="rounded-md border p-3">
-                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+              <div className="rounded-card border p-3">
+                <div className="mb-2 flex items-center gap-2 text-micro font-semibold text-muted-foreground">
                   <TrendingUp className="h-3 w-3" /> Last 30 days
                 </div>
-                <div className="grid grid-cols-2 gap-y-1 text-xs">
+                <div className="grid grid-cols-2 gap-y-1 text-micro">
                   <span className="text-emerald-500">On time</span><span className="text-right font-mono">{stats.onTime}</span>
                   <span className="text-amber-500">Late</span><span className="text-right font-mono">{stats.late}</span>
                   <span className="text-red-500">Qada</span><span className="text-right font-mono">{stats.qada}</span>
@@ -201,7 +201,7 @@ export default function SalahTracker() {
         </div>
 
         <Card className="mt-6">
-          <CardHeader className="pb-3"><CardTitle className="text-lg">Last 14 days</CardTitle></CardHeader>
+          <CardHeader className="pb-3"><CardTitle className="text-heading">Last 14 days</CardTitle></CardHeader>
           <CardContent>
             <div className="grid grid-cols-7 gap-2 sm:grid-cols-14">
               {heatmap.map((d) => {

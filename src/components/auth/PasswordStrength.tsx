@@ -33,7 +33,7 @@ export function PasswordStrength({ value, className }: { value: string; classNam
           <div
             key={i}
             className={cn(
-              "h-1 flex-1 rounded-full transition-colors duration-200",
+              "h-1 flex-1 rounded-pill transition-colors duration-200",
               i <= score ? TONES[score] : "bg-muted",
             )}
           />

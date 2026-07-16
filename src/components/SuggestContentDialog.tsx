@@ -134,7 +134,7 @@ export default function SuggestContentDialog({ trigger }: Props) {
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <button className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10">
+          <button className="inline-flex items-center gap-1.5 rounded-pill border border-primary/40 bg-primary/5 px-3 py-1.5 text-micro font-semibold text-primary hover:bg-primary/10">
             <Lightbulb className="h-3.5 w-3.5" /> Suggest content
           </button>
         )}

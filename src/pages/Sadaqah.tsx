@@ -96,11 +96,11 @@ const Sadaqah = () => {
 
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6 flex items-start gap-3">
-          <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+          <div className="rounded-card bg-primary/10 p-3 text-primary">
             <HandCoins className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">Sadaqah Tracker</h1>
+            <h1 className="font-heading text-title font-bold text-foreground md:text-display">Sadaqah Tracker</h1>
             <p className="mt-1 text-muted-foreground">
               "The believer's shade on the Day of Judgement will be his charity." — Tirmidhi
             </p>
@@ -109,38 +109,38 @@ const Sadaqah = () => {
 
         {/* Stats */}
         <section className="mb-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="rounded-card border border-border bg-card p-4">
+            <div className="flex items-center gap-2 text-micro text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" /> This month
             </div>
-            <p className="mt-1 font-heading text-2xl font-bold text-primary">{fmt(stats.thisMonthTotal)}</p>
+            <p className="mt-1 font-heading text-title font-bold text-primary">{fmt(stats.thisMonthTotal)}</p>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="rounded-card border border-border bg-card p-4">
+            <div className="flex items-center gap-2 text-micro text-muted-foreground">
               <TrendingUp className="h-3.5 w-3.5" /> All-time
             </div>
-            <p className="mt-1 font-heading text-2xl font-bold text-foreground">{fmt(stats.allTime)}</p>
+            <p className="mt-1 font-heading text-title font-bold text-foreground">{fmt(stats.allTime)}</p>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="rounded-card border border-border bg-card p-4">
+            <div className="flex items-center gap-2 text-micro text-muted-foreground">
               <Target className="h-3.5 w-3.5" /> Months active
             </div>
-            <p className="mt-1 font-heading text-2xl font-bold text-foreground">{stats.monthsActive}</p>
+            <p className="mt-1 font-heading text-title font-bold text-foreground">{stats.monthsActive}</p>
           </div>
         </section>
 
         {/* Goal */}
-        <section className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <section className="mb-6 rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="font-heading text-lg font-semibold text-foreground">Monthly goal</h2>
-              <p className="text-xs text-muted-foreground">Set a target to consistently give.</p>
+              <h2 className="font-heading text-heading font-semibold text-foreground">Monthly goal</h2>
+              <p className="text-micro text-muted-foreground">Set a target to consistently give.</p>
             </div>
             <div className="flex items-center gap-2">
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="h-9 rounded-md border border-border bg-background px-2 text-sm"
+                className="h-9 rounded-card border border-border bg-background px-2 text-sm"
               >
                 {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
               </select>
@@ -150,17 +150,17 @@ const Sadaqah = () => {
                 value={goal || ""}
                 onChange={(e) => setGoal(Math.max(0, Number(e.target.value) || 0))}
                 placeholder="Goal"
-                className="h-9 w-32 rounded-md border border-border bg-background px-2 text-sm"
+                className="h-9 w-32 rounded-card border border-border bg-background px-2 text-sm"
               />
             </div>
           </div>
           {goal > 0 ? (
             <>
-              <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+              <div className="mb-1 flex justify-between text-micro text-muted-foreground">
                 <span>{fmt(stats.thisMonthTotal)} of {fmt(goal)}</span>
                 <span>{goalPct}%</span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <div className="h-2 w-full overflow-hidden rounded-pill bg-secondary">
                 <div className="h-full bg-primary transition-all" style={{ width: `${goalPct}%` }} />
               </div>
             </>
@@ -171,8 +171,8 @@ const Sadaqah = () => {
 
         <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
           {/* Add entry */}
-          <section className="rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Log sadaqah</h2>
+          <section className="rounded-card border border-border bg-card p-5">
+            <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Log sadaqah</h2>
             <div className="grid grid-cols-[1fr_120px] gap-2">
               <input
                 type="number"
@@ -181,19 +181,19 @@ const Sadaqah = () => {
                 placeholder="Amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="h-10 rounded-md border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
+                className="h-10 rounded-card border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
               />
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="h-10 rounded-md border border-border bg-background px-2 text-sm"
+                className="h-10 rounded-card border border-border bg-background px-2 text-sm"
               />
             </div>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="mt-2 h-10 w-full rounded-md border border-border bg-background px-2 text-sm"
+              className="mt-2 h-10 w-full rounded-card border border-border bg-background px-2 text-sm"
             >
               {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
             </select>
@@ -202,19 +202,19 @@ const Sadaqah = () => {
               placeholder="Note (optional)"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="mt-2 h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+              className="mt-2 h-10 w-full rounded-card border border-border bg-background px-3 text-sm"
             />
             <button
               onClick={addEntry}
-              className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-card bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
               <Plus className="h-4 w-4" /> Add entry
             </button>
           </section>
 
           {/* By category */}
-          <section className="rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">This month by category</h2>
+          <section className="rounded-card border border-border bg-card p-5">
+            <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">This month by category</h2>
             {Object.keys(stats.byCat).length === 0 ? (
               <p className="text-sm text-muted-foreground">No entries this month yet.</p>
             ) : (
@@ -223,11 +223,11 @@ const Sadaqah = () => {
                   .sort((a, b) => b[1] - a[1])
                   .map(([cat, val]) => (
                     <li key={cat}>
-                      <div className="mb-1 flex justify-between text-xs">
+                      <div className="mb-1 flex justify-between text-micro">
                         <span className="text-foreground">{cat}</span>
                         <span className="text-muted-foreground">{fmt(val)}</span>
                       </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                      <div className="h-1.5 w-full overflow-hidden rounded-pill bg-secondary">
                         <div className="h-full bg-primary transition-all" style={{ width: `${(val / maxCat) * 100}%` }} />
                       </div>
                     </li>
@@ -238,8 +238,8 @@ const Sadaqah = () => {
         </div>
 
         {/* Recent */}
-        <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-          <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Recent entries</h2>
+        <section className="mt-6 rounded-card border border-border bg-card p-5">
+          <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Recent entries</h2>
           {recent.length === 0 ? (
             <p className="text-sm text-muted-foreground">No entries yet. Your first sadaqah is one tap away.</p>
           ) : (
@@ -247,12 +247,12 @@ const Sadaqah = () => {
               {recent.map((e) => (
                 <li key={e.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="min-w-0">
-                    <p className="font-medium text-foreground">{fmt(e.amount)} <span className="text-xs font-normal text-muted-foreground">· {e.category}</span></p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="font-medium text-foreground">{fmt(e.amount)} <span className="text-micro font-normal text-muted-foreground">· {e.category}</span></p>
+                    <p className="text-micro text-muted-foreground">
                       {e.date}{e.note ? ` · ${e.note}` : ""}
                     </p>
                   </div>
-                  <button onClick={() => remove(e.id)} aria-label="Delete" className="rounded-full p-2 text-muted-foreground hover:bg-secondary">
+                  <button onClick={() => remove(e.id)} aria-label="Delete" className="rounded-pill p-2 text-muted-foreground hover:bg-secondary">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </li>

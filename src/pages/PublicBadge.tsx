@@ -90,12 +90,12 @@ export default function PublicBadge() {
           <>
             <Card className={`overflow-hidden ${TIER_STYLES[badge.tier]}`}>
               <CardContent className="pt-8 pb-8 text-center space-y-4">
-                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-background/60 text-5xl">
+                <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-pill bg-background/60 text-display">
                   {badge.emoji}
                 </div>
                 <div className="space-y-1">
                   <Badge variant="outline" className="text-[10px] uppercase">{badge.tier}</Badge>
-                  <h1 className="text-3xl font-bold">{badge.title}</h1>
+                  <h1 className="text-title font-bold">{badge.title}</h1>
                   <p className="text-sm text-muted-foreground">{badge.description}</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 pt-2 text-sm">
@@ -126,7 +126,7 @@ export default function PublicBadge() {
               </Button>
             </div>
 
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-micro text-muted-foreground">
               Heartify — halal streaming with streaks, dhikr, and Qur'an milestones.
             </p>
           </>

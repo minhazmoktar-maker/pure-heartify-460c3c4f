@@ -63,7 +63,7 @@ export default function HandleClaimCard() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-micro text-muted-foreground">
           Claim a username to get a shareable page at{" "}
           <span className="font-mono">heartify.app/u/yourname</span>.
         </p>
@@ -85,7 +85,7 @@ export default function HandleClaimCard() {
         {publicUrl && (
           <Link
             to={publicUrl}
-            className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+            className="flex items-center gap-1.5 text-micro text-primary hover:underline"
           >
             <ExternalLink className="h-3 w-3" /> View public profile
           </Link>

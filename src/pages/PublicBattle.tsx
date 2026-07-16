@@ -67,19 +67,19 @@ export default function PublicBattle() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-5 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Swords className="h-4 w-4 text-primary" />
               Ghazwah · {idx + 1} of {BATTLES.length}
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-4xl md:text-5xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {b.name_ar}
             </p>
-            <h1 className="text-2xl md:text-3xl font-semibold">{b.translit}</h1>
+            <h1 className="text-title md:text-title font-semibold">{b.translit}</h1>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
               <span className="heartify-chip heartify-chip--muted inline-flex items-center gap-1">
                 <Calendar className="h-3 w-3" /> {b.hijri} · {b.ce}
@@ -97,13 +97,13 @@ export default function PublicBattle() {
         <Card className="mt-6 border-border/60">
           <CardContent className="pt-5 pb-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <div className="rounded-md border border-border/60 p-3">
+              <div className="rounded-card border border-border/60 p-3">
                 <div className="text-[10px] uppercase text-muted-foreground inline-flex items-center gap-1">
                   <Users className="h-3 w-3" /> Muslim force
                 </div>
                 <div className="mt-1 font-medium">{b.muslim_force}</div>
               </div>
-              <div className="rounded-md border border-border/60 p-3">
+              <div className="rounded-card border border-border/60 p-3">
                 <div className="text-[10px] uppercase text-muted-foreground inline-flex items-center gap-1">
                   <Users className="h-3 w-3" /> Opponent
                 </div>
@@ -113,7 +113,7 @@ export default function PublicBattle() {
             <p className="text-sm md:text-base leading-relaxed border-l-2 border-primary/40 pl-4">
               {b.summary}
             </p>
-            <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
+            <div className="rounded-card border border-primary/30 bg-primary/5 p-3 text-sm">
               <div className="text-[10px] uppercase text-primary/80 mb-1 inline-flex items-center gap-1">
                 <BookMarked className="h-3 w-3" /> Lesson
               </div>

@@ -16,8 +16,8 @@ const NotFound = () => {
     <div className="flex min-h-dvh items-center justify-center bg-muted">
       <SEO title="Page Not Found — Heartify" description="The page you're looking for doesn't exist. Return to Heartify to keep exploring halal content." path="/404" />
       <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
+        <h1 className="mb-4 text-display font-bold">404</h1>
+        <p className="mb-4 text-heading text-muted-foreground">Oops! Page not found</p>
         <a href="/" className="text-primary underline hover:text-primary/90">
           Return to Home
         </a>

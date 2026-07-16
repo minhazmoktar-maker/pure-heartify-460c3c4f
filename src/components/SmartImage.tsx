@@ -39,7 +39,7 @@ const SmartImage = forwardRef<HTMLImageElement, SmartImageProps>(
           onError?.(e);
         }}
         className={cn(
-          "h-full w-full object-cover transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "h-full w-full object-cover transition-opacity duration-short ease-[cubic-bezier(0.22,1,0.36,1)]",
           state === "loaded" ? "opacity-100" : "opacity-0",
           className,
         )}

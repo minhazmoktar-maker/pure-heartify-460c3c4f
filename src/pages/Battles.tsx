@@ -33,7 +33,7 @@ const Battles = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Battles & Expeditions of the Prophet ﷺ — Ghazawāt" description="The major battles of the Prophet Muḥammad ﷺ — Badr, Uhud, Khandaq, Khaybar, Mu'tah, Fatḥ Makkah, Ḥunayn, Tabūk — from authentic sīrah." path="/battles" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Swords className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Ghazawāt — Battles of the Prophet ﷺ</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Swords className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Ghazawāt — Battles of the Prophet ﷺ</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Studied</span><span className="text-sm font-medium">{count} / {BATTLES.length}</span></div><Progress value={(count / BATTLES.length) * 100} /></Card>
         <div className="flex gap-2"><Input placeholder="Search battles…" value={q} onChange={e => setQ(e.target.value)} /><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>
@@ -53,7 +53,7 @@ const Battles = () => {
           return (
             <Card key={b.id} className="p-5 cursor-pointer hover:border-primary transition" onClick={() => persist({ ...done, [b.id]: !done[b.id] })}>
               <div className="flex items-start justify-between gap-3 mb-2">
-                <div><h2 className="font-semibold text-lg">{b.name}</h2><p className="text-xs text-muted-foreground">{b.year} · {b.place}</p></div>
+                <div><h2 className="font-semibold text-heading">{b.name}</h2><p className="text-micro text-muted-foreground">{b.year} · {b.place}</p></div>
                 {done[b.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
               </div>
               <span className={`heartify-chip ${tone} mb-2 inline-flex`}>{b.outcome}</span>

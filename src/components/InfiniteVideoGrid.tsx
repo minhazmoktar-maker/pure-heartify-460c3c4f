@@ -45,7 +45,7 @@ const InfiniteVideoGrid = ({
       >
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="space-y-2">
-            <Skeleton className="aspect-video w-full rounded-xl" />
+            <Skeleton className="aspect-video w-full rounded-card" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
           </div>
@@ -58,7 +58,7 @@ const InfiniteVideoGrid = ({
   if (error) {
     return (
       <div className="py-20 text-center">
-        <p className="text-lg font-medium text-destructive">Failed to load videos.</p>
+        <p className="text-heading font-medium text-destructive">Failed to load videos.</p>
         <p className="mt-1 text-sm text-muted-foreground">{(error as Error).message}</p>
       </div>
     );
@@ -67,7 +67,7 @@ const InfiniteVideoGrid = ({
   if (allVideos.length === 0) {
     return (
       <div className="py-20 text-center">
-        <p className="text-lg font-medium text-muted-foreground">{fallbackMessage}</p>
+        <p className="text-heading font-medium text-muted-foreground">{fallbackMessage}</p>
       </div>
     );
   }

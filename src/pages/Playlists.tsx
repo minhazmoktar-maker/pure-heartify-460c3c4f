@@ -81,7 +81,7 @@ export default function Playlists() {
         {isLoading ? (
           <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
         ) : playlists.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border py-16 text-center">
+          <div className="rounded-card border border-dashed border-border py-16 text-center">
             <p className="text-sm text-muted-foreground">No playlists yet — start by creating one.</p>
           </div>
         ) : (
@@ -89,11 +89,11 @@ export default function Playlists() {
             {playlists.map((p) => {
               const Icon = VIS_ICON[p.visibility];
               return (
-                <li key={p.id} className="group rounded-xl border border-border bg-card p-4 transition hover:shadow-md">
+                <li key={p.id} className="group rounded-card border border-border bg-card p-4 transition hover:shadow-md">
                   <div className="flex items-start justify-between">
                     <Link to={`/p/${p.id}`} className="flex-1">
                       <h3 className="font-semibold text-foreground group-hover:text-primary">{p.title}</h3>
-                      <p className="mt-0.5 text-xs text-muted-foreground">
+                      <p className="mt-0.5 text-micro text-muted-foreground">
                         <Icon className="mr-1 inline h-3 w-3" />
                         {p.visibility} · {p.items_count} video{p.items_count === 1 ? "" : "s"}
                       </p>

@@ -15,10 +15,10 @@ const OPTIONS = [
 export default function ThemeModeSetting() {
   const { mode, setMode } = useTheme();
   return (
-    <section className="rounded-2xl border border-border bg-card p-5">
+    <section className="rounded-card border border-border bg-card p-5">
       <div className="mb-3">
         <h2 className="text-sm font-semibold text-foreground">Appearance</h2>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-micro text-muted-foreground">
           Auto uses your saved prayer location — light during the day, dark from Maghrib until sunrise.
         </p>
       </div>
@@ -34,7 +34,7 @@ export default function ThemeModeSetting() {
               onClick={() => { soundTap(); setMode(id); }}
               aria-pressed={active}
               className={cn(
-                "flex flex-col items-center gap-1 rounded-xl border p-3 text-xs transition-colors",
+                "flex flex-col items-center gap-1 rounded-card border p-3 text-micro transition-colors",
                 active ? "border-primary bg-primary/5 text-primary" : "border-border text-foreground hover:bg-secondary",
               )}
               title={hint ?? label}

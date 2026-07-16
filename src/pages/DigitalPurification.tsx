@@ -102,10 +102,10 @@ export default function DigitalPurification() {
         <header className="mb-8 flex items-start gap-3">
           <ShieldCheck className="mt-1 h-8 w-8 shrink-0 text-primary" />
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <p className="text-micro font-semibold uppercase tracking-wide text-muted-foreground">
               Digital purification
             </p>
-            <h1 className="mt-1 text-2xl font-bold leading-tight md:text-3xl">
+            <h1 className="mt-1 text-title font-bold leading-tight md:text-title">
               How to stop watching bad videos Islamically — a scholar-guided roadmap
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
@@ -117,7 +117,7 @@ export default function DigitalPurification() {
         </header>
 
         <section aria-labelledby="steps" className="mb-10 space-y-4">
-          <h2 id="steps" className="flex items-center gap-2 text-lg font-semibold">
+          <h2 id="steps" className="flex items-center gap-2 text-heading font-semibold">
             <Sparkles className="h-5 w-5 text-primary" /> The eight steps
           </h2>
           {STEPS.map((s) => (
@@ -133,7 +133,7 @@ export default function DigitalPurification() {
         </section>
 
         <section aria-labelledby="replace" className="mb-10">
-          <h2 id="replace" className="mb-3 flex items-center gap-2 text-lg font-semibold">
+          <h2 id="replace" className="mb-3 flex items-center gap-2 text-heading font-semibold">
             <HeartHandshake className="h-5 w-5 text-primary" /> Replace with Heartify
           </h2>
           <Card>
@@ -154,7 +154,7 @@ export default function DigitalPurification() {
         </section>
 
         <section aria-labelledby="faq" className="mb-10">
-          <h2 id="faq" className="mb-3 flex items-center gap-2 text-lg font-semibold">
+          <h2 id="faq" className="mb-3 flex items-center gap-2 text-heading font-semibold">
             <BookOpen className="h-5 w-5 text-primary" /> Frequently asked
           </h2>
           <div className="space-y-3">
@@ -171,7 +171,7 @@ export default function DigitalPurification() {
           </div>
         </section>
 
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-center text-micro text-muted-foreground">
           For personal circumstances, please consult a qualified local scholar.
         </p>
       </main>

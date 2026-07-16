@@ -132,12 +132,12 @@ export function ReportButton({
                 <label
                   key={r.value}
                   htmlFor={`reason-${r.value}`}
-                  className="flex cursor-pointer items-start gap-3 rounded-md border border-border p-3 text-sm transition-colors hover:bg-accent"
+                  className="flex cursor-pointer items-start gap-3 rounded-card border border-border p-3 text-sm transition-colors hover:bg-accent"
                 >
                   <RadioGroupItem id={`reason-${r.value}`} value={r.value} className="mt-0.5" />
                   <div className="min-w-0">
                     <div className="font-medium">{r.label}</div>
-                    <div className="text-xs text-muted-foreground">{r.description}</div>
+                    <div className="text-micro text-muted-foreground">{r.description}</div>
                   </div>
                 </label>
               ))}

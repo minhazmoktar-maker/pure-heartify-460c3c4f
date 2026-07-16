@@ -191,7 +191,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
       <div className={embedded ? "space-y-6" : "mx-auto max-w-6xl p-4 space-y-6"}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className={embedded ? "text-lg font-semibold" : "text-2xl font-bold"}>Channel & Video Review</h1>
+            <h1 className={embedded ? "text-heading font-semibold" : "text-title font-bold"}>Channel & Video Review</h1>
             <p className="text-sm text-muted-foreground">
               {pending.length} pending · {approved.length} approved · {flaggedCh.length} flagged
             </p>
@@ -215,7 +215,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 <Search className="mr-2 h-4 w-4" /> Verify
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-micro text-muted-foreground">
               Single ID uses per-channel verify. Multiple IDs run through the batch verifier.
             </p>
           </CardContent>
@@ -246,9 +246,9 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                         dup: {c.duplicate_risk ?? "?"}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">{c.youtube_channel_id} · {c.category ?? "uncategorized"}</p>
+                    <p className="text-micro text-muted-foreground">{c.youtube_channel_id} · {c.category ?? "uncategorized"}</p>
                     {c.evidence?.exclusion_hits?.length > 0 && (
-                      <p className="text-xs text-destructive mt-1">Exclusions: {c.evidence.exclusion_hits.join(", ")}</p>
+                      <p className="text-micro text-destructive mt-1">Exclusions: {c.evidence.exclusion_hits.join(", ")}</p>
                     )}
                   </div>
                   <div className="flex gap-2">
@@ -274,7 +274,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                   {approvedCands.map((c) => (
                     <button key={c.id} onClick={() => setDrawer(c)} className="w-full text-left p-2 rounded hover:bg-muted">
                       <div className="font-medium text-sm">{c.title}</div>
-                      <div className="text-xs text-muted-foreground">conf {c.confidence} · {c.category}</div>
+                      <div className="text-micro text-muted-foreground">conf {c.confidence} · {c.category}</div>
                     </button>
                   ))}
                 </CardContent>
@@ -285,7 +285,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                   {rejectedCands.map((c) => (
                     <button key={c.id} onClick={() => setDrawer(c)} className="w-full text-left p-2 rounded hover:bg-muted">
                       <div className="font-medium text-sm">{c.title}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-micro text-muted-foreground">
                         {c.evidence?.exclusion_hits?.length > 0
                           ? `Exclusions: ${c.evidence.exclusion_hits.slice(0, 2).join(", ")}`
                           : c.duplicate_risk === "high" ? "Duplicate" : "Low confidence"}
@@ -307,7 +307,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <div className="font-semibold">{c.title}</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-micro text-muted-foreground">
                       score {c.consistency_score} · last check {c.last_rechecked_at?.slice(0, 10)}
                     </div>
                   </div>
@@ -347,7 +347,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 <CardContent className="p-4 flex items-center justify-between">
                   <div>
                     <div className="font-semibold text-sm">{v.title}</div>
-                    <div className="text-xs text-muted-foreground">{v.youtube_channel_id} · {v.status}</div>
+                    <div className="text-micro text-muted-foreground">{v.youtube_channel_id} · {v.status}</div>
                   </div>
                   <Button size="sm" variant="outline" onClick={() => setDrawer(v)}><Eye className="h-4 w-4" /></Button>
                 </CardContent>
@@ -369,9 +369,9 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
                     : r.action === "removed" ? "heartify-chip--warning"
                     : "heartify-chip--muted"
                   }`}>{r.action}</span>
-                  <span className="font-mono text-xs">{r.youtube_channel_id}</span>
+                  <span className="font-mono text-micro">{r.youtube_channel_id}</span>
                 </div>
-                <div className="text-xs text-muted-foreground flex items-center gap-2">
+                <div className="text-micro text-muted-foreground flex items-center gap-2">
                   conf {r.confidence ?? "-"} · {r.created_at.slice(0, 16).replace("T", " ")}
                   <Button size="sm" variant="ghost" onClick={() => setDrawer(r)}><Eye className="h-3 w-3" /></Button>
                 </div>
@@ -386,7 +386,7 @@ const AdminReview = ({ embedded = false }: { embedded?: boolean } = {}) => {
         <SheetContent className="w-full sm:max-w-xl overflow-auto">
           <SheetHeader><SheetTitle>Evidence & decision trace</SheetTitle></SheetHeader>
           {drawer && (
-            <pre className="mt-4 text-xs bg-muted p-3 rounded overflow-auto whitespace-pre-wrap">
+            <pre className="mt-4 text-micro bg-muted p-3 rounded overflow-auto whitespace-pre-wrap">
               {JSON.stringify(drawer, null, 2)}
             </pre>
           )}

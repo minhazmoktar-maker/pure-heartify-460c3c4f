@@ -29,7 +29,7 @@ export const AuthField = React.forwardRef<HTMLInputElement, AuthFieldProps>(
     return (
       <div className={cn("space-y-1.5", invalid && "animate-shake")}>
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-medium text-muted-foreground">
+          <label htmlFor={inputId} className="block text-micro font-medium text-muted-foreground">
             {label}
           </label>
         )}
@@ -70,11 +70,11 @@ export const AuthField = React.forwardRef<HTMLInputElement, AuthFieldProps>(
           )}
         </div>
         {error ? (
-          <p id={errId} role="alert" className="text-xs font-medium text-destructive">
+          <p id={errId} role="alert" className="text-micro font-medium text-destructive">
             {error}
           </p>
         ) : hint ? (
-          <p id={hintId} className="text-xs text-muted-foreground">
+          <p id={hintId} className="text-micro text-muted-foreground">
             {hint}
           </p>
         ) : null}

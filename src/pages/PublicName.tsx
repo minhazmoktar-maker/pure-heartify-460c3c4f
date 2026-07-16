@@ -39,20 +39,20 @@ export default function PublicName() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-10 pb-10 space-y-6 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Sparkles className="h-4 w-4 text-primary" />
               Name {n} of 99 · Asmāʾ al-Ḥusnā
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-6xl md:text-7xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {name.ar}
             </p>
-            <h1 className="text-3xl md:text-4xl font-semibold">{name.translit}</h1>
-            <p className="text-lg md:text-xl text-muted-foreground">{name.meaning}</p>
+            <h1 className="text-title md:text-display font-semibold">{name.translit}</h1>
+            <p className="text-heading md:text-heading text-muted-foreground">{name.meaning}</p>
           </CardContent>
         </Card>
 

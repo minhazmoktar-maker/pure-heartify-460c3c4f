@@ -97,7 +97,7 @@ export default function Qibla() {
       <main className="container mx-auto max-w-3xl px-4 pb-24 pt-24">
         <header className="mb-6">
           <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground"><Compass className="h-4 w-4" /> Direction</div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Qibla Compass</h1>
+          <h1 className="text-title font-bold tracking-tight md:text-display">Qibla Compass</h1>
           <p className="mt-1 text-muted-foreground">Great-circle bearing from your location to the Kaaba in Makkah.</p>
         </header>
 
@@ -106,14 +106,14 @@ export default function Qibla() {
             <CardHeader><CardTitle className="text-base">Location</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <Button onClick={getLocation} className="w-full"><MapPin className="mr-2 h-4 w-4" />Use my location</Button>
-              <div className="text-center text-xs text-muted-foreground">or enter manually</div>
+              <div className="text-center text-micro text-muted-foreground">or enter manually</div>
               <div className="grid grid-cols-2 gap-2">
                 <Input placeholder="Latitude" value={manualLat} onChange={(e) => setManualLat(e.target.value)} />
                 <Input placeholder="Longitude" value={manualLon} onChange={(e) => setManualLon(e.target.value)} />
               </div>
               <Button variant="outline" className="w-full" onClick={applyManual}>Apply coordinates</Button>
               {coords && (
-                <div className="rounded-md border p-3 text-sm">
+                <div className="rounded-card border p-3 text-sm">
                   <div>Lat: <span className="font-mono">{coords.lat.toFixed(4)}</span></div>
                   <div>Lon: <span className="font-mono">{coords.lon.toFixed(4)}</span></div>
                   <div className="mt-1">Distance to Kaaba: <span className="font-medium">{distance?.toFixed(0)} km</span></div>
@@ -126,7 +126,7 @@ export default function Qibla() {
                 </Button>
               )}
               {orientationPermission === "granted" && heading != null && (
-                <div className="text-xs text-muted-foreground">Live heading: {heading.toFixed(0)}°</div>
+                <div className="text-micro text-muted-foreground">Live heading: {heading.toFixed(0)}°</div>
               )}
             </CardContent>
           </Card>
@@ -135,23 +135,23 @@ export default function Qibla() {
             <CardHeader><CardTitle className="text-base">Compass</CardTitle></CardHeader>
             <CardContent>
               <div className="relative mx-auto aspect-square w-full max-w-[280px]">
-                <div className="absolute inset-0 rounded-full border-4 border-border bg-muted/30" />
+                <div className="absolute inset-0 rounded-pill border-4 border-border bg-muted/30" />
                 {["N", "E", "S", "W"].map((label, i) => (
                   <div key={label} className="absolute inset-0 flex items-start justify-center text-sm font-semibold" style={{ transform: `rotate(${i * 90}deg)` }}>
                     <span className="mt-2" style={{ transform: `rotate(${-i * 90}deg)` }}>{label}</span>
                   </div>
                 ))}
                 {coords ? (
-                  <div className="absolute inset-0 transition-transform duration-300" style={{ transform: `rotate(${needleAngle}deg)` }}>
+                  <div className="absolute inset-0 transition-transform duration-short" style={{ transform: `rotate(${needleAngle}deg)` }}>
                     <div className="absolute left-1/2 top-4 h-[45%] w-1 -translate-x-1/2 rounded bg-primary" />
-                    <div className="absolute left-1/2 top-2 -translate-x-1/2 text-lg">🕋</div>
+                    <div className="absolute left-1/2 top-2 -translate-x-1/2 text-heading">🕋</div>
                   </div>
                 ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">Set location first</div>
+                  <div className="absolute inset-0 flex items-center justify-center text-micro text-muted-foreground">Set location first</div>
                 )}
-                <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground" />
+                <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-pill bg-foreground" />
               </div>
-              <p className="mt-4 text-center text-xs text-muted-foreground">
+              <p className="mt-4 text-center text-micro text-muted-foreground">
                 {heading == null ? "Static view — needle points to Qibla bearing from true North." : "Live view — needle points to the Kaaba as you rotate your device."}
               </p>
             </CardContent>

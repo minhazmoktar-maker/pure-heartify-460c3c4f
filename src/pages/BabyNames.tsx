@@ -106,7 +106,7 @@ export default function BabyNames() {
       <main className="container mx-auto max-w-4xl px-4 pb-24 pt-24">
         <header className="mb-6">
           <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground"><Baby className="h-4 w-4" /> Family</div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Islamic Baby Names</h1>
+          <h1 className="text-title font-bold tracking-tight md:text-display">Islamic Baby Names</h1>
           <p className="mt-1 text-muted-foreground">Curated names with Arabic script, meanings, and origins. Save your favorites.</p>
         </header>
 
@@ -142,12 +142,12 @@ export default function BabyNames() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h2 className="text-lg font-semibold">{n.name}</h2>
+                            <h2 className="text-heading font-semibold">{n.name}</h2>
                             <Badge variant="secondary" className="capitalize">{n.gender}</Badge>
                           </div>
-                          <div className="mt-0.5 text-right font-arabic text-xl" dir="rtl">{n.arabic}</div>
+                          <div className="mt-0.5 text-right font-arabic text-heading" dir="rtl">{n.arabic}</div>
                           <p className="mt-2 text-sm text-muted-foreground">{n.meaning}</p>
-                          <p className="mt-1 text-xs text-muted-foreground">Origin: {n.origin}</p>
+                          <p className="mt-1 text-micro text-muted-foreground">Origin: {n.origin}</p>
                         </div>
                         <Button size="icon" variant="ghost" onClick={() => toggleFav(n.name)} aria-label={fav ? "Unfavorite" : "Favorite"}>
                           <Heart className={`h-5 w-5 ${fav ? "fill-primary text-primary" : ""}`} />

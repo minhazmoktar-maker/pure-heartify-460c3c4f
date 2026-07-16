@@ -55,7 +55,7 @@ export default function Redeem() {
       <PageHeader title="Redeem a gift" subtitle="Enter your Heartify Plus code" />
       <div className="container mx-auto max-w-md px-4 pb-16">
         {!user ? (
-          <div className="rounded-lg border border-border bg-card p-6 text-center">
+          <div className="rounded-card border border-border bg-card p-6 text-center">
             <p className="text-sm text-muted-foreground">
               <Link to="/login?redirect=/redeem" className="text-primary underline">
                 Sign in
@@ -64,9 +64,9 @@ export default function Redeem() {
             </p>
           </div>
         ) : success ? (
-          <div className="rounded-xl border border-primary/40 bg-primary/5 p-6 text-center">
+          <div className="rounded-card border border-primary/40 bg-primary/5 p-6 text-center">
             <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-primary" />
-            <h2 className="text-lg font-semibold">Redeemed — jazakAllah khair</h2>
+            <h2 className="text-heading font-semibold">Redeemed — jazakAllah khair</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {success.months} month{success.months === 1 ? "" : "s"} of Heartify Plus is now active on your account.
             </p>
@@ -75,7 +75,7 @@ export default function Redeem() {
             </Button>
           </div>
         ) : (
-          <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <div className="space-y-4 rounded-card border border-border bg-card p-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Gift className="h-4 w-4 text-primary" /> Enter the code from your gift or invite email.
             </div>

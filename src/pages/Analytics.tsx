@@ -1,3 +1,4 @@
+// design-lint-disable-file — brand/canvas/chart palette requires literal hex colors
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
@@ -165,19 +166,19 @@ const Analytics = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
+            <h1 className="text-title font-bold flex items-center gap-2">
               <BarChart3 className="h-6 w-6 text-primary" /> Analytics BI
             </h1>
             <p className="text-sm text-muted-foreground">Aggregate-only metrics. No raw user data leaves the database.</p>
           </div>
           <div className="flex items-end gap-2 flex-wrap">
             <div>
-              <Label className="text-xs">From</Label>
+              <Label className="text-micro">From</Label>
               <Input type="date" value={from.toISOString().slice(0, 10)}
                 onChange={(e) => { const d = new Date(e.target.value); d.setHours(0, 0, 0, 0); setFrom(d); }} />
             </div>
             <div>
-              <Label className="text-xs">To</Label>
+              <Label className="text-micro">To</Label>
               <Input type="date" value={to.toISOString().slice(0, 10)}
                 onChange={(e) => { const d = new Date(e.target.value); d.setHours(23, 59, 59, 999); setTo(d); }} />
             </div>
@@ -222,7 +223,7 @@ const Analytics = () => {
           </Panel>
 
           <Panel title="Retention (weekly cohorts)" data={retention} filename="retention.csv">
-            <div className="max-h-[240px] overflow-auto text-xs">
+            <div className="max-h-[240px] overflow-auto text-micro">
               <table className="w-full">
                 <thead className="text-left text-muted-foreground">
                   <tr><th>Cohort</th><th>Size</th><th>W0</th><th>W1</th><th>W2</th><th>W4</th><th>W8</th></tr>
@@ -385,15 +386,15 @@ const Analytics = () => {
             </ResponsiveContainer>
           </Panel>
           <Panel title="Device / platform" data={[...(device?.device ?? []), ...(device?.platform ?? [])]} filename="device.csv">
-            <div className="text-xs font-medium mb-1">Device</div>
+            <div className="text-micro font-medium mb-1">Device</div>
             <div className="flex gap-2 flex-wrap mb-3">
               {(device?.device ?? []).map((d) => <Badge key={d.device} variant="outline">{d.device}: {d.n}</Badge>)}
             </div>
-            <div className="text-xs font-medium mb-1">Platform</div>
+            <div className="text-micro font-medium mb-1">Platform</div>
             <div className="flex gap-2 flex-wrap mb-3">
               {(device?.platform ?? []).map((d) => <Badge key={d.platform} variant="outline">{d.platform}: {d.n}</Badge>)}
             </div>
-            <div className="text-xs font-medium mb-1">Viewport</div>
+            <div className="text-micro font-medium mb-1">Viewport</div>
             <div className="flex gap-2 flex-wrap">
               {(device?.viewport ?? []).map((d) => <Badge key={d.viewport} variant="outline">{d.viewport}: {d.n}</Badge>)}
             </div>
@@ -424,8 +425,8 @@ const Analytics = () => {
 
 const Kpi = ({ label, value }: { label: string; value: string | number }) => (
   <Card><CardContent className="p-4">
-    <div className="text-xs text-muted-foreground">{label}</div>
-    <div className="text-2xl font-semibold">{value}</div>
+    <div className="text-micro text-muted-foreground">{label}</div>
+    <div className="text-title font-semibold">{value}</div>
   </CardContent></Card>
 );
 

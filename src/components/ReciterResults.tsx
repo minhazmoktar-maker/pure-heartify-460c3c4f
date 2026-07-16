@@ -54,7 +54,7 @@ export default function ReciterResults({ query }: { query: string }) {
         {results.map((r) => {
           const isGated = gated[r.id] && !isPremium;
           const cardClass =
-            "relative flex min-w-[220px] flex-col gap-1 rounded-xl border border-border bg-card p-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+            "relative flex min-w-[220px] flex-col gap-1 rounded-card border border-border bg-card p-3 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
           const content = (
             <>
               {gated[r.id] && (
@@ -65,7 +65,7 @@ export default function ReciterResults({ query }: { query: string }) {
                   {r.canonical_name_en}
                 </span>
                 {r.is_living === false && (
-                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                  <span className="rounded-pill bg-muted px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
                     رحمه الله
                   </span>
                 )}
@@ -75,7 +75,7 @@ export default function ReciterResults({ query }: { query: string }) {
                   {r.canonical_name_ar}
                 </span>
               )}
-              <span className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="flex items-center gap-2 text-micro text-muted-foreground">
                 {r.country && (
                   <span className="flex items-center gap-1">
                     <MapPin className="h-3 w-3" />

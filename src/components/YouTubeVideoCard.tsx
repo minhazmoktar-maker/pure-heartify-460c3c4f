@@ -49,7 +49,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
       className="group cursor-pointer"
       onClick={handleClick}
     >
-      <div className="relative overflow-hidden rounded-xl">
+      <div className="relative overflow-hidden rounded-card">
         <img
           src={video.thumbnailUrl}
           alt={video.title}
@@ -58,24 +58,24 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           fetchPriority={index < 2 ? "high" : "low"}
           width={480}
           height={270}
-          className="aspect-video w-full bg-muted object-cover transition-transform duration-300 group-hover:scale-105"
+          className="aspect-video w-full bg-muted object-cover transition-transform duration-short group-hover:scale-105"
         />
         <div className="absolute bottom-2 left-2 right-2">
           <TrustBadges channelTitle={video.channelTitle} halalScore={video.halalScore} />
         </div>
-        <span className="absolute right-2 top-2 rounded-md bg-foreground/70 px-1.5 py-0.5 text-xs font-medium text-background">
+        <span className="absolute right-2 top-2 rounded-card bg-foreground/70 px-1.5 py-0.5 text-micro font-medium text-background">
           {video.category}
         </span>
         <div className="absolute left-2 top-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={handleBookmark}
             aria-label={liked ? "Remove bookmark" : "Bookmark video"}
-            className="rounded-full bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-background"
+            className="rounded-pill bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-background"
             title={liked ? "Remove bookmark" : "Bookmark"}
           >
             <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
           </button>
-          <div className="rounded-full bg-background/80 backdrop-blur-sm">
+          <div className="rounded-pill bg-background/80 backdrop-blur-sm">
             <NotInterestedMenu videoId={video.id} compact />
           </div>
         </div>
@@ -85,18 +85,18 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
       </div>
 
       <div className="mt-3 flex gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-pill bg-primary text-micro font-bold text-primary-foreground">
           {video.channelTitle[0]}
         </div>
         <div className="min-w-0">
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
             {video.title}
           </h3>
-          <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="mt-1 flex items-center gap-1 text-micro text-muted-foreground">
             <span>{video.channelTitle}</span>
             <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
           </div>
-          <p className="text-xs text-muted-foreground">{timeAgo}</p>
+          <p className="text-micro text-muted-foreground">{timeAgo}</p>
         </div>
       </div>
     </FadeIn>

@@ -47,19 +47,19 @@ const AudioPlayer = () => {
           {needsUserGesture && (
             <button
               onClick={resumePlayback}
-              className="flex w-full items-center justify-center gap-2 bg-primary/95 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary"
+              className="flex w-full items-center justify-center gap-2 bg-primary/95 py-2 text-micro font-semibold text-primary-foreground hover:bg-primary"
             >
               <Hand className="h-3.5 w-3.5" />
               Tap to start playback — your browser blocked autoplay.
             </button>
           )}
           {isPreview && (
-            <div className="flex w-full items-center justify-center gap-3 bg-gradient-to-r from-[hsl(var(--gold))]/95 to-[hsl(var(--gold))]/80 px-3 py-1.5 text-xs font-semibold text-black">
+            <div className="flex w-full items-center justify-center gap-3 bg-gradient-to-r from-[hsl(var(--gold))]/95 to-[hsl(var(--gold))]/80 px-3 py-1.5 text-micro font-semibold text-black">
               <Crown className="h-3.5 w-3.5" aria-hidden />
               <span>Preview · {previewLeft}s left</span>
               <Link
                 to="/plus"
-                className="rounded-full bg-black/85 px-3 py-0.5 text-[11px] font-bold text-white hover:bg-black"
+                className="rounded-pill bg-black/85 px-3 py-0.5 text-[11px] font-bold text-white hover:bg-black"
               >
                 Upgrade to hear it all
               </Link>
@@ -73,10 +73,10 @@ const AudioPlayer = () => {
                 <SmartImage
                   src={currentTrack.cover}
                   alt={currentTrack.title}
-                  wrapperClassName="h-full w-full rounded-md overflow-hidden shadow-card"
+                  wrapperClassName="h-full w-full rounded-card overflow-hidden shadow-card"
                 />
                 {isBuffering && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background/60">
+                  <div className="absolute inset-0 flex items-center justify-center rounded-card bg-background/60">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>
                 )}
@@ -86,7 +86,7 @@ const AudioPlayer = () => {
                   {currentTrack.title}
                   {currentTrack.isPremium && <Crown className="ml-1 inline h-3.5 w-3.5 text-gold" />}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="truncate text-micro text-muted-foreground">
                   {currentTrack.artist} · {currentTrack.language}
                 </p>
               </div>
@@ -112,7 +112,7 @@ const AudioPlayer = () => {
                   <SkipBack className="h-4 w-4" />
                 </button>
                 <button onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Play"}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.5)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:opacity-60"
+                  className="flex h-11 w-11 items-center justify-center rounded-pill bg-primary text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.5)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-card disabled:opacity-60"
                   disabled={isBuffering && !isPlaying}>
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.span
@@ -168,16 +168,16 @@ const AudioPlayer = () => {
               <div className="relative hidden sm:block">
                 <button onClick={() => setSpeedOpen((v) => !v)}
                   aria-label={`Playback speed ${playbackRate}x`}
-                  className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary">
+                  className="flex items-center gap-1 rounded-card px-2 py-1 text-micro text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary">
                   <Gauge className="h-3.5 w-3.5" />
                   <span className="tabular-nums">{playbackRate}×</span>
                 </button>
                 {speedOpen && (
-                  <div className="absolute bottom-full right-0 mb-2 flex flex-col overflow-hidden rounded-lg border border-border bg-popover p-1 shadow-lg">
+                  <div className="absolute bottom-full right-0 mb-2 flex flex-col overflow-hidden rounded-card border border-border bg-popover p-1 shadow-lg">
                     {SPEEDS.map((s) => (
                       <button key={s} onClick={() => { setPlaybackRate(s); setSpeedOpen(false); }}
                         className={cn(
-                          "rounded-md px-3 py-1 text-left text-xs tabular-nums",
+                          "rounded-card px-3 py-1 text-left text-micro tabular-nums",
                           playbackRate === s
                             ? "bg-primary text-primary-foreground"
                             : "text-foreground hover:bg-secondary",

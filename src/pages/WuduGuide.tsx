@@ -86,7 +86,7 @@ export default function WuduGuide() {
             <Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <Droplets className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Purification Guide</h1>
+          <h1 className="text-heading font-semibold">Purification Guide</h1>
         </div>
       </header>
 
@@ -108,13 +108,13 @@ export default function WuduGuide() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-base font-semibold">{guide.label}</h2>
-                      <p className="mt-1 text-xs text-muted-foreground">{guide.note}</p>
+                      <p className="mt-1 text-micro text-muted-foreground">{guide.note}</p>
                     </div>
                     <Button size="sm" variant="outline" onClick={() => reset(g)}>
                       <RotateCcw className="mr-1 h-4 w-4" /> Reset
                     </Button>
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-xs">
+                  <div className="mt-3 flex items-center justify-between text-micro">
                     <span className="text-muted-foreground">Progress</span>
                     <span className="font-medium">{doneCount} / {guide.steps.length}</span>
                   </div>
@@ -129,12 +129,12 @@ export default function WuduGuide() {
                         <button
                           type="button"
                           onClick={() => setDone((d) => ({ ...d, [key(g, i)]: !d[key(g, i)] }))}
-                          className={`w-full rounded-lg border p-4 text-left transition-colors ${
+                          className={`w-full rounded-card border p-4 text-left transition-colors ${
                             isDone ? "border-primary bg-primary/5" : "border-border/60 hover:bg-muted/40"
                           }`}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                            <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-pill text-micro font-semibold ${
                               isDone ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                             }`}>
                               {isDone ? <Check className="h-4 w-4" /> : i + 1}
@@ -166,7 +166,7 @@ export default function WuduGuide() {
           })}
         </Tabs>
 
-        <Card className="p-4 text-xs text-muted-foreground">
+        <Card className="p-4 text-micro text-muted-foreground">
           <strong className="text-foreground">Nullifiers of wudu:</strong> passing wind, urine or
           stool, deep sleep, loss of consciousness, and direct contact with impurity (per most
           scholars). When any of these occur, renew wudu before the next prayer.

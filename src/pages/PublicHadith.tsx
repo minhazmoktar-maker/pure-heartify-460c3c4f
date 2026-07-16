@@ -115,7 +115,7 @@ export default function PublicHadith() {
           <>
             <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
               <CardContent className="pt-8 pb-8 space-y-6">
-                <div className="flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground">
+                <div className="flex items-center justify-between text-micro uppercase tracking-widest text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5">
                     <ScrollText className="h-4 w-4 text-primary" />
                     {col.label} · #{num}
@@ -131,7 +131,7 @@ export default function PublicHadith() {
                   <p
                     dir="rtl"
                     lang="ar"
-                    className="text-2xl md:text-3xl leading-loose text-right"
+                    className="text-title md:text-title leading-loose text-right"
                     style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
                   >
                     {arabic.text}
@@ -139,7 +139,7 @@ export default function PublicHadith() {
                 )}
 
                 {english?.text && (
-                  <p className="text-base md:text-lg leading-relaxed text-muted-foreground border-l-2 border-primary/40 pl-4 whitespace-pre-line">
+                  <p className="text-base md:text-heading leading-relaxed text-muted-foreground border-l-2 border-primary/40 pl-4 whitespace-pre-line">
                     {english.text}
                   </p>
                 )}
@@ -158,7 +158,7 @@ export default function PublicHadith() {
               </Button>
             </div>
 
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-micro text-muted-foreground">
               Source: fawazahmed0/hadith-api (public domain compilation)
             </p>
           </>

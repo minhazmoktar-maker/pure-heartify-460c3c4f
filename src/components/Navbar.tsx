@@ -59,7 +59,7 @@ const Navbar = () => {
             <SheetTrigger asChild>
               <button
                 aria-label="Open navigation menu"
-                className="tap-target rounded-lg hover:bg-secondary transition-colors"
+                className="tap-target rounded-card hover:bg-secondary transition-colors"
               >
                 <Menu className="h-5 w-5 text-foreground" />
               </button>
@@ -104,7 +104,7 @@ const Navbar = () => {
                   { to: "/changelog", label: unseenChangelog ? "What's new •" : "What's new", icon: Sparkles },
                 ].map(({ to, label, icon: Icon }) => (
                   <SheetClose asChild key={to}>
-                    <Link to={to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">
+                    <Link to={to} className="flex items-center gap-3 rounded-card px-3 py-2 text-sm hover:bg-secondary">
                       <Icon className="h-4 w-4 text-muted-foreground" />
                       {label}
                     </Link>
@@ -124,7 +124,7 @@ const Navbar = () => {
                       const Icon = "icon" in l && l.icon ? l.icon : ShieldAlert;
                       return (
                         <SheetClose asChild key={l.to}>
-                          <Link to={l.to} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-secondary">
+                          <Link to={l.to} className="flex items-center gap-3 rounded-card px-3 py-2 text-sm hover:bg-secondary">
                             <Icon className="h-4 w-4 text-primary" />
                             {l.label}
                           </Link>
@@ -138,10 +138,10 @@ const Navbar = () => {
             </SheetContent>
           </Sheet>
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-card bg-primary">
               <span className="text-sm font-bold text-primary-foreground">H</span>
             </div>
-            <span className="hidden font-heading text-xl font-bold text-foreground sm:block">
+            <span className="hidden font-heading text-heading font-bold text-foreground sm:block">
               Halal<span className="text-[hsl(var(--gold))]">Tube</span>
             </span>
           </Link>
@@ -167,7 +167,7 @@ const Navbar = () => {
         <div className="flex items-center gap-1">
           <Link
             to="/channels"
-            className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary md:flex"
+            className="hidden items-center gap-1.5 rounded-pill px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary md:flex"
             title="Browse trusted channels"
           >
             <ShieldCheck className="h-4 w-4 text-primary" />
@@ -179,14 +179,14 @@ const Navbar = () => {
             aria-pressed={kidsOn}
             aria-label={kidsOn ? "Turn Kids mode off" : "Turn Kids mode on"}
             title={kidsOn ? "Kids mode ON — safe content only" : "Kids mode OFF"}
-            className={`tap-target rounded-full transition-colors ${kidsOn ? "bg-primary/15 text-primary" : "hover:bg-secondary"}`}
+            className={`tap-target rounded-pill transition-colors ${kidsOn ? "bg-primary/15 text-primary" : "hover:bg-secondary"}`}
           >
             <Baby className="h-5 w-5" />
           </button>
           <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="tap-target rounded-full hover:bg-secondary transition-colors"
+            className="tap-target rounded-pill hover:bg-secondary transition-colors"
             title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
             {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
@@ -199,7 +199,7 @@ const Navbar = () => {
               <button
                 onClick={signOut}
                 aria-label="Sign out"
-                className="tap-target rounded-full hover:bg-secondary transition-colors"
+                className="tap-target rounded-pill hover:bg-secondary transition-colors"
                 title="Sign out"
               >
                 <LogOut className="h-5 w-5 text-foreground" />
@@ -207,10 +207,10 @@ const Navbar = () => {
               <Link
                 to="/profile"
                 aria-label="Open profile"
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-primary transition-colors hover:opacity-90"
+                className="flex h-8 w-8 items-center justify-center rounded-pill bg-primary transition-colors hover:opacity-90"
                 title="Profile"
               >
-                <span className="text-xs font-bold text-primary-foreground">
+                <span className="text-micro font-bold text-primary-foreground">
                   {user.email?.charAt(0).toUpperCase() ?? "U"}
                 </span>
               </Link>
@@ -218,7 +218,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
+              className="flex items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
             >
               <User className="h-4 w-4" />
               Sign In

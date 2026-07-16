@@ -41,7 +41,7 @@ const EatingSunnah = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Sunnahs of Eating & Drinking" description="Prophetic manners of the meal: before, during, and after — with authentic references." path="/eating-sunnah" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Utensils className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Sunnahs of Eating</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Utensils className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Sunnahs of Eating</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Practicing</span><span className="text-sm font-medium">{count} / {SUNNAH.length}</span></div><Progress value={(count / SUNNAH.length) * 100} /></Card>
         <div className="flex gap-2"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search…" className="pl-9" /></div><Button variant="outline" size="icon" aria-label="Reset" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>
@@ -50,7 +50,7 @@ const EatingSunnah = () => {
           <Card key={s.id} className={`p-4 cursor-pointer ${done[s.id] ? "border-primary/60 bg-primary/5" : ""}`} onClick={() => persist({ ...done, [s.id]: !done[s.id] })}>
             <div className="flex items-start justify-between mb-2"><h3 className="font-semibold">{s.title}</h3><Badge variant="secondary">{s.category}</Badge></div>
             <p className="text-sm mb-2">{s.detail}</p>
-            <p className="text-xs text-muted-foreground">{s.source}</p>
+            <p className="text-micro text-muted-foreground">{s.source}</p>
           </Card>
         ))}</div>
       </div>

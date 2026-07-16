@@ -47,7 +47,7 @@ export default function About() {
               body: "Signed-in members can report non-halal content or suggest better channels for review.",
             },
           ].map(({ icon: Icon, title, body }) => (
-            <section key={title} className="rounded-lg border border-border bg-card p-5">
+            <section key={title} className="rounded-card border border-border bg-card p-5">
               <Icon className="h-5 w-5 text-primary" />
               <h2 className="mt-4 text-base font-semibold text-foreground">{title}</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p>

@@ -252,7 +252,7 @@ export default function GroupKhatmDetail() {
         <Card className="p-5 space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-foreground">{group.name}</h1>
+              <h1 className="text-heading font-bold text-foreground">{group.name}</h1>
               {group.description && (
                 <p className="mt-1 text-sm text-muted-foreground">{group.description}</p>
               )}
@@ -269,7 +269,7 @@ export default function GroupKhatmDetail() {
             )}
           </div>
           <div>
-            <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+            <div className="mb-1 flex items-center justify-between text-micro text-muted-foreground">
               <span>Progress</span>
               <span className="tabular-nums">{completedCount}/30 Juz · {members.length} members</span>
             </div>
@@ -317,7 +317,7 @@ export default function GroupKhatmDetail() {
                           ? `Juz ${n} claimed by another member`
                           : `Juz ${n} available — tap to claim`
                   }
-                  className={`relative aspect-square rounded-lg border text-sm font-medium tabular-nums transition-colors focus:outline-none focus:ring-2 focus:ring-primary ${
+                  className={`relative aspect-square rounded-card border text-sm font-medium tabular-nums transition-colors focus:outline-none focus:ring-2 focus:ring-primary ${
                     done
                       ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
                       : mine
@@ -341,7 +341,7 @@ export default function GroupKhatmDetail() {
             })}
           </div>
           {isMember && (
-            <p className="mt-3 text-xs text-muted-foreground">
+            <p className="mt-3 text-micro text-muted-foreground">
               Tap an empty Juz to claim it. Tap your claimed Juz to mark complete. Long-press or use the
               release action below to give it back.
             </p>
@@ -355,7 +355,7 @@ export default function GroupKhatmDetail() {
                     key={c.juz_number}
                     variant="ghost"
                     size="sm"
-                    className="h-7 px-2 text-xs"
+                    className="h-7 px-2 text-micro"
                     onClick={() => release(c.juz_number)}
                   >
                     Release Juz {c.juz_number}

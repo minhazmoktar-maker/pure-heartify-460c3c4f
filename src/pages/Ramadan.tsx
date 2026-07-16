@@ -124,11 +124,11 @@ const Ramadan = () => {
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6 flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+            <div className="rounded-card bg-primary/10 p-3 text-primary">
               <Moon className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">Ramadan Planner</h1>
+              <h1 className="font-heading text-title font-bold text-foreground md:text-display">Ramadan Planner</h1>
               <p className="mt-1 text-muted-foreground">
                 Ramadan {year} AH · begins ~{start.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}
               </p>
@@ -137,26 +137,26 @@ const Ramadan = () => {
           <select
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
-            className="h-10 rounded-md border border-border bg-background px-2 text-sm"
+            className="h-10 rounded-card border border-border bg-background px-2 text-sm"
           >
             {availableYears.map((y) => <option key={y} value={y}>{y} AH</option>)}
           </select>
         </header>
 
         {/* Countdown / in-progress */}
-        <section className="mb-6 rounded-2xl border border-primary/40 bg-primary/5 p-5">
+        <section className="mb-6 rounded-card border border-primary/40 bg-primary/5 p-5">
           {dayInRamadan > 0 ? (
             <>
               <p className="text-sm font-medium text-primary">You are in Ramadan</p>
-              <p className="mt-1 font-heading text-3xl font-bold text-foreground">Day {dayInRamadan} of 30</p>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <p className="mt-1 font-heading text-title font-bold text-foreground">Day {dayInRamadan} of 30</p>
+              <div className="mt-3 h-2 w-full overflow-hidden rounded-pill bg-secondary">
                 <div className="h-full bg-primary transition-all" style={{ width: `${(dayInRamadan / 30) * 100}%` }} />
               </div>
             </>
           ) : daysUntil > 0 ? (
             <>
               <p className="text-sm font-medium text-primary">Countdown to Ramadan</p>
-              <p className="mt-1 font-heading text-3xl font-bold text-foreground">
+              <p className="mt-1 font-heading text-title font-bold text-foreground">
                 {daysUntil} {daysUntil === 1 ? "day" : "days"} to go
               </p>
               <p className="mt-2 text-sm text-muted-foreground">Use this time to prepare your heart, body, and goals.</p>
@@ -171,34 +171,34 @@ const Ramadan = () => {
 
         {/* Summary tiles */}
         <section className="mb-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="rounded-card border border-border bg-card p-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">Taraweeh nights</p>
-              <p className="text-xs font-medium text-primary">{taraweehPct}%</p>
+              <p className="text-micro text-muted-foreground">Taraweeh nights</p>
+              <p className="text-micro font-medium text-primary">{taraweehPct}%</p>
             </div>
-            <p className="mt-1 font-heading text-2xl font-bold text-foreground">{taraweeh.length} / 30</p>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+            <p className="mt-1 font-heading text-title font-bold text-foreground">{taraweeh.length} / 30</p>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-pill bg-secondary">
               <div className="h-full bg-primary transition-all" style={{ width: `${taraweehPct}%` }} />
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
+          <div className="rounded-card border border-border bg-card p-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">Ramadan goals</p>
-              <p className="text-xs font-medium text-primary">{goalsPct}%</p>
+              <p className="text-micro text-muted-foreground">Ramadan goals</p>
+              <p className="text-micro font-medium text-primary">{goalsPct}%</p>
             </div>
-            <p className="mt-1 font-heading text-2xl font-bold text-foreground">
+            <p className="mt-1 font-heading text-title font-bold text-foreground">
               {goals.filter((g) => g.done).length} / {goals.length}
             </p>
-            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-pill bg-secondary">
               <div className="h-full bg-primary transition-all" style={{ width: `${goalsPct}%` }} />
             </div>
           </div>
         </section>
 
         {/* Taraweeh grid */}
-        <section className="mb-6 rounded-2xl border border-border bg-card p-5">
-          <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Taraweeh tracker</h2>
-          <p className="mb-3 text-xs text-muted-foreground">Tap a night once you've prayed Taraweeh.</p>
+        <section className="mb-6 rounded-card border border-border bg-card p-5">
+          <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Taraweeh tracker</h2>
+          <p className="mb-3 text-micro text-muted-foreground">Tap a night once you've prayed Taraweeh.</p>
           <div className="grid grid-cols-6 gap-2 sm:grid-cols-10">
             {Array.from({ length: 30 }, (_, i) => i + 1).map((n) => {
               const done = taraweeh.includes(n);
@@ -206,7 +206,7 @@ const Ramadan = () => {
                 <button
                   key={n}
                   onClick={() => toggleTaraweeh(n)}
-                  className={`aspect-square rounded-lg border text-sm font-semibold transition ${
+                  className={`aspect-square rounded-card border text-sm font-semibold transition ${
                     done
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border bg-background text-foreground hover:border-primary"
@@ -220,12 +220,12 @@ const Ramadan = () => {
         </section>
 
         {/* Last 10 nights */}
-        <section className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <section className="mb-6 rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex items-center gap-2">
             <Star className="h-4 w-4 text-[hsl(var(--gold))]" />
-            <h2 className="font-heading text-lg font-semibold text-foreground">Last 10 nights — Laylatul Qadr</h2>
+            <h2 className="font-heading text-heading font-semibold text-foreground">Last 10 nights — Laylatul Qadr</h2>
           </div>
-          <p className="mb-4 text-xs text-muted-foreground">
+          <p className="mb-4 text-micro text-muted-foreground">
             "Seek it in the last ten, in the odd nights." — Bukhari. Odd nights (21, 23, 25, 27, 29) are especially emphasized.
           </p>
           <div className="space-y-3">
@@ -235,13 +235,13 @@ const Ramadan = () => {
               return (
                 <div
                   key={n}
-                  className={`rounded-xl border p-3 ${odd ? "border-[hsl(var(--gold))]/40 bg-[hsl(var(--gold))]/5" : "border-border bg-background"}`}
+                  className={`rounded-card border p-3 ${odd ? "border-[hsl(var(--gold))]/40 bg-[hsl(var(--gold))]/5" : "border-border bg-background"}`}
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <p className="font-heading text-sm font-semibold text-foreground">
-                      Night {n}{odd && <span className="ml-2 text-xs text-[hsl(var(--gold))]">(odd)</span>}
+                      Night {n}{odd && <span className="ml-2 text-micro text-[hsl(var(--gold))]">(odd)</span>}
                     </p>
-                    <p className="text-xs text-muted-foreground">{done} / {NIGHT_ACTIONS.length}</p>
+                    <p className="text-micro text-muted-foreground">{done} / {NIGHT_ACTIONS.length}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {NIGHT_ACTIONS.map((a) => {
@@ -250,7 +250,7 @@ const Ramadan = () => {
                         <button
                           key={a}
                           onClick={() => toggleAction(n, a)}
-                          className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
+                          className={`inline-flex items-center gap-1 rounded-pill border px-2.5 py-1 text-micro transition ${
                             active
                               ? "border-primary bg-primary/10 text-primary"
                               : "border-border text-muted-foreground hover:text-foreground"
@@ -269,10 +269,10 @@ const Ramadan = () => {
         </section>
 
         {/* Goals */}
-        <section className="rounded-2xl border border-border bg-card p-5">
+        <section className="rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex items-center gap-2">
             <Target className="h-4 w-4 text-primary" />
-            <h2 className="font-heading text-lg font-semibold text-foreground">Ramadan goals</h2>
+            <h2 className="font-heading text-heading font-semibold text-foreground">Ramadan goals</h2>
           </div>
           <div className="mb-3 flex gap-2">
             <input
@@ -280,28 +280,28 @@ const Ramadan = () => {
               onChange={(e) => setNewGoal(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addGoal()}
               placeholder="Add a Ramadan goal…"
-              className="h-10 flex-1 rounded-md border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
+              className="h-10 flex-1 rounded-card border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
             />
             <button
               onClick={addGoal}
-              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="inline-flex items-center gap-1 rounded-card bg-primary px-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
               <Plus className="h-4 w-4" /> Add
             </button>
           </div>
           <ul className="space-y-2">
             {goals.map((g) => (
-              <li key={g.id} className={`flex items-center justify-between gap-2 rounded-lg border p-3 ${g.done ? "border-primary/40 bg-primary/5" : "border-border bg-background"}`}>
+              <li key={g.id} className={`flex items-center justify-between gap-2 rounded-card border p-3 ${g.done ? "border-primary/40 bg-primary/5" : "border-border bg-background"}`}>
                 <button
                   onClick={() => toggleGoal(g.id)}
                   className="flex flex-1 items-center gap-3 text-left"
                 >
-                  <span className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${g.done ? "border-primary bg-primary" : "border-border"}`}>
+                  <span className={`flex h-5 w-5 items-center justify-center rounded-pill border-2 ${g.done ? "border-primary bg-primary" : "border-border"}`}>
                     {g.done && <Check className="h-3 w-3 text-primary-foreground" />}
                   </span>
                   <span className={`text-sm ${g.done ? "text-muted-foreground line-through" : "text-foreground"}`}>{g.text}</span>
                 </button>
-                <button onClick={() => deleteGoal(g.id)} className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary" aria-label="Delete">
+                <button onClick={() => deleteGoal(g.id)} className="rounded-pill p-1.5 text-muted-foreground hover:bg-secondary" aria-label="Delete">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </li>
@@ -312,7 +312,7 @@ const Ramadan = () => {
           </ul>
         </section>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
+        <p className="mt-6 text-center text-micro text-muted-foreground">
           Ramadan dates are approximate — always confirm with your local moon-sighting authority.
         </p>
       </main>

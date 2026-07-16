@@ -195,13 +195,13 @@ const FAQS: { q: string; a: string }[] = [
 function Cell({ value }: { value: string | boolean }) {
   if (value === true)
     return (
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-primary" aria-label="Included">
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-pill bg-primary/15 text-primary" aria-label="Included">
         <Check className="h-3.5 w-3.5" aria-hidden />
       </span>
     );
   if (value === false)
-    return <span className="text-xs text-muted-foreground" aria-label="Not included">—</span>;
-  return <span className="text-xs font-medium text-foreground">{value}</span>;
+    return <span className="text-micro text-muted-foreground" aria-label="Not included">—</span>;
+  return <span className="text-micro font-medium text-foreground">{value}</span>;
 }
 
 export default function HeartifyPlus() {
@@ -267,37 +267,37 @@ export default function HeartifyPlus() {
         </Link>
 
         {/* Hero */}
-        <header className="relative overflow-hidden rounded-3xl border border-[hsl(var(--gold))]/30 bg-gradient-to-br from-[hsl(var(--emerald-dark))] via-[hsl(var(--emerald-dark))] to-[hsl(153_45%_16%)] p-8 text-[hsl(var(--cream))] md:p-12">
-          <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[hsl(var(--gold))]/20 blur-3xl" aria-hidden />
+        <header className="relative overflow-hidden rounded-card border border-[hsl(var(--gold))]/30 bg-gradient-to-br from-[hsl(var(--emerald-dark))] via-[hsl(var(--emerald-dark))] to-[hsl(153_45%_16%)] p-8 text-[hsl(var(--cream))] md:p-12">
+          <div className="absolute -right-16 -top-16 h-64 w-64 rounded-pill bg-[hsl(var(--gold))]/20 blur-3xl" aria-hidden />
           <div className="relative">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--gold))]/40 bg-[hsl(var(--gold))]/10 px-3 py-1 text-xs font-medium text-[hsl(var(--gold))]">
+            <span className="inline-flex items-center gap-1.5 rounded-pill border border-[hsl(var(--gold))]/40 bg-[hsl(var(--gold))]/10 px-3 py-1 text-micro font-medium text-[hsl(var(--gold))]">
               <Sparkles className="h-3 w-3" aria-hidden />
               Introducing Heartify+
             </span>
-            <h1 className="mt-4 font-heading text-3xl font-bold md:text-5xl">
+            <h1 className="mt-4 font-heading text-title font-bold md:text-display">
               Halal streaming, without limits.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-[hsl(var(--cream))]/80 md:text-base">
               The full Qur'an from your favourite reciters. Guided Khatm programs. Family
               seats with Kids Mode. Offline everywhere. No music, no ads, no compromise.
             </p>
-            <div className="mt-6 flex flex-wrap gap-2 text-xs text-[hsl(var(--cream))]/80">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
+            <div className="mt-6 flex flex-wrap gap-2 text-micro text-[hsl(var(--cream))]/80">
+              <span className="inline-flex items-center gap-1.5 rounded-pill bg-white/5 px-3 py-1">
                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> Trying our best to keep it halal
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
+              <span className="inline-flex items-center gap-1.5 rounded-pill bg-white/5 px-3 py-1">
                 <InfinityIcon className="h-3.5 w-3.5" aria-hidden /> Unlimited offline
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
+              <span className="inline-flex items-center gap-1.5 rounded-pill bg-white/5 px-3 py-1">
                 <Users className="h-3.5 w-3.5" aria-hidden /> Family & Kids Mode
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1">
+              <span className="inline-flex items-center gap-1.5 rounded-pill bg-white/5 px-3 py-1">
                 <Star className="h-3.5 w-3.5" aria-hidden /> Founding‑member perks
               </span>
             </div>
 
             {!entLoading && isPremium ? (
-              <div className="mt-8 inline-flex items-center gap-2 rounded-xl border border-[hsl(var(--gold))]/50 bg-[hsl(var(--gold))]/10 px-4 py-3 text-sm text-[hsl(var(--cream))]">
+              <div className="mt-8 inline-flex items-center gap-2 rounded-card border border-[hsl(var(--gold))]/50 bg-[hsl(var(--gold))]/10 px-4 py-3 text-sm text-[hsl(var(--cream))]">
                 <Crown className="h-4 w-4 text-[hsl(var(--gold))]" aria-hidden />
                 You're already a Heartify+ member — jazākum Allāhu khayran.
                 {entitlement.expiresAt && (
@@ -309,7 +309,7 @@ export default function HeartifyPlus() {
             ) : (
               <a
                 href="#tiers"
-                className="mt-8 inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--gold))] px-5 py-2.5 text-sm font-semibold text-[hsl(var(--emerald-dark))] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--emerald-dark))]"
+                className="mt-8 inline-flex items-center gap-2 rounded-card bg-[hsl(var(--gold))] px-5 py-2.5 text-sm font-semibold text-[hsl(var(--emerald-dark))] transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--emerald-dark))]"
               >
                 See plans
               </a>
@@ -319,7 +319,7 @@ export default function HeartifyPlus() {
 
         {/* Tiers */}
         <section id="tiers" className="mt-12">
-          <h2 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
+          <h2 className="font-heading text-title font-bold text-foreground md:text-title">
             Choose your plan
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -332,21 +332,21 @@ export default function HeartifyPlus() {
                 <article
                   key={t.id}
                   className={cn(
-                    "flex flex-col rounded-2xl border bg-card p-6 shadow-sm transition-shadow hover:shadow-md",
+                    "flex flex-col rounded-card border bg-card p-6 shadow-sm transition-shadow hover:shadow-md",
                     t.highlight
                       ? "border-[hsl(var(--gold))] ring-2 ring-[hsl(var(--gold))]/40"
                       : "border-border",
                   )}
                 >
                   {t.highlight && (
-                    <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-[hsl(var(--gold))]/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[hsl(var(--gold))]">
+                    <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-pill bg-[hsl(var(--gold))]/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[hsl(var(--gold))]">
                       Most loved
                     </span>
                   )}
                   <div className="flex items-center gap-2">
                     <span
                       className={cn(
-                        "flex h-9 w-9 items-center justify-center rounded-full",
+                        "flex h-9 w-9 items-center justify-center rounded-pill",
                         t.highlight
                           ? "bg-[hsl(var(--gold))]/15 text-[hsl(var(--gold))]"
                           : "bg-primary/10 text-primary",
@@ -354,16 +354,16 @@ export default function HeartifyPlus() {
                     >
                       <Icon className="h-4 w-4" aria-hidden />
                     </span>
-                    <h3 className="font-heading text-lg font-semibold text-foreground">
+                    <h3 className="font-heading text-heading font-semibold text-foreground">
                       {t.name}
                     </h3>
                   </div>
-                  <p className="mt-2 text-xs text-muted-foreground">{t.tagline}</p>
+                  <p className="mt-2 text-micro text-muted-foreground">{t.tagline}</p>
                   <div className="mt-4 flex items-baseline gap-1">
-                    <span className="font-heading text-3xl font-bold text-foreground">
+                    <span className="font-heading text-title font-bold text-foreground">
                       {formatPrice(t.priceUsd)}
                     </span>
-                    <span className="text-xs text-muted-foreground">/ {t.period}</span>
+                    <span className="text-micro text-muted-foreground">/ {t.period}</span>
                   </div>
                   <ul className="mt-4 flex-1 space-y-2">
                     {t.bullets.map((b) => (
@@ -397,15 +397,15 @@ export default function HeartifyPlus() {
 
         {/* Comparison */}
         <section className="mt-16">
-          <h2 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
+          <h2 className="font-heading text-title font-bold text-foreground md:text-title">
             Free vs. Heartify+
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Everything on the left stays free, forever. The right adds what serious seekers ask for.
           </p>
-          <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="mt-6 overflow-hidden rounded-card border border-border bg-card">
             <table className="w-full text-left text-sm">
-              <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+              <thead className="bg-muted/40 text-micro uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-medium">Feature</th>
                   <th scope="col" className="px-4 py-3 font-medium">Free</th>
@@ -417,7 +417,7 @@ export default function HeartifyPlus() {
               <tbody>
                 {COMPARISON.flatMap((sec) => [
                   <tr key={`sec-${sec.section}`} className="bg-muted/20">
-                    <td colSpan={3} className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <td colSpan={3} className="px-4 py-2 text-micro font-semibold uppercase tracking-wide text-muted-foreground">
                       {sec.section}
                     </td>
                   </tr>,
@@ -438,7 +438,7 @@ export default function HeartifyPlus() {
 
         {/* Family seats */}
         <section id="family" className="mt-16">
-          <h2 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
+          <h2 className="font-heading text-title font-bold text-foreground md:text-title">
             Family seats
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -447,7 +447,7 @@ export default function HeartifyPlus() {
           <div className="mt-6">
             <HouseholdPanel />
           </div>
-          <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/30 p-4 text-sm">
+          <div className="mt-4 rounded-card border border-dashed border-border bg-muted/30 p-4 text-sm">
             <span className="font-medium text-foreground">Have a gift code? </span>
             <a href="/redeem" className="text-primary underline hover:no-underline">
               Redeem it here
@@ -459,14 +459,14 @@ export default function HeartifyPlus() {
         {/* Waitlist */}
         <section
           id="waitlist"
-          className="mt-16 overflow-hidden rounded-3xl border border-border bg-card p-6 md:p-10"
+          className="mt-16 overflow-hidden rounded-card border border-border bg-card p-6 md:p-10"
         >
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <span className="inline-flex items-center gap-1.5 rounded-pill bg-primary/10 px-3 py-1 text-micro font-medium text-primary">
                 <Sparkles className="h-3 w-3" aria-hidden /> Founding members
               </span>
-              <h2 className="mt-3 font-heading text-2xl font-bold text-foreground md:text-3xl">
+              <h2 className="mt-3 font-heading text-title font-bold text-foreground md:text-title">
                 Join the Heartify+ waitlist
               </h2>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -490,11 +490,11 @@ export default function HeartifyPlus() {
             </div>
 
             {alreadyOnList ? (
-              <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
-                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary" aria-hidden>
+              <div className="rounded-card border border-primary/30 bg-primary/5 p-6 text-center">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-pill bg-primary/15 text-primary" aria-hidden>
                   <Check className="h-6 w-6" />
                 </span>
-                <p className="mt-3 font-heading text-lg font-semibold text-foreground">
+                <p className="mt-3 font-heading text-heading font-semibold text-foreground">
                   You're on the list
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -504,7 +504,7 @@ export default function HeartifyPlus() {
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="space-y-4 rounded-2xl border border-border bg-background/60 p-5"
+                className="space-y-4 rounded-card border border-border bg-background/60 p-5"
                 aria-label="Heartify Plus waitlist signup"
               >
                 <div className="space-y-1.5">
@@ -527,7 +527,7 @@ export default function HeartifyPlus() {
                     id="waitlist-tier"
                     value={tier}
                     onChange={(e) => setTier(e.target.value as PreferredTier)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="flex h-10 w-full rounded-card border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
                     <option value="plus">Heartify+ ($4.99 / month)</option>
                     <option value="family">Heartify+ Family ($8.99 / month)</option>
@@ -558,10 +558,10 @@ export default function HeartifyPlus() {
 
         {/* FAQ */}
         <section className="mt-16">
-          <h2 className="font-heading text-2xl font-bold text-foreground md:text-3xl">
+          <h2 className="font-heading text-title font-bold text-foreground md:text-title">
             Frequently asked
           </h2>
-          <div className="mt-4 rounded-2xl border border-border bg-card">
+          <div className="mt-4 rounded-card border border-border bg-card">
             <Accordion type="single" collapsible className="w-full">
               {FAQS.map((f, i) => (
                 <AccordionItem key={f.q} value={`faq-${i}`} className="px-4">
@@ -577,7 +577,7 @@ export default function HeartifyPlus() {
           </div>
         </section>
 
-        <p className="mt-10 text-center text-xs text-muted-foreground">
+        <p className="mt-10 text-center text-micro text-muted-foreground">
           Heartify+ is under active development. Pricing shown reflects launch pricing and
           may vary by region. Your free experience is guaranteed to remain free.
         </p>

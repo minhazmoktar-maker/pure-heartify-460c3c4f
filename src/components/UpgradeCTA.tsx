@@ -25,7 +25,7 @@ export default function UpgradeCTA({ feature, compact, className }: UpgradeCTAPr
       <Link
         to="/plus"
         className={cn(
-          "inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--gold))]/40 bg-[hsl(var(--gold))]/10 px-3 py-1 text-xs font-medium text-[hsl(var(--gold))] transition-colors hover:bg-[hsl(var(--gold))]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))]",
+          "inline-flex items-center gap-1.5 rounded-pill border border-[hsl(var(--gold))]/40 bg-[hsl(var(--gold))]/10 px-3 py-1 text-micro font-medium text-[hsl(var(--gold))] transition-colors hover:bg-[hsl(var(--gold))]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))]",
           className,
         )}
       >
@@ -38,7 +38,7 @@ export default function UpgradeCTA({ feature, compact, className }: UpgradeCTAPr
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-2xl border border-[hsl(var(--gold))]/30 bg-gradient-to-br from-[hsl(var(--gold))]/10 via-background to-background p-5 sm:flex-row sm:items-center sm:justify-between",
+        "flex flex-col gap-3 rounded-card border border-[hsl(var(--gold))]/30 bg-gradient-to-br from-[hsl(var(--gold))]/10 via-background to-background p-5 sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
       role="region"
@@ -46,7 +46,7 @@ export default function UpgradeCTA({ feature, compact, className }: UpgradeCTAPr
     >
       <div className="flex items-start gap-3">
         <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--gold))]/15 text-[hsl(var(--gold))]"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-[hsl(var(--gold))]/15 text-[hsl(var(--gold))]"
           aria-hidden
         >
           <Sparkles className="h-5 w-5" />
@@ -55,7 +55,7 @@ export default function UpgradeCTA({ feature, compact, className }: UpgradeCTAPr
           <p className="font-heading text-sm font-semibold text-foreground">
             {feature ? `${feature} is a Heartify+ feature` : "Unlock the full Heartify+ experience"}
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="mt-0.5 text-micro text-muted-foreground">
             Unlimited offline audio, exclusive reciters, family seats, and guided Khatm programs.
           </p>
         </div>

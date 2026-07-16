@@ -116,7 +116,7 @@ export default function Tajweed() {
             <Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <BookOpen className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Tajweed Rules</h1>
+          <h1 className="text-heading font-semibold">Tajweed Rules</h1>
         </div>
       </header>
 
@@ -156,18 +156,18 @@ export default function Tajweed() {
                     <Badge variant="secondary" className="mt-1">{r.category}</Badge>
                   </div>
                   {r.arabic && (
-                    <div className="text-2xl" dir="rtl" lang="ar">{r.arabic}</div>
+                    <div className="text-title" dir="rtl" lang="ar">{r.arabic}</div>
                   )}
                 </div>
                 {r.letters && (
-                  <div className="mt-2 text-xs text-muted-foreground">
+                  <div className="mt-2 text-micro text-muted-foreground">
                     <span className="font-medium text-foreground">Letters:</span> {r.letters}
                   </div>
                 )}
                 <p className="mt-2 text-sm">{r.description}</p>
-                <div className="mt-3 rounded-md border border-border/60 bg-muted/40 p-3">
-                  <div className="text-2xl leading-loose" dir="rtl" lang="ar">{r.example}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{r.exampleTranslit}</div>
+                <div className="mt-3 rounded-card border border-border/60 bg-muted/40 p-3">
+                  <div className="text-title leading-loose" dir="rtl" lang="ar">{r.example}</div>
+                  <div className="mt-1 text-micro text-muted-foreground">{r.exampleTranslit}</div>
                 </div>
               </Card>
             ))}

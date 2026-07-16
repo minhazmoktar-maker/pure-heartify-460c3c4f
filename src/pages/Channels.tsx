@@ -45,7 +45,7 @@ const Channels = () => {
         <div className="mx-auto max-w-[1800px] px-4 py-8 md:px-6">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">Trusted Channels</h1>
+            <h1 className="text-title font-bold">Trusted Channels</h1>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             Browse {TOTAL_CHANNELS}+ vetted halal channels across {CHANNEL_CATEGORIES.length} categories.
@@ -68,7 +68,7 @@ const Channels = () => {
             <button
               onClick={() => setActiveCategory("all")}
               className={cn(
-                "shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+                "shrink-0 rounded-pill px-4 py-1.5 text-micro font-medium transition-colors",
                 activeCategory === "all"
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-secondary-foreground hover:bg-muted",
@@ -81,7 +81,7 @@ const Channels = () => {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  "shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+                  "shrink-0 rounded-pill px-4 py-1.5 text-micro font-medium transition-colors",
                   activeCategory === cat.id
                     ? "bg-primary text-primary-foreground"
                     : "bg-secondary text-secondary-foreground hover:bg-muted",
@@ -105,10 +105,10 @@ const Channels = () => {
               <section key={cat.id}>
                 <div className="flex items-end justify-between gap-4">
                   <div>
-                    <h2 className="text-lg font-bold">
+                    <h2 className="text-heading font-bold">
                       {cat.icon} {cat.title}
                     </h2>
-                    <p className="text-xs text-muted-foreground">{cat.description}</p>
+                    <p className="text-micro text-muted-foreground">{cat.description}</p>
                   </div>
                   <Badge variant="secondary" className="shrink-0">
                     {cat.channels.length}
@@ -120,7 +120,7 @@ const Channels = () => {
                     <a
                       key={`${cat.id}-${channel}`}
                       href={`/search?q=${encodeURIComponent(channel)}`}
-                      className="group flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5 text-sm transition-colors hover:border-primary/50 hover:bg-accent"
+                      className="group flex items-center justify-between rounded-card border border-border bg-card px-3 py-2.5 text-sm transition-colors hover:border-primary/50 hover:bg-accent"
                     >
                       <span className="flex items-center gap-2 truncate">
                         <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-primary" />

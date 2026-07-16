@@ -79,14 +79,15 @@ Primary buttons, links, and focus rings use `--primary` (emerald). Gold (`--gold
 - Off-scale radii (`rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`, `rounded-full`)
 - Arbitrary durations (`duration-[…ms]`, `duration-75|100|150|300|500|700|1000`)
 
-Allow-listed: `src/components/ui/**` (vendored shadcn) and `src/integrations/**` (auto-generated). Any line may opt out with a `// design-lint-disable` comment on the same or previous line.
+Allow-listed: `src/components/ui/**` (vendored shadcn) and `src/integrations/**` (auto-generated). Individual lines may opt out with `// design-lint-disable` on the same or previous line. Whole files may opt out with `// design-lint-disable-file` anywhere in the file — reserved for canvas palettes (confetti), chart color scales, generated SVGs (PWA icons), and third-party brand marks (Google G).
 
 Run locally:
 
 - `node scripts/design-lint.mjs` — enforce (exit 1 on any violation)
-- `node scripts/design-lint.mjs --report` — count violations without failing (used to track baseline)
+- `node scripts/design-lint.mjs --report` — count violations without failing
+- `node scripts/design-migrate.mjs` — Phase 4 codemod that maps legacy Tailwind sizes/radii/durations to design tokens (idempotent, safe to re-run)
 
-CI: `.github/workflows/design-lint.yml` runs `--report` on every PR today so the baseline is tracked without breaking existing screens; flip to enforce mode after Phase 2 migrates product surfaces.
+CI: `.github/workflows/design-lint.yml` runs in **enforce mode** (Phase 4+). Any violation without a documented exception fails the build.
 
 ## 8. Change process
 

@@ -119,7 +119,7 @@ export default function PublicDhikrCircle() {
             </div>
 
             {!circle.is_active && (
-              <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">
+              <p className="rounded-card bg-muted p-3 text-sm text-muted-foreground">
                 This circle has ended. Alhamdulillah.
               </p>
             )}
@@ -141,7 +141,7 @@ export default function PublicDhikrCircle() {
                 </div>
               )
             ) : (
-              <div className="rounded-md border p-4 text-center">
+              <div className="rounded-card border p-4 text-center">
                 <p className="mb-3 text-sm">
                   Sign in to contribute to this circle.
                 </p>

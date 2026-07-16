@@ -38,18 +38,18 @@ const TrackRow = ({ track, index, queue, showAlbum = false }: TrackRowProps) => 
       aria-label={`Play track ${index + 1}`}
       onKeyDown={(e) => !disabled && (e.key === "Enter" || e.key === " ") && (e.preventDefault(), handlePlay())}
       className={cn(
-        "group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
+        "group flex cursor-pointer items-center gap-3 rounded-card px-3 py-2.5 transition-colors",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
         isActive ? "bg-primary/10" : "hover:bg-secondary",
         disabled && "opacity-60 cursor-not-allowed hover:bg-transparent",
       )}
     >
-      <span className="w-6 text-center text-xs tabular-nums text-muted-foreground group-hover:hidden">
+      <span className="w-6 text-center text-micro tabular-nums text-muted-foreground group-hover:hidden">
         {isActive && isPlaying ? (
           <span className="inline-flex h-3 w-3 items-center justify-center gap-[2px]">
-            <span className="h-full w-[2px] animate-pulse rounded-sm bg-primary" />
-            <span className="h-2/3 w-[2px] animate-pulse rounded-sm bg-primary [animation-delay:120ms]" />
-            <span className="h-1/2 w-[2px] animate-pulse rounded-sm bg-primary [animation-delay:240ms]" />
+            <span className="h-full w-[2px] animate-pulse rounded-card bg-primary" />
+            <span className="h-2/3 w-[2px] animate-pulse rounded-card bg-primary [animation-delay:120ms]" />
+            <span className="h-1/2 w-[2px] animate-pulse rounded-card bg-primary [animation-delay:240ms]" />
           </span>
         ) : (
           index + 1
@@ -77,21 +77,21 @@ const TrackRow = ({ track, index, queue, showAlbum = false }: TrackRowProps) => 
           {track.title}
           {track.isPremium && <Crown className="ml-1.5 inline h-3 w-3 text-gold" aria-label="Premium" />}
           {isComing && (
-            <span className="ml-2 rounded-full bg-secondary px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <span className="ml-2 rounded-pill bg-secondary px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
               Soon
             </span>
           )}
         </p>
-        <p className="truncate text-xs text-muted-foreground">
+        <p className="truncate text-micro text-muted-foreground">
           {track.artist}
           {showAlbum && <span className="text-muted-foreground/70"> · {track.album}</span>}
         </p>
       </div>
 
-      <span className="hidden rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground md:block">
+      <span className="hidden rounded-pill border border-border px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground md:block">
         {track.language}
       </span>
-      <span className="hidden text-xs text-muted-foreground lg:block">{track.plays} plays</span>
+      <span className="hidden text-micro text-muted-foreground lg:block">{track.plays} plays</span>
       <button
         onClick={(e) => { e.stopPropagation(); if (!disabled) addToQueue(track); }}
         aria-label="Add to queue"
@@ -105,7 +105,7 @@ const TrackRow = ({ track, index, queue, showAlbum = false }: TrackRowProps) => 
       >
         <ReportAudioDialog track={track} compact />
       </span>
-      <span className="flex w-14 items-center justify-end gap-1 text-xs tabular-nums text-muted-foreground">
+      <span className="flex w-14 items-center justify-end gap-1 text-micro tabular-nums text-muted-foreground">
         <Clock className="h-3 w-3 opacity-60" />{track.duration}
       </span>
     </motion.div>

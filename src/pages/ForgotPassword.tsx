@@ -34,16 +34,16 @@ const ForgotPassword = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <span className="text-lg font-bold text-primary-foreground">H</span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-card bg-primary">
+              <span className="text-heading font-bold text-primary-foreground">H</span>
             </div>
           </Link>
-          <h1 className="mt-4 font-heading text-xl font-bold text-foreground">Reset your password</h1>
+          <h1 className="mt-4 font-heading text-heading font-bold text-foreground">Reset your password</h1>
           <p className="mt-1 text-sm text-muted-foreground">Enter your email and we'll send a reset link</p>
         </div>
 
         {sent ? (
-          <div className="rounded-lg border border-border bg-card p-6 text-center">
+          <div className="rounded-card border border-border bg-card p-6 text-center">
             <CheckCircle2 className="mx-auto h-8 w-8 text-primary" />
             <p className="mt-3 text-sm text-foreground">Check your inbox for the reset link.</p>
             <Link to="/login" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">Back to login</Link>
@@ -67,7 +67,7 @@ const ForgotPassword = () => {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.45)] transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.45)] transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
               Send Reset Link

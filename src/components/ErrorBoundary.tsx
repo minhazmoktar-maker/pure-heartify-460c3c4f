@@ -49,10 +49,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-background px-6 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+        <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-destructive/10">
           <AlertTriangle className="h-6 w-6 text-destructive" />
         </div>
-        <h1 className="font-heading text-xl font-bold text-foreground">Something went wrong</h1>
+        <h1 className="font-heading text-heading font-bold text-foreground">Something went wrong</h1>
         <p className="max-w-md text-sm text-muted-foreground">
           The app hit an unexpected error. You can retry, or reload the page. Our team has
           been notified.
@@ -60,19 +60,19 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="flex gap-2">
           <button
             onClick={this.handleReset}
-            className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent/10"
+            className="rounded-card border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent/10"
           >
             Try again
           </button>
           <button
             onClick={this.handleReload}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            className="inline-flex items-center gap-2 rounded-card bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
           >
             <RefreshCw className="h-4 w-4" /> Reload
           </button>
         </div>
         {import.meta.env.DEV && this.state.error && (
-          <pre className="mt-4 max-w-2xl overflow-auto rounded-lg border border-border bg-muted p-3 text-left text-xs text-muted-foreground">
+          <pre className="mt-4 max-w-2xl overflow-auto rounded-card border border-border bg-muted p-3 text-left text-micro text-muted-foreground">
             {this.state.error.message}
           </pre>
         )}

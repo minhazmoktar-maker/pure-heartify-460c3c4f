@@ -26,7 +26,7 @@ export default function HouseholdPanel() {
 
   if (authLoading || entLoading || loading) {
     return (
-      <div className="flex items-center gap-2 rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 rounded-card border border-border bg-card p-6 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" /> Loading family seats…
       </div>
     );
@@ -34,8 +34,8 @@ export default function HouseholdPanel() {
 
   if (!user) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6">
-        <h3 className="font-heading text-lg font-semibold">Family seats</h3>
+      <div className="rounded-card border border-border bg-card p-6">
+        <h3 className="font-heading text-heading font-semibold">Family seats</h3>
         <p className="mt-1 text-sm text-muted-foreground">
           Sign in to create or join a Heartify+ household and share your plan with up to 5 family members.
         </p>
@@ -51,8 +51,8 @@ export default function HouseholdPanel() {
   if (!household) {
     if (!isPremium) {
       return (
-        <div className="rounded-2xl border border-border bg-card p-6">
-          <h3 className="font-heading text-lg font-semibold">Family seats</h3>
+        <div className="rounded-card border border-border bg-card p-6">
+          <h3 className="font-heading text-heading font-semibold">Family seats</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Heartify+ Family lets you share one plan with up to 5 family members. Upgrade to create your household.
           </p>
@@ -61,8 +61,8 @@ export default function HouseholdPanel() {
       );
     }
     return (
-      <div className="rounded-2xl border border-border bg-card p-6">
-        <h3 className="font-heading text-lg font-semibold">Create your household</h3>
+      <div className="rounded-card border border-border bg-card p-6">
+        <h3 className="font-heading text-heading font-semibold">Create your household</h3>
         <p className="mt-1 text-sm text-muted-foreground">
           Your Heartify+ plan supports up to 5 family seats. Create your household to start inviting.
         </p>
@@ -87,14 +87,14 @@ export default function HouseholdPanel() {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6">
+    <div className="rounded-card border border-border bg-card p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-[hsl(var(--gold))]" aria-hidden />
-            <h3 className="font-heading text-lg font-semibold">{household.name}</h3>
+            <h3 className="font-heading text-heading font-semibold">{household.name}</h3>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-micro text-muted-foreground">
             {seatsUsed} of {household.seat_limit} seats used {isOwner ? "· you're the owner" : "· you're a member"}
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function HouseholdPanel() {
       </div>
 
       {/* Members */}
-      <ul className="mt-4 divide-y divide-border/60 rounded-xl border border-border">
+      <ul className="mt-4 divide-y divide-border/60 rounded-card border border-border">
         {members.length === 0 && (
           <li className="px-4 py-3 text-sm text-muted-foreground">No members yet.</li>
         )}
@@ -125,7 +125,7 @@ export default function HouseholdPanel() {
               <p className="font-medium text-foreground">
                 {m.user_id === user.id ? "You" : `Member ${m.user_id.slice(0, 8)}`}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-micro text-muted-foreground">
                 {m.role === "owner" ? "Owner" : "Member"} · joined {new Date(m.joined_at).toLocaleDateString()}
               </p>
             </div>
@@ -152,17 +152,17 @@ export default function HouseholdPanel() {
         <>
           {invites.length > 0 && (
             <div className="mt-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <p className="mb-2 text-micro font-semibold uppercase tracking-wide text-muted-foreground">
                 Pending invites
               </p>
-              <ul className="divide-y divide-border/60 rounded-xl border border-border">
+              <ul className="divide-y divide-border/60 rounded-card border border-border">
                 {invites.map((inv) => {
                   const link = `${window.location.origin}/plus/join?token=${inv.token}`;
                   return (
                     <li key={inv.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium text-foreground">{inv.invited_email}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-micro text-muted-foreground">
                           Expires {new Date(inv.expires_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -216,7 +216,7 @@ export default function HouseholdPanel() {
             }}
           >
             <div className="flex-1">
-              <Label htmlFor="invite-email" className="text-xs">Invite a family member</Label>
+              <Label htmlFor="invite-email" className="text-micro">Invite a family member</Label>
               <div className="relative mt-1">
                 <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
                 <Input

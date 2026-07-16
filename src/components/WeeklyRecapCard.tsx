@@ -41,13 +41,13 @@ export function WeeklyRecapCard() {
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="space-y-2 rounded-lg border border-border/40 p-3">
+            <div key={i} className="space-y-2 rounded-card border border-border/40 p-3">
               <Skeleton className="h-3 w-16" />
               <Skeleton className="h-5 w-10" />
             </div>
           ))}
         </div>
-        <Skeleton className="h-9 w-full rounded-md" />
+        <Skeleton className="h-9 w-full rounded-card" />
       </Card>
     );
   }
@@ -103,11 +103,11 @@ export function WeeklyRecapCard() {
 
 function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: number }) {
   return (
-    <div className="rounded-md border bg-muted/30 px-3 py-2">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="rounded-card border bg-muted/30 px-3 py-2">
+      <div className="flex items-center gap-1.5 text-micro text-muted-foreground">
         <Icon className="h-3.5 w-3.5" aria-hidden /> {label}
       </div>
-      <div className="mt-0.5 text-lg font-semibold tabular-nums">{value.toLocaleString()}</div>
+      <div className="mt-0.5 text-heading font-semibold tabular-nums">{value.toLocaleString()}</div>
     </div>
   );
 }

@@ -59,6 +59,7 @@ for (const file of files) {
   const rel = relative(ROOT, file).replaceAll("\\", "/");
   if (ALLOW_DIRS.some((d) => rel.startsWith(d))) continue;
   const src = readFileSync(file, "utf8");
+  if (src.includes("design-lint-disable-file")) continue;
   const lines = src.split("\n");
   for (const rule of RULES) {
     rule.re.lastIndex = 0;

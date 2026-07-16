@@ -71,20 +71,20 @@ export default function PublicSignOfHour() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-5 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Hourglass className="h-4 w-4 text-primary" />
               Ashrāṭ as-Sāʿah · {idx + 1} of {SIGNS_OF_HOUR.length}
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-4xl md:text-5xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {s.arabic}
             </p>
-            <h1 className="text-2xl md:text-3xl font-semibold">{s.translit}</h1>
-            <p className="text-base md:text-lg text-primary/90 font-medium">{s.title}</p>
+            <h1 className="text-title md:text-title font-semibold">{s.translit}</h1>
+            <p className="text-base md:text-heading text-primary/90 font-medium">{s.title}</p>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
               <Badge variant="outline" className="text-[10px] uppercase">
                 {s.category === "major" ? "Major sign" : "Minor sign"}
@@ -102,7 +102,7 @@ export default function PublicSignOfHour() {
               <AlertTriangle className="h-4 w-4 mt-1 text-primary shrink-0" />
               <p>{s.summary}</p>
             </div>
-            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
+            <p className="text-micro text-muted-foreground inline-flex items-center gap-1">
               <BookMarked className="h-3.5 w-3.5" /> {s.reference}
             </p>
           </CardContent>

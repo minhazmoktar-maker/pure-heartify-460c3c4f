@@ -93,7 +93,7 @@ export default function Library() {
           {slice.map((e) => (
             <Link key={e.slug} to={`/library/${e.slug}`}>
               <Card className="p-4 h-full hover:shadow-md transition-shadow">
-                <Badge variant="secondary" className="mb-2 text-xs">
+                <Badge variant="secondary" className="mb-2 text-micro">
                   {e.category}
                 </Badge>
                 <h2 className="font-semibold mb-1">{e.title}</h2>

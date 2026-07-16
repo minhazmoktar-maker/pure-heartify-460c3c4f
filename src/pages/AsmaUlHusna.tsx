@@ -30,7 +30,7 @@ export default function AsmaUlHusna() {
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6">
-          <h1 className="flex items-center gap-2 text-3xl font-bold">
+          <h1 className="flex items-center gap-2 text-title font-bold">
             <Sparkles className="h-7 w-7 text-primary" />
             99 Names of Allah
           </h1>
@@ -56,8 +56,8 @@ export default function AsmaUlHusna() {
               <Card key={n.n} className="transition hover:border-primary/60">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-xs font-mono text-muted-foreground">#{n.n}</span>
-                    <span dir="rtl" lang="ar" className="text-2xl font-semibold leading-tight">
+                    <span className="text-micro font-mono text-muted-foreground">#{n.n}</span>
+                    <span dir="rtl" lang="ar" className="text-title font-semibold leading-tight">
                       {n.ar}
                     </span>
                   </div>

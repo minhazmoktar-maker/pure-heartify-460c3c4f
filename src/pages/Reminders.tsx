@@ -105,7 +105,7 @@ const Reminders = () => {
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8 md:py-10">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Habit reminders</h1>
+          <h1 className="text-title font-bold tracking-tight">Habit reminders</h1>
           <p className="mt-2 text-muted-foreground">
             Gentle daily nudges for the habits that matter. Reminders run while Heartify is open in a tab.
           </p>
@@ -134,7 +134,7 @@ const Reminders = () => {
               <Card key={r.key} className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 rounded-lg bg-secondary p-2">
+                    <div className="mt-0.5 rounded-card bg-secondary p-2">
                       <Icon className="h-5 w-5 text-primary" />
                     </div>
                     <div>
@@ -165,7 +165,7 @@ const Reminders = () => {
           })}
         </div>
 
-        <p className="mt-6 text-xs text-muted-foreground">
+        <p className="mt-6 text-micro text-muted-foreground">
           Reminders are stored locally on this device. For background delivery when Heartify is closed, install the app to your home screen.
         </p>
       </main>

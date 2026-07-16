@@ -19,7 +19,7 @@ export default function PlaylistDetail() {
   if (!data?.playlist) {
     return (
       <div className="container mx-auto max-w-2xl px-4 py-16 text-center">
-        <p className="text-lg font-semibold text-foreground">Playlist not found</p>
+        <p className="text-heading font-semibold text-foreground">Playlist not found</p>
         <p className="text-sm text-muted-foreground">It may have been deleted or is private.</p>
       </div>
     );
@@ -39,18 +39,18 @@ export default function PlaylistDetail() {
         subtitle={playlist.description ?? undefined}
       />
       <div className="container mx-auto max-w-4xl px-4 pb-16">
-        <p className="mb-6 text-xs text-muted-foreground">
+        <p className="mb-6 text-micro text-muted-foreground">
           <Icon className="mr-1 inline h-3 w-3" />
           {playlist.visibility} · {items.length} videos
         </p>
         {items.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+          <div className="rounded-card border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
             {isOwner ? "Add videos to this playlist from any watch page." : "This playlist is empty."}
           </div>
         ) : (
           <ol className="space-y-2">
             {items.map((it, idx) => (
-              <li key={it.id} className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+              <li key={it.id} className="flex items-center gap-3 rounded-card border border-border bg-card p-3">
                 <span className="w-6 text-right text-sm font-medium text-muted-foreground">{idx + 1}</span>
                 <img
                   src={`https://i.ytimg.com/vi/${it.video_id}/mqdefault.jpg`}
@@ -62,11 +62,11 @@ export default function PlaylistDetail() {
                   <Link to={`/watch/${it.video_id}`} className="line-clamp-1 text-sm font-medium hover:text-primary">
                     {it.video_id}
                   </Link>
-                  <p className="text-xs text-muted-foreground">Added {new Date(it.added_at).toLocaleDateString()}</p>
+                  <p className="text-micro text-muted-foreground">Added {new Date(it.added_at).toLocaleDateString()}</p>
                 </div>
                 <Link
                   to={`/watch/${it.video_id}`}
-                  className="rounded-full bg-primary p-2 text-primary-foreground hover:opacity-90"
+                  className="rounded-pill bg-primary p-2 text-primary-foreground hover:opacity-90"
                   aria-label="Play"
                 >
                   <Play className="h-4 w-4" />

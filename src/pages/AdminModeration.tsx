@@ -35,7 +35,7 @@ export default function AdminModeration() {
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-6 w-6 text-primary" />
             <div>
-              <h1 className="text-2xl font-semibold">Moderation</h1>
+              <h1 className="text-title font-semibold">Moderation</h1>
               <p className="text-sm text-muted-foreground">
                 Reports, candidate review, and the automatic rejection audit — all in one place.
               </p>

@@ -187,11 +187,11 @@ export default function Achievements() {
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="flex items-center gap-2 text-3xl font-bold"><Award className="h-7 w-7 text-primary" />Achievements</h1>
+            <h1 className="flex items-center gap-2 text-title font-bold"><Award className="h-7 w-7 text-primary" />Achievements</h1>
             <p className="mt-1 text-muted-foreground">Milestones for salah, dhikr, Quran, and adhkar consistency.</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="rounded-full border bg-card px-4 py-2 text-sm">
+            <div className="rounded-pill border bg-card px-4 py-2 text-sm">
               <span className="font-bold text-primary">{unlockedCount}</span>
               <span className="text-muted-foreground"> / {enriched.length} unlocked</span>
             </div>
@@ -243,17 +243,17 @@ export default function Achievements() {
                   <Badge variant="outline" className="text-[10px] uppercase">{a.tier}</Badge>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="text-xs text-muted-foreground">{a.description}</p>
+                  <p className="text-micro text-muted-foreground">{a.description}</p>
                   <Progress value={a.pct} className="h-2" />
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-mono">
+                    <p className="text-micro font-mono">
                       {a.current.toLocaleString()} / {a.target.toLocaleString()}
                     </p>
                     {a.unlocked && (
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 px-2 text-xs"
+                        className="h-7 px-2 text-micro"
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onShareBadge(a.id); }}
                         aria-label={`Share ${a.title}`}
                       >

@@ -28,8 +28,8 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
           aria-label="Feedback on this video"
           className={
             compact
-              ? "rounded-full p-1.5 text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:bg-accent hover:text-foreground"
-              : "inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors hover:bg-accent"
+              ? "rounded-pill p-1.5 text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:bg-accent hover:text-foreground"
+              : "inline-flex items-center gap-1 rounded-pill border border-border px-3 py-1 text-micro font-medium transition-colors hover:bg-accent"
           }
           onClick={(e) => e.stopPropagation()}
         >

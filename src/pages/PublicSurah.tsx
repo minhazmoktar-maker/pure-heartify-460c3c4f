@@ -105,14 +105,14 @@ export default function PublicSurah() {
           <>
             <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
               <CardContent className="pt-10 pb-10 space-y-4 text-center">
-                <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+                <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
                   <BookOpen className="h-4 w-4 text-primary" />
                   Sūrah {meta.number} of 114 · {meta.revelationType}
                 </div>
-                <p dir="rtl" lang="ar" className="text-5xl md:text-6xl text-primary" style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
+                <p dir="rtl" lang="ar" className="text-display md:text-display text-primary" style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
                   {meta.name}
                 </p>
-                <h1 className="text-3xl md:text-4xl font-semibold">{meta.englishName}</h1>
+                <h1 className="text-title md:text-display font-semibold">{meta.englishName}</h1>
                 <p className="text-base text-muted-foreground">{meta.englishNameTranslation} · {meta.numberOfAyahs} verses</p>
               </CardContent>
             </Card>
@@ -123,7 +123,7 @@ export default function PublicSurah() {
                   <h2 className="text-sm uppercase tracking-widest text-muted-foreground">Opening verses</h2>
                   {firstAyahs.map((a) => (
                     <div key={a.num} className="space-y-2 border-b border-border/40 pb-4 last:border-none last:pb-0">
-                      <p dir="rtl" lang="ar" className="text-2xl leading-loose text-right" style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
+                      <p dir="rtl" lang="ar" className="text-title leading-loose text-right" style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
                         {a.ar}
                       </p>
                       <p className="text-sm text-muted-foreground">

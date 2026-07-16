@@ -91,11 +91,11 @@ export default function AdminExperiments() {
             {experiments.map((e) => {
               const rs = results.filter((r) => r.experiment_id === e.id);
               return (
-                <div key={e.id} className="rounded-lg border border-border p-3">
+                <div key={e.id} className="rounded-card border border-border p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <div className="font-semibold">{e.name} <span className="text-xs text-muted-foreground">({e.key})</span></div>
-                      <div className="text-xs text-muted-foreground">Status: {e.status} · Traffic: {(e.traffic_allocation * 100).toFixed(0)}%</div>
+                      <div className="font-semibold">{e.name} <span className="text-micro text-muted-foreground">({e.key})</span></div>
+                      <div className="text-micro text-muted-foreground">Status: {e.status} · Traffic: {(e.traffic_allocation * 100).toFixed(0)}%</div>
                     </div>
                     <div className="flex gap-2">
                       <Select value={e.status} onValueChange={(v) => setStatus(e.id, v as Experiment["status"])}>
@@ -112,7 +112,7 @@ export default function AdminExperiments() {
                   </div>
                   {rs.length > 0 && (
                     <table className="mt-3 w-full text-sm">
-                      <thead className="text-xs text-muted-foreground"><tr><th className="text-left">Variant</th><th className="text-right">Exposures</th><th className="text-right">Unique users</th></tr></thead>
+                      <thead className="text-micro text-muted-foreground"><tr><th className="text-left">Variant</th><th className="text-right">Exposures</th><th className="text-right">Unique users</th></tr></thead>
                       <tbody>
                         {rs.map((r) => (
                           <tr key={r.variant_key} className="border-t border-border">

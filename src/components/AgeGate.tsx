@@ -95,15 +95,15 @@ export default function AgeGate() {
   if (blocked) {
     return (
       <div className="fixed inset-0 z-[90] flex items-center justify-center bg-background p-6">
-        <div className="max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-xl">
-          <h2 className="text-lg font-semibold text-foreground">Thank you for visiting Heartify</h2>
+        <div className="max-w-md rounded-card border border-border bg-card p-6 text-center shadow-xl">
+          <h2 className="text-heading font-semibold text-foreground">Thank you for visiting Heartify</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             You need to be at least {MIN_AGE} years old to use this service.
             Please come back when you're old enough — jazakAllahu khayran.
           </p>
           <button
             onClick={resetGate}
-            className="mt-4 text-xs text-muted-foreground underline hover:text-foreground"
+            className="mt-4 text-micro text-muted-foreground underline hover:text-foreground"
           >
             Entered the wrong date? Try again.
           </button>
@@ -121,8 +121,8 @@ export default function AgeGate() {
       aria-label="Age verification"
       className="fixed inset-0 z-[85] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
     >
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
-        <h2 className="text-lg font-semibold text-foreground">Welcome to Heartify</h2>
+      <div className="w-full max-w-md rounded-card border border-border bg-card p-6 shadow-xl">
+        <h2 className="text-heading font-semibold text-foreground">Welcome to Heartify</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Please confirm your date of birth. Heartify is intended for users aged {MIN_AGE} and above.
         </p>
@@ -134,17 +134,17 @@ export default function AgeGate() {
           type="date"
           value={dob}
           onChange={(e) => { setDob(e.target.value); setError(null); }}
-          className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          className="mt-1 w-full rounded-card border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           max={new Date().toISOString().slice(0, 10)}
         />
         {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
         <button
           onClick={confirm}
-          className="mt-4 w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          className="mt-4 w-full rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
         >
           Continue
         </button>
-        <p className="mt-3 text-xs text-muted-foreground">
+        <p className="mt-3 text-micro text-muted-foreground">
           We store your confirmation in your browser only. We never share this date.
         </p>
       </div>

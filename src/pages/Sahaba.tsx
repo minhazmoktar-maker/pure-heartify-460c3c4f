@@ -88,7 +88,7 @@ const Sahaba = () => {
         <header className="mt-4 mb-6">
           <div className="flex items-center gap-3">
             <Users className="h-7 w-7 text-primary" />
-            <h1 className="text-3xl font-bold">Companions of the Prophet ﷺ</h1>
+            <h1 className="text-title font-bold">Companions of the Prophet ﷺ</h1>
           </div>
           <p className="mt-2 text-muted-foreground">
             The Sahaba are the generation that saw the Prophet ﷺ, believed in him, and died upon Islam. Their lives are living tafsir of the Qur'an.
@@ -127,8 +127,8 @@ const Sahaba = () => {
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <h2 className="text-xl font-semibold">{s.name}</h2>
-                    <span className="text-xl font-arabic" dir="rtl">{s.arabic}</span>
+                    <h2 className="text-heading font-semibold">{s.name}</h2>
+                    <span className="text-heading font-arabic" dir="rtl">{s.arabic}</span>
                   </div>
                   <div className="mt-1 flex flex-wrap gap-2">
                     <Badge variant="secondary">{s.title}</Badge>
@@ -138,8 +138,8 @@ const Sahaba = () => {
                 {read[s.id] && <Badge className="shrink-0">Read</Badge>}
               </div>
               <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.summary}</p>
-              <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">Lesson</div>
+              <div className="mt-3 rounded-card border border-primary/30 bg-primary/5 p-3">
+                <div className="text-micro font-semibold uppercase tracking-wide text-primary mb-1">Lesson</div>
                 <p className="text-sm">{s.lesson}</p>
               </div>
             </Card>

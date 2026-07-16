@@ -67,27 +67,27 @@ export default function PublicMiracle() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center justify-between text-micro uppercase tracking-widest text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-primary" /> Muʿjizāt · Miracle {idx + 1} of {MIRACLES.length}
               </span>
             </div>
-            <p dir="rtl" lang="ar" className="text-4xl md:text-5xl leading-loose text-primary text-right"
+            <p dir="rtl" lang="ar" className="text-display md:text-display leading-loose text-primary text-right"
                style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
               {m.name_ar}
             </p>
-            <h1 className="text-2xl md:text-3xl font-semibold leading-tight">{m.translit}</h1>
-            <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${CATEGORY_STYLE[m.category] ?? ""}`}>
+            <h1 className="text-title md:text-title font-semibold leading-tight">{m.translit}</h1>
+            <div className={`inline-flex items-center gap-1.5 rounded-pill border px-3 py-1 text-micro font-medium ${CATEGORY_STYLE[m.category] ?? ""}`}>
               <Tag className="h-3.5 w-3.5" /> {m.category}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-muted-foreground">
               <div className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> {m.place}</div>
               <div className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-primary" /> {m.source}</div>
             </div>
-            <p className="text-base md:text-lg leading-relaxed border-l-2 border-primary/40 pl-4">
+            <p className="text-base md:text-heading leading-relaxed border-l-2 border-primary/40 pl-4">
               {m.summary}
             </p>
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-micro text-muted-foreground italic">
               ṣallā-Llāhu ʿalayhi wa-sallam — may Allāh send peace and blessings upon him.
             </p>
           </CardContent>

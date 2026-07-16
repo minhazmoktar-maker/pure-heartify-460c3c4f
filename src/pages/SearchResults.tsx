@@ -97,11 +97,11 @@ const SearchResults = () => {
         </button>
 
         {query && blocked ? (
-          <div className="rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <div className="rounded-card border border-border bg-card p-6 text-center shadow-sm">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-pill bg-primary/10 text-primary">
               <Sparkles className="h-6 w-6" aria-hidden />
             </div>
-            <h1 className="text-lg font-bold text-foreground">
+            <h1 className="text-heading font-bold text-foreground">
               That search isn&apos;t available on Heartify
             </h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
@@ -113,7 +113,7 @@ const SearchResults = () => {
                 <Link
                   key={s}
                   to={`/search?q=${encodeURIComponent(s)}`}
-                  className="rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent transition-colors"
+                  className="rounded-pill border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent transition-colors"
                 >
                   {s}
                 </Link>
@@ -125,7 +125,7 @@ const SearchResults = () => {
             <div className="mb-4 flex items-center gap-3">
               <Search className="h-6 w-6 text-primary" />
               <div className="min-w-0">
-                <h1 className="truncate text-xl font-bold text-foreground">
+                <h1 className="truncate text-heading font-bold text-foreground">
                   Results for "{query}"
                 </h1>
                 <p className="text-sm text-muted-foreground">
@@ -135,7 +135,7 @@ const SearchResults = () => {
             </div>
 
             {smart.didYouMean && (
-              <div className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm">
+              <div className="mb-4 flex items-center gap-2 rounded-card border border-border bg-card px-3 py-2 text-sm">
                 <Sparkles className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">Did you mean</span>
                 <Link
@@ -152,7 +152,7 @@ const SearchResults = () => {
 
             {smartVideos.length > 0 ? (
               <>
-                <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+                <div className="mb-2 flex items-center justify-between text-micro text-muted-foreground">
                   <span>Smart-ranked matches ({smartVideos.length})</span>
                 </div>
                 <div className="mb-10 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -184,12 +184,12 @@ const SearchResults = () => {
         ) : (
           <>
             <div className="mb-6 flex items-start gap-3 sm:items-center">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-primary/10 text-primary">
                 <Search className="h-5 w-5" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg font-bold text-foreground sm:text-xl">Search Heartify</h1>
-                <p className="text-xs text-muted-foreground sm:text-sm">
+                <h1 className="text-heading font-bold text-foreground sm:text-heading">Search Heartify</h1>
+                <p className="text-micro text-muted-foreground sm:text-sm">
                   Typo-tolerant search across trusted creators, topics, and reminders
                 </p>
               </div>
@@ -205,7 +205,7 @@ const SearchResults = () => {
                 }
               }}
               placeholder="Try 'quraan', 'hubrman', 'ramadn'…"
-              className="mb-4 w-full rounded-xl border border-border bg-card px-4 py-3 text-base outline-none ring-primary/20 focus:ring-2"
+              className="mb-4 w-full rounded-card border border-border bg-card px-4 py-3 text-base outline-none ring-primary/20 focus:ring-2"
             />
 
             {liveInput.length >= 2 && smart.autocomplete.length > 0 && (
@@ -214,7 +214,7 @@ const SearchResults = () => {
                   <button
                     key={s}
                     onClick={() => navigate(`/search?q=${encodeURIComponent(s)}`)}
-                    className="rounded-full border border-border bg-card px-3 py-1.5 text-sm hover:bg-accent transition-colors"
+                    className="rounded-pill border border-border bg-card px-3 py-1.5 text-sm hover:bg-accent transition-colors"
                   >
                     {s}
                   </button>

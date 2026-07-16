@@ -64,8 +64,8 @@ export default function Transparency() {
               <Metric label="Appeals approved" value={approvedAppeals.toLocaleString()} />
             </div>
 
-            <h2 className="mt-10 text-lg font-semibold text-foreground">Decisions by month</h2>
-            <div className="mt-3 overflow-x-auto rounded-lg border border-border">
+            <h2 className="mt-10 text-heading font-semibold text-foreground">Decisions by month</h2>
+            <div className="mt-3 overflow-x-auto rounded-card border border-border">
               <table className="w-full text-sm">
                 <thead className="bg-muted text-left">
                   <tr>
@@ -94,8 +94,8 @@ export default function Transparency() {
               </table>
             </div>
 
-            <h2 className="mt-10 text-lg font-semibold text-foreground">Appeals</h2>
-            <div className="mt-3 overflow-x-auto rounded-lg border border-border">
+            <h2 className="mt-10 text-heading font-semibold text-foreground">Appeals</h2>
+            <div className="mt-3 overflow-x-auto rounded-card border border-border">
               <table className="w-full text-sm">
                 <thead className="bg-muted text-left">
                   <tr>
@@ -116,7 +116,7 @@ export default function Transparency() {
               </table>
             </div>
 
-            <p className="mt-8 text-xs text-muted-foreground">
+            <p className="mt-8 text-micro text-muted-foreground">
               Aggregated from real moderation and appeal records over the last 18 months. Personally identifying data is never included.
             </p>
           </>
@@ -128,9 +128,9 @@ export default function Transparency() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
+    <div className="rounded-card border border-border bg-card p-4">
+      <p className="text-micro text-muted-foreground">{label}</p>
+      <p className="mt-1 text-title font-semibold text-foreground">{value}</p>
     </div>
   );
 }
