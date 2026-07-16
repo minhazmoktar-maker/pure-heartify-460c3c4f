@@ -18,6 +18,12 @@ const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
 const SectionAll = () => {
   const { sectionId } = useParams<{ sectionId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const onRefresh = async () => {
+    await queryClient.invalidateQueries();
+    toast.success("Refreshed");
+  };
 
   // "Recently Added" is a synthetic section backed by the feed function's
   // `sort: "recent"` mode (newest moderation-approved videos, personalized).
