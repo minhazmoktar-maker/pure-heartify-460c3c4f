@@ -155,6 +155,9 @@ const Index = () => {
         <FeedDiversityProvider>
           <main className="mx-auto max-w-[1800px] px-4 py-2 md:px-6">
             <DiversityToggle />
+            <Suspense fallback={null}>
+              <RecentlyAddedRow />
+            </Suspense>
             {CURATED_SECTIONS.map((section) => (
               <CuratedSectionRow key={section.id} section={section} />
             ))}
