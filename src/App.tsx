@@ -269,8 +269,9 @@ const App = () => (
           <PlayerProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <SkipLink />
+            <OfflineBanner />
             <ScrollRestoration />
             <MobileBridge />
             <ReferralBridge />
