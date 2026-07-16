@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
-import { Video, Headphones, Sparkles, Shuffle } from "lucide-react";
+import { Video, Headphones, Sparkles, Shuffle, TrendingUp, Clock, Gem, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import HalalCategoryFilter from "@/components/HalalCategoryFilter";
@@ -22,6 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { FeedDiversityProvider, useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import type { FeedSort } from "@/hooks/useInfiniteFeed";
 import { cn } from "@/lib/utils";
 
 const DiversityToggle = () => {
