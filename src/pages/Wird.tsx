@@ -79,8 +79,9 @@ const Wird = () => {
   };
   const bump = (id: string, target: number) => {
     setCounts((c) => ({ ...c, [id]: Math.min(target, (c[id] || 0) + 1) }));
-    if (navigator.vibrate) navigator.vibrate(10);
+    haptic("light");
   };
+
   const resetRunning = () => running && setCounts(Object.fromEntries(running.items.map((i) => [i.id, 0])));
 
   const allDone = running && running.items.every((i) => (counts[i.id] || 0) >= i.target);
