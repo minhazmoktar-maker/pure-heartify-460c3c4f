@@ -4552,6 +4552,10 @@ export type Database = {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
       }
+      join_khatm_group: {
+        Args: { _group_id: string; _invite_code?: string }
+        Returns: undefined
+      }
       join_team_streak: {
         Args: { _code: string }
         Returns: {
