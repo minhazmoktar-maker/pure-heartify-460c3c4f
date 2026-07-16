@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import { runDedupedRefresh } from "@/lib/refreshMetrics";
 
 /**
  * Recently Added — newest videos approved into Heartify (moderation-passed).
