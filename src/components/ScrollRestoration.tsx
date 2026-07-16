@@ -33,7 +33,7 @@ function saveCache(cache: Record<string, number>) {
 }
 
 export default function ScrollRestoration() {
-  const { pathname, search } = useLocation();
+  const { pathname, search, hash } = useLocation();
   const navType = useNavigationType();
   const lastKey = useRef<string | null>(null);
 
