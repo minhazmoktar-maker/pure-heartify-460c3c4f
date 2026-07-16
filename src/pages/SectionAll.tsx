@@ -1,9 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, ShieldCheck, Sparkles } from "lucide-react";
 import { Suspense, lazy } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import PageSkeleton from "@/components/PageSkeleton";
+import PullToRefresh from "@/components/PullToRefresh";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { useCuratedSection } from "@/hooks/useCuratedSection";
 import { isTrustedChannel } from "@/data/trustedChannels";
@@ -15,6 +18,12 @@ const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
 const SectionAll = () => {
   const { sectionId } = useParams<{ sectionId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const onRefresh = async () => {
+    await queryClient.invalidateQueries();
+    toast.success("Refreshed");
+  };
 
   // "Recently Added" is a synthetic section backed by the feed function's
   // `sort: "recent"` mode (newest moderation-approved videos, personalized).
@@ -22,6 +31,7 @@ const SectionAll = () => {
   // caching, and the personalization/dismissal/blocked-creator pipeline.
   if (sectionId === "recently-added") {
     return (
+      <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
       <div className="min-h-dvh bg-background pb-12">
         <SEO
           title="Recently Added — Heartify"
@@ -50,7 +60,8 @@ const SectionAll = () => {
             <InfiniteVideoGrid sort="recent" limit={40} />
           </Suspense>
         </div>
-      </div>
+        </div>
+      </PullToRefresh>
     );
   }
 
@@ -87,6 +98,7 @@ const SectionAll = () => {
 
 
   return (
+    <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
     <div className="min-h-dvh bg-background pb-12">
       <SEO title="Browse Section — Heartify" description="Explore curated halal videos and audio across every section on Heartify." path="/section" />
       <Navbar />
@@ -134,6 +146,7 @@ const SectionAll = () => {
         )}
       </div>
     </div>
+    </PullToRefresh>
   );
 };
 
