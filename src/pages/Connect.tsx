@@ -33,7 +33,8 @@ export default function Connect() {
       <SEO
         title="Connect Heartify to ChatGPT or Claude"
         description="Paste the Heartify MCP server URL into ChatGPT or Claude to let your AI assistant use Heartify's tools."
-        canonicalPath="/connect"
+        path="/connect"
+        noBreadcrumbs
       />
       <div className="mx-auto max-w-2xl px-4 py-10 md:py-16">
         <Link
