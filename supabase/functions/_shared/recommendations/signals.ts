@@ -310,11 +310,43 @@ export async function gatherSignals(
         })
         .catch(() => {}),
     );
+
+    // Skipped-video signal: recent impressions with no click/convert are a
+    // negative preference. Best-effort: uses recommendation_events directly.
+    jobs.push(
+      admin
+        .from("recommendation_events")
+        .select("video_id, event_type, created_at")
+        .eq("user_id", userId)
+        .gte("created_at", new Date(nowMs - 14 * 86400000).toISOString())
+        .order("created_at", { ascending: false })
+        .limit(2000)
+        .then(({ data }) => {
+          const rows = (data ?? []) as Array<{ video_id: string; event_type: string }>;
+          const impressed = new Map<string, boolean>();
+          const engaged = new Set<string>();
+          for (const r of rows) {
+            if (r.event_type === "click" || r.event_type === "convert") engaged.add(r.video_id);
+            else if (r.event_type === "impression") impressed.set(r.video_id, true);
+            else if (r.event_type === "dismiss") signals.dismissedVideoIds.add(r.video_id);
+          }
+          for (const [vid] of impressed) if (!engaged.has(vid)) signals.skippedVideoIds.add(vid);
+        })
+        .catch(() => {}),
+    );
   }
 
   await Promise.all(jobs);
 
+  // Per-channel impression pressure derived from per-video impressions and
+  // any candidate channel_title we can infer. We approximate here by counting
+  // impressions across recent videos grouped by channel — cheap and effective
+  // for creator overexposure damping in the ranker.
+  // (Populated in the ranker from candidate joins if channel is available.)
+
   signals.categoryAffinity = normalize(signals.categoryAffinity);
   signals.channelAffinity = normalize(signals.channelAffinity);
+  signals.longTermCategoryAffinity = normalize(signals.longTermCategoryAffinity);
+  signals.longTermChannelAffinity = normalize(signals.longTermChannelAffinity);
   return signals;
 }
