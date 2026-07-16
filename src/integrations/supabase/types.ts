@@ -1026,6 +1026,45 @@ export type Database = {
         }
         Relationships: []
       }
+      dead_letter_queue: {
+        Row: {
+          attempts: number
+          created_at: string
+          error: string
+          id: string
+          job_type: string
+          next_retry_at: string | null
+          payload: Json
+          resolved_at: string | null
+          resolved_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error: string
+          id?: string
+          job_type: string
+          next_retry_at?: string | null
+          payload?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error?: string
+          id?: string
+          job_type?: string
+          next_retry_at?: string | null
+          payload?: Json
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       device_registrations: {
         Row: {
           app_version: string | null
@@ -1259,6 +1298,39 @@ export type Database = {
           stats?: Json
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      discovery_quota_allocations: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          notes: string | null
+          share_percent: number
+          source: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          notes?: string | null
+          share_percent: number
+          source: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          notes?: string | null
+          share_percent?: number
+          source?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -2416,6 +2488,30 @@ export type Database = {
           message?: string
           recipient_id?: string
           sender_id?: string
+        }
+        Relationships: []
+      }
+      ops_metrics: {
+        Row: {
+          id: number
+          metric: string
+          tags: Json
+          ts: string
+          value: number
+        }
+        Insert: {
+          id?: number
+          metric: string
+          tags?: Json
+          ts?: string
+          value: number
+        }
+        Update: {
+          id?: number
+          metric?: string
+          tags?: Json
+          ts?: string
+          value?: number
         }
         Relationships: []
       }
@@ -4511,6 +4607,7 @@ export type Database = {
           youtube_channel_id: string
         }[]
       }
+      check_ops_alerts: { Args: never; Returns: undefined }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       complete_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       compute_owner_key: { Args: { _name: string }; Returns: string }
@@ -4601,6 +4698,7 @@ export type Database = {
         }[]
       }
       get_internal_config: { Args: { _key: string }; Returns: string }
+      get_ops_dashboard: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
       get_public_dhikr_circle: {
         Args: { _circle_id: string }
@@ -4869,6 +4967,7 @@ export type Database = {
         Args: { _action: string; _bucket: string; _identity: string }
         Returns: number
       }
+      reap_stuck_discovery_jobs: { Args: never; Returns: number }
       recent_video_report_count: {
         Args: { _user_id: string; _window_minutes?: number }
         Returns: number
