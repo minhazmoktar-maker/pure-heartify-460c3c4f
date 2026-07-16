@@ -274,6 +274,7 @@ const App = () => (
             <CookieConsent />
             <CommandPalette />
             <BottomTabBar />
+            <EdgeSwipeBack />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
