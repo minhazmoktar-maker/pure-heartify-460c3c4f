@@ -1,84 +1,120 @@
 
-# Phase P1 — Ultimate Execution Plan
+# Confidence-Tiered Moderation Pipeline
 
-Phase P1 as written spans ~7 major workstreams that together represent 2–3 months of production engineering. Shipping it as one atomic change would either be shallow across everything or drop existing features by accident. To honor the "do not remove any existing features" and "no moderation bypasses" constraints, I will ship it as **5 sequential sub-phases**, each independently verifiable, each preserving all prior behavior.
+Goal: scale channel moderation from 1-by-1 review to a 4-tier confidence pipeline with batch actions, AI-generated evidence, cluster review, and active learning — while preserving every existing halal rule and never lowering the approval bar.
 
-Below is what each sub-phase delivers. I will start P1.1 immediately after you approve this plan, and return for a go-ahead between sub-phases so you can catch regressions early.
+## 1. Confidence tier model
 
----
+Extend `channel_candidates` with:
+- `tier CHAR(1)` — A/B/C/D
+- `tier_reason TEXT[]` — human-readable evidence bullets
+- `auto_action TEXT` — `auto_approved` | `queued_fast` | `queued_full` | `auto_rejected` | `quarantined`
+- `moderation_summary JSONB` — AI + rules blob (topics, presenter, music, dup, similar approved)
+- `risk_score INTEGER` (0–100, inverse of confidence + penalties)
+- `cluster_id UUID` — bulk grouping key
+- `learned_weight_version INTEGER` — active-learning generation used at scoring time
 
-## P1.1 — Creator Discovery Pipeline (Content Scale)
+Tier gating (server-computed, immutable client-side):
+```text
+A  98–100  auto_approve   (strict allow-list of trusted org signals + zero flags)
+B  90–97   fast_review    (~5-10s: summary card, 1-click approve/reject)
+C  70–89   full_review    (existing manual UI)
+D  <70     auto_reject / quarantine
+```
 
-Goal: continuously grow approved channels toward 50k+ without weakening moderation.
+Tier A requires ALL of: institution match (universities/gov/known scholar registry), zero exclusion hits, zero female-presenter signal, zero music signal, `duplicate_risk=low`, subs≥10k, channel age≥2y. Any single failure ⇒ demote to B.
 
-- New edge function `discover-channels` (scheduled via `pg_cron`) that walks the YouTube graph from every `approved_channels` row:
-  - Featured channels, subscriptions (where public), related-channel signals from top videos, collaborators surfaced in descriptions, playlist owners.
-- New table `channel_discovery_queue` (candidate URL/ID, source_channel_id, discovery_method, priority_score, halal_topic_hint, dedup key via `compute_owner_key`, status enum: `queued|processing|approved|rejected|duplicate|needs_owner_review`).
-- Discovery reuses the **existing** `verify-channel` pipeline verbatim — no shortcut path. Auto-approval remains impossible; every candidate lands in the owner review queue.
-- Priority scoring boosts the halal topic list you enumerated (Islamic, education, science, business, history, medicine, etc.) via keyword + language classifier.
-- Quota safety: token-bucket in `rate_limit_counters`, hard daily cap, graceful degrade when quota exhausted.
-- Admin UI (`/admin/discovery`) to review the queue with bulk approve/reject and one-click "run full moderation now".
+## 2. Trust registries (new tables)
 
-## P1.2 — Feed Ranking v2 (Content Variety)
+- `trusted_institutions` — regex/domain patterns for universities, ministries, waqf orgs (auto-Tier-A eligibility).
+- `verified_scholars` — hand-curated scholar identity list; matches on name/handle/YouTube ID.
+- `moderation_learned_signals` — active-learning weights per feature (topic, org, source, language).
+- `moderation_clusters` — bulk grouping (owner-key prefix, topic, language, org).
 
-Goal: no repetition, high diversity, every refresh feels fresh.
+All admin-only RLS + service_role, standard 4-step grant pattern.
 
-- Extend `hybridRules.ts` with:
-  - **Creator rotation window**: per-user 7-day exposure decay so recently-shown channels are down-weighted.
-  - **Long-tail booster**: inverse-frequency weight for creators under-served in the last 30 days.
-  - **Topic/age/language/region rotation**: soft caps per page (already partial for channel/category — extend to topic + language + upload-age bucket).
-  - **Anti-repeat memory**: persistent `recommendation_events` lookup (already exists) to hard-exclude any video shown in last 14 days for signed-in users.
-- New "Hidden Gems" section wired to `idx_curated_videos_hidden_gems` (added last turn).
-- "Fast growing creators" surface backed by channel-trust delta over 30 days.
+## 3. AI moderation summary
 
-## P1.3 — Reliability Audit & Fixes
+New edge function `moderate-channel-summary`:
+- Input: candidate row + YouTube snippet + latest 10 titles + thumbnails.
+- Uses Lovable AI (`google/gemini-3.5-flash` for cost; escalate to `openai/gpt-5.4` for Tier B/C ambiguous cases).
+- Structured output (Zod):
+  ```
+  { topics[], presenter_analysis, music_analysis, halal_flags[],
+    confidence_breakdown{...}, duplicate_notes, similar_approved_ids[],
+    recommend_tier, rationale }
+  ```
+- Writes to `channel_candidates.moderation_summary`.
+- Called automatically after `discover-channels` enqueue and on-demand from admin UI.
 
-Goal: nothing silently fails.
+## 4. Batch scoring & clustering
 
-- Automated sweep script (`scripts/reliability-audit.mjs`) that grep-scans for:
-  - `<button>` / `onClick` handlers that are empty, `TODO`, or reference undefined functions.
-  - Router `<Link>` targets not present in route table.
-  - `supabase.functions.invoke` calls whose function doesn't exist in `supabase/functions/`.
-  - Mutations without error toast/handler.
-- Playwright suite `tests/e2e/reliability.spec.ts` clicking every primary CTA on every route and asserting no console error + no unhandled promise rejection.
-- Fix every finding surfaced by the sweep (batched per-route in the sub-phase).
+New edge function `batch-classify-candidates`:
+- Runs over all `status=pending` in pages of 500.
+- For each: recompute tier from current rules + learned weights, call `moderate-channel-summary` if missing, assign `cluster_id` via:
+  - Same owner-key prefix (org family), OR
+  - Same (language, primary_topic, org_type) triple.
+- Auto-executes Tier A approvals and Tier D rejections; logs every action to `channel_audit_log` with `evidence` (fully reversible via existing pipeline).
 
-## P1.4 — Performance Pass
+## 5. Admin UI — `/admin/moderation`
 
-Goal: instant on mid-range Android.
+New page with 4 tabs (A/B/C/D) plus Clusters view.
 
-- React Query: raise `staleTime` on read-mostly queries, dedupe with `queryKey` audit, add `placeholderData: keepPreviousData` for paginated feeds.
-- Render: memoize `YouTubeVideoCard`, wrap `InfiniteVideoGrid` in `react-window` (virtualization) for lists > 60 items.
-- Bundle: route-level `lazy()` for `/admin/*`, `/mushaf`, `/shorts`, `/creator/*` (heavy, low-traffic).
-- Images: enforce `loading="lazy"`, `decoding="async"`, `sizes` attribute on all thumbnails; preconnect to `i.ytimg.com`.
-- DB: EXPLAIN top 10 slowest queries via `supabase--slow_queries`, add missing indexes.
-- Edge: increase in-process TTL cache hit ratio for anonymous feed (already scaffolded).
+- **Tier A tab**: audit log of auto-approvals, one-click revert.
+- **Tier B tab**: card list. Each card = channel + AI summary + 4 buttons (Approve / Reject / Escalate / Approve cluster).
+- **Tier C tab**: full existing review UI.
+- **Tier D tab**: quarantine list; requires 2-admin override to promote.
+- **Clusters tab**: grouped list; "Approve all similar" / "Reject all similar" acts on entire `cluster_id`.
+- **Bulk bar** (all tabs): multi-select + Approve 50–500 / Reject / Reassign tier.
 
-## P1.5 — Halal Intelligence Hardening
+Every action calls new edge function `bulk-moderate-candidates` (batches of ≤500, atomic per candidate, full audit).
 
-Goal: strictest platform in the world, without false positives.
+## 6. Active learning
 
-- Two-tier moderation: existing keyword+AI pipeline unchanged; add a **secondary re-review job** (`recheck-approved-channels` on daily `pg_cron`) that samples 1% of trusted-channel uploads for re-moderation and flags drift.
-- Channel trust score refinements: incorporate report_rate, appeal-loss rate, and moderation-override history.
-- Thumbnail moderation: forward thumbnail URL to existing vision-moderation path in `moderate-video` (already imports it — extend to also score thumbnails for new videos, not just titles).
-- Appeal workflow: ensure every rejected candidate from P1.1 can trigger an owner appeal review — reuse `appeals` table.
+- On every moderator decision (approve/reject/revert), insert into `moderation_learned_signals` deltas:
+  - +weight for features present on approvals, −weight on rejections.
+- Weekly cron `retrain-moderation-weights` recomputes normalized weights (bounded −0.25..+0.25) and bumps `learned_weight_version`.
+- Scorer blends baseline confidence with learned weights (learned weights can only **raise the bar**, never lower halal exclusions — hard-coded floor unchanged).
 
----
+## 7. Safeguards (unchanged and reinforced)
 
-## What ships in P1.1 (starting immediately on approval)
+- Halal exclusion keywords, duplicate check, female-presenter heuristic, music heuristic — all still hard-blocking regardless of tier or learned weights.
+- Learned weights cannot promote a candidate past a hard-block.
+- Every auto-approval reversible from Tier A log; reverting a Tier A also feeds negative signal into active learning.
+- Tier A eligibility list itself is admin-curated (no self-promotion possible from AI or heuristics).
 
-1. Migration: `channel_discovery_queue` table + indexes + RLS + GRANTs.
-2. Edge function: `discover-channels` (graph crawl, dedup, enqueue).
-3. Edge function extension: `verify-channel` invoked from the queue.
-4. Cron: `pg_cron` schedule every 6h with quota guard.
-5. Admin UI: `/admin/discovery` page with queue table, filters, bulk actions.
-6. Zero changes to existing moderation thresholds or auto-approval (there is no auto-approval).
+## 8. Technical scope
 
-## Guardrails held across every sub-phase
+New files:
+- `supabase/migrations/*` — schema + registries + RLS + grants.
+- `supabase/functions/moderate-channel-summary/index.ts`
+- `supabase/functions/batch-classify-candidates/index.ts`
+- `supabase/functions/bulk-moderate-candidates/index.ts`
+- `supabase/functions/retrain-moderation-weights/index.ts` (cron, weekly)
+- `src/pages/admin/Moderation.tsx` + tab components
+- `src/components/admin/ModerationSummaryCard.tsx`
+- `src/components/admin/ClusterList.tsx`
+- `src/hooks/useModerationQueue.ts`
+- `docs/PHASE_P1_2D.md` — pipeline spec + reversal procedure.
 
-- No feature removed, no route deleted, no moderation rule loosened.
-- Every new table has explicit `GRANT` + RLS from day one.
-- Every new edge function validates JWT + rate-limits + surfaces provider errors verbatim.
-- Kids Mode, Age Gate, blocklist, and trusted-channel gating remain authoritative.
+Reuse:
+- Existing `verify-channel` moderation gate (Tier A auto-approve still routes through it for the actual approval write).
+- Existing `channel_audit_log`, `check_channel_duplicate`, `compute_owner_key`.
+- Existing discovery cron — just triggers `batch-classify-candidates` at the end of each run.
 
-Approve to proceed with P1.1, or tell me to reorder or expand any sub-phase.
+Estimated review reduction (from your 25% baseline approval rate at ~800–1500 hits/day):
+- Tier A auto-approve ~10–15% of hits → 0 review time
+- Tier D auto-reject ~40–55% → 0 review time
+- Tier B fast (5–10s each) → ~25–35%
+- Tier C full review → ~5–10%
+Total manual time ≈ 10–20% of current, meeting the 80–95% reduction target with no rule weakening.
+
+## 9. Rollout
+
+1. Ship schema + registries (migration).
+2. Ship AI summary function + batch classifier (dry-run mode: writes tier/summary but does not auto-act).
+3. Ship admin UI; run in dry-run for 3–7 days to calibrate.
+4. Enable Tier A auto-approve + Tier D auto-reject.
+5. Enable active learning cron after ≥500 moderator decisions collected.
+
+Confirm and I'll implement in this order.
