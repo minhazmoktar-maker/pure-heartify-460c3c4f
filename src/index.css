@@ -193,6 +193,17 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top, 0px);
   }
+  /* Landscape / foldable safe-area for left & right insets. */
+  .px-safe-x {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .pl-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .pr-safe {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
 
   /* Minimum accessible tap target (WCAG 2.5.5 recommends ≥44×44 CSS px).
      Wraps icon-only buttons to hit the target without changing visual size. */

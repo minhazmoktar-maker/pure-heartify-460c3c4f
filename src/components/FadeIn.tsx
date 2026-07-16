@@ -33,7 +33,7 @@ export default function FadeIn<T extends ElementType = "div">({
 }: FadeInProps<T>) {
   const reduce = useReducedMotion();
   const Tag = (as ?? "div") as ElementType;
-  const MotionTag = motion(Tag as never) as never;
+  const MotionTag = motion.create(Tag as never) as never;
 
   if (reduce) {
     return (

@@ -242,9 +242,9 @@ const Watch = () => {
                       alt={currentVideo?.title ?? "Video thumbnail"}
                       width={1280}
                       height={720}
-                      fetchPriority="high"
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover"
+                      {...({ fetchpriority: "high" } as Record<string, string>)}
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />

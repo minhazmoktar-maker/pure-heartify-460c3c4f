@@ -47,7 +47,7 @@ export default function BottomTabBar() {
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 md:hidden",
         "border-t border-border/60 bg-card/95 backdrop-blur-xl",
-        "pb-safe",
+        "pb-safe px-safe-x",
       )}
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around">
