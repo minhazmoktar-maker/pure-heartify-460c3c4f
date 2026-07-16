@@ -76,9 +76,20 @@ const Sahaba = () => {
     <div className="min-h-dvh bg-background">
       <SEO
         title="Companions of the Prophet ﷺ — Heartify"
-        description="Learn from the lives of 20 leading Sahaba: bios, roles, and enduring lessons."
+        description="Learn from the lives of 20 leading Sahaba: biographies, roles in early Islam, and enduring lessons for today."
         path="/sahaba"
-        
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Companions of the Prophet ﷺ",
+          numberOfItems: SAHABA.length,
+          itemListElement: SAHABA.map((s, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: s.name,
+            description: s.summary,
+          })),
+        }}
       />
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
