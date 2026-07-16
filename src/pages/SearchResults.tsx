@@ -196,6 +196,10 @@ const SearchResults = () => {
               </div>
             </div>
 
+            <SearchTipCard />
+
+
+
             <input
               type="search"
               value={liveInput}
