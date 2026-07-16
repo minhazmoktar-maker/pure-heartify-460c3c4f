@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 const AudioSection = lazy(() => import("@/components/AudioSection"));
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
 const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
+const RecentlyAddedRow = lazy(() => import("@/components/RecentlyAddedRow"));
 
 const DiversityToggle = () => {
   const { showMoreChannels, toggleShowMoreChannels } = useFeedDiversity();
