@@ -235,7 +235,7 @@ const Navbar = () => {
           <UpgradeCTA compact className="hidden sm:inline-flex" />
           {user ? (
             <>
-              <div className="hidden md:block"><SuggestContentDialog /></div>
+              <SuggestContentDialog />
               <NotificationsBell isAdmin={isAdmin} />
               <button
                 onClick={signOut}
