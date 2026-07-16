@@ -27,6 +27,7 @@ import AgeGate from "./components/AgeGate";
 import CookieConsent from "./components/CookieConsent";
 import CommandPalette from "./components/CommandPalette";
 import BottomTabBar from "./components/BottomTabBar";
+import EdgeSwipeBack from "./components/EdgeSwipeBack";
 import ScrollRestoration from "./components/ScrollRestoration";
 import SkipLink from "./components/SkipLink";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
@@ -273,6 +274,7 @@ const App = () => (
             <CookieConsent />
             <CommandPalette />
             <BottomTabBar />
+            <EdgeSwipeBack />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
