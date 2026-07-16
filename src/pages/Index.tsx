@@ -48,8 +48,15 @@ const Index = () => {
   const { user } = useAuth();
   const [mainTab, setMainTab] = useState<MainTab>("curated");
   const [selectedCategory, setSelectedCategory] = useState<HalalCategory>("All");
+  const queryClient = useQueryClient();
+
+  const onRefresh = async () => {
+    await queryClient.invalidateQueries();
+    toast.success("Feed refreshed");
+  };
 
   return (
+    <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
     <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Heartify — Curated Halal Video & Audio App"
