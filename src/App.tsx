@@ -283,7 +283,7 @@ const App = () => (
             <BackToTop />
             <AgeGate />
             <CookieConsent />
-            <CommandPalette />
+            <Suspense fallback={null}><CommandPalette /></Suspense>
             <BottomTabBar />
             <EdgeSwipeBack />
             <KeyboardFocusScroller />
