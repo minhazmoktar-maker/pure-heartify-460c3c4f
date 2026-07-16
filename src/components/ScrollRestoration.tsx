@@ -33,7 +33,7 @@ function saveCache(cache: Record<string, number>) {
 }
 
 export default function ScrollRestoration() {
-  const { pathname, search } = useLocation();
+  const { pathname, search, hash } = useLocation();
   const navType = useNavigationType();
   const lastKey = useRef<string | null>(null);
 
@@ -59,7 +59,14 @@ export default function ScrollRestoration() {
     }
     lastKey.current = key;
 
-    if (navType === "POP") {
+    // If the URL has a #hash, defer to the browser / target element so
+    // deep links (Privacy TOC, /quotes#patience, etc.) land on the section.
+    if (hash) {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(decodeURIComponent(hash.slice(1)));
+        if (el) el.scrollIntoView({ block: "start" });
+      });
+    } else if (navType === "POP") {
       const cache = loadCache();
       const y = cache[key] ?? 0;
       // Wait a frame so the incoming page has laid out.
@@ -69,7 +76,7 @@ export default function ScrollRestoration() {
     }
     // REPLACE: intentionally no-op — preserves position when filters/query
     // params change on the same page.
-  }, [pathname, search, navType]);
+  }, [pathname, search, hash, navType]);
 
   // Also flush on tab hide so refreshes preserve position.
   useEffect(() => {
