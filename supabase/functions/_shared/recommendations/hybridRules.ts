@@ -131,12 +131,29 @@ function scoreCandidate(
   }
 
   score += push("trending", s.trendingIds.has(candidate.video_id) ? 1 : 0, W.trending,
-    "recent global engagement");
+    "recent global engagement (14d)");
+
+  // Native Heartify trending — clicks+converts inside the app in the last 72h.
+  score += push("heartify_trending", s.heartifyTrendingIds.has(candidate.video_id) ? 1 : 0,
+    W.heartifyTrend, "trending inside Heartify (72h)");
+
+  // Hidden Gem — high halal, low exposure. Promoted so famous creators can't monopolize.
+  score += push("hidden_gem", s.hiddenGemIds.has(candidate.video_id) ? 1 : 0,
+    W.hiddenGem, "high-quality creator with limited exposure");
 
   score += push("trusted_channel", candidate.is_trusted_channel ? 1 : 0, W.trusted);
   score += push("high_halal_score", (candidate.halal_score ?? 0) / 100, W.halal);
   score += push("ai_confidence", (candidate.moderation_confidence ?? 0) / 100, W.aiConfidence);
   score += push("freshness", freshnessScore(candidate.published_at), W.freshness);
+
+  // Anti-repeat cooldown: subtract per prior impression in last 24h.
+  const shownCount = s.recentImpressionCounts.get(candidate.video_id) ?? 0;
+  if (shownCount > 0) {
+    const penalty = W.repeatPenalty * Math.min(shownCount, 4);
+    reasons.push({ code: "recently_shown_penalty", weight: -penalty, detail: `shown ${shownCount}× in last 24h` });
+    components["recently_shown_penalty"] = shownCount;
+    score -= penalty;
+  }
 
   if (candidate.channel_title && s.sessionChannelIds.has(candidate.channel_title)) {
     score += push("session_continuity", 1, W.session, "continues current session");
