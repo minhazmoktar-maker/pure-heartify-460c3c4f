@@ -246,6 +246,15 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
     const scored: Recommendation[] = [];
     for (const c of candidates) {
       if (excludeWatched && signals.watchedVideoIds.has(c.video_id)) continue;
+      // Hard filter: "Not Interested" / user-hidden — never resurface.
+      if (signals.dismissedVideoIds.has(c.video_id)) continue;
+      // Hard filter: globally blocked creators.
+      if (c.channel_title && signals.blockedChannelPatterns.length) {
+        const ch = c.channel_title.toLowerCase();
+        if (signals.blockedChannelPatterns.some((p) => ch.includes(p))) continue;
+      }
+      // Anti-repeat hard cutoff: shown 4+ times in last 24h → drop entirely.
+      if ((signals.recentImpressionCounts.get(c.video_id) ?? 0) >= 4) continue;
       if (opts.categoryFilter && c.category !== opts.categoryFilter) continue;
       const { score, reasons, components } = scoreCandidate(c, signals);
       if (score <= 0) continue;
