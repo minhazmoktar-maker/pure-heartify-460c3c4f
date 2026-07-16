@@ -166,6 +166,7 @@ const Index = () => {
             <a href="/trust" className="hover:text-foreground underline">Trust &amp; Security</a>
             <a href="/status" className="hover:text-foreground underline">System Status</a>
             <a href="/about" className="hover:text-foreground underline">About</a>
+            <a href="/connect" className="hover:text-foreground underline">Connect to AI</a>
           </nav>
         </div>
       </footer>
