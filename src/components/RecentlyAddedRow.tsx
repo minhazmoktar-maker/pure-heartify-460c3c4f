@@ -144,7 +144,7 @@ const RecentlyAddedRow = () => {
                     action: {
                       label: "Retry",
                       onClick: () => {
-                        void runDedupedRefresh("recently-added-row", () => refetch({ throwOnError: true }));
+                        void runDedupedRefresh("recently-added-row", async () => { await refetch({ throwOnError: true }); });
                       },
                     },
                   });
