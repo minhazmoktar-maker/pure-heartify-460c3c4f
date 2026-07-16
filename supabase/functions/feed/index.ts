@@ -190,10 +190,15 @@ Deno.serve(async (req) => {
     // of the previous ±3-position jitter that made every viewer's feed
     // nearly identical. Anonymous users still get a per-device seeded
     // shuffle so distinct devices don't converge on one page order.
-    if (sort === "fresh" && !search) {
+    // Personalization runs for both "fresh" and "recent" sorts. "recent" is the
+    // "Recently Added" surface — we keep newest-approved-first as the anchor
+    // but still honor blocked creators, dismissals, hidden videos, and give a
+    // mild affinity boost so the ordering is personal rather than identical
+    // across users.
+    if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
       const weekBucket = Math.floor(Date.now() / (7 * 86400000));
-      const seedStr = `${identity}:${weekBucket}:${category ?? "all"}`;
+      const seedStr = `${identity}:${weekBucket}:${category ?? "all"}:${sort}`;
       // FNV-1a hash → deterministic [0,1)
       const hash01 = (s: string): number => {
         let h = 2166136261 >>> 0;
@@ -202,6 +207,7 @@ Deno.serve(async (req) => {
       };
 
       if (callerId) {
+
         // Signed-in: gather signals (best-effort, timeboxed) and apply a
         // compact re-ranker on top of the freshness-sorted page.
         //
@@ -215,9 +221,23 @@ Deno.serve(async (req) => {
             new Promise<null>((resolve) => setTimeout(() => resolve(null), 900)),
           ]);
           if (signals) {
+            // Blocked-creator hard filter (applies globally + per user_blocks).
+            const blockedPatterns = signals.blockedChannelPatterns ?? [];
+            const preFiltered = blockedPatterns.length
+              ? ordered.filter((v) => {
+                  const ch = ((v.channel_title as string) ?? "").toLowerCase();
+                  return !blockedPatterns.some((p) => ch.includes(p));
+                })
+              : ordered;
+
+            // In "recent" mode, freshness must dominate — dampen affinity
+            // weights to ~40% so the chronological anchor still wins.
+            const aff = sort === "recent" ? 0.4 : 1.0;
+            const freshAnchor = sort === "recent" ? 1.6 : 1.0;
+
             // Precompute base freshness index → score so ties break stably.
-            const N = ordered.length;
-            const scored = ordered.map((v, i) => {
+            const N = preFiltered.length;
+            const scored = preFiltered.map((v, i) => {
               const ch = (v.channel_title as string | null) ?? "";
               const cat = (v.category as string | null) ?? "";
               const vid = (v.video_id as string) ?? "";
@@ -240,13 +260,13 @@ Deno.serve(async (req) => {
               // Per-user weight perturbation on affinity signals only.
               const p = (k: string) => 0.75 + hash01(`${identity}:w:${k}`) * 0.5;
               const score =
-                baseFresh * 1.0 +                      // freshness anchor
-                chAff * 0.55 * p("ch") +
-                catAff * 0.45 * p("cat") +
-                longCh * 0.25 * p("longCh") +
-                longCat * 0.20 * p("longCat") +
-                interestMatch * 0.30 * p("int") +
-                novelty * 0.20 * p("nov") -
+                baseFresh * freshAnchor +              // freshness anchor
+                chAff * 0.55 * aff * p("ch") +
+                catAff * 0.45 * aff * p("cat") +
+                longCh * 0.25 * aff * p("longCh") +
+                longCat * 0.20 * aff * p("longCat") +
+                interestMatch * 0.30 * aff * p("int") +
+                novelty * 0.20 * aff * p("nov") -
                 Math.min(shownCount, 4) * 0.12 -
                 skipped * 0.25 -
                 dismissed * 5.0;                       // effectively drops it
@@ -259,6 +279,7 @@ Deno.serve(async (req) => {
               .sort((a, b) => a.k - b.k)
               .map((x) => x.v);
           }
+
         } catch (e) {
           console.warn("[feed] personalization skipped:", (e as Error).message);
         }

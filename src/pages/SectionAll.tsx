@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck, Sparkles } from "lucide-react";
+import { Suspense, lazy } from "react";
 import Navbar from "@/components/Navbar";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import PageSkeleton from "@/components/PageSkeleton";
@@ -9,9 +10,49 @@ import { isTrustedChannel } from "@/data/trustedChannels";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
 
+const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
+
 const SectionAll = () => {
   const { sectionId } = useParams<{ sectionId: string }>();
   const navigate = useNavigate();
+
+  // "Recently Added" is a synthetic section backed by the feed function's
+  // `sort: "recent"` mode (newest moderation-approved videos, personalized).
+  // Rendered via InfiniteVideoGrid so it supports true infinite scroll,
+  // caching, and the personalization/dismissal/blocked-creator pipeline.
+  if (sectionId === "recently-added") {
+    return (
+      <div className="min-h-dvh bg-background pb-12">
+        <SEO
+          title="Recently Added — Heartify"
+          description="The newest videos we've approved onto Heartify — personalized for you, always halal-first."
+          path="/section/recently-added"
+        />
+        <Navbar />
+        <div className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">
+          <button
+            onClick={() => navigate("/")}
+            className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to For You
+          </button>
+          <div className="mb-6">
+            <h1 className="text-title font-bold text-foreground">
+              <Sparkles className="mr-1 inline h-5 w-5 text-primary" />
+              Recently Added
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              The newest videos we've approved onto Heartify — personalized for you.
+            </p>
+          </div>
+          <Suspense fallback={<PageSkeleton variant="grid" className="max-w-none px-0" />}>
+            <InfiniteVideoGrid sort="recent" limit={40} />
+          </Suspense>
+        </div>
+      </div>
+    );
+  }
 
   const section = CURATED_SECTIONS.find((s) => s.id === sectionId);
 
@@ -43,6 +84,7 @@ const SectionAll = () => {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-dvh bg-background pb-12">
