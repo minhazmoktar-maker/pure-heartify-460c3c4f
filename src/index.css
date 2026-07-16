@@ -176,6 +176,18 @@
     @apply inline-flex items-center justify-center min-h-[44px] min-w-[44px];
   }
 
+  /* Deep-link anchors: keep target below sticky header. */
+  :where(h1, h2, h3, h4, [id]) {
+    scroll-margin-top: 5rem;
+  }
+
+  /* Mobile-first typography scale-down for headline classes. */
+  @media (max-width: 640px) {
+    .text-hero    { font-size: clamp(2rem, 8vw, 2.75rem); line-height: 1.1; }
+    .text-display { font-size: clamp(1.75rem, 7vw, 2.25rem); line-height: 1.15; }
+    .text-h1      { font-size: clamp(1.5rem, 6vw, 1.875rem); line-height: 1.2; }
+  }
+
   /* Long-form typographic rhythm — apply to any article/prose wrapper
      (About, Quran surah body, Hadith translations, Seerah chapters).
      Establishes a modular scale, comfortable measure, and consistent spacing. */

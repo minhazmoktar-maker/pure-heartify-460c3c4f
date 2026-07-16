@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuFilter, setMenuFilter] = useState("");
   const [unseenChangelog, setUnseenChangelog] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -27,6 +28,7 @@ const Navbar = () => {
   const { enabled: kidsOn, toggle: toggleKids } = useKidsMode();
 
   useEffect(() => { setUnseenChangelog(hasUnseenChangelog()); }, []);
+  useEffect(() => { if (!menuOpen) setMenuFilter(""); }, [menuOpen]);
 
 
   const handleSearch = (e: React.FormEvent) => {
@@ -64,67 +66,92 @@ const Navbar = () => {
                 <Menu className="h-5 w-5 text-foreground" />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 flex flex-col p-0">
-              <SheetHeader className="px-6 pt-6 pb-2 shrink-0"><SheetTitle>Menu</SheetTitle></SheetHeader>
+            <SheetContent side="left" className="w-[85vw] max-w-sm sm:w-80 flex flex-col p-0">
+              <SheetHeader className="px-6 pt-6 pb-3 shrink-0 space-y-3">
+                <SheetTitle>Menu</SheetTitle>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+                  <input
+                    type="search"
+                    inputMode="search"
+                    enterKeyHint="search"
+                    autoComplete="off"
+                    value={menuFilter}
+                    onChange={(e) => setMenuFilter(e.target.value)}
+                    placeholder="Filter menu..."
+                    aria-label="Filter menu"
+                    className="h-10 w-full rounded-pill border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                  />
+                </div>
+              </SheetHeader>
               <nav className="flex-1 overflow-y-auto overscroll-contain px-6 pb-6 flex flex-col gap-1">
-                {[
-                  { to: "/", label: "Home", icon: Home },
-                  { to: "/today", label: "Today (Daily Dose)", icon: Sunrise },
-                  { to: "/prayer", label: "Prayer & Qibla", icon: Compass },
-                  { to: "/quran", label: "Quran reader", icon: BookOpen },
-                  { to: "/khatm", label: "Khatm tracker", icon: BookMarked },
-                  { to: "/bookmarks", label: "Bookmarks", icon: BookMarked },
-                  { to: "/dhikr", label: "Dhikr & Tasbih", icon: CircleDot },
-                  { to: "/adhkar", label: "Adhkar & Duas", icon: Sunrise },
-                  { to: "/zakat", label: "Zakat calculator", icon: Calculator },
-                  { to: "/hijri", label: "Hijri calendar", icon: CalendarDays },
-                  { to: "/names", label: "99 Names of Allah", icon: Sparkles },
-                  { to: "/mosques", label: "Mosque finder", icon: MapPin },
-                  { to: "/hadith", label: "Hadith library", icon: BookText },
-                  { to: "/seerah", label: "Seerah timeline", icon: Milestone },
-                  { to: "/learn", label: "Learning paths", icon: GraduationCap },
-                  { to: "/wird", label: "Wird builder", icon: CircleDot },
-                  { to: "/sadaqah", label: "Sadaqah tracker", icon: HandCoins },
-                  { to: "/wasiyyah", label: "Wasiyyah (will)", icon: Scroll },
-                  { to: "/ramadan", label: "Ramadan planner", icon: Moon },
-                  { to: "/salah", label: "Salah tracker", icon: ListChecks },
-                  { to: "/fasting", label: "Fasting tracker", icon: MoonStar },
-                  { to: "/achievements", label: "Achievements", icon: Award },
-                  { to: "/challenges", label: "Daily challenges", icon: Target },
-                  { to: "/reminders", label: "Habit reminders", icon: Bell },
-                  { to: "/recap", label: "Weekly recap", icon: LineChart },
-                  { to: "/journal", label: "Journal (Niyyah)", icon: BookMarked },
-                  { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
-                  { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
-                  { to: "/profile?tab=history", label: "Watch history", icon: Clock },
-                  { to: "/profile?tab=streak", label: "Daily dose & streak", icon: Flame },
-                  { to: "/profile?tab=interests", label: "My interests", icon: ListMusic },
-                  { to: "/offline", label: "Offline downloads", icon: Download },
-                  { to: "/profile", label: "Profile & settings", icon: Settings },
-                  { to: "/changelog", label: unseenChangelog ? "What's new •" : "What's new", icon: Sparkles },
-                ].map(({ to, label, icon: Icon }) => (
-                  <SheetClose asChild key={to}>
-                    <Link to={to} className="flex items-center gap-3 rounded-card px-3 py-2 text-sm hover:bg-secondary">
-                      <Icon className="h-4 w-4 text-muted-foreground" />
-                      {label}
-                    </Link>
-                  </SheetClose>
-                ))}
-                {isAdmin && (
+                {(() => {
+                  const q = menuFilter.trim().toLowerCase();
+                  const items = [
+                    { to: "/", label: "Home", icon: Home },
+                    { to: "/today", label: "Today (Daily Dose)", icon: Sunrise },
+                    { to: "/prayer", label: "Prayer & Qibla", icon: Compass },
+                    { to: "/quran", label: "Quran reader", icon: BookOpen },
+                    { to: "/khatm", label: "Khatm tracker", icon: BookMarked },
+                    { to: "/bookmarks", label: "Bookmarks", icon: BookMarked },
+                    { to: "/dhikr", label: "Dhikr & Tasbih", icon: CircleDot },
+                    { to: "/adhkar", label: "Adhkar & Duas", icon: Sunrise },
+                    { to: "/zakat", label: "Zakat calculator", icon: Calculator },
+                    { to: "/hijri", label: "Hijri calendar", icon: CalendarDays },
+                    { to: "/names", label: "99 Names of Allah", icon: Sparkles },
+                    { to: "/mosques", label: "Mosque finder", icon: MapPin },
+                    { to: "/hadith", label: "Hadith library", icon: BookText },
+                    { to: "/seerah", label: "Seerah timeline", icon: Milestone },
+                    { to: "/learn", label: "Learning paths", icon: GraduationCap },
+                    { to: "/wird", label: "Wird builder", icon: CircleDot },
+                    { to: "/sadaqah", label: "Sadaqah tracker", icon: HandCoins },
+                    { to: "/wasiyyah", label: "Wasiyyah (will)", icon: Scroll },
+                    { to: "/ramadan", label: "Ramadan planner", icon: Moon },
+                    { to: "/salah", label: "Salah tracker", icon: ListChecks },
+                    { to: "/fasting", label: "Fasting tracker", icon: MoonStar },
+                    { to: "/achievements", label: "Achievements", icon: Award },
+                    { to: "/challenges", label: "Daily challenges", icon: Target },
+                    { to: "/reminders", label: "Habit reminders", icon: Bell },
+                    { to: "/recap", label: "Weekly recap", icon: LineChart },
+                    { to: "/journal", label: "Journal (Niyyah)", icon: BookMarked },
+                    { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
+                    { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
+                    { to: "/profile?tab=history", label: "Watch history", icon: Clock },
+                    { to: "/profile?tab=streak", label: "Daily dose & streak", icon: Flame },
+                    { to: "/profile?tab=interests", label: "My interests", icon: ListMusic },
+                    { to: "/offline", label: "Offline downloads", icon: Download },
+                    { to: "/profile", label: "Profile & settings", icon: Settings },
+                    { to: "/changelog", label: unseenChangelog ? "What's new •" : "What's new", icon: Sparkles },
+                  ];
+                  const filtered = q ? items.filter((i) => i.label.toLowerCase().includes(q)) : items;
+                  if (filtered.length === 0) {
+                    return (
+                      <p className="px-3 py-6 text-center text-sm text-muted-foreground">No matches for "{menuFilter}"</p>
+                    );
+                  }
+                  return filtered.map(({ to, label, icon: Icon }) => (
+                    <SheetClose asChild key={to}>
+                      <Link to={to} className="flex min-h-11 items-center gap-3 rounded-card px-3 py-2 text-sm hover:bg-secondary">
+                        <Icon className="h-4 w-4 text-muted-foreground" />
+                        {label}
+                      </Link>
+                    </SheetClose>
+                  ));
+                })()}
+                {isAdmin && !menuFilter && (
                   <>
                     <div className="mt-4 mb-1 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Admin</div>
                     {[
                       ...(isOwner ? [{ to: "/admin/users", label: "Users, roles & entitlements", icon: Crown }] : []),
                       { to: "/admin/moderation", label: "Moderation" },
                       { to: "/admin/viral", label: "Viral & flags" },
-
                       { to: "/admin/console", label: "Admin console" },
                       { to: "/admin/audit", label: "Audit log" },
                     ].map((l) => {
                       const Icon = "icon" in l && l.icon ? l.icon : ShieldAlert;
                       return (
                         <SheetClose asChild key={l.to}>
-                          <Link to={l.to} className="flex items-center gap-3 rounded-card px-3 py-2 text-sm hover:bg-secondary">
+                          <Link to={l.to} className="flex min-h-11 items-center gap-3 rounded-card px-3 py-2 text-sm hover:bg-secondary">
                             <Icon className="h-4 w-4 text-primary" />
                             {l.label}
                           </Link>
@@ -133,7 +160,6 @@ const Navbar = () => {
                     })}
                   </>
                 )}
-
               </nav>
             </SheetContent>
           </Sheet>
@@ -147,14 +173,18 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Center — Search */}
-        <div className="flex max-w-xl flex-1 items-center">
+        {/* Center — Search (desktop/tablet) */}
+        <div className="hidden max-w-xl flex-1 items-center md:flex">
           <form onSubmit={handleSearch} className="relative flex w-full">
             <input
-              type="text"
+              type="search"
+              inputMode="search"
+              enterKeyHint="search"
+              autoComplete="off"
               placeholder="Search halal content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search halal content"
               className="h-10 w-full rounded-l-full border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
             />
             <button type="submit" aria-label="Search" className="flex h-10 items-center justify-center rounded-r-full border border-l-0 border-border bg-secondary px-5 hover:bg-muted transition-colors">
@@ -163,8 +193,19 @@ const Navbar = () => {
           </form>
         </div>
 
+        {/* Spacer on mobile so right cluster hugs the edge */}
+        <div className="flex-1 md:hidden" aria-hidden />
+
         {/* Right */}
         <div className="flex items-center gap-1">
+          <Link
+            to="/search"
+            aria-label="Search"
+            title="Search"
+            className="tap-target rounded-pill hover:bg-secondary transition-colors md:hidden"
+          >
+            <Search className="h-5 w-5 text-foreground" />
+          </Link>
           <Link
             to="/channels"
             className="hidden items-center gap-1.5 rounded-pill px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary md:flex"
@@ -186,7 +227,7 @@ const Navbar = () => {
           <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="tap-target rounded-pill hover:bg-secondary transition-colors"
+            className="tap-target rounded-pill hover:bg-secondary transition-colors hidden sm:inline-flex"
             title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
           >
             {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
@@ -199,7 +240,7 @@ const Navbar = () => {
               <button
                 onClick={signOut}
                 aria-label="Sign out"
-                className="tap-target rounded-pill hover:bg-secondary transition-colors"
+                className="tap-target rounded-pill hover:bg-secondary transition-colors hidden sm:inline-flex"
                 title="Sign out"
               >
                 <LogOut className="h-5 w-5 text-foreground" />
