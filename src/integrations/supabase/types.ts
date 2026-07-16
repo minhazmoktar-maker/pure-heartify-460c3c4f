@@ -449,12 +449,17 @@ export type Database = {
           country: string | null
           created_at: string
           description: string | null
+          discovery_method: string | null
           duplicate_risk: string | null
           evidence: Json
+          halal_topic_hint: string | null
           handle: string | null
           id: string
           language: string | null
+          last_verified_at: string | null
+          priority_score: number
           source: string
+          source_channel_id: string | null
           status: string
           submitted_by: string | null
           subscriber_count: number | null
@@ -468,12 +473,17 @@ export type Database = {
           country?: string | null
           created_at?: string
           description?: string | null
+          discovery_method?: string | null
           duplicate_risk?: string | null
           evidence?: Json
+          halal_topic_hint?: string | null
           handle?: string | null
           id?: string
           language?: string | null
+          last_verified_at?: string | null
+          priority_score?: number
           source?: string
+          source_channel_id?: string | null
           status?: string
           submitted_by?: string | null
           subscriber_count?: number | null
@@ -487,12 +497,17 @@ export type Database = {
           country?: string | null
           created_at?: string
           description?: string | null
+          discovery_method?: string | null
           duplicate_risk?: string | null
           evidence?: Json
+          halal_topic_hint?: string | null
           handle?: string | null
           id?: string
           language?: string | null
+          last_verified_at?: string | null
+          priority_score?: number
           source?: string
+          source_channel_id?: string | null
           status?: string
           submitted_by?: string | null
           subscriber_count?: number | null
@@ -1169,6 +1184,30 @@ export type Database = {
           target?: number | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      discovery_quota_ledger: {
+        Row: {
+          api_name: string
+          day: string
+          id: string
+          units_used: number
+          updated_at: string
+        }
+        Insert: {
+          api_name: string
+          day: string
+          id?: string
+          units_used?: number
+          updated_at?: string
+        }
+        Update: {
+          api_name?: string
+          day?: string
+          id?: string
+          units_used?: number
+          updated_at?: string
         }
         Relationships: []
       }

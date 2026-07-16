@@ -55,6 +55,7 @@ const AdminConsole = lazy(() => import("./pages/AdminConsole.tsx"));
 const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
 const AdminModeration = lazy(() => import("./pages/AdminModeration.tsx"));
 const AdminSLA = lazy(() => import("./pages/AdminSLA.tsx"));
+const AdminDiscovery = lazy(() => import("./pages/AdminDiscovery.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
@@ -472,6 +473,7 @@ const App = () => (
                 <Route path="/admin" element={<Navigate to="/admin/console" replace />} />
                 <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
                 <Route path="/admin/sla" element={<AdminRoute><AdminSLA /></AdminRoute>} />
+                <Route path="/admin/discovery" element={<AdminRoute><AdminDiscovery /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
 
                 <Route path="/admin/moderation-log" element={<Navigate to="/admin/moderation" replace />} />
