@@ -6,6 +6,7 @@ import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import SearchSuggestions from "@/components/SearchSuggestions";
+import SearchTipCard from "@/components/SearchTipCard";
 import ReciterResults from "@/components/ReciterResults";
 import EmptyState from "@/components/EmptyState";
 import { addRecentSearch } from "@/lib/recentSearches";
