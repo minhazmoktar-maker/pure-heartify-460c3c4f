@@ -33,7 +33,13 @@ async function fetchComments(videoId: string, userId: string | undefined): Promi
 
   const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
   const [{ data: profs }, { data: blocks }, { data: myLikes }] = await Promise.all([
-    supabase.from("profiles").select("user_id,display_name,handle,avatar_url").in("user_id", userIds),
+    // RLS restricts profiles to auth.uid() = user_id, so anonymous callers get
+    // a 401 (no anon SELECT grant) and authed users only ever see their own
+    // row here. Skip the join for anon; authed users still resolve their own
+    // name, others fall back to the generic label.
+    userId
+      ? supabase.from("profiles").select("user_id,display_name,handle,avatar_url").in("user_id", userIds)
+      : Promise.resolve({ data: [] as Array<{ user_id: string; display_name: string | null; handle: string | null; avatar_url: string | null }> }),
     userId
       ? supabase.from("user_blocks").select("blocked_user_id").eq("blocker_id", userId)
       : Promise.resolve({ data: [] as { blocked_user_id: string }[] }),
