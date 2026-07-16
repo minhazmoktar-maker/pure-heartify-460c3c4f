@@ -549,3 +549,10 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Mobile parity: on touch devices without hover, reveal hover-gated affordances
+   (delete buttons on Playlists/Journal, compact "not interested" menu on cards, etc.)
+   so mobile users can access the same actions as desktop users. */
+@media (hover: none) and (pointer: coarse) {
+  .group-hover\:opacity-100 { opacity: 1 !important; }
+}
+
