@@ -276,6 +276,7 @@ const App = () => (
             <CommandPalette />
             <BottomTabBar />
             <EdgeSwipeBack />
+            <KeyboardFocusScroller />
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
