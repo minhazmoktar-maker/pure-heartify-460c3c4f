@@ -9,12 +9,15 @@ interface FeedPage {
   total: number;
 }
 
+export type FeedSort = "fresh" | "trending" | "recent";
+
 interface UseFeedOptions {
   category?: HalalCategory;
   sectionId?: string;
   search?: string;
   limit?: number;
   enabled?: boolean;
+  sort?: FeedSort;
 }
 
 async function fetchFeedPage(opts: {
