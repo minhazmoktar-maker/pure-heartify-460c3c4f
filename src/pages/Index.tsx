@@ -14,6 +14,7 @@ import StreakCard from "@/components/StreakCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import StreakAtRiskBanner from "@/components/StreakAtRiskBanner";
 import RamadanBanner from "@/components/RamadanBanner";
+import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
