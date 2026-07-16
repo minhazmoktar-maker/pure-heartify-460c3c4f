@@ -40,9 +40,15 @@ export default function GroupKhatmJoin() {
         setState("idle");
         return;
       }
-      await supabase
-        .from("khatm_group_members")
-        .upsert({ group_id: g.id, user_id: user.id, role: "member" });
+      const { error: joinErr } = await supabase.rpc("join_khatm_group", {
+        _group_id: g.id,
+        _invite_code: code,
+      });
+      if (joinErr) {
+        toast.error(joinErr.message);
+        setState("notfound");
+        return;
+      }
       await supabase.from("khatm_events").insert({
         group_id: g.id,
         user_id: user.id,
