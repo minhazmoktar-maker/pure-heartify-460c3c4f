@@ -232,22 +232,44 @@ function searchFallbackVideos(query: string, maxResults: number): YouTubeVideo[]
   return pool.slice(0, maxResults);
 }
 
+const inflight = new Map<string, Promise<YouTubeProxyResponse>>();
+let rateLimitedUntil = 0;
+
 async function callYouTubeProxy(query: string, maxResults: number): Promise<YouTubeProxyResponse> {
-  const { data, error } = await supabase.functions.invoke("youtube-proxy", {
-    body: { query, maxResults },
-  });
-
-  if (error) {
-    const context = (error as { context?: Response }).context;
-    if (context) {
-      const body = await context.text().catch(() => "");
-      throw new Error(body || error.message || "YouTube proxy error");
-    }
-    throw new Error(error.message || "YouTube proxy error");
+  if (Date.now() < rateLimitedUntil) {
+    return { degraded: true, code: "RATE_LIMITED" };
   }
+  const key = `${query.toLowerCase()}::${maxResults}`;
+  const existing = inflight.get(key);
+  if (existing) return existing;
 
-  return (data ?? {}) as YouTubeProxyResponse;
+  const p = (async (): Promise<YouTubeProxyResponse> => {
+    const { data, error } = await supabase.functions.invoke("youtube-proxy", {
+      body: { query, maxResults },
+    });
+
+    if (error) {
+      const context = (error as { context?: Response }).context;
+      let bodyText = "";
+      if (context) bodyText = await context.text().catch(() => "");
+      if (context?.status === 429 || /RATE_LIMITED/i.test(bodyText)) {
+        rateLimitedUntil = Date.now() + 60_000;
+        return { degraded: true, code: "RATE_LIMITED" };
+      }
+      throw new Error(bodyText || error.message || "YouTube proxy error");
+    }
+
+    return (data ?? {}) as YouTubeProxyResponse;
+  })();
+
+  inflight.set(key, p);
+  try {
+    return await p;
+  } finally {
+    inflight.delete(key);
+  }
 }
+
 
 export async function fetchHalalVideos(query?: string, maxResults = 20): Promise<YouTubeVideo[]> {
   const q = query || SEARCH_QUERIES[Math.floor(Math.random() * SEARCH_QUERIES.length)];
