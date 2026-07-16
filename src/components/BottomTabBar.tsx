@@ -60,8 +60,9 @@ export default function BottomTabBar() {
                 to={spine.path}
                 aria-current={isActive ? "page" : undefined}
                 aria-label={spine.label}
+                onClick={() => { if (!isActive) soundTap(); }}
                 className={cn(
-                  "flex min-h-[56px] flex-col items-center justify-center gap-0.5 px-ds-xs py-ds-sm text-micro font-medium",
+                  "flex min-h-[56px] flex-col items-center justify-center gap-0.5 px-ds-xs py-ds-sm text-micro font-medium pressable",
                   "transition-colors duration-micro ease-standard",
                   isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
                 )}
