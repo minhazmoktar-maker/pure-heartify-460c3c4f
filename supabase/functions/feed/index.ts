@@ -185,18 +185,21 @@ Deno.serve(async (req) => {
 
     // Personalization: deterministic per-user shuffle within same-ranked
     // buckets so each viewer sees a distinct ordering while ranking stays stable.
-    if (callerId && sort === "fresh" && !search) {
-      const seedStr = `${callerId}:${cursor ?? "0"}:${category ?? "all"}`;
+    // Salt rotates daily so the same user gets a fresh ordering each day.
+    // Anonymous users get a session-level rotation via the IP-derived identity
+    // hash so different anon devices don't all see identical Browse pages.
+    if (sort === "fresh" && !search) {
+      const seedStr = `${callerId ?? getClientIdentity(req, null)}:${Math.floor(Date.now() / 86400000)}:${category ?? "all"}`;
       let seed = 0;
       for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
       const rand = () => {
         seed = (seed * 1664525 + 1013904223) >>> 0;
         return seed / 0xffffffff;
       };
-      // Small jitter (±0.5 position) — enough to reshuffle ties without
-      // breaking the recency ordering.
+      // Larger jitter (±3 positions) so distinct users/devices see visibly
+      // different orderings while overall recency ranking is preserved.
       ordered = ordered
-        .map((v, i) => ({ v, k: i + (rand() - 0.5) }))
+        .map((v, i) => ({ v, k: i + (rand() - 0.5) * 6 }))
         .sort((a, b) => a.k - b.k)
         .map((x) => x.v);
     }

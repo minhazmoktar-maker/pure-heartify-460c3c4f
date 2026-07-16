@@ -244,10 +244,26 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
   ): Promise<Recommendation[]> {
     const excludeWatched = opts.excludeWatched ?? true;
     const scored: Recommendation[] = [];
-    // Per-user deterministic jitter (~±4%) so users with very similar
-    // signals still get meaningfully different feed orderings. Preserves
-    // halal-first ranking because jitter is small vs core score weights.
-    const salt = signals.userId ?? "anon";
+
+    // Adaptive per-user jitter. Cold-start users (empty history + no
+    // interests) all collapse onto the same trending/hidden-gem pool, so a
+    // tiny ±4% jitter is not enough to differentiate their feeds. We scale
+    // the jitter magnitude by an inverse-signal-strength factor and rotate
+    // the salt daily so the same user's ordering evolves over time. Ranking
+    // remains halal-first — even the maximum jitter (±18%) cannot overturn
+    // a trusted+high-halal candidate against an untrusted low-halal one.
+    const signalStrength = Math.min(
+      1,
+      (signals.interests.length * 0.06) +
+      (signals.favoriteVideoIds.size * 0.08) +
+      (signals.watchedVideoIds.size * 0.02) +
+      (signals.categoryAffinity.size * 0.05) +
+      (signals.channelAffinity.size * 0.04),
+    );
+    // 0.18 for cold-start users → 0.05 for fully-signalled users.
+    const jitterAmp = 0.05 + (1 - signalStrength) * 0.13;
+    const daySalt = Math.floor(Date.now() / 86400000).toString(36);
+    const salt = `${signals.userId ?? "anon"}:${daySalt}`;
     const jitter = (videoId: string): number => {
       let h = 2166136261 >>> 0;
       const s = `${salt}:${videoId}`;
@@ -255,9 +271,9 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
         h ^= s.charCodeAt(i);
         h = Math.imul(h, 16777619);
       }
-      // Map to [-0.04, +0.04)
-      return ((h >>> 0) / 0xffffffff - 0.5) * 0.08;
+      return ((h >>> 0) / 0xffffffff - 0.5) * 2 * jitterAmp;
     };
+
     for (const c of candidates) {
       if (excludeWatched && signals.watchedVideoIds.has(c.video_id)) continue;
       // Hard filter: "Not Interested" / user-hidden — never resurface.
