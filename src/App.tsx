@@ -35,6 +35,7 @@ const Shorts = lazy(() => import("./pages/Shorts.tsx"));
 const Mushaf = lazy(() => import("./pages/Mushaf.tsx"));
 const Redeem = lazy(() => import("./pages/Redeem.tsx"));
 const Changelog = lazy(() => import("./pages/Changelog.tsx"));
+const OmarSuleimanRamadanSeries = lazy(() => import("./pages/OmarSuleimanRamadanSeries.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
@@ -293,6 +294,7 @@ const App = () => (
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
+                <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/account/export-data" element={<ExportData />} />
