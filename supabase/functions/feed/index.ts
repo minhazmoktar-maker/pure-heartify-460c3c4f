@@ -62,6 +62,11 @@ Deno.serve(async (req) => {
     const sectionId = body?.section_id as string | undefined;
     const cursor = body?.cursor as string | undefined; // ISO timestamp of last item's ingested_at
     const limit = Math.min(Math.max(body?.limit ?? 20, 1), 100);
+    // Sort mode: 'fresh' (default) | 'trending' (view_count desc) | 'recent' (ingested_at desc)
+    const sort = (["fresh", "trending", "recent"] as const).includes(body?.sort as any)
+      ? (body.sort as "fresh" | "trending" | "recent") : "fresh";
+    // Max videos per channel per page — creator diversity guard.
+    const maxPerChannel = Math.min(Math.max(Number(body?.max_per_channel ?? 3), 1), 10);
     // Locale-aware filtering: soft filter to caller's content languages.
     // Sanitized to 2-3 char ISO codes to prevent injection.
     const rawLangs = Array.isArray(body?.content_languages) ? body.content_languages : [];
@@ -80,8 +85,13 @@ Deno.serve(async (req) => {
     // NOTE: we intentionally overfetch a bit so post-fetch JS blocklist filter
     // can drop matches without leaving the page short of `limit`.
     // Overfetch more when locale-boosting so we can re-rank without starving pages.
-    const fetchLimit = Math.min(limit * (contentLanguages.length ? 3 : 2), 300);
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=published_at.desc.nullslast,halal_score.desc,ingested_at.desc&limit=${fetchLimit}`;
+    const fetchLimit = Math.min(limit * (contentLanguages.length ? 5 : 4), 400);
+    const orderClause = sort === "trending"
+      ? "view_count.desc.nullslast,published_at.desc.nullslast,halal_score.desc"
+      : sort === "recent"
+      ? "ingested_at.desc,published_at.desc.nullslast,halal_score.desc"
+      : "published_at.desc.nullslast,halal_score.desc,ingested_at.desc";
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=${orderClause}&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
@@ -124,7 +134,7 @@ Deno.serve(async (req) => {
     const cacheable = !callerId && !search;
     const langKey = contentLanguages.length ? contentLanguages.join(",") : "-";
     const cacheKey = cacheable
-      ? `feed:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${langKey}`
+      ? `feed:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}`
       : "";
 
     const produce = async () => {
@@ -173,7 +183,38 @@ Deno.serve(async (req) => {
       ordered = [...matches, ...untagged, ...others];
     }
 
-    const items = ordered.slice(0, limit);
+    // Personalization: deterministic per-user shuffle within same-ranked
+    // buckets so each viewer sees a distinct ordering while ranking stays stable.
+    if (callerId && sort === "fresh" && !search) {
+      const seedStr = `${callerId}:${cursor ?? "0"}:${category ?? "all"}`;
+      let seed = 0;
+      for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
+      const rand = () => {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        return seed / 0xffffffff;
+      };
+      // Small jitter (±0.5 position) — enough to reshuffle ties without
+      // breaking the recency ordering.
+      ordered = ordered
+        .map((v, i) => ({ v, k: i + (rand() - 0.5) }))
+        .sort((a, b) => a.k - b.k)
+        .map((x) => x.v);
+    }
+
+    // Creator diversity: cap items per channel per page so no single creator
+    // dominates. Overflow items are pushed to the tail to keep pagination full.
+    const perChannel = new Map<string, number>();
+    const primary: Array<Record<string, unknown>> = [];
+    const overflow: Array<Record<string, unknown>> = [];
+    for (const v of ordered) {
+      const ch = (v.channel_title as string) ?? "__";
+      const n = perChannel.get(ch) ?? 0;
+      if (n < maxPerChannel) { primary.push(v); perChannel.set(ch, n + 1); }
+      else overflow.push(v);
+    }
+    const diversified = [...primary, ...overflow];
+
+    const items = diversified.slice(0, limit);
     const nextCursor = items.length === limit
       ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
       : null;
