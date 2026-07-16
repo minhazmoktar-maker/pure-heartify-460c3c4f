@@ -72,6 +72,8 @@ const Index = () => {
 
       <NextSalahWidget />
       <RamadanBanner />
+      <FirstSessionCard />
+
 
       {user && (
         <div className="mx-auto max-w-[1800px] space-y-3 px-4 pt-2 md:px-6">
