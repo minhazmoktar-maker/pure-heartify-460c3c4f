@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
-import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
+import { useInfiniteFeed, type FeedSort } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { HalalCategory } from "@/services/youtube";
 
@@ -10,6 +10,7 @@ interface Props {
   sectionId?: string;
   search?: string;
   limit?: number;
+  sort?: FeedSort;
   fallbackMessage?: string;
 }
 
@@ -18,6 +19,7 @@ const InfiniteVideoGrid = ({
   sectionId,
   search,
   limit = 20,
+  sort = "fresh",
   fallbackMessage = "No halal-compliant content found.",
 }: Props) => {
   const {
@@ -27,7 +29,7 @@ const InfiniteVideoGrid = ({
     hasNextPage,
     fetchNextPage,
     error,
-  } = useInfiniteFeed({ category, sectionId, search, limit });
+  } = useInfiniteFeed({ category, sectionId, search, limit, sort });
 
   const sentinelRef = useInfiniteScroll(
     () => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); },
