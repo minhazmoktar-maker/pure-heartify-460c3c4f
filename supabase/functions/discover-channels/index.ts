@@ -664,6 +664,11 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
         daily_quota_cap: DAILY_QUOTA_CAP,
       },
     });
+    await admin.from('ops_metrics').insert([
+      { metric: 'discovery.job.duration_ms', value: Date.now() - started, tags: { job: jobId, status: cancelled ? 'cancelled' : (overDeadline() ? 'timed_out' : 'succeeded') } },
+      { metric: 'discovery.job.enqueued', value: totalEnqueued, tags: { job: jobId } },
+      { metric: 'discovery.job.api_failures', value: ctx.apiFailures, tags: { job: jobId } },
+    ]);
   } catch (err) {
     console.error('discovery job failed', err);
     await updateJob(admin, jobId, {
@@ -676,6 +681,14 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
       seeds_processed: seedsProcessed,
       api_failures: ctx.apiFailures,
       stats: { by_source: bySource, duration_ms: Date.now() - started },
+    });
+    await admin.from('dead_letter_queue').insert({
+      job_type: 'discovery_job',
+      payload: { job_id: jobId, seedsProcessed, enqueued: totalEnqueued, quota_used: ctx.usedThisRun },
+      error: String(err instanceof Error ? err.message : err).slice(0, 500),
+    });
+    await admin.from('ops_metrics').insert({
+      metric: 'discovery.job.failed', value: 1, tags: { job: jobId },
     });
   }
 }
