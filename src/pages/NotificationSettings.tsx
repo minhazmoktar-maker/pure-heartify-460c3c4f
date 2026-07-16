@@ -148,11 +148,21 @@ export default function NotificationSettings() {
       />
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8 md:py-12">
-        <header className="mb-6">
-          <h1 className="text-title font-bold">Notifications</h1>
-          <p className="mt-1 text-muted-foreground">
-            Pick exactly what you want, exactly where you want it.
-          </p>
+        <header className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-title font-bold">Notifications</h1>
+            <p className="mt-1 text-muted-foreground">
+              Pick exactly what you want, exactly where you want it.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={restoreDefaults}
+            aria-label="Restore recommended notification defaults"
+          >
+            Recommended defaults
+          </Button>
         </header>
 
         {/* Browser push status */}
