@@ -31,15 +31,21 @@ export interface UserSignals {
   recentVideoIds: string[];                  // last 20, order preserved
   favoriteVideoIds: Set<string>;             // liked/starred
   doseVideoIds: Set<string>;                 // Daily Dose completions
-  categoryAffinity: Map<string, number>;     // normalized 0..1
-  channelAffinity: Map<string, number>;      // normalized 0..1
+  categoryAffinity: Map<string, number>;     // normalized 0..1 (short-term, 14d halflife)
+  channelAffinity: Map<string, number>;      // normalized 0..1 (short-term, 14d halflife)
+  longTermCategoryAffinity: Map<string, number>; // normalized 0..1 (180d halflife, stable taste)
+  longTermChannelAffinity: Map<string, number>;  // normalized 0..1 (180d halflife, stable taste)
   sessionChannelIds: Set<string>;            // channels seen in last hour
+  sessionCategoryIds: Set<string>;           // categories seen in last hour
+  seenChannelIds: Set<string>;               // every channel the user has ever watched (novelty base)
   trendingIds: Set<string>;                  // legacy trending pool (clicks+converts, 14d)
   heartifyTrendingIds: Set<string>;          // native Heartify trending (72h, weighted)
   hiddenGemIds: Set<string>;                 // high-halal, low-exposure promotion pool
   dismissedVideoIds: Set<string>;            // "Not Interested" / hidden by user
+  skippedVideoIds: Set<string>;              // recently skipped (impression w/o click)
   blockedChannelPatterns: string[];          // lowercased substrings from blocked_creators
   recentImpressionCounts: Map<string, number>; // per-video impressions in last 24h
+  recentChannelImpressionCounts: Map<string, number>; // per-channel impressions in last 24h
   contentLanguages: string[];                // preferred content languages
   diversityLevel: number;                    // 0..100, higher = more out-of-language content
   context: RecommendationContext;            // time-of-day / Ramadan / weekday
@@ -79,11 +85,17 @@ export interface RecommendationReason {
     | "cold_start_popular"
     | "diversity_boost"
     | "recently_shown_penalty"
+    | "recently_skipped_penalty"
+    | "channel_overexposure_penalty"
     | "language_match"
-    | "context_boost";
+    | "context_boost"
+    | "novelty_new_channel"
+    | "long_term_taste"
+    | "exploration_epsilon";
   weight: number;
   detail?: string;
 }
+
 
 export interface RecommendOptions {
   limit?: number;

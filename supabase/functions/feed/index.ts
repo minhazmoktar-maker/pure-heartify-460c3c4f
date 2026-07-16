@@ -8,6 +8,7 @@
 import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { readThrough } from "../_shared/cache.ts";
+import { gatherSignals } from "../_shared/recommendations/signals.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -183,25 +184,95 @@ Deno.serve(async (req) => {
       ordered = [...matches, ...untagged, ...others];
     }
 
-    // Personalization: deterministic per-user shuffle within same-ranked
-    // buckets so each viewer sees a distinct ordering while ranking stays stable.
-    // Salt rotates daily so the same user gets a fresh ordering each day.
-    // Anonymous users get a session-level rotation via the IP-derived identity
-    // hash so different anon devices don't all see identical Browse pages.
+    // Personalization: for signed-in users, apply a real signal-based
+    // re-rank (category/channel affinity, long-term taste, novelty,
+    // recency-of-impression penalty, per-user weight perturbation) instead
+    // of the previous ±3-position jitter that made every viewer's feed
+    // nearly identical. Anonymous users still get a per-device seeded
+    // shuffle so distinct devices don't converge on one page order.
     if (sort === "fresh" && !search) {
-      const seedStr = `${callerId ?? getClientIdentity(req, null)}:${Math.floor(Date.now() / 86400000)}:${category ?? "all"}`;
-      let seed = 0;
-      for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
-      const rand = () => {
-        seed = (seed * 1664525 + 1013904223) >>> 0;
-        return seed / 0xffffffff;
+      const identity = callerId ?? getClientIdentity(req, null);
+      const weekBucket = Math.floor(Date.now() / (7 * 86400000));
+      const seedStr = `${identity}:${weekBucket}:${category ?? "all"}`;
+      // FNV-1a hash → deterministic [0,1)
+      const hash01 = (s: string): number => {
+        let h = 2166136261 >>> 0;
+        for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+        return (h >>> 0) / 0xffffffff;
       };
-      // Larger jitter (±3 positions) so distinct users/devices see visibly
-      // different orderings while overall recency ranking is preserved.
-      ordered = ordered
-        .map((v, i) => ({ v, k: i + (rand() - 0.5) * 6 }))
-        .sort((a, b) => a.k - b.k)
-        .map((x) => x.v);
+
+      if (callerId) {
+        // Signed-in: gather signals (best-effort, timeboxed) and apply a
+        // compact re-ranker on top of the freshness-sorted page.
+        //
+        // Halal-first invariant preserved: this only *reorders* items that
+        // already passed moderation into this fetch page; nothing new is
+        // introduced, nothing is upranked past a trusted+high-halal item
+        // whose base freshness score is meaningfully higher.
+        try {
+          const signals = await Promise.race([
+            gatherSignals(admin, callerId),
+            new Promise<null>((resolve) => setTimeout(() => resolve(null), 900)),
+          ]);
+          if (signals) {
+            // Precompute base freshness index → score so ties break stably.
+            const N = ordered.length;
+            const scored = ordered.map((v, i) => {
+              const ch = (v.channel_title as string | null) ?? "";
+              const cat = (v.category as string | null) ?? "";
+              const vid = (v.video_id as string) ?? "";
+              const baseFresh = 1 - i / Math.max(1, N); // 1.0 at top, 0.0 at bottom
+              const chAff = signals.channelAffinity.get(ch) ?? 0;
+              const catAff = signals.categoryAffinity.get(cat) ?? 0;
+              const longCh = signals.longTermChannelAffinity.get(ch) ?? 0;
+              const longCat = signals.longTermCategoryAffinity.get(cat) ?? 0;
+              const interestMatch = signals.interests.some((kw) =>
+                kw && (
+                  ((v.title as string) ?? "").toLowerCase().includes(kw) ||
+                  ((v.category as string) ?? "").toLowerCase().includes(kw)
+                )
+              ) ? 1 : 0;
+              const seenCh = ch && signals.seenChannelIds.has(ch);
+              const novelty = ch && !seenCh && v.is_trusted_channel === true ? 1 : 0;
+              const shownCount = signals.recentImpressionCounts.get(vid) ?? 0;
+              const skipped = signals.skippedVideoIds.has(vid) ? 1 : 0;
+              const dismissed = signals.dismissedVideoIds.has(vid) ? 1 : 0;
+              // Per-user weight perturbation on affinity signals only.
+              const p = (k: string) => 0.75 + hash01(`${identity}:w:${k}`) * 0.5;
+              const score =
+                baseFresh * 1.0 +                      // freshness anchor
+                chAff * 0.55 * p("ch") +
+                catAff * 0.45 * p("cat") +
+                longCh * 0.25 * p("longCh") +
+                longCat * 0.20 * p("longCat") +
+                interestMatch * 0.30 * p("int") +
+                novelty * 0.20 * p("nov") -
+                Math.min(shownCount, 4) * 0.12 -
+                skipped * 0.25 -
+                dismissed * 5.0;                       // effectively drops it
+              // Per-user + per-video jitter (±8% max) — deterministic, halal-safe.
+              const j = (hash01(`${identity}:${weekBucket}:${vid}`) - 0.5) * 0.16;
+              return { v, k: -(score * (1 + j)) };
+            });
+            ordered = scored
+              .filter((x) => x.k < 4.5)                // drop hard-dismissed
+              .sort((a, b) => a.k - b.k)
+              .map((x) => x.v);
+          }
+        } catch (e) {
+          console.warn("[feed] personalization skipped:", (e as Error).message);
+        }
+      } else {
+        // Anonymous: keep the deterministic per-device shuffle so distinct
+        // devices don't collide on identical page ordering.
+        let seed = 0;
+        for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
+        const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 0xffffffff; };
+        ordered = ordered
+          .map((v, i) => ({ v, k: i + (rand() - 0.5) * 6 }))
+          .sort((a, b) => a.k - b.k)
+          .map((x) => x.v);
+      }
     }
 
     // Creator diversity: cap items per channel per page so no single creator

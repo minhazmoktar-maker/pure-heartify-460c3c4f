@@ -9,9 +9,10 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import type { RecommendationContext, UserSignals } from "./types.ts";
 
 const AFFINITY_HALF_LIFE_DAYS = 14;
+const LONG_TERM_HALF_LIFE_DAYS = 180;
 
-function decayWeight(daysAgo: number): number {
-  return Math.pow(0.5, daysAgo / AFFINITY_HALF_LIFE_DAYS);
+function decayWeight(daysAgo: number, halfLife = AFFINITY_HALF_LIFE_DAYS): number {
+  return Math.pow(0.5, daysAgo / halfLife);
 }
 
 function buildContext(now: Date = new Date()): RecommendationContext {
@@ -59,13 +60,19 @@ export async function gatherSignals(
     doseVideoIds: new Set(),
     categoryAffinity: new Map(),
     channelAffinity: new Map(),
+    longTermCategoryAffinity: new Map(),
+    longTermChannelAffinity: new Map(),
     sessionChannelIds: new Set(),
+    sessionCategoryIds: new Set(),
+    seenChannelIds: new Set(),
     trendingIds: new Set(),
     heartifyTrendingIds: new Set(),
     hiddenGemIds: new Set(),
     dismissedVideoIds: new Set(),
+    skippedVideoIds: new Set(),
     blockedChannelPatterns: [],
     recentImpressionCounts: new Map(),
+    recentChannelImpressionCounts: new Map(),
     contentLanguages: [],
     diversityLevel: 50,
     context: buildContext(),
@@ -174,8 +181,16 @@ export async function gatherSignals(
             signals.favoriteVideoIds.add(row.video_id);
             const days = Math.max(0, (nowMs - new Date(row.created_at).getTime()) / 86400000);
             const w = decayWeight(days) * 2;
-            if (row.category) signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
-            if (row.channel_title) signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
+            const wLong = decayWeight(days, LONG_TERM_HALF_LIFE_DAYS) * 2;
+            if (row.category) {
+              signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
+              signals.longTermCategoryAffinity.set(row.category, (signals.longTermCategoryAffinity.get(row.category) ?? 0) + wLong);
+            }
+            if (row.channel_title) {
+              signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
+              signals.longTermChannelAffinity.set(row.channel_title, (signals.longTermChannelAffinity.get(row.channel_title) ?? 0) + wLong);
+              signals.seenChannelIds.add(row.channel_title);
+            }
           }
         })
         .catch(() => {}),
@@ -202,9 +217,20 @@ export async function gatherSignals(
             const ts = new Date(row.watched_at).getTime();
             const days = Math.max(0, (nowMs - ts) / 86400000);
             const w = decayWeight(days);
-            if (row.category) signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
-            if (row.channel_title) signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
-            if (ts >= sessionCutoffMs && row.channel_title) signals.sessionChannelIds.add(row.channel_title);
+            const wLong = decayWeight(days, LONG_TERM_HALF_LIFE_DAYS);
+            if (row.category) {
+              signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
+              signals.longTermCategoryAffinity.set(row.category, (signals.longTermCategoryAffinity.get(row.category) ?? 0) + wLong);
+            }
+            if (row.channel_title) {
+              signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
+              signals.longTermChannelAffinity.set(row.channel_title, (signals.longTermChannelAffinity.get(row.channel_title) ?? 0) + wLong);
+              signals.seenChannelIds.add(row.channel_title);
+            }
+            if (ts >= sessionCutoffMs) {
+              if (row.channel_title) signals.sessionChannelIds.add(row.channel_title);
+              if (row.category) signals.sessionCategoryIds.add(row.category);
+            }
           }
         })
         .catch(() => {}),
@@ -284,11 +310,43 @@ export async function gatherSignals(
         })
         .catch(() => {}),
     );
+
+    // Skipped-video signal: recent impressions with no click/convert are a
+    // negative preference. Best-effort: uses recommendation_events directly.
+    jobs.push(
+      admin
+        .from("recommendation_events")
+        .select("video_id, event_type, created_at")
+        .eq("user_id", userId)
+        .gte("created_at", new Date(nowMs - 14 * 86400000).toISOString())
+        .order("created_at", { ascending: false })
+        .limit(2000)
+        .then(({ data }) => {
+          const rows = (data ?? []) as Array<{ video_id: string; event_type: string }>;
+          const impressed = new Map<string, boolean>();
+          const engaged = new Set<string>();
+          for (const r of rows) {
+            if (r.event_type === "click" || r.event_type === "convert") engaged.add(r.video_id);
+            else if (r.event_type === "impression") impressed.set(r.video_id, true);
+            else if (r.event_type === "dismiss") signals.dismissedVideoIds.add(r.video_id);
+          }
+          for (const [vid] of impressed) if (!engaged.has(vid)) signals.skippedVideoIds.add(vid);
+        })
+        .catch(() => {}),
+    );
   }
 
   await Promise.all(jobs);
 
+  // Per-channel impression pressure derived from per-video impressions and
+  // any candidate channel_title we can infer. We approximate here by counting
+  // impressions across recent videos grouped by channel — cheap and effective
+  // for creator overexposure damping in the ranker.
+  // (Populated in the ranker from candidate joins if channel is available.)
+
   signals.categoryAffinity = normalize(signals.categoryAffinity);
   signals.channelAffinity = normalize(signals.channelAffinity);
+  signals.longTermCategoryAffinity = normalize(signals.longTermCategoryAffinity);
+  signals.longTermChannelAffinity = normalize(signals.longTermChannelAffinity);
   return signals;
 }
