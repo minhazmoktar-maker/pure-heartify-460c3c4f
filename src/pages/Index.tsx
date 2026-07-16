@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
-import { Video, Headphones, Sparkles, Shuffle, TrendingUp, Clock, Gem, Zap } from "lucide-react";
+import { Video, Headphones, Sparkles, Shuffle, TrendingUp, Clock, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import HalalCategoryFilter from "@/components/HalalCategoryFilter";
