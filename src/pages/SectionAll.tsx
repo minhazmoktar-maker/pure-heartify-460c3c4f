@@ -1,9 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, ShieldCheck, Sparkles } from "lucide-react";
 import { Suspense, lazy } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import PageSkeleton from "@/components/PageSkeleton";
+import PullToRefresh from "@/components/PullToRefresh";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { useCuratedSection } from "@/hooks/useCuratedSection";
 import { isTrustedChannel } from "@/data/trustedChannels";
