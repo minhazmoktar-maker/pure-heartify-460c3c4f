@@ -446,17 +446,22 @@ export type Database = {
         Row: {
           category: string | null
           confidence: number | null
+          confidence_breakdown: Json
           country: string | null
+          crawl_depth: number
           created_at: string
           description: string | null
           discovery_method: string | null
           duplicate_risk: string | null
+          educational_quality: number | null
           evidence: Json
           halal_topic_hint: string | null
           handle: string | null
           id: string
           language: string | null
+          language_detected: string | null
           last_verified_at: string | null
+          organization_type: string | null
           priority_score: number
           source: string
           source_channel_id: string | null
@@ -470,17 +475,22 @@ export type Database = {
         Insert: {
           category?: string | null
           confidence?: number | null
+          confidence_breakdown?: Json
           country?: string | null
+          crawl_depth?: number
           created_at?: string
           description?: string | null
           discovery_method?: string | null
           duplicate_risk?: string | null
+          educational_quality?: number | null
           evidence?: Json
           halal_topic_hint?: string | null
           handle?: string | null
           id?: string
           language?: string | null
+          language_detected?: string | null
           last_verified_at?: string | null
+          organization_type?: string | null
           priority_score?: number
           source?: string
           source_channel_id?: string | null
@@ -494,17 +504,22 @@ export type Database = {
         Update: {
           category?: string | null
           confidence?: number | null
+          confidence_breakdown?: Json
           country?: string | null
+          crawl_depth?: number
           created_at?: string
           description?: string | null
           discovery_method?: string | null
           duplicate_risk?: string | null
+          educational_quality?: number | null
           evidence?: Json
           halal_topic_hint?: string | null
           handle?: string | null
           id?: string
           language?: string | null
+          language_detected?: string | null
           last_verified_at?: string | null
+          organization_type?: string | null
           priority_score?: number
           source?: string
           source_channel_id?: string | null
@@ -1207,6 +1222,87 @@ export type Database = {
           day?: string
           id?: string
           units_used?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      discovery_seeds: {
+        Row: {
+          attempts: number
+          created_at: string
+          depth: number
+          exhausted: boolean
+          id: string
+          last_error: string | null
+          last_processed_at: string | null
+          metadata: Json
+          method: string
+          next_page_token: string | null
+          seed_channel_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          depth?: number
+          exhausted?: boolean
+          id?: string
+          last_error?: string | null
+          last_processed_at?: string | null
+          metadata?: Json
+          method: string
+          next_page_token?: string | null
+          seed_channel_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          depth?: number
+          exhausted?: boolean
+          id?: string
+          last_error?: string | null
+          last_processed_at?: string | null
+          metadata?: Json
+          method?: string
+          next_page_token?: string | null
+          seed_channel_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      discovery_topic_queries: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          language: string
+          last_run_at: string | null
+          priority: number
+          query: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          language: string
+          last_run_at?: string | null
+          priority?: number
+          query: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          language?: string
+          last_run_at?: string | null
+          priority?: number
+          query?: string
+          topic?: string
           updated_at?: string
         }
         Relationships: []
