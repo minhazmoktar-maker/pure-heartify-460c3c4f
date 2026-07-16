@@ -475,6 +475,7 @@ const App = () => (
                 <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
                 <Route path="/admin/sla" element={<AdminRoute><AdminSLA /></AdminRoute>} />
                 <Route path="/admin/discovery" element={<AdminRoute><AdminDiscovery /></AdminRoute>} />
+                <Route path="/admin/ops" element={<AdminRoute><AdminOps /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
 
                 <Route path="/admin/moderation-log" element={<Navigate to="/admin/moderation" replace />} />
