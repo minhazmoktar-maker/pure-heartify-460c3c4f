@@ -102,6 +102,12 @@ export default defineConfig(({ mode }) => ({
             "@radix-ui/react-tabs",
           ],
           "icons-vendor": ["lucide-react"],
+          // Perf: hoist heavy libs into cache-stable vendor chunks so a page
+          // that imports recharts/framer/date-fns doesn't drag a copy into its
+          // route chunk and so returning visitors keep them across releases.
+          "charts-vendor": ["recharts"],
+          "motion-vendor": ["framer-motion"],
+          "date-vendor": ["date-fns"],
         },
       },
     },
