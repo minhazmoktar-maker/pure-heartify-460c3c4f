@@ -244,6 +244,20 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
   ): Promise<Recommendation[]> {
     const excludeWatched = opts.excludeWatched ?? true;
     const scored: Recommendation[] = [];
+    // Per-user deterministic jitter (~±4%) so users with very similar
+    // signals still get meaningfully different feed orderings. Preserves
+    // halal-first ranking because jitter is small vs core score weights.
+    const salt = signals.userId ?? "anon";
+    const jitter = (videoId: string): number => {
+      let h = 2166136261 >>> 0;
+      const s = `${salt}:${videoId}`;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      // Map to [-0.04, +0.04)
+      return ((h >>> 0) / 0xffffffff - 0.5) * 0.08;
+    };
     for (const c of candidates) {
       if (excludeWatched && signals.watchedVideoIds.has(c.video_id)) continue;
       // Hard filter: "Not Interested" / user-hidden — never resurface.
@@ -258,8 +272,10 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
       if (opts.categoryFilter && c.category !== opts.categoryFilter) continue;
       const { score, reasons, components } = scoreCandidate(c, signals);
       if (score <= 0) continue;
-      scored.push({ video: c, score: Number(score.toFixed(4)), reasons, signals: components });
+      const jittered = score * (1 + jitter(c.video_id));
+      scored.push({ video: c, score: Number(jittered.toFixed(4)), reasons, signals: components });
     }
     return diversify(scored, opts.limit ?? 24);
   }
 }
+
