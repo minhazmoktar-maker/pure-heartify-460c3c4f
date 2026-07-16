@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuFilter, setMenuFilter] = useState("");
   const [unseenChangelog, setUnseenChangelog] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -27,6 +28,7 @@ const Navbar = () => {
   const { enabled: kidsOn, toggle: toggleKids } = useKidsMode();
 
   useEffect(() => { setUnseenChangelog(hasUnseenChangelog()); }, []);
+  useEffect(() => { if (!menuOpen) setMenuFilter(""); }, [menuOpen]);
 
 
   const handleSearch = (e: React.FormEvent) => {
