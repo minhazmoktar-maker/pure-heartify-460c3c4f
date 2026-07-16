@@ -27,6 +27,7 @@ async function fetchFeedPage(opts: {
   cursor?: string;
   limit: number;
   contentLanguages: string[];
+  sort?: FeedSort;
 }): Promise<FeedPage> {
   const { data, error } = await supabase.functions.invoke("feed", {
     body: {
@@ -36,6 +37,7 @@ async function fetchFeedPage(opts: {
       cursor: opts.cursor,
       limit: opts.limit,
       content_languages: opts.contentLanguages,
+      sort: opts.sort,
     },
   });
 
@@ -54,13 +56,14 @@ export function useInfiniteFeed({
   search,
   limit = 20,
   enabled = true,
+  sort = "fresh",
 }: UseFeedOptions = {}) {
   const { preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
   const langKey = contentLanguages.join(",");
 
   return useInfiniteQuery<FeedPage>({
-    queryKey: ["feed", category, sectionId, search, limit, langKey],
+    queryKey: ["feed", category, sectionId, search, limit, langKey, sort],
     queryFn: ({ pageParam }) =>
       fetchFeedPage({
         category: category === "All" ? undefined : category,
@@ -69,6 +72,7 @@ export function useInfiniteFeed({
         cursor: pageParam as string | undefined,
         limit,
         contentLanguages,
+        sort,
       }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
@@ -77,3 +81,4 @@ export function useInfiniteFeed({
     refetchOnWindowFocus: false,
   });
 }
+
