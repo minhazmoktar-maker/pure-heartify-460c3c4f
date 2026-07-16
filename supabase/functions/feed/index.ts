@@ -134,7 +134,7 @@ Deno.serve(async (req) => {
     const cacheable = !callerId && !search;
     const langKey = contentLanguages.length ? contentLanguages.join(",") : "-";
     const cacheKey = cacheable
-      ? `feed:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${langKey}`
+      ? `feed:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}`
       : "";
 
     const produce = async () => {
