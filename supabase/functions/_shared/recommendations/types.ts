@@ -85,11 +85,13 @@ export interface RecommendationReason {
     | "cold_start_popular"
     | "diversity_boost"
     | "recently_shown_penalty"
+    | "recently_skipped_penalty"
+    | "channel_overexposure_penalty"
     | "language_match"
-    | "context_boost";
-  weight: number;
-  detail?: string;
-}
+    | "context_boost"
+    | "novelty_new_channel"
+    | "long_term_taste"
+    | "exploration_epsilon";
 
 export interface RecommendOptions {
   limit?: number;
