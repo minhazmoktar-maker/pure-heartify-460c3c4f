@@ -8,6 +8,7 @@
 import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { readThrough } from "../_shared/cache.ts";
+import { gatherSignals } from "../_shared/recommendations/signals.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
