@@ -133,6 +133,7 @@ const Login = () => {
             icon={Lock}
             passwordToggle
             autoComplete="current-password"
+            enterKeyHint="go"
             placeholder="Password"
             value={password}
             onChange={(e) => {
