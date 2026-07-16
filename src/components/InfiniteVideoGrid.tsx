@@ -76,7 +76,14 @@ const InfiniteVideoGrid = ({
     <>
       <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {allVideos.map((video, i) => (
-          <YouTubeVideoCard key={video.id} video={video} index={i} />
+          <div
+            key={video.id}
+            // content-visibility virtualizes off-screen cards without breaking the
+            // responsive CSS grid; contain-intrinsic-size prevents layout shift.
+            style={{ contentVisibility: "auto", containIntrinsicSize: "320px" }}
+          >
+            <YouTubeVideoCard video={video} index={i} />
+          </div>
         ))}
       </div>
 
