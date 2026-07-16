@@ -68,23 +68,23 @@ export function GiftDialog({ freezesAvailable = 0, trigger }: Props) {
   if (!freezeFlag && !premiumFlag) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={setOpen}>
+      <ResponsiveModalTrigger asChild>
         {trigger ?? (
           <Button variant="outline" size="sm" className="gap-2">
             <Gift className="h-4 w-4" /> Send a gift
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent>
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle className="flex items-center gap-2">
             <Gift className="h-5 w-5 text-primary" /> Send a gift
-          </DialogTitle>
-          <DialogDescription>
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             Gift a friend a streak freeze or a month of Premium. Enter their user ID from their profile share link.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
 
         <Tabs defaultValue={freezeFlag ? "freeze" : "premium"}>
           <TabsList className="w-full">
@@ -103,12 +103,12 @@ export function GiftDialog({ freezesAvailable = 0, trigger }: Props) {
                 <Label htmlFor="freeze-note">Note (optional)</Label>
                 <Textarea id="freeze-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} rows={2} />
               </div>
-              <DialogFooter>
+              <ResponsiveModalFooter>
                 <Button onClick={handleFreeze} disabled={sending || freezesAvailable < 1}>
                   {sending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Send freeze
                 </Button>
-              </DialogFooter>
+              </ResponsiveModalFooter>
             </TabsContent>
           )}
 
@@ -131,18 +131,18 @@ export function GiftDialog({ freezesAvailable = 0, trigger }: Props) {
                     <Label htmlFor="pr-note">Note (optional)</Label>
                     <Textarea id="pr-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={200} rows={2} />
                   </div>
-                  <DialogFooter>
+                  <ResponsiveModalFooter>
                     <Button onClick={handlePremium} disabled={sending}>
                       {sending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Gift Premium
                     </Button>
-                  </DialogFooter>
+                  </ResponsiveModalFooter>
                 </>
               )}
             </TabsContent>
           )}
         </Tabs>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
