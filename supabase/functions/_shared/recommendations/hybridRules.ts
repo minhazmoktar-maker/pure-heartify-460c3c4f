@@ -139,6 +139,7 @@ function interestMatch(interests: string[], candidate: RecommendationCandidate):
 function scoreCandidate(
   candidate: RecommendationCandidate,
   s: UserSignals,
+  W: Weights,
 ): { score: number; reasons: RecommendationReason[]; components: Record<string, number> } {
   const reasons: RecommendationReason[] = [];
   const components: Record<string, number> = {};
@@ -169,6 +170,20 @@ function scoreCandidate(
   score += push("channel_affinity", chAff, W.channelAff,
     candidate.channel_title ? `channel "${candidate.channel_title}"` : undefined);
 
+  // Long-term taste (180d halflife). Separated so a user with a persistent
+  // interest in tafsīr keeps seeing tafsīr weeks after their short-term
+  // signal has decayed. Two users with identical last-week behaviour but
+  // different multi-year histories will now diverge here.
+  const longCat = candidate.category
+    ? (s.longTermCategoryAffinity.get(candidate.category) ?? 0) : 0;
+  const longCh = candidate.channel_title
+    ? (s.longTermChannelAffinity.get(candidate.channel_title) ?? 0) : 0;
+  const longTerm = Math.max(longCat, longCh);
+  if (longTerm > 0) {
+    score += push("long_term_taste", longTerm, W.longTerm,
+      "matches user's long-term taste");
+  }
+
   if (candidate.channel_title && s.favoriteVideoIds.size > 0) {
     // Bonus if user has favorited anything by this channel.
     score += push("favorite_channel", chAff > 0 ? 1 : 0, W.favoriteChannel);
@@ -190,6 +205,17 @@ function scoreCandidate(
   score += push("ai_confidence", (candidate.moderation_confidence ?? 0) / 100, W.aiConfidence);
   score += push("freshness", freshnessScore(candidate.published_at), W.freshness);
 
+  // Novelty boost: a channel the user has never encountered before is a
+  // fresh discovery signal — but only for approved+trusted channels, so we
+  // never trade halal safety for "exploration".
+  if (
+    candidate.channel_title &&
+    !s.seenChannelIds.has(candidate.channel_title) &&
+    candidate.is_trusted_channel === true
+  ) {
+    score += push("novelty_new_channel", 1, W.novelty, "creator you haven't seen before");
+  }
+
   // Anti-repeat cooldown: subtract per prior impression in last 24h.
   const shownCount = s.recentImpressionCounts.get(candidate.video_id) ?? 0;
   if (shownCount > 0) {
@@ -197,6 +223,25 @@ function scoreCandidate(
     reasons.push({ code: "recently_shown_penalty", weight: -penalty, detail: `shown ${shownCount}× in last 24h` });
     components["recently_shown_penalty"] = shownCount;
     score -= penalty;
+  }
+
+  // Skip penalty: user was shown this recently and did not engage.
+  if (s.skippedVideoIds.has(candidate.video_id)) {
+    const penalty = W.skipPenalty;
+    reasons.push({ code: "recently_skipped_penalty", weight: -penalty, detail: "skipped without engagement" });
+    components["recently_skipped_penalty"] = 1;
+    score -= penalty;
+  }
+
+  // Channel overexposure: same creator shown many times recently → dampen.
+  if (candidate.channel_title) {
+    const chImpressions = s.recentChannelImpressionCounts.get(candidate.channel_title) ?? 0;
+    if (chImpressions >= 3) {
+      const penalty = W.channelOverexp * Math.min(chImpressions / 10, 1);
+      reasons.push({ code: "channel_overexposure_penalty", weight: -penalty, detail: `channel shown ${chImpressions}× recently` });
+      components["channel_overexposure_penalty"] = chImpressions;
+      score -= penalty;
+    }
   }
 
   if (candidate.channel_title && s.sessionChannelIds.has(candidate.channel_title)) {
@@ -229,6 +274,7 @@ function scoreCandidate(
 
   return { score, reasons, components };
 }
+
 
 /** MMR-style diversification: iteratively picks the highest-scoring item
  *  whose channel/category hasn't already saturated the top of the list. */
