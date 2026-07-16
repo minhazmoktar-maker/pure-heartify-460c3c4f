@@ -183,7 +183,38 @@ Deno.serve(async (req) => {
       ordered = [...matches, ...untagged, ...others];
     }
 
-    const items = ordered.slice(0, limit);
+    // Personalization: deterministic per-user shuffle within same-ranked
+    // buckets so each viewer sees a distinct ordering while ranking stays stable.
+    if (callerId && sort === "fresh" && !search) {
+      const seedStr = `${callerId}:${cursor ?? "0"}:${category ?? "all"}`;
+      let seed = 0;
+      for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
+      const rand = () => {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        return seed / 0xffffffff;
+      };
+      // Small jitter (±0.5 position) — enough to reshuffle ties without
+      // breaking the recency ordering.
+      ordered = ordered
+        .map((v, i) => ({ v, k: i + (rand() - 0.5) }))
+        .sort((a, b) => a.k - b.k)
+        .map((x) => x.v);
+    }
+
+    // Creator diversity: cap items per channel per page so no single creator
+    // dominates. Overflow items are pushed to the tail to keep pagination full.
+    const perChannel = new Map<string, number>();
+    const primary: Array<Record<string, unknown>> = [];
+    const overflow: Array<Record<string, unknown>> = [];
+    for (const v of ordered) {
+      const ch = (v.channel_title as string) ?? "__";
+      const n = perChannel.get(ch) ?? 0;
+      if (n < maxPerChannel) { primary.push(v); perChannel.set(ch, n + 1); }
+      else overflow.push(v);
+    }
+    const diversified = [...primary, ...overflow];
+
+    const items = diversified.slice(0, limit);
     const nextCursor = items.length === limit
       ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
       : null;
