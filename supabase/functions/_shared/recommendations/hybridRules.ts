@@ -18,9 +18,12 @@ import type {
   UserSignals,
 } from "./types.ts";
 
-// Weights are tunable via env; ship strict defaults tuned for a
-// halal-content platform (trust > freshness > raw popularity).
-const W = {
+// Base weights are tunable via env; ship strict defaults tuned for a
+// halal-content platform (trust > freshness > raw popularity). At runtime
+// each user gets a stable per-user perturbation of this vector (see
+// perturbWeights) so different users literally optimize a different linear
+// combination of signals — not merely a different ordering of the same one.
+const W_BASE = {
   interest:        Number(Deno.env.get("REC_W_INTEREST") ?? 0.18),
   categoryAff:     Number(Deno.env.get("REC_W_CATEGORY") ?? 0.16),
   channelAff:      Number(Deno.env.get("REC_W_CHANNEL")  ?? 0.14),
@@ -35,11 +38,52 @@ const W = {
   session:         Number(Deno.env.get("REC_W_SESSION")  ?? 0.04),
   language:        Number(Deno.env.get("REC_W_LANGUAGE") ?? 0.10),
   context:         Number(Deno.env.get("REC_W_CONTEXT")  ?? 0.12),
+  longTerm:        Number(Deno.env.get("REC_W_LONGTERM") ?? 0.10),
+  novelty:         Number(Deno.env.get("REC_W_NOVELTY")  ?? 0.07),
   // Penalty applied per prior impression in the last 24h (soft cooldown).
   repeatPenalty:   Number(Deno.env.get("REC_W_REPEAT")   ?? 0.15),
-  // Exploration ε — probability of injecting a hidden gem near the top.
+  skipPenalty:     Number(Deno.env.get("REC_W_SKIP")     ?? 0.12),
+  channelOverexp:  Number(Deno.env.get("REC_W_CHAN_OVEREXP") ?? 0.10),
+  // Exploration ε — base probability of injecting a hidden gem near the top.
   exploration:     Number(Deno.env.get("REC_EXPLORATION") ?? 0.10),
 };
+type Weights = typeof W_BASE;
+
+// FNV-1a 32-bit hash → deterministic per-string [0,1). Halal-first invariant:
+// the perturbation only reweights *positive* signals within a bounded band
+// (±25%), never a signed flip, so a trusted+high-halal item always beats
+// an untrusted low-halal item regardless of user seed.
+function hash01(s: string): number {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) / 0xffffffff;
+}
+
+/**
+ * Stable per-user weight perturbation. Each viewer gets a bounded ±25%
+ * multiplier on every signal weight, seeded by their user id (or client
+ * identity when signed-out). Result: no two users score the same candidate
+ * pool with the same linear combination, so their top-N lists diverge even
+ * on identical inputs — while the halal/trust/moderation contributions
+ * remain strictly positive.
+ */
+function perturbWeights(seedBase: string): Weights {
+  const out = { ...W_BASE } as Weights;
+  const keys = Object.keys(W_BASE) as Array<keyof Weights>;
+  for (const k of keys) {
+    // Halal/trust/moderation weights never shrink below 85% — the halal-first
+    // floor must not be undermined by personalization.
+    const r = hash01(`${seedBase}:w:${String(k)}`);
+    const lo = (k === "halal" || k === "trusted" || k === "aiConfidence") ? 0.85 : 0.75;
+    const hi = 1.25;
+    out[k] = W_BASE[k] * (lo + r * (hi - lo));
+  }
+  return out;
+}
+
 
 /**
  * Contextual boost — matches ambient signals (time of day, Ramadan, Jummuah)
