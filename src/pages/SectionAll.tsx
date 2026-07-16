@@ -25,6 +25,8 @@ const SectionAll = () => {
     toast.success("Refreshed");
   };
 
+  const ptrKey = `section:${sectionId ?? "unknown"}`;
+
   // "Recently Added" is a synthetic section backed by the feed function's
   // `sort: "recent"` mode (newest moderation-approved videos, personalized).
   // Rendered via InfiniteVideoGrid so it supports true infinite scroll,
