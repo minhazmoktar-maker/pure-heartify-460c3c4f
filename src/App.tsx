@@ -28,6 +28,7 @@ import CookieConsent from "./components/CookieConsent";
 import CommandPalette from "./components/CommandPalette";
 import BottomTabBar from "./components/BottomTabBar";
 import ScrollRestoration from "./components/ScrollRestoration";
+import SkipLink from "./components/SkipLink";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
@@ -259,6 +260,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <SkipLink />
             <ScrollRestoration />
             <MobileBridge />
             <ReferralBridge />

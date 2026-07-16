@@ -1,7 +1,7 @@
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
-import { Shield, Lock, Eye, FileCheck, Users, AlertCircle } from "lucide-react";
+import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server } from "lucide-react";
 
 /**
  * Public Trust page. App-owned editable content maintained by the Heartify team.
@@ -93,6 +93,55 @@ export default function Trust() {
               </div>
             </div>
           </Card>
+
+          <Card className="p-6">
+            <div className="flex gap-3 items-start">
+              <Database className="w-5 h-5 text-primary mt-1 shrink-0" />
+              <div>
+                <h2 className="text-heading font-semibold mb-2">Subprocessors & integrations</h2>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Heartify uses a small set of processors to run the service. This list is maintained by the Heartify team.
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                  <li><strong className="text-foreground">Managed backend & database</strong> — authentication, storage, and Postgres hosting.</li>
+                  <li><strong className="text-foreground">YouTube Data API</strong> — video metadata and playback (public content only).</li>
+                  <li><strong className="text-foreground">Push delivery</strong> — Web Push (VAPID) and platform APNs / FCM for mobile.</li>
+                  <li><strong className="text-foreground">Error monitoring</strong> — Sentry, receiving stack traces with PII stripped.</li>
+                </ul>
+                <p className="mt-2 text-micro text-muted-foreground">
+                  We do not sell personal data and do not share it with advertising networks. A data-processing addendum is available on request via <a className="underline" href="mailto:privacy@heartify.app">privacy@heartify.app</a>.
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex gap-3 items-start">
+              <Clock className="w-5 h-5 text-primary mt-1 shrink-0" />
+              <div>
+                <h2 className="text-heading font-semibold mb-2">Retention & deletion</h2>
+                <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                  <li>Account profile and playback history are kept while your account is active.</li>
+                  <li>Analytics events are retained for up to 24 months in aggregated form, then purged by the nightly retention job.</li>
+                  <li>Deleted accounts are erased from user-owned tables immediately; residual references in audit and moderation logs are anonymised within 30 days.</li>
+                  <li>Backups are encrypted and rotated on a rolling 30-day window.</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex gap-3 items-start">
+              <Server className="w-5 h-5 text-primary mt-1 shrink-0" />
+              <div>
+                <h2 className="text-heading font-semibold mb-2">Incident response</h2>
+                <p className="text-sm text-muted-foreground">
+                  We monitor error rates, moderation SLAs, and edge-function health continuously. If a security incident affects your data, we will notify affected users by email without undue delay and post an update on our public status page. Post-incident summaries are shared once remediation is complete.
+                </p>
+              </div>
+            </div>
+          </Card>
+
 
           <Card className="p-6 border-primary/20">
             <div className="flex gap-3 items-start">
