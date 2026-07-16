@@ -232,14 +232,6 @@ const Navbar = () => {
           >
             {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
           </button>
-          <button
-            onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="tap-target rounded-pill hover:bg-secondary transition-colors"
-            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
-          </button>
           <UpgradeCTA compact className="hidden sm:inline-flex" />
           {user ? (
             <>
@@ -248,7 +240,7 @@ const Navbar = () => {
               <button
                 onClick={signOut}
                 aria-label="Sign out"
-                className="tap-target rounded-pill hover:bg-secondary transition-colors"
+                className="tap-target rounded-pill hover:bg-secondary transition-colors hidden sm:inline-flex"
                 title="Sign out"
               >
                 <LogOut className="h-5 w-5 text-foreground" />
