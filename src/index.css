@@ -151,7 +151,12 @@
 
   /* Canonical interactive card motion — apply to any grid card that navigates or triggers an action. */
   .card-interactive {
-    @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover focus-visible:-translate-y-0.5 focus-visible:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:translate-y-0 active:scale-[0.99];
+    @apply transition-all duration-short ease-standard hover:-translate-y-0.5 hover:shadow-e2 focus-visible:-translate-y-0.5 focus-visible:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:translate-y-0 active:scale-[0.99] motion-reduce:transform-none motion-reduce:transition-none;
+  }
+
+  /* Canonical tactile pressable (buttons, chips, list rows). */
+  .pressable {
+    @apply transition-transform duration-micro ease-standard active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none;
   }
 
   /* iOS safe-area helpers. Use on any fixed bottom bar so the notch/home indicator
