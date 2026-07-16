@@ -134,7 +134,24 @@ const RecentlyAddedRow = () => {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <button
-            onClick={() => refetch()}
+            onClick={() => {
+              void runDedupedRefresh("recently-added-row", async () => {
+                try {
+                  await refetch({ throwOnError: true });
+                } catch (err) {
+                  toast.error("Couldn't refresh Recently Added", {
+                    description: err instanceof Error ? err.message : "Please try again.",
+                    action: {
+                      label: "Retry",
+                      onClick: () => {
+                        void runDedupedRefresh("recently-added-row", () => refetch({ throwOnError: true }));
+                      },
+                    },
+                  });
+                  throw err;
+                }
+              });
+            }}
             disabled={isFetching}
             aria-label="Refresh Recently Added"
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
