@@ -444,7 +444,9 @@ export type Database = {
       }
       channel_candidates: {
         Row: {
+          auto_action: string | null
           category: string | null
+          cluster_id: string | null
           confidence: number | null
           confidence_breakdown: Json
           country: string | null
@@ -461,19 +463,27 @@ export type Database = {
           language: string | null
           language_detected: string | null
           last_verified_at: string | null
+          learned_weight_version: number | null
+          moderation_summary: Json | null
           organization_type: string | null
           priority_score: number
+          risk_score: number | null
           source: string
           source_channel_id: string | null
           status: string
           submitted_by: string | null
           subscriber_count: number | null
+          summary_generated_at: string | null
+          tier: string | null
+          tier_reason: string[] | null
           title: string
           updated_at: string
           youtube_channel_id: string
         }
         Insert: {
+          auto_action?: string | null
           category?: string | null
+          cluster_id?: string | null
           confidence?: number | null
           confidence_breakdown?: Json
           country?: string | null
@@ -490,19 +500,27 @@ export type Database = {
           language?: string | null
           language_detected?: string | null
           last_verified_at?: string | null
+          learned_weight_version?: number | null
+          moderation_summary?: Json | null
           organization_type?: string | null
           priority_score?: number
+          risk_score?: number | null
           source?: string
           source_channel_id?: string | null
           status?: string
           submitted_by?: string | null
           subscriber_count?: number | null
+          summary_generated_at?: string | null
+          tier?: string | null
+          tier_reason?: string[] | null
           title: string
           updated_at?: string
           youtube_channel_id: string
         }
         Update: {
+          auto_action?: string | null
           category?: string | null
+          cluster_id?: string | null
           confidence?: number | null
           confidence_breakdown?: Json
           country?: string | null
@@ -519,13 +537,19 @@ export type Database = {
           language?: string | null
           language_detected?: string | null
           last_verified_at?: string | null
+          learned_weight_version?: number | null
+          moderation_summary?: Json | null
           organization_type?: string | null
           priority_score?: number
+          risk_score?: number | null
           source?: string
           source_channel_id?: string | null
           status?: string
           submitted_by?: string | null
           subscriber_count?: number | null
+          summary_generated_at?: string | null
+          tier?: string | null
+          tier_reason?: string[] | null
           title?: string
           updated_at?: string
           youtube_channel_id?: string
@@ -557,6 +581,65 @@ export type Database = {
             columns: ["channel_id"]
             isOneToOne: false
             referencedRelation: "approved_channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      channel_moderation_decisions: {
+        Row: {
+          action: string
+          actor: string | null
+          candidate_id: string
+          cluster_id: string | null
+          created_at: string
+          evidence: Json | null
+          id: string
+          is_bulk: boolean
+          new_status: string | null
+          previous_status: string | null
+          reason: string | null
+          reversible: boolean
+          tier: string | null
+          youtube_channel_id: string
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          candidate_id: string
+          cluster_id?: string | null
+          created_at?: string
+          evidence?: Json | null
+          id?: string
+          is_bulk?: boolean
+          new_status?: string | null
+          previous_status?: string | null
+          reason?: string | null
+          reversible?: boolean
+          tier?: string | null
+          youtube_channel_id: string
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          candidate_id?: string
+          cluster_id?: string | null
+          created_at?: string
+          evidence?: Json | null
+          id?: string
+          is_bulk?: boolean
+          new_status?: string | null
+          previous_status?: string | null
+          reason?: string | null
+          reversible?: boolean
+          tier?: string | null
+          youtube_channel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_moderation_decisions_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "channel_candidates"
             referencedColumns: ["id"]
           },
         ]
@@ -2214,6 +2297,45 @@ export type Database = {
           },
         ]
       }
+      moderation_clusters: {
+        Row: {
+          candidate_count: number
+          cluster_key: string
+          created_at: string
+          dominant_tier: string | null
+          id: string
+          label: string
+          language: string | null
+          organization_type: string | null
+          primary_topic: string | null
+          updated_at: string
+        }
+        Insert: {
+          candidate_count?: number
+          cluster_key: string
+          created_at?: string
+          dominant_tier?: string | null
+          id?: string
+          label: string
+          language?: string | null
+          organization_type?: string | null
+          primary_topic?: string | null
+          updated_at?: string
+        }
+        Update: {
+          candidate_count?: number
+          cluster_key?: string
+          created_at?: string
+          dominant_tier?: string | null
+          id?: string
+          label?: string
+          language?: string | null
+          organization_type?: string | null
+          primary_topic?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       moderation_decisions: {
         Row: {
           actor_id: string | null
@@ -2266,6 +2388,42 @@ export type Database = {
           stage?: Database["public"]["Enums"]["moderation_stage"]
           state?: Database["public"]["Enums"]["moderation_state"]
           video_id?: string
+        }
+        Relationships: []
+      }
+      moderation_learned_signals: {
+        Row: {
+          approvals: number
+          feature_type: string
+          feature_value: string
+          id: string
+          rejections: number
+          reverts: number
+          updated_at: string
+          version: number
+          weight: number
+        }
+        Insert: {
+          approvals?: number
+          feature_type: string
+          feature_value: string
+          id?: string
+          rejections?: number
+          reverts?: number
+          updated_at?: string
+          version?: number
+          weight?: number
+        }
+        Update: {
+          approvals?: number
+          feature_type?: string
+          feature_value?: string
+          id?: string
+          rejections?: number
+          reverts?: number
+          updated_at?: string
+          version?: number
+          weight?: number
         }
         Relationships: []
       }
@@ -3734,6 +3892,51 @@ export type Database = {
         }
         Relationships: []
       }
+      trusted_institutions: {
+        Row: {
+          country: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          language: string | null
+          match_pattern: string
+          min_subs: number | null
+          name: string
+          notes: string | null
+          organization_type: string
+          updated_at: string
+          weight: number | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          language?: string | null
+          match_pattern: string
+          min_subs?: number | null
+          name: string
+          notes?: string | null
+          organization_type: string
+          updated_at?: string
+          weight?: number | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          language?: string | null
+          match_pattern?: string
+          min_subs?: number | null
+          name?: string
+          notes?: string | null
+          organization_type?: string
+          updated_at?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_key: string
@@ -4058,6 +4261,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      verified_scholars: {
+        Row: {
+          affiliation: string | null
+          aliases: string[] | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          display_name: string
+          handles: string[] | null
+          id: string
+          language: string | null
+          notes: string | null
+          updated_at: string
+          weight: number | null
+          youtube_channel_ids: string[] | null
+        }
+        Insert: {
+          affiliation?: string | null
+          aliases?: string[] | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_name: string
+          handles?: string[] | null
+          id?: string
+          language?: string | null
+          notes?: string | null
+          updated_at?: string
+          weight?: number | null
+          youtube_channel_ids?: string[] | null
+        }
+        Update: {
+          affiliation?: string | null
+          aliases?: string[] | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_name?: string
+          handles?: string[] | null
+          id?: string
+          language?: string | null
+          notes?: string | null
+          updated_at?: string
+          weight?: number | null
+          youtube_channel_ids?: string[] | null
+        }
+        Relationships: []
       }
       video_audit_log: {
         Row: {
@@ -4610,6 +4861,18 @@ export type Database = {
       check_ops_alerts: { Args: never; Returns: undefined }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       complete_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
+      compute_candidate_tier: {
+        Args: {
+          _confidence: number
+          _duplicate_risk: string
+          _exclusion_hits: number
+          _has_female_presenter_signal: boolean
+          _has_music_signal: boolean
+          _institution_match: boolean
+          _subs: number
+        }
+        Returns: string
+      }
       compute_owner_key: { Args: { _name: string }; Returns: string }
       compute_weekly_recap: {
         Args: { _user_id: string; _week_start: string }
