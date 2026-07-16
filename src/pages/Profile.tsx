@@ -9,6 +9,7 @@ import HandleClaimCard from "@/components/HandleClaimCard";
 import LanguageSettings from "@/components/LanguageSettings";
 import AppIconPicker from "@/components/AppIconPicker";
 import ThemeModeSetting from "@/components/ThemeModeSetting";
+import UpgradeCTA from "@/components/UpgradeCTA";
 import SoundSetting from "@/components/SoundSetting";
 import MfaStatusCard from "@/components/MfaStatusCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
