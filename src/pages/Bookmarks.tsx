@@ -270,6 +270,7 @@ const Bookmarks = () => {
           </p>
         </Card>
       </main>
+      </PullToRefresh>
     </div>
   );
 };
