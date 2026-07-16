@@ -46,6 +46,7 @@ export default function Shorts() {
         description="Vertical short-form halal reminders. Swipe to keep your heart softened in under a minute."
       />
       <Navbar />
+      <h1 className="sr-only">Halal Shorts — Quick Daily Reminders</h1>
       <div className="fixed right-4 top-20 z-30">
         <button
           type="button"
