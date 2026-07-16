@@ -188,12 +188,18 @@ const Index = () => {
             ))}
           </div>
           <main className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">
-            <InfiniteVideoGrid category={selectedCategory} sort={browseSort} />
+            <Suspense fallback={null}>
+              <InfiniteVideoGrid category={selectedCategory} sort={browseSort} />
+            </Suspense>
           </main>
         </>
       )}
 
-      {mainTab === "listen" && <AudioSection />}
+      {mainTab === "listen" && (
+        <Suspense fallback={null}>
+          <AudioSection />
+        </Suspense>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-border bg-card py-8">
