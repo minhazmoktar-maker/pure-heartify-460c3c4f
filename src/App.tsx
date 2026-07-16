@@ -35,6 +35,7 @@ const Shorts = lazy(() => import("./pages/Shorts.tsx"));
 const Mushaf = lazy(() => import("./pages/Mushaf.tsx"));
 const Redeem = lazy(() => import("./pages/Redeem.tsx"));
 const Changelog = lazy(() => import("./pages/Changelog.tsx"));
+const Connect = lazy(() => import("./pages/Connect.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
