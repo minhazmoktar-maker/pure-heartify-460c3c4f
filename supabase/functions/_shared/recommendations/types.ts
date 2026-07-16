@@ -92,6 +92,10 @@ export interface RecommendationReason {
     | "novelty_new_channel"
     | "long_term_taste"
     | "exploration_epsilon";
+  weight: number;
+  detail?: string;
+}
+
 
 export interface RecommendOptions {
   limit?: number;
