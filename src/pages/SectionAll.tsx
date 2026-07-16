@@ -146,6 +146,7 @@ const SectionAll = () => {
         )}
       </div>
     </div>
+    </PullToRefresh>
   );
 };
 
