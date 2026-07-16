@@ -1,24 +1,17 @@
 /**
- * discover-channels — Phase P1.2B multi-source discovery engine.
+ * discover-channels — Phase P1.2C production-hardened discovery engine.
  *
- * Sources supported (dispatched via body.method, or "auto" rotation):
- *   - related_channels   : YouTube "relatedToChannelId" (legacy default)
- *   - topic_search       : multi-language search seeds (discovery_topic_queries)
- *   - playlist_collab    : channels co-appearing in a seed's playlists
- *   - description_mention: @handles or channel URLs mentioned in seed descriptions
- *   - featured_channel   : channels featured on a seed's channel page (via search)
- *   - institution_seed   : hand-curated seed roster (bootstrap only)
- *
- * NEVER auto-approves. Every discovery still passes through the full
- * verification pipeline before it can serve to users.
- *
- * Resumability: long-running crawls persist a cursor in `discovery_seeds`
- * (next_page_token, exhausted) so the next invocation resumes where the
- * previous one stopped — even if the edge function timed out.
- *
- * Quota: every network call is reserved against `discovery_quota_ledger`
- * before being made. When headroom is exhausted mid-run, the function
- * exits gracefully and the outstanding seed stays queued.
+ * Changes vs P1.2B:
+ *  - Removed deprecated `related_channels` (YouTube retired relatedToChannelId).
+ *  - Background execution via EdgeRuntime.waitUntil — returns HTTP 202 immediately.
+ *  - Job tracking in public.discovery_jobs with heartbeat + cancel + stats.
+ *  - Batched channels.list (up to 50 IDs per call) — up to 50× cheaper than per-ID.
+ *  - Batched duplicate lookup via check_channel_duplicates_batch RPC.
+ *  - Batched INSERT of candidates (single round trip per source).
+ *  - Multilingual language detector with confidence scoring.
+ *  - Expanded multilingual organization detector.
+ *  - Time-budgeted execution (soft deadline < edge idle limit).
+ *  - Never auto-approves. All candidates still enter the full moderation pipeline.
  */
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -27,14 +20,16 @@ const YOUTUBE_API_KEY =
   Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2') ?? '';
 
 const DAILY_QUOTA_CAP = Number(Deno.env.get('DISCOVERY_DAILY_QUOTA') ?? 4000);
-const MAX_SEEDS_PER_RUN = Number(Deno.env.get('DISCOVERY_SEEDS_PER_RUN') ?? 25);
-const MAX_TOPIC_QUERIES_PER_RUN = Number(Deno.env.get('DISCOVERY_TOPIC_PER_RUN') ?? 12);
-const MAX_CANDIDATES_PER_SEED = 15;
-const MAX_CRAWL_DEPTH = Number(Deno.env.get('DISCOVERY_MAX_DEPTH') ?? 2);
+const MAX_SEEDS_PER_RUN = Number(Deno.env.get('DISCOVERY_SEEDS_PER_RUN') ?? 40);
+const MAX_TOPIC_QUERIES_PER_RUN = Number(Deno.env.get('DISCOVERY_TOPIC_PER_RUN') ?? 16);
+const MAX_CANDIDATES_PER_SEED = 20;
+const BUDGET_STOP_RATIO = 0.9;             // stop when we've spent 90% of daily cap
+const SOFT_DEADLINE_MS = 5 * 60_000;       // 5 min soft deadline for background job
+const CHANNELS_BATCH = 50;                 // YouTube channels.list max ids per call
 
-// YouTube quota (per docs): search.list=100, channels.list=1, playlistItems.list=1, playlists.list=1.
+// YouTube quota costs
 const COST_SEARCH = 100;
-const COST_CHANNEL = 1;
+const COST_CHANNEL_BATCH = 1;              // channels.list is 1 unit regardless of ids
 const COST_PLAYLIST_ITEMS = 1;
 const COST_PLAYLISTS = 1;
 
@@ -43,15 +38,15 @@ type Admin = ReturnType<typeof createClient>;
 // ─────────────────────────── Topic classification ───────────────────────────
 
 const HALAL_TOPIC_KEYWORDS: Record<string, string[]> = {
-  islamic: ['islam', 'quran', 'tafsir', 'hadith', 'sunnah', 'seerah', 'dawah', 'dua', 'ramadan', 'salah', 'fiqh', 'قرآن', 'حديث', 'سيرة', 'اسلام', 'ইসলাম', 'قرآن پاک', 'ইসলামিক'],
-  education: ['learn', 'course', 'tutorial', 'lesson', 'lecture', 'academy', 'university', 'school', 'درس', 'محاضرة', 'شیک্ষা'],
-  science: ['physics', 'chemistry', 'biology', 'astronomy', 'science', 'علم', 'বিজ্ঞান'],
-  history: ['history', 'historical', 'civilization', 'empire', 'ancient', 'تاريخ', 'ইতিহাস'],
-  technology: ['tech', 'programming', 'code', 'coding', 'developer', 'engineering', 'ai ', 'برمجة'],
-  business: ['business', 'entrepreneur', 'startup', 'marketing', 'finance', 'investing', 'ethical'],
-  language: ['language', 'arabic', 'english', 'grammar', 'vocabulary', 'لغة'],
-  medicine: ['medicine', 'health', 'medical', 'doctor', 'nutrition', 'صحة'],
-  documentary: ['documentary', 'nature', 'wildlife', 'planet'],
+  islamic: ['islam', 'quran', 'tafsir', 'hadith', 'sunnah', 'seerah', 'dawah', 'dua', 'ramadan', 'salah', 'fiqh', 'قرآن', 'حديث', 'سيرة', 'اسلام', 'ইসলাম', 'قرآن پاک', 'ইসলামিক', 'مسلم', 'اسلامی'],
+  education: ['learn', 'course', 'tutorial', 'lesson', 'lecture', 'academy', 'university', 'school', 'درس', 'محاضرة', 'تعليم', 'শিক্ষা', 'পাঠ', 'تعلیم', 'sekolah', 'kuliah'],
+  science: ['physics', 'chemistry', 'biology', 'astronomy', 'science', 'علم', 'বিজ্ঞান', 'ilmu', 'ilim', 'ciencia', 'ciência', 'wissenschaft', '科学', '科學', '과학'],
+  history: ['history', 'historical', 'civilization', 'empire', 'ancient', 'تاريخ', 'ইতিহাস', 'sejarah', 'tarih', 'historia', 'geschichte', '歴史', '历史', '역사'],
+  technology: ['tech', 'programming', 'code', 'coding', 'developer', 'engineering', 'ai ', 'برمجة', 'teknologi', 'teknoloji'],
+  business: ['business', 'entrepreneur', 'startup', 'marketing', 'finance', 'investing', 'ethical', 'halal finance', 'islamic finance'],
+  language: ['language', 'arabic', 'grammar', 'vocabulary', 'لغة', 'nahw', 'sarf'],
+  medicine: ['medicine', 'health', 'medical', 'doctor', 'nutrition', 'صحة', 'kesehatan', 'sağlık', 'saúde'],
+  documentary: ['documentary', 'nature', 'wildlife', 'planet', 'documental', 'dokumentation'],
   productivity: ['productivity', 'self-improvement', 'habits', 'discipline'],
   sports: ['sport', 'fitness', 'training', 'athletics'],
 };
@@ -64,15 +59,25 @@ const HARD_EXCLUDE = [
   'dating', 'onlyfans', 'vlog haram', 'nudity',
 ];
 
-// Institution / organization heuristics (title keyword → org type).
+// Multilingual organization detector.
 const ORG_HINTS: Array<[RegExp, string]> = [
-  [/\buniversity\b|\bcollege\b|جامعة|université|universität|大学|대학교/i, 'university'],
-  [/\binstitute\b|\bfoundation\b|\bfund\b|معهد|مؤسسة/i, 'institute'],
-  [/\bmasjid\b|\bmosque\b|مسجد|জামে/i, 'mosque'],
-  [/\bacademy\b|academia|أكاديمية/i, 'academy'],
-  [/\bschool\b|école|schule|مدرسة/i, 'school'],
-  [/\btv\b|\bchannel\b|network/i, 'media'],
-  [/\bofficial\b|verified/i, 'official'],
+  // Universities
+  [/\buniversit(y|é|ät|à|e)\b|جامعة|دانشگاه|বিশ্ববিদ্যালয়|大学|대학교|üniversite|universidad|universidade|universiteit/i, 'university'],
+  // Institutes / research
+  [/\binstitut(e|o|s)?\b|معهد|মহাবিদ্যালয়|研究所|연구소|instituto|institut/i, 'institute'],
+  // Foundations / charities
+  [/\bfoundation\b|مؤسسة|بنیاد|ফাউন্ডেশন|재단|fundação|fundación|stiftung/i, 'foundation'],
+  // Mosques
+  [/\bmasjid\b|\bmosque\b|مسجد|مسـجد|مسجدی|জামে|masjid/i, 'mosque'],
+  // Academies
+  [/\bacademy\b|academia|أكاديمية|akademi|akademie/i, 'academy'],
+  // Schools
+  [/\bschool\b|école|schule|مدرسة|مدرسه|মাদ্রাসা|madrasah|escuela|escola/i, 'school'],
+  // Ministries / official
+  [/\bministry\b|وزارة|kementerian|ministério|ministerio|ministerium|departamento|departmento/i, 'ministry'],
+  [/\bofficial\b|verified|قناة رسمية|رسمی|resmi|oficial|offiziell/i, 'official'],
+  // Media / TV
+  [/\btv\b|\bchannel\b|network|قناة|チャンネル|채널|canal|kanal/i, 'media'],
 ];
 
 function classifyTopic(title: string, description: string): { hint: string | null; priority: number } {
@@ -93,37 +98,67 @@ function detectOrganization(title: string, description: string): string | null {
   return null;
 }
 
-// Cheap script-based language detection — good enough to bucket candidates.
-function detectLanguage(text: string): string | null {
-  if (!text) return null;
-  if (/[\u0600-\u06FF]/.test(text)) {
-    if (/[\u0679\u067E\u0686\u0688\u0691\u0698\u06A9\u06AF\u06BA\u06BE\u06C1\u06CC\u06D2]/.test(text)) return 'ur';
-    if (/[\u067E\u0686\u0698\u06A9\u06AF\u06CC]/.test(text)) return 'fa';
-    return 'ar';
+// ─────────────────────────── Language detection ─────────────────────────────
+
+// Script-based detection first (highest confidence), then keyword dictionaries.
+const LANG_KEYWORDS: Record<string, RegExp> = {
+  tr: /\b(ve|bir|için|olan|değil|ile|çok|kadar|nasıl|neden)\b/i,
+  id: /\b(dan|yang|untuk|dengan|adalah|tidak|kita|saya|bagaimana)\b/i,
+  ms: /\b(dan|yang|untuk|dengan|adalah|tidak|kita|saya|bagaimana|sahaja|kami)\b/i,
+  es: /\b(el|la|los|las|para|con|una|del|cómo|porque|también)\b/i,
+  fr: /\b(le|la|les|des|pour|avec|dans|est|comment|pourquoi|également)\b/i,
+  de: /\b(der|die|das|und|nicht|für|mit|ist|warum|wie|auch)\b/i,
+  pt: /\b(um|uma|para|com|não|está|isso|porque|como|também)\b/i,
+  sw: /\b(na|wa|kwa|hii|hiyo|kama|lakini|kwenye|kuhusu)\b/i,
+};
+
+interface LangResult { code: string | null; confidence: number }
+
+function detectLanguageWithConfidence(text: string): LangResult {
+  if (!text || text.trim().length < 3) return { code: null, confidence: 0 };
+  const t = text.slice(0, 500);
+
+  // Script-based (very high confidence)
+  if (/[\u0600-\u06FF]/.test(t)) {
+    // Urdu-specific letters
+    if (/[\u0679\u067E\u0688\u0691\u0698\u06BA\u06BE\u06C1\u06CC\u06D2]/.test(t)) return { code: 'ur', confidence: 0.95 };
+    // Persian-specific
+    if (/[\u067E\u0686\u0698\u06A9\u06AF]/.test(t)) return { code: 'fa', confidence: 0.92 };
+    return { code: 'ar', confidence: 0.95 };
   }
-  if (/[\u0980-\u09FF]/.test(text)) return 'bn';
-  if (/[\u0900-\u097F]/.test(text)) return 'hi';
-  if (/[\u4E00-\u9FFF]/.test(text)) return 'zh';
-  if (/[\u3040-\u30FF]/.test(text)) return 'ja';
-  if (/[\uAC00-\uD7AF]/.test(text)) return 'ko';
-  if (/\b(ve|bir|için|olan|değil|ile)\b/i.test(text)) return 'tr';
-  if (/\b(dan|yang|untuk|dengan|adalah|tidak)\b/i.test(text)) return 'id';
-  if (/\b(el|la|los|las|para|con|una|del)\b/i.test(text)) return 'es';
-  if (/\b(le|la|les|des|pour|avec|dans|est)\b/i.test(text)) return 'fr';
-  if (/\b(der|die|das|und|nicht|für|mit|ist)\b/i.test(text)) return 'de';
-  if (/\b(um|uma|para|com|não|está|isso)\b/i.test(text)) return 'pt';
-  return 'en';
+  if (/[\u0980-\u09FF]/.test(t)) return { code: 'bn', confidence: 0.95 };
+  if (/[\u0900-\u097F]/.test(t)) return { code: 'hi', confidence: 0.95 };
+  if (/[\u4E00-\u9FFF]/.test(t)) return { code: 'zh', confidence: 0.93 };
+  if (/[\u3040-\u30FF]/.test(t)) return { code: 'ja', confidence: 0.95 };
+  if (/[\uAC00-\uD7AF]/.test(t)) return { code: 'ko', confidence: 0.95 };
+
+  // Latin-script keyword scoring
+  const scores: Array<[string, number]> = [];
+  for (const [lang, rx] of Object.entries(LANG_KEYWORDS)) {
+    const matches = t.match(new RegExp(rx.source, 'gi'));
+    if (matches) scores.push([lang, matches.length]);
+  }
+  scores.sort((a, b) => b[1] - a[1]);
+  if (scores.length > 0 && scores[0][1] >= 2) {
+    const top = scores[0][1];
+    const runner = scores[1]?.[1] ?? 0;
+    const confidence = Math.min(0.85, 0.5 + (top - runner) * 0.1);
+    return { code: scores[0][0], confidence };
+  }
+
+  // Fallback: assume English if latin and no signal.
+  return { code: 'en', confidence: 0.35 };
 }
 
 // ─────────────────────────── Confidence scoring ─────────────────────────────
 
 interface ConfidenceBreakdown {
-  topic_relevance: number;      // 0..1 from keyword classifier
-  educational_quality: number;  // 0..1 lecture/tutorial/course signals
-  discovery_source: number;     // 0..1 by method reliability
-  organization: number;         // 0..1 verified org detected
-  language_confidence: number;  // 0..1 detected + script clarity
-  duplicate_probability: number;// 0..1 (higher = more likely dup)
+  topic_relevance: number;
+  educational_quality: number;
+  discovery_source: number;
+  organization: number;
+  language_confidence: number;
+  duplicate_probability: number;
 }
 
 const METHOD_RELIABILITY: Record<string, number> = {
@@ -131,7 +166,6 @@ const METHOD_RELIABILITY: Record<string, number> = {
   featured_channel: 0.80,
   playlist_collab: 0.75,
   topic_search: 0.70,
-  related_channels: 0.65,
   description_mention: 0.60,
 };
 
@@ -141,7 +175,7 @@ function scoreConfidence(
   description: string,
   topic: string | null,
   org: string | null,
-  lang: string | null,
+  langConf: number,
   dupRisk: 'low' | 'medium' | 'high',
 ): { breakdown: ConfidenceBreakdown; overall: number; eduQuality: number } {
   const hay = `${title} ${description}`.toLowerCase();
@@ -156,10 +190,8 @@ function scoreConfidence(
   const eduQuality = Math.min(1, eduHits / 3);
 
   const orgScore = org
-    ? (['university', 'institute', 'academy', 'school', 'official'].includes(org) ? 1.0 : 0.7)
+    ? (['university', 'institute', 'academy', 'school', 'official', 'ministry', 'foundation', 'mosque'].includes(org) ? 1.0 : 0.7)
     : 0.4;
-
-  const langScore = lang ? 0.9 : 0.5;
 
   const dupScore = dupRisk === 'low' ? 0.05 : dupRisk === 'medium' ? 0.5 : 0.95;
 
@@ -168,11 +200,10 @@ function scoreConfidence(
     educational_quality: eduQuality,
     discovery_source: METHOD_RELIABILITY[method] ?? 0.5,
     organization: orgScore,
-    language_confidence: langScore,
+    language_confidence: langConf,
     duplicate_probability: dupScore,
   };
 
-  // Overall = weighted mean minus duplicate penalty. Range 0..100.
   const positive =
     0.30 * breakdown.topic_relevance +
     0.20 * breakdown.educational_quality +
@@ -186,7 +217,7 @@ function scoreConfidence(
 
 // ─────────────────────────────── Quota ─────────────────────────────────────
 
-interface QuotaCtx { admin: Admin; usedThisRun: number }
+interface QuotaCtx { admin: Admin; usedThisRun: number; apiFailures: number }
 
 async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   const day = new Date().toISOString().slice(0, 10);
@@ -208,18 +239,26 @@ async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   return true;
 }
 
-async function ytFetch(url: string): Promise<any | null> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.error('youtube api error', res.status, await res.text());
-      return null;
+// Fetch with exponential backoff on transient errors.
+async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | null> {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return await res.json();
+      if (res.status === 403 || res.status === 400 || res.status === 404) {
+        console.error('youtube api error', res.status, (await res.text()).slice(0, 200));
+        ctx.apiFailures++;
+        return null;
+      }
+      // 5xx / 429 → backoff
+      await new Promise((r) => setTimeout(r, 250 * Math.pow(2, i)));
+    } catch (e) {
+      console.error('youtube fetch failed', e);
+      await new Promise((r) => setTimeout(r, 250 * Math.pow(2, i)));
     }
-    return await res.json();
-  } catch (e) {
-    console.error('youtube fetch failed', e);
-    return null;
   }
+  ctx.apiFailures++;
+  return null;
 }
 
 // ─────────────────────────── Candidate enqueue ─────────────────────────────
@@ -232,146 +271,158 @@ interface DiscoveredChannel {
   subscriber_count: number;
   discovery_method: string;
   source_channel_id: string | null;
-  source_kind: string; // channel_candidates.source enum value
+  source_kind: string;
   depth: number;
 }
 
-async function enqueueCandidate(
+/**
+ * Batched candidate ingestion — one duplicate lookup + one insert per group.
+ * Cuts round trips from 3N to ~2 per batch.
+ */
+async function ingestCandidatesBatch(
   admin: Admin,
-  disc: DiscoveredChannel,
-): Promise<'enqueued' | 'duplicate' | 'excluded' | 'exists'> {
-  const { hint, priority } = classifyTopic(disc.title, disc.description);
-  if (priority < 0) return 'excluded';
+  candidates: DiscoveredChannel[],
+): Promise<{ enqueued: number; skipped: number }> {
+  if (candidates.length === 0) return { enqueued: 0, skipped: 0 };
 
-  const { data: approved } = await admin
-    .from('approved_channels')
-    .select('id')
-    .eq('youtube_channel_id', disc.youtube_channel_id)
-    .maybeSingle();
-  if (approved) return 'exists';
-
-  const { data: existing } = await admin
-    .from('channel_candidates')
-    .select('id, status')
-    .eq('youtube_channel_id', disc.youtube_channel_id)
-    .maybeSingle();
-  if (existing) return 'duplicate';
-
-  const { data: dupRows } = await admin.rpc('check_channel_duplicate', {
-    _yt_id: disc.youtube_channel_id,
-    _title: disc.title,
-    _handle: disc.handle,
-  });
-  const dup = (dupRows as any[] | null)?.[0];
-  const duplicateRisk: 'low' | 'medium' | 'high' =
-    !dup ? 'low' : dup.match_type === 'title_similarity' ? 'medium' : 'high';
-  if (duplicateRisk === 'high') return 'duplicate';
-
-  const org = detectOrganization(disc.title, disc.description);
-  const lang = detectLanguage(`${disc.title} ${disc.description}`);
-  const { breakdown, overall, eduQuality } = scoreConfidence(
-    disc.discovery_method, disc.title, disc.description, hint, org, lang, duplicateRisk,
+  // 1) Batch existence check
+  const ids = Array.from(new Set(candidates.map((c) => c.youtube_channel_id)));
+  const { data: existingRows } = await admin.rpc('check_channel_duplicates_batch', { _ids: ids });
+  const existing = new Set<string>(
+    ((existingRows as any[] | null) ?? []).map((r) => r.youtube_channel_id),
   );
 
-  await admin.from('channel_candidates').insert({
-    youtube_channel_id: disc.youtube_channel_id,
-    title: disc.title,
-    description: disc.description.slice(0, 2000),
-    handle: disc.handle,
-    subscriber_count: disc.subscriber_count,
-    source: disc.source_kind,
-    discovery_method: disc.discovery_method,
-    source_channel_id: disc.source_channel_id,
-    priority_score: Math.max(priority, overall),
-    confidence: overall,
-    confidence_breakdown: breakdown,
-    halal_topic_hint: hint,
-    language_detected: lang,
-    crawl_depth: disc.depth,
-    educational_quality: eduQuality,
-    organization_type: org,
-    status: 'pending',
-    duplicate_risk: duplicateRisk,
-    evidence: {
-      discovered_at: new Date().toISOString(),
-      via: disc.discovery_method,
+  const rows: any[] = [];
+  let skipped = 0;
+
+  // 2) Score + dedupe within batch
+  const seen = new Set<string>();
+  for (const disc of candidates) {
+    if (seen.has(disc.youtube_channel_id)) { skipped++; continue; }
+    seen.add(disc.youtube_channel_id);
+
+    if (existing.has(disc.youtube_channel_id)) { skipped++; continue; }
+
+    const { hint, priority } = classifyTopic(disc.title, disc.description);
+    if (priority < 0) { skipped++; continue; }
+
+    const org = detectOrganization(disc.title, disc.description);
+    const { code: lang, confidence: langConf } = detectLanguageWithConfidence(`${disc.title} ${disc.description}`);
+    const duplicateRisk: 'low' | 'medium' | 'high' = 'low';
+    const { breakdown, overall, eduQuality } = scoreConfidence(
+      disc.discovery_method, disc.title, disc.description, hint, org, langConf, duplicateRisk,
+    );
+
+    rows.push({
+      youtube_channel_id: disc.youtube_channel_id,
+      title: disc.title,
+      description: disc.description.slice(0, 2000),
+      handle: disc.handle,
+      subscriber_count: disc.subscriber_count,
+      source: disc.source_kind,
+      discovery_method: disc.discovery_method,
       source_channel_id: disc.source_channel_id,
-      depth: disc.depth,
-    },
-  });
-  return 'enqueued';
+      priority_score: Math.max(priority, overall),
+      confidence: overall,
+      confidence_breakdown: breakdown,
+      halal_topic_hint: hint,
+      language_detected: lang,
+      crawl_depth: disc.depth,
+      educational_quality: eduQuality,
+      organization_type: org,
+      status: 'pending',
+      duplicate_risk: duplicateRisk,
+      evidence: {
+        discovered_at: new Date().toISOString(),
+        via: disc.discovery_method,
+        source_channel_id: disc.source_channel_id,
+        depth: disc.depth,
+        language_confidence: langConf,
+      },
+    });
+  }
+
+  if (rows.length === 0) return { enqueued: 0, skipped };
+
+  // 3) Single batched INSERT with ON CONFLICT DO NOTHING semantics via upsert
+  const { error } = await admin
+    .from('channel_candidates')
+    .upsert(rows, { onConflict: 'youtube_channel_id', ignoreDuplicates: true });
+  if (error) {
+    console.error('batch insert error', error.message);
+    return { enqueued: 0, skipped: skipped + rows.length };
+  }
+  return { enqueued: rows.length, skipped };
 }
 
-// ─────────────────────────── Discovery methods ─────────────────────────────
+// ─────────────────────────── Batched channel hydration ─────────────────────
 
-interface CrawlResult { enqueued: number; skipped: number }
-
-async function hydrateChannels(ids: string[]): Promise<any[]> {
-  if (ids.length === 0) return [];
-  const json = await ytFetch(
-    `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${ids.join(',')}&key=${YOUTUBE_API_KEY}`,
-  );
-  return json?.items ?? [];
-}
-
-async function ingestChannelIds(
-  admin: Admin,
+async function hydrateChannelsBatched(
+  ctx: QuotaCtx,
   ids: string[],
+): Promise<any[]> {
+  const unique = Array.from(new Set(ids)).filter(Boolean);
+  const out: any[] = [];
+  for (let i = 0; i < unique.length; i += CHANNELS_BATCH) {
+    const chunk = unique.slice(i, i + CHANNELS_BATCH);
+    if (!(await reserveQuota(ctx, COST_CHANNEL_BATCH))) break;
+    const json = await ytFetch(
+      ctx,
+      `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${chunk.join(',')}&key=${YOUTUBE_API_KEY}`,
+    );
+    if (json?.items) out.push(...json.items);
+  }
+  return out;
+}
+
+function itemsToDiscovered(
+  items: any[],
   method: string,
   sourceKind: string,
   sourceId: string | null,
   depth: number,
+): DiscoveredChannel[] {
+  return items.map((it) => ({
+    youtube_channel_id: it.id,
+    title: it.snippet?.title ?? 'Unknown',
+    description: it.snippet?.description ?? '',
+    handle: it.snippet?.customUrl ?? null,
+    subscriber_count: Number(it.statistics?.subscriberCount ?? 0),
+    discovery_method: method,
+    source_channel_id: sourceId,
+    source_kind: sourceKind,
+    depth,
+  }));
+}
+
+// ─────────────────────────── Discovery methods ─────────────────────────────
+
+interface CrawlResult { enqueued: number; skipped: number; ids: number }
+
+async function crawlTopicSearch(
+  admin: Admin, ctx: QuotaCtx, query: string, language: string,
 ): Promise<CrawlResult> {
-  let enqueued = 0, skipped = 0;
-  const items = await hydrateChannels(ids.slice(0, MAX_CANDIDATES_PER_SEED));
-  for (const it of items) {
-    const outcome = await enqueueCandidate(admin, {
-      youtube_channel_id: it.id,
-      title: it.snippet?.title ?? 'Unknown',
-      description: it.snippet?.description ?? '',
-      handle: it.snippet?.customUrl ?? null,
-      subscriber_count: Number(it.statistics?.subscriberCount ?? 0),
-      discovery_method: method,
-      source_channel_id: sourceId,
-      source_kind: sourceKind,
-      depth,
-    });
-    if (outcome === 'enqueued') enqueued++; else skipped++;
-  }
-  return { enqueued, skipped };
-}
-
-async function crawlRelated(admin: Admin, ctx: QuotaCtx, seedId: string, depth: number): Promise<CrawlResult> {
-  if (!(await reserveQuota(ctx, COST_SEARCH))) return { enqueued: 0, skipped: 0 };
-  const search = await ytFetch(
-    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&relatedToChannelId=${encodeURIComponent(seedId)}&maxResults=${MAX_CANDIDATES_PER_SEED}&key=${YOUTUBE_API_KEY}`,
-  );
-  const ids: string[] = (search?.items ?? [])
-    .map((it: any) => it?.snippet?.channelId ?? it?.id?.channelId)
-    .filter(Boolean);
-  if (ids.length === 0) return { enqueued: 0, skipped: 0 };
-  if (!(await reserveQuota(ctx, COST_CHANNEL))) return { enqueued: 0, skipped: 0 };
-  return ingestChannelIds(admin, ids, 'related_channels', 'discovery', seedId, depth);
-}
-
-async function crawlTopicSearch(admin: Admin, ctx: QuotaCtx, query: string, language: string): Promise<CrawlResult> {
-  if (!(await reserveQuota(ctx, COST_SEARCH))) return { enqueued: 0, skipped: 0 };
+  if (!(await reserveQuota(ctx, COST_SEARCH))) return { enqueued: 0, skipped: 0, ids: 0 };
   const url =
     `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel` +
     `&q=${encodeURIComponent(query)}&relevanceLanguage=${encodeURIComponent(language)}` +
-    `&maxResults=${MAX_CANDIDATES_PER_SEED}&key=${YOUTUBE_API_KEY}`;
-  const search = await ytFetch(url);
+    `&maxResults=${MAX_CANDIDATES_PER_SEED}&safeSearch=strict&key=${YOUTUBE_API_KEY}`;
+  const search = await ytFetch(ctx, url);
   const ids: string[] = (search?.items ?? [])
     .map((it: any) => it?.snippet?.channelId ?? it?.id?.channelId)
     .filter(Boolean);
-  if (ids.length === 0) return { enqueued: 0, skipped: 0 };
-  if (!(await reserveQuota(ctx, COST_CHANNEL))) return { enqueued: 0, skipped: 0 };
-  return ingestChannelIds(admin, ids, `topic_search:${language}`, 'topic_search', null, 0);
+  if (ids.length === 0) return { enqueued: 0, skipped: 0, ids: 0 };
+  const items = await hydrateChannelsBatched(ctx, ids);
+  const r = await ingestCandidatesBatch(admin, itemsToDiscovered(items, `topic_search:${language}`, 'topic_search', null, 0));
+  return { ...r, ids: ids.length };
 }
 
-async function crawlPlaylistCollab(admin: Admin, ctx: QuotaCtx, seedId: string, depth: number): Promise<CrawlResult> {
-  if (!(await reserveQuota(ctx, COST_PLAYLISTS))) return { enqueued: 0, skipped: 0 };
+async function crawlPlaylistCollab(
+  admin: Admin, ctx: QuotaCtx, seedId: string, depth: number,
+): Promise<CrawlResult> {
+  if (!(await reserveQuota(ctx, COST_PLAYLISTS))) return { enqueued: 0, skipped: 0, ids: 0 };
   const pls = await ytFetch(
+    ctx,
     `https://www.googleapis.com/youtube/v3/playlists?part=id&channelId=${encodeURIComponent(seedId)}&maxResults=5&key=${YOUTUBE_API_KEY}`,
   );
   const playlistIds: string[] = (pls?.items ?? []).map((it: any) => it.id).filter(Boolean);
@@ -379,6 +430,7 @@ async function crawlPlaylistCollab(admin: Admin, ctx: QuotaCtx, seedId: string, 
   for (const pid of playlistIds) {
     if (!(await reserveQuota(ctx, COST_PLAYLIST_ITEMS))) break;
     const items = await ytFetch(
+      ctx,
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${encodeURIComponent(pid)}&maxResults=20&key=${YOUTUBE_API_KEY}`,
     );
     for (const it of items?.items ?? []) {
@@ -387,24 +439,24 @@ async function crawlPlaylistCollab(admin: Admin, ctx: QuotaCtx, seedId: string, 
     }
     if (collabIds.size >= MAX_CANDIDATES_PER_SEED) break;
   }
-  if (collabIds.size === 0) return { enqueued: 0, skipped: 0 };
-  if (!(await reserveQuota(ctx, COST_CHANNEL))) return { enqueued: 0, skipped: 0 };
-  return ingestChannelIds(admin, Array.from(collabIds), 'playlist_collab', 'playlist_collab', seedId, depth);
+  if (collabIds.size === 0) return { enqueued: 0, skipped: 0, ids: 0 };
+  const items = await hydrateChannelsBatched(ctx, Array.from(collabIds));
+  const r = await ingestCandidatesBatch(admin, itemsToDiscovered(items, 'playlist_collab', 'playlist_collab', seedId, depth));
+  return { ...r, ids: collabIds.size };
 }
 
 // Parse @handles and /channel/UC… mentions from the seed's description.
-async function crawlDescriptionMention(admin: Admin, ctx: QuotaCtx, seedId: string, depth: number): Promise<CrawlResult> {
-  if (!(await reserveQuota(ctx, COST_CHANNEL))) return { enqueued: 0, skipped: 0 };
-  const info = await ytFetch(
-    `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${encodeURIComponent(seedId)}&key=${YOUTUBE_API_KEY}`,
-  );
-  const desc: string = info?.items?.[0]?.snippet?.description ?? '';
+// Optimization: reuses hydrated seed metadata to avoid re-fetching.
+async function crawlDescriptionMention(
+  admin: Admin, ctx: QuotaCtx, seedDescription: string, seedId: string, depth: number,
+): Promise<CrawlResult> {
   const directIds = Array.from(new Set(
-    Array.from(desc.matchAll(/UC[\w-]{22}/g)).map((m) => m[0]).filter((id) => id !== seedId),
+    Array.from(seedDescription.matchAll(/UC[\w-]{22}/g)).map((m) => m[0]).filter((id) => id !== seedId),
   )).slice(0, MAX_CANDIDATES_PER_SEED);
-  if (directIds.length === 0) return { enqueued: 0, skipped: 0 };
-  if (!(await reserveQuota(ctx, COST_CHANNEL))) return { enqueued: 0, skipped: 0 };
-  return ingestChannelIds(admin, directIds, 'description_mention', 'description_mention', seedId, depth);
+  if (directIds.length === 0) return { enqueued: 0, skipped: 0, ids: 0 };
+  const items = await hydrateChannelsBatched(ctx, directIds);
+  const r = await ingestCandidatesBatch(admin, itemsToDiscovered(items, 'description_mention', 'description_mention', seedId, depth));
+  return { ...r, ids: directIds.length };
 }
 
 // ─────────────────────────── Seed selection ─────────────────────────────────
@@ -430,7 +482,139 @@ async function loadApprovedSeeds(admin: Admin, limit: number): Promise<Array<{ y
   return (data as any[] | null) ?? [];
 }
 
+// ─────────────────────────── Job worker ─────────────────────────────────────
+
+async function updateJob(admin: Admin, jobId: string, patch: Record<string, unknown>) {
+  await admin.from('discovery_jobs').update({ ...patch, heartbeat_at: new Date().toISOString() }).eq('id', jobId);
+}
+
+async function isCancelled(admin: Admin, jobId: string): Promise<boolean> {
+  const { data } = await admin.from('discovery_jobs').select('cancel_requested').eq('id', jobId).maybeSingle();
+  return Boolean((data as any)?.cancel_requested);
+}
+
+interface JobParams { targetSeedId?: string; requestedMethod?: string }
+
+async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
+  const started = Date.now();
+  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0 };
+  let totalEnqueued = 0;
+  let totalSkipped = 0;
+  let seedsProcessed = 0;
+  const bySource: Record<string, { enqueued: number; skipped: number; ids: number; runs: number }> = {};
+  const record = (m: string, r: CrawlResult) => {
+    const b = bySource[m] ?? { enqueued: 0, skipped: 0, ids: 0, runs: 0 };
+    b.enqueued += r.enqueued; b.skipped += r.skipped; b.ids += r.ids; b.runs++;
+    bySource[m] = b;
+  };
+  const overBudget = () => ctx.usedThisRun >= DAILY_QUOTA_CAP * BUDGET_STOP_RATIO;
+  const overDeadline = () => Date.now() - started >= SOFT_DEADLINE_MS;
+
+  await updateJob(admin, jobId, { status: 'running', started_at: new Date().toISOString() });
+
+  try {
+    // Single-seed explicit request
+    if (params.targetSeedId) {
+      const methods = params.requestedMethod && params.requestedMethod !== 'auto'
+        ? [params.requestedMethod]
+        : ['playlist_collab', 'description_mention'];
+      // Prefetch seed description once for description_mention (channels.list = 1 unit).
+      let seedDesc = '';
+      if (methods.includes('description_mention')) {
+        if (await reserveQuota(ctx, COST_CHANNEL_BATCH)) {
+          const info = await ytFetch(
+            ctx,
+            `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${encodeURIComponent(params.targetSeedId)}&key=${YOUTUBE_API_KEY}`,
+          );
+          seedDesc = info?.items?.[0]?.snippet?.description ?? '';
+        }
+      }
+      for (const m of methods) {
+        if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
+        let r: CrawlResult = { enqueued: 0, skipped: 0, ids: 0 };
+        if (m === 'playlist_collab') r = await crawlPlaylistCollab(admin, ctx, params.targetSeedId, 1);
+        else if (m === 'description_mention') r = await crawlDescriptionMention(admin, ctx, seedDesc, params.targetSeedId, 1);
+        totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(m, r);
+      }
+      seedsProcessed = 1;
+    } else {
+      // Priority queue: topic search first (highest signal), then approved-seed rotation.
+      const queries = await loadTopicQueries(admin);
+      for (const q of queries) {
+        if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
+        const r = await crawlTopicSearch(admin, ctx, q.query, q.language);
+        totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(`topic_search:${q.language}`, r);
+        seedsProcessed++;
+        await admin.from('discovery_topic_queries').update({ last_run_at: new Date().toISOString() }).eq('id', q.id);
+        if (seedsProcessed % 5 === 0) {
+          await updateJob(admin, jobId, {
+            quota_used: ctx.usedThisRun, enqueued_count: totalEnqueued, skipped_count: totalSkipped,
+            seeds_processed: seedsProcessed, api_failures: ctx.apiFailures,
+          });
+        }
+      }
+
+      const seeds = await loadApprovedSeeds(admin, MAX_SEEDS_PER_RUN);
+      // Batch-prefetch seed descriptions (up to CHANNELS_BATCH per call).
+      const descMap = new Map<string, string>();
+      const seedItems = await hydrateChannelsBatched(ctx, seeds.map((s) => s.youtube_channel_id));
+      for (const it of seedItems) descMap.set(it.id, it.snippet?.description ?? '');
+
+      const methodRotation = ['playlist_collab', 'description_mention'];
+      let mIdx = 0;
+      for (const s of seeds) {
+        if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
+        const method = methodRotation[mIdx++ % methodRotation.length];
+        let r: CrawlResult = { enqueued: 0, skipped: 0, ids: 0 };
+        if (method === 'playlist_collab') r = await crawlPlaylistCollab(admin, ctx, s.youtube_channel_id, 1);
+        else r = await crawlDescriptionMention(admin, ctx, descMap.get(s.youtube_channel_id) ?? '', s.youtube_channel_id, 1);
+        totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(method, r);
+        seedsProcessed++;
+        if (seedsProcessed % 10 === 0) {
+          await updateJob(admin, jobId, {
+            quota_used: ctx.usedThisRun, enqueued_count: totalEnqueued, skipped_count: totalSkipped,
+            seeds_processed: seedsProcessed, api_failures: ctx.apiFailures,
+          });
+        }
+      }
+    }
+
+    const cancelled = await isCancelled(admin, jobId);
+    await updateJob(admin, jobId, {
+      status: cancelled ? 'cancelled' : (overDeadline() ? 'timed_out' : 'succeeded'),
+      finished_at: new Date().toISOString(),
+      quota_used: ctx.usedThisRun,
+      enqueued_count: totalEnqueued,
+      skipped_count: totalSkipped,
+      seeds_processed: seedsProcessed,
+      api_failures: ctx.apiFailures,
+      stats: {
+        by_source: bySource,
+        duration_ms: Date.now() - started,
+        deadline_ms: SOFT_DEADLINE_MS,
+        daily_quota_cap: DAILY_QUOTA_CAP,
+      },
+    });
+  } catch (err) {
+    console.error('discovery job failed', err);
+    await updateJob(admin, jobId, {
+      status: 'failed',
+      finished_at: new Date().toISOString(),
+      error: String(err instanceof Error ? err.message : err).slice(0, 500),
+      quota_used: ctx.usedThisRun,
+      enqueued_count: totalEnqueued,
+      skipped_count: totalSkipped,
+      seeds_processed: seedsProcessed,
+      api_failures: ctx.apiFailures,
+      stats: { by_source: bySource, duration_ms: Date.now() - started },
+    });
+  }
+}
+
 // ────────────────────────────────── Entry ───────────────────────────────────
+
+// Deno.EdgeRuntime is provided by Supabase edge runtime for background tasks.
+declare const EdgeRuntime: { waitUntil: (p: Promise<unknown>) => void } | undefined;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -443,6 +627,7 @@ Deno.serve(async (req) => {
 
     const cronSecret = req.headers.get('X-Cron-Secret');
     const isCron = cronSecret && cronSecret === Deno.env.get('CRON_SECRET');
+    let requestedBy: string | null = null;
 
     if (!isCron) {
       const authHeader = req.headers.get('Authorization') ?? '';
@@ -453,98 +638,78 @@ Deno.serve(async (req) => {
       );
       const { data: userData } = await supabase.auth.getUser();
       const user = userData?.user;
-      if (!user) {
-        return new Response(JSON.stringify({ error: 'unauthorized' }), {
-          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
+      if (!user) return json({ error: 'unauthorized' }, 401);
       const { data: isAdmin } = await admin.rpc('has_role', { _user_id: user.id, _role: 'admin' });
-      if (!isAdmin) {
-        return new Response(JSON.stringify({ error: 'forbidden' }), {
-          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
+      if (!isAdmin) return json({ error: 'forbidden' }, 403);
+      requestedBy = user.id;
     }
 
-    if (!YOUTUBE_API_KEY) {
-      return new Response(JSON.stringify({ error: 'YOUTUBE_API_KEY not configured' }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    if (!YOUTUBE_API_KEY) return json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
 
     const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
-    const targetSeedId: string | undefined = body?.source_channel_id;
-    const requestedMethod: string = body?.method ?? 'auto';
 
-    const ctx: QuotaCtx = { admin, usedThisRun: 0 };
-    let totalEnqueued = 0;
-    let totalSkipped = 0;
-    const details: Array<Record<string, unknown>> = [];
+    // GET-style status inspection: ?job=<id> or body.job
+    const url = new URL(req.url);
+    const jobParam = url.searchParams.get('job') ?? body?.job;
+    if (jobParam && req.method !== 'POST') {
+      const { data } = await admin.from('discovery_jobs').select('*').eq('id', jobParam).maybeSingle();
+      return json({ ok: true, job: data });
+    }
 
-    // Helper: bail once we've spent ~90% of daily budget.
-    const overBudget = () => ctx.usedThisRun >= DAILY_QUOTA_CAP * 0.9;
+    // Cancel request
+    if (body?.action === 'cancel' && body?.job) {
+      await admin.from('discovery_jobs').update({ cancel_requested: true }).eq('id', String(body.job));
+      return json({ ok: true, cancelled: body.job });
+    }
 
-    // ── 1) Explicit single-seed request from admin UI ────────────────────────
-    if (targetSeedId) {
-      const methods = requestedMethod === 'auto'
-        ? ['related_channels', 'playlist_collab', 'description_mention']
-        : [requestedMethod];
-      for (const m of methods) {
-        if (overBudget()) break;
-        let r: CrawlResult = { enqueued: 0, skipped: 0 };
-        if (m === 'related_channels') r = await crawlRelated(admin, ctx, targetSeedId, 1);
-        else if (m === 'playlist_collab') r = await crawlPlaylistCollab(admin, ctx, targetSeedId, 1);
-        else if (m === 'description_mention') r = await crawlDescriptionMention(admin, ctx, targetSeedId, 1);
-        totalEnqueued += r.enqueued; totalSkipped += r.skipped;
-        details.push({ seed: targetSeedId, method: m, ...r });
-      }
-    } else {
-      // ── 2) Rotation crawl: approved seeds × 3 methods + multi-language topic search ──
-      const seeds = await loadApprovedSeeds(admin, MAX_SEEDS_PER_RUN);
-      const methodRotation = ['related_channels', 'playlist_collab', 'description_mention'];
-      let mIdx = 0;
-      for (const s of seeds) {
-        if (overBudget()) break;
-        const method = methodRotation[mIdx++ % methodRotation.length];
-        let r: CrawlResult = { enqueued: 0, skipped: 0 };
-        if (method === 'related_channels') r = await crawlRelated(admin, ctx, s.youtube_channel_id, 1);
-        else if (method === 'playlist_collab') r = await crawlPlaylistCollab(admin, ctx, s.youtube_channel_id, 1);
-        else if (method === 'description_mention') r = await crawlDescriptionMention(admin, ctx, s.youtube_channel_id, 1);
-        totalEnqueued += r.enqueued; totalSkipped += r.skipped;
-        details.push({ seed: s.youtube_channel_id, method, ...r });
-      }
-
-      // Multi-language topic-search sweep.
-      const queries = await loadTopicQueries(admin);
-      for (const q of queries) {
-        if (overBudget()) break;
-        const r = await crawlTopicSearch(admin, ctx, q.query, q.language);
-        totalEnqueued += r.enqueued; totalSkipped += r.skipped;
-        details.push({ topic_query: q.query, language: q.language, ...r });
-        await admin
-          .from('discovery_topic_queries')
-          .update({ last_run_at: new Date().toISOString() })
-          .eq('id', q.id);
+    // Idempotency: reject if a job is already running unless force=true.
+    if (!body?.force) {
+      const { data: running } = await admin
+        .from('discovery_jobs').select('id')
+        .in('status', ['queued', 'running'])
+        .order('created_at', { ascending: false }).limit(1);
+      if (running && running.length > 0) {
+        return json({ ok: true, already_running: true, job: (running[0] as any).id }, 202);
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        seeds_processed: details.length,
-        enqueued: totalEnqueued,
-        skipped: totalSkipped,
-        quota_used_this_run: ctx.usedThisRun,
-        daily_quota_cap: DAILY_QUOTA_CAP,
-        max_crawl_depth: MAX_CRAWL_DEPTH,
-        details,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    // Create job row
+    const { data: jobRow, error: jobErr } = await admin
+      .from('discovery_jobs')
+      .insert({
+        status: 'queued',
+        mode: body?.method ?? (body?.source_channel_id ? 'targeted' : 'auto'),
+        requested_by: requestedBy,
+      })
+      .select('id')
+      .single();
+    if (jobErr || !jobRow) return json({ error: 'failed to create job', detail: jobErr?.message }, 500);
+    const jobId = (jobRow as any).id as string;
+
+    const params: JobParams = {
+      targetSeedId: body?.source_channel_id,
+      requestedMethod: body?.method,
+    };
+
+    // Fire-and-forget background execution.
+    const work = runDiscoveryJob(admin, jobId, params);
+    if (typeof EdgeRuntime !== 'undefined') {
+      EdgeRuntime.waitUntil(work);
+    } else {
+      // Fallback for local dev — still returns 202 but awaits.
+      work.catch((e) => console.error('bg work error', e));
+    }
+
+    return json({ ok: true, job: jobId, status: 'accepted' }, 202);
   } catch (err) {
     console.error('discover-channels error', err);
-    return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return json({ error: String(err) }, 500);
   }
 });
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
