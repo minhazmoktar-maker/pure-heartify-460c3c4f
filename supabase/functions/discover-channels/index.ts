@@ -538,44 +538,94 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
       }
       seedsProcessed = 1;
     } else {
-      // Priority queue: topic search first (highest signal), then approved-seed rotation.
-      const queries = await loadTopicQueries(admin);
-      for (const q of queries) {
-        if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
-        const r = await crawlTopicSearch(admin, ctx, q.query, q.language);
-        totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(`topic_search:${q.language}`, r);
-        seedsProcessed++;
-        await admin.from('discovery_topic_queries').update({ last_run_at: new Date().toISOString() }).eq('id', q.id);
-        if (seedsProcessed % 5 === 0) {
-          await updateJob(admin, jobId, {
-            quota_used: ctx.usedThisRun, enqueued_count: totalEnqueued, skipped_count: totalSkipped,
-            seeds_processed: seedsProcessed, api_failures: ctx.apiFailures,
-          });
+      // P1.3: allocation-driven fair scheduler.
+      // Each source runs against its own quota envelope so no single source
+      // can starve the others (previously topic_search consumed the whole
+      // budget on rich runs).
+      const allocations = await loadAllocations(admin);
+      const totalCap = DAILY_QUOTA_CAP * BUDGET_STOP_RATIO;
+      const budgets: Record<string, number> = {};
+      for (const a of allocations) {
+        if (!a.enabled) continue;
+        budgets[a.source] = Math.floor(totalCap * (Number(a.share_percent) / 100));
+      }
+      const spentAtStart = ctx.usedThisRun;
+      const spentForSource = (src: string) =>
+        (bySource[src]?.runs ? 0 : 0) + Math.max(0, ctx.usedThisRun - spentAtStart - Object.entries(bySource)
+          .filter(([k]) => k !== src && k !== `topic_search:${src}`)
+          .reduce((_a, _b) => _a, 0));
+      // Simpler: track spend per source explicitly.
+      const spend: Record<string, number> = { topic_search: 0, playlist_collab: 0, description_mention: 0 };
+      const canSpend = (src: string, cost: number) =>
+        (budgets[src] ?? 0) > 0 && spend[src] + cost <= (budgets[src] ?? 0);
+      const track = (src: string, cost: number) => { spend[src] = (spend[src] ?? 0) + cost; };
+
+      // 1) topic_search (each query costs ~COST_SEARCH + hydration).
+      if ((budgets.topic_search ?? 0) > 0) {
+        const queries = await loadTopicQueries(admin);
+        for (const q of queries) {
+          if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
+          if (!canSpend('topic_search', COST_SEARCH + COST_CHANNEL_BATCH)) break;
+          const before = ctx.usedThisRun;
+          const r = await crawlTopicSearch(admin, ctx, q.query, q.language);
+          track('topic_search', ctx.usedThisRun - before);
+          totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(`topic_search:${q.language}`, r);
+          seedsProcessed++;
+          await admin.from('discovery_topic_queries').update({ last_run_at: new Date().toISOString() }).eq('id', q.id);
+          if (seedsProcessed % 5 === 0) {
+            await updateJob(admin, jobId, {
+              quota_used: ctx.usedThisRun, enqueued_count: totalEnqueued, skipped_count: totalSkipped,
+              seeds_processed: seedsProcessed, api_failures: ctx.apiFailures,
+              stats: { by_source: bySource, spend, budgets },
+            });
+          }
         }
       }
 
-      const seeds = await loadApprovedSeeds(admin, MAX_SEEDS_PER_RUN);
-      // Batch-prefetch seed descriptions (up to CHANNELS_BATCH per call).
-      const descMap = new Map<string, string>();
-      const seedItems = await hydrateChannelsBatched(ctx, seeds.map((s) => s.youtube_channel_id));
-      for (const it of seedItems) descMap.set(it.id, it.snippet?.description ?? '');
-
-      const methodRotation = ['playlist_collab', 'description_mention'];
-      let mIdx = 0;
-      for (const s of seeds) {
-        if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
-        const method = methodRotation[mIdx++ % methodRotation.length];
-        let r: CrawlResult = { enqueued: 0, skipped: 0, ids: 0 };
-        if (method === 'playlist_collab') r = await crawlPlaylistCollab(admin, ctx, s.youtube_channel_id, 1);
-        else r = await crawlDescriptionMention(admin, ctx, descMap.get(s.youtube_channel_id) ?? '', s.youtube_channel_id, 1);
-        totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(method, r);
-        seedsProcessed++;
-        if (seedsProcessed % 10 === 0) {
-          await updateJob(admin, jobId, {
-            quota_used: ctx.usedThisRun, enqueued_count: totalEnqueued, skipped_count: totalSkipped,
-            seeds_processed: seedsProcessed, api_failures: ctx.apiFailures,
-          });
+      // 2) Approved-seed methods with per-source budgets.
+      const wantPlaylist = (budgets.playlist_collab ?? 0) > 0;
+      const wantDesc = (budgets.description_mention ?? 0) > 0;
+      if (wantPlaylist || wantDesc) {
+        const seeds = await loadApprovedSeeds(admin, MAX_SEEDS_PER_RUN);
+        const descMap = new Map<string, string>();
+        if (wantDesc && seeds.length > 0) {
+          const seedItems = await hydrateChannelsBatched(ctx, seeds.map((s) => s.youtube_channel_id));
+          for (const it of seedItems) descMap.set(it.id, it.snippet?.description ?? '');
         }
+
+        for (const s of seeds) {
+          if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
+          // Alternate methods; skip any whose per-source budget is exhausted.
+          const order = wantPlaylist && wantDesc
+            ? (seedsProcessed % 2 === 0 ? ['playlist_collab','description_mention'] : ['description_mention','playlist_collab'])
+            : (wantPlaylist ? ['playlist_collab'] : ['description_mention']);
+          for (const method of order) {
+            if (!canSpend(method, COST_PLAYLISTS + COST_CHANNEL_BATCH)) continue;
+            const before = ctx.usedThisRun;
+            let r: CrawlResult = { enqueued: 0, skipped: 0, ids: 0 };
+            if (method === 'playlist_collab') r = await crawlPlaylistCollab(admin, ctx, s.youtube_channel_id, 1);
+            else r = await crawlDescriptionMention(admin, ctx, descMap.get(s.youtube_channel_id) ?? '', s.youtube_channel_id, 1);
+            track(method, ctx.usedThisRun - before);
+            totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(method, r);
+          }
+          seedsProcessed++;
+          if (seedsProcessed % 10 === 0) {
+            await updateJob(admin, jobId, {
+              quota_used: ctx.usedThisRun, enqueued_count: totalEnqueued, skipped_count: totalSkipped,
+              seeds_processed: seedsProcessed, api_failures: ctx.apiFailures,
+              stats: { by_source: bySource, spend, budgets },
+            });
+          }
+        }
+      }
+
+      // Emit per-source metrics for the ops dashboard.
+      for (const [src, units] of Object.entries(spend)) {
+        await admin.from('ops_metrics').insert({
+          metric: 'discovery.quota.spent',
+          value: units,
+          tags: { source: src, job: jobId },
+        });
       }
     }
 
