@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const STORAGE_KEY = "heartify.bookmarks.v1";
 
@@ -114,6 +115,12 @@ const Bookmarks = () => {
       />
       <Navbar />
 
+      <PullToRefresh
+        onRefresh={async () => {
+          setItems(loadAll());
+          toast.success("Bookmarks refreshed");
+        }}
+      >
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <SectionHeader
           title="Bookmarks"
@@ -263,6 +270,7 @@ const Bookmarks = () => {
           </p>
         </Card>
       </main>
+      </PullToRefresh>
     </div>
   );
 };

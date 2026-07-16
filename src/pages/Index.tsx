@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import PullToRefresh from "@/components/PullToRefresh";
+import { toast } from "sonner";
 import { Video, Headphones, Sparkles, Shuffle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
@@ -45,8 +48,15 @@ const Index = () => {
   const { user } = useAuth();
   const [mainTab, setMainTab] = useState<MainTab>("curated");
   const [selectedCategory, setSelectedCategory] = useState<HalalCategory>("All");
+  const queryClient = useQueryClient();
+
+  const onRefresh = async () => {
+    await queryClient.invalidateQueries();
+    toast.success("Feed refreshed");
+  };
 
   return (
+    <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
     <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Heartify — Curated Halal Video & Audio App"
@@ -172,6 +182,7 @@ const Index = () => {
 
       <AudioPlayer />
     </div>
+    </PullToRefresh>
   );
 };
 
