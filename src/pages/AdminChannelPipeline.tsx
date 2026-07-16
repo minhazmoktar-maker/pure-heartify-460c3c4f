@@ -147,7 +147,7 @@ const AdminChannelPipeline = () => {
 
   return (
     <div className="min-h-screen">
-      <SEO title="Channel Moderation Pipeline · Admin" description="Confidence-tiered channel moderation" />
+      <SEO title="Channel Moderation Pipeline · Admin" description="Confidence-tiered channel moderation" path="/admin/channel-pipeline" />
       <Navbar />
       <main className="mx-auto max-w-7xl p-4 sm:p-6 space-y-6">
         <header className="flex flex-wrap items-center justify-between gap-3">
