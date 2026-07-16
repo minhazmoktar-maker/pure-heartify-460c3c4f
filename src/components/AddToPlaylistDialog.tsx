@@ -35,8 +35,8 @@ export default function AddToPlaylistDialog({ videoId, variant = "button" }: Pro
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={setOpen}>
+      <ResponsiveModalTrigger asChild>
         {variant === "icon" ? (
           <button aria-label="Add to playlist" className="rounded-pill border border-border p-2 hover:bg-accent">
             <Plus className="h-4 w-4" />
@@ -46,11 +46,11 @@ export default function AddToPlaylistDialog({ videoId, variant = "button" }: Pro
             <Plus className="mr-1.5 h-4 w-4" /> Save
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Save to playlist</DialogTitle>
-        </DialogHeader>
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent className="max-w-md">
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle>Save to playlist</ResponsiveModalTitle>
+        </ResponsiveModalHeader>
         {isLoading ? (
           <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
         ) : (
@@ -103,7 +103,7 @@ export default function AddToPlaylistDialog({ videoId, variant = "button" }: Pro
             )}
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
