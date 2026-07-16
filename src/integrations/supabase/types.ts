@@ -4424,6 +4424,19 @@ export type Database = {
           source: Database["public"]["Enums"]["trust_event_source"]
         }[]
       }
+      get_heartify_trending_ids: {
+        Args: { _limit?: number; _window_hours?: number }
+        Returns: {
+          score: number
+          video_id: string
+        }[]
+      }
+      get_hidden_gem_ids: {
+        Args: { _limit?: number; _max_impressions?: number }
+        Returns: {
+          video_id: string
+        }[]
+      }
       get_internal_config: { Args: { _key: string }; Returns: string }
       get_or_create_referral_code: { Args: never; Returns: string }
       get_public_dhikr_circle: {
@@ -4475,6 +4488,13 @@ export type Database = {
         Args: { _handle: string; _week_start: string }
         Returns: Json
       }
+      get_recent_impression_ids: {
+        Args: { _hours?: number; _limit?: number; _user_id: string }
+        Returns: {
+          shown_count: number
+          video_id: string
+        }[]
+      }
       get_referral_tier_progress: { Args: never; Returns: Json }
       get_related_searches: {
         Args: { _limit?: number; _query: string }
@@ -4521,6 +4541,12 @@ export type Database = {
         Args: { _limit?: number; _window_hours?: number }
         Returns: {
           hits: number
+          video_id: string
+        }[]
+      }
+      get_user_dismissed_video_ids: {
+        Args: { _limit?: number; _user_id: string }
+        Returns: {
           video_id: string
         }[]
       }
