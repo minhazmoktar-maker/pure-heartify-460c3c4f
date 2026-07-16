@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, PlayCircle, Compass, BookOpen, User } from "lucide-react";
 import { SPINES, shouldShowBottomBar, resolveSpine, type SpineId } from "@/lib/navigation";
