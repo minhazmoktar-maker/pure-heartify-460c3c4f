@@ -173,14 +173,18 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Center — Search */}
-        <div className="flex max-w-xl flex-1 items-center">
+        {/* Center — Search (desktop/tablet) */}
+        <div className="hidden max-w-xl flex-1 items-center md:flex">
           <form onSubmit={handleSearch} className="relative flex w-full">
             <input
-              type="text"
+              type="search"
+              inputMode="search"
+              enterKeyHint="search"
+              autoComplete="off"
               placeholder="Search halal content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search halal content"
               className="h-10 w-full rounded-l-full border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
             />
             <button type="submit" aria-label="Search" className="flex h-10 items-center justify-center rounded-r-full border border-l-0 border-border bg-secondary px-5 hover:bg-muted transition-colors">
@@ -189,8 +193,19 @@ const Navbar = () => {
           </form>
         </div>
 
+        {/* Spacer on mobile so right cluster hugs the edge */}
+        <div className="flex-1 md:hidden" aria-hidden />
+
         {/* Right */}
         <div className="flex items-center gap-1">
+          <Link
+            to="/search"
+            aria-label="Search"
+            title="Search"
+            className="tap-target rounded-pill hover:bg-secondary transition-colors md:hidden"
+          >
+            <Search className="h-5 w-5 text-foreground" />
+          </Link>
           <Link
             to="/channels"
             className="hidden items-center gap-1.5 rounded-pill px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary md:flex"
@@ -208,6 +223,14 @@ const Navbar = () => {
             className={`tap-target rounded-pill transition-colors ${kidsOn ? "bg-primary/15 text-primary" : "hover:bg-secondary"}`}
           >
             <Baby className="h-5 w-5" />
+          </button>
+          <button
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className="tap-target rounded-pill hover:bg-secondary transition-colors hidden sm:inline-flex"
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
           </button>
           <button
             onClick={toggleTheme}
