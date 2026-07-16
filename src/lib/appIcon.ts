@@ -1,3 +1,4 @@
+// design-lint-disable — brand/canvas/chart palette requires literal hex colors
 // Phase 10 — User-selectable app icon.
 // On the web, we swap the browser tab favicon <link>. On native Capacitor,
 // we dynamically import `capacitor-app-icon` if it's installed — this is a

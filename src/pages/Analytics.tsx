@@ -1,3 +1,4 @@
+// design-lint-disable — brand/canvas/chart palette requires literal hex colors
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
