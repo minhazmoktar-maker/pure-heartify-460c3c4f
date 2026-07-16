@@ -325,7 +325,7 @@ function diversify(items: Recommendation[], limit: number): Recommendation[] {
 }
 
 export class HybridRulesRecommendationProvider implements RecommendationProvider {
-  readonly name = "hybrid-rules-v1";
+  readonly name = "hybrid-rules-v2";
 
   async recommend(
     signals: UserSignals,
@@ -335,13 +335,23 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
     const excludeWatched = opts.excludeWatched ?? true;
     const scored: Recommendation[] = [];
 
-    // Adaptive per-user jitter. Cold-start users (empty history + no
-    // interests) all collapse onto the same trending/hidden-gem pool, so a
-    // tiny ±4% jitter is not enough to differentiate their feeds. We scale
-    // the jitter magnitude by an inverse-signal-strength factor and rotate
-    // the salt daily so the same user's ordering evolves over time. Ranking
-    // remains halal-first — even the maximum jitter (±18%) cannot overturn
-    // a trusted+high-halal candidate against an untrusted low-halal one.
+    // Per-user identity seed. Stable across sessions for signed-in users so
+    // taste-shaped weight perturbation is consistent; salted with a slow
+    // rotating bucket (weekly) so the same user still sees evolution over
+    // time without daily churn wiping short-term learning.
+    const identity = signals.userId ?? "anon";
+    const weekBucket = Math.floor(Date.now() / (7 * 86400000)).toString(36);
+    const userSeed = `${identity}:${weekBucket}`;
+
+    // Personalized weight vector — two users literally optimize different
+    // linear combinations of the same signals. Halal/trust weights have a
+    // higher floor (see perturbWeights) so the halal-first invariant holds.
+    const W = perturbWeights(userSeed);
+
+    // Per-user exploration ε: users with more diversity preference and less
+    // signal history get more exploration. Bounded so a fully-signalled
+    // user still gets some novelty (5%) and a cold-start user never gets
+    // fully random (30% ceiling).
     const signalStrength = Math.min(
       1,
       (signals.interests.length * 0.06) +
@@ -350,18 +360,34 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
       (signals.categoryAffinity.size * 0.05) +
       (signals.channelAffinity.size * 0.04),
     );
-    // 0.18 for cold-start users → 0.05 for fully-signalled users.
+    const diversityPref = Math.min(1, Math.max(0, signals.diversityLevel) / 100);
+    const epsilon = Math.min(
+      0.30,
+      Math.max(0.05, W.exploration + (1 - signalStrength) * 0.15 + diversityPref * 0.05),
+    );
+
+    // Per-user pool partitioning. Global trending/hidden-gem pools are the
+    // main reason two viewers with identical taste see identical feeds. We
+    // bucket each pool id against the user seed and, for the top slot in
+    // each pool, drop the tail of items whose bucket doesn't match. This
+    // is deterministic per user + per week so pagination stays stable, and
+    // strictly a *subset* operation — never adds unmoderated content.
+    const inUserPartition = (videoId: string, keepFraction: number): boolean => {
+      if (keepFraction >= 1) return true;
+      const r = hash01(`${userSeed}:part:${videoId}`);
+      return r < keepFraction;
+    };
+    const trendingKeep = 0.55;         // each user sees ~55% of the trending pool
+    const hiddenGemKeep = 0.45;        // deeper divergence on discovery pool
+
+    // Adaptive per-user score jitter. Ranking stays halal-first — even the
+    // maximum jitter cannot overturn a trusted+high-halal candidate against
+    // an untrusted low-halal one, because the halal/trusted contributions
+    // already sit at the top of the weight vector.
     const jitterAmp = 0.05 + (1 - signalStrength) * 0.13;
-    const daySalt = Math.floor(Date.now() / 86400000).toString(36);
-    const salt = `${signals.userId ?? "anon"}:${daySalt}`;
     const jitter = (videoId: string): number => {
-      let h = 2166136261 >>> 0;
-      const s = `${salt}:${videoId}`;
-      for (let i = 0; i < s.length; i++) {
-        h ^= s.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-      }
-      return ((h >>> 0) / 0xffffffff - 0.5) * 2 * jitterAmp;
+      const r = hash01(`${userSeed}:j:${videoId}`);
+      return (r - 0.5) * 2 * jitterAmp;
     };
 
     for (const c of candidates) {
@@ -376,12 +402,43 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
       // Anti-repeat hard cutoff: shown 4+ times in last 24h → drop entirely.
       if ((signals.recentImpressionCounts.get(c.video_id) ?? 0) >= 4) continue;
       if (opts.categoryFilter && c.category !== opts.categoryFilter) continue;
-      const { score, reasons, components } = scoreCandidate(c, signals);
+
+      // Per-user pool partitioning — only for items whose *sole* recall
+      // reason is a global pool (trending / hidden-gem). If the user has
+      // any personal affinity to the item's channel/category, we keep it.
+      const hasPersonalAffinity =
+        (c.channel_title && (signals.channelAffinity.get(c.channel_title) ?? 0) > 0) ||
+        (c.category && (signals.categoryAffinity.get(c.category) ?? 0) > 0) ||
+        signals.favoriteVideoIds.has(c.video_id);
+      if (!hasPersonalAffinity) {
+        if (signals.trendingIds.has(c.video_id) && !inUserPartition(c.video_id, trendingKeep)) continue;
+        if (signals.hiddenGemIds.has(c.video_id) && !inUserPartition(c.video_id, hiddenGemKeep)) continue;
+      }
+
+      const { score, reasons, components } = scoreCandidate(c, signals, W);
       if (score <= 0) continue;
-      const jittered = score * (1 + jitter(c.video_id));
+
+      // Epsilon-greedy exploration: with probability ε, add a small
+      // positive kick to items in the hidden-gem or novel-channel pool.
+      // This is bounded and additive, never a signed flip.
+      let explorationBonus = 0;
+      const isExplorable =
+        signals.hiddenGemIds.has(c.video_id) ||
+        (c.channel_title && !signals.seenChannelIds.has(c.channel_title) && c.is_trusted_channel === true);
+      if (isExplorable) {
+        const r = hash01(`${userSeed}:eps:${c.video_id}`);
+        if (r < epsilon) {
+          explorationBonus = 0.08 + r * 0.05;
+          reasons.push({ code: "exploration_epsilon", weight: explorationBonus, detail: `ε=${epsilon.toFixed(2)}` });
+          components["exploration_epsilon"] = 1;
+        }
+      }
+
+      const jittered = (score + explorationBonus) * (1 + jitter(c.video_id));
       scored.push({ video: c, score: Number(jittered.toFixed(4)), reasons, signals: components });
     }
     return diversify(scored, opts.limit ?? 24);
   }
 }
+
 
