@@ -245,6 +245,45 @@ export async function gatherSignals(
         })
         .catch(() => {}),
     );
+
+    // "Not Interested" / hidden — hard-filter memory (persistent).
+    jobs.push(
+      admin
+        .from("user_hidden_videos")
+        .select("video_id")
+        .eq("user_id", userId)
+        .limit(1000)
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<{ video_id: string }>) {
+            signals.dismissedVideoIds.add(row.video_id);
+          }
+        })
+        .catch(() => {}),
+    );
+
+    // Dismissed via recommendation surface (also hard filter).
+    jobs.push(
+      admin
+        .rpc("get_user_dismissed_video_ids", { _user_id: userId, _limit: 500 })
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<{ video_id: string }>) {
+            signals.dismissedVideoIds.add(row.video_id);
+          }
+        })
+        .catch(() => {}),
+    );
+
+    // Anti-repeat memory — how many times each video was shown in last 24h.
+    jobs.push(
+      admin
+        .rpc("get_recent_impression_ids", { _user_id: userId, _hours: 24, _limit: 400 })
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<{ video_id: string; shown_count: number }>) {
+            signals.recentImpressionCounts.set(row.video_id, Number(row.shown_count) || 1);
+          }
+        })
+        .catch(() => {}),
+    );
   }
 
   await Promise.all(jobs);
