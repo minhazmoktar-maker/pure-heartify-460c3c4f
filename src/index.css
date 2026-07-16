@@ -122,6 +122,30 @@
     }
   }
 
+  /* Phase M4 — native mobile polish.
+     - overscroll-behavior-y: contain → prevents rubber-band pull-to-close in PWAs and
+       lets our custom PullToRefresh own the top overscroll region.
+     - -webkit-overflow-scrolling: touch → iOS momentum scrolling.
+     - text-size-adjust: 100% → prevents iOS auto-resizing rotated text.
+     - touch-action: manipulation on interactive elements → suppresses the 300ms tap
+       delay Safari still applies to buttons/anchors. */
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  html, body {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (max-width: 767px) {
+    button, a[role="button"], [role="tab"], summary {
+      touch-action: manipulation;
+    }
+    /* Sticky headers should always clear the notch/status bar. */
+    .sticky-safe-top {
+      top: env(safe-area-inset-top, 0px);
+    }
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight text-foreground;
   }
