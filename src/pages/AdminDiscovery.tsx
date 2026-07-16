@@ -74,10 +74,38 @@ const AdminDiscovery = () => {
     try {
       const { data, error } = await supabase.functions.invoke("discover-channels", { body: {} });
       if (error) throw error;
-      toast({
-        title: "Discovery run complete",
-        description: `Enqueued ${data?.enqueued ?? 0} · skipped ${data?.skipped ?? 0} · quota ${data?.quota_used_this_run ?? 0}`,
-      });
+      if (data?.already_running) {
+        toast({ title: "Discovery already running", description: `Job ${String(data.job).slice(0, 8)}…` });
+      } else {
+        toast({
+          title: "Discovery started",
+          description: `Job ${String(data?.job ?? "").slice(0, 8)}… running in background.`,
+        });
+      }
+      // Poll job status every 5s for up to 5 min while this component is mounted.
+      const jobId = data?.job as string | undefined;
+      if (jobId) {
+        const start = Date.now();
+        const poll = async () => {
+          const { data: job } = await supabase
+            .from("discovery_jobs")
+            .select("status, enqueued_count, skipped_count, quota_used, seeds_processed")
+            .eq("id", jobId)
+            .maybeSingle();
+          if (!job) return;
+          const j = job as any;
+          if (["succeeded", "failed", "cancelled", "timed_out"].includes(j.status)) {
+            toast({
+              title: `Discovery ${j.status}`,
+              description: `Enqueued ${j.enqueued_count} · skipped ${j.skipped_count} · quota ${j.quota_used}`,
+            });
+            await load();
+            return;
+          }
+          if (Date.now() - start < 5 * 60_000) setTimeout(poll, 5000);
+        };
+        setTimeout(poll, 3000);
+      }
       await load();
     } catch (e: any) {
       toast({ title: "Discovery failed", description: String(e?.message ?? e), variant: "destructive" });
