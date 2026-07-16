@@ -20,7 +20,8 @@ export default function RouteTransition({ children }: { children: ReactNode }) {
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -2 }}
-        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        // Design system: --duration-short (200ms) with ease-standard.
+        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
         style={{ minHeight: "100%" }}
       >
         {children}

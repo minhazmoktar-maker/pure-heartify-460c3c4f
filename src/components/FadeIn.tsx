@@ -26,7 +26,8 @@ export default function FadeIn<T extends ElementType = "div">({
   index = 0,
   y = 12,
   x = 0,
-  duration = 0.35,
+  // Design system: --duration-medium (320ms) with ease-standard.
+  duration = 0.32,
   className,
   ...rest
 }: FadeInProps<T>) {
