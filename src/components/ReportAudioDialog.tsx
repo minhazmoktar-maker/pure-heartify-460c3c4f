@@ -6,8 +6,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import type { Track } from "@/data/audio";
 import { detectPlatform } from "@/hooks/useCrossDevicePlayback";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter,
-} from "@/components/ui/dialog";
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalFooter,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from "@/components/ui/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -64,8 +70,8 @@ const ReportAudioDialog = ({ track, errorCode, compact, triggerClassName }: Prop
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={setOpen}>
+      <ResponsiveModalTrigger asChild>
         <button
           onClick={(e) => e.stopPropagation()}
           aria-label={`Report a problem with ${track.title}`}
@@ -79,17 +85,17 @@ const ReportAudioDialog = ({ track, errorCode, compact, triggerClassName }: Prop
           <Flag className={compact ? "h-3.5 w-3.5" : "h-3 w-3"} />
           {!compact && <span>Report</span>}
         </button>
-      </DialogTrigger>
-      <DialogContent onClick={(e) => e.stopPropagation()} className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent onClick={(e) => e.stopPropagation()} className="sm:max-w-md">
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-destructive" />
             Report an audio problem
-          </DialogTitle>
-          <DialogDescription>
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             "{track.title}" — {track.artist}. Your report helps us keep the Premium catalog clean.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
 
         <RadioGroup value={reason} onValueChange={setReason} className="space-y-2">
           {REASONS.map((r) => (
@@ -126,14 +132,14 @@ const ReportAudioDialog = ({ track, errorCode, compact, triggerClassName }: Prop
           )}
         </div>
 
-        <DialogFooter>
+        <ResponsiveModalFooter>
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button>
           <Button onClick={submit} disabled={busy}>
             {busy ? "Sending…" : "Send report"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveModalFooter>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 };
 

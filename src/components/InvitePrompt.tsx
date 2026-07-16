@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalFooter,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from "@/components/ui/responsive-modal";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 import { useReferral } from "@/hooks/useReferral";
@@ -60,25 +68,25 @@ export function InvitePrompt({ trigger, headline, body, open: controlled, onOpen
   if (!enabled) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpenSafe}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+    <ResponsiveModal open={open} onOpenChange={setOpenSafe}>
+      <ResponsiveModalContent>
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-primary" aria-hidden />
             {headline}
-          </DialogTitle>
-          <DialogDescription>{body}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="gap-2 sm:gap-2">
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>{body}</ResponsiveModalDescription>
+        </ResponsiveModalHeader>
+        <ResponsiveModalFooter className="gap-2 sm:gap-2">
           <Button variant="ghost" onClick={handleDismiss}>
             Not now
           </Button>
           <Button onClick={handleShare} disabled={!shareUrl}>
             Share invite
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveModalFooter>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
 

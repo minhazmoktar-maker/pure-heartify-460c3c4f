@@ -13,13 +13,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalFooter,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from "@/components/ui/responsive-modal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -140,16 +141,16 @@ export default function GroupKhatmList() {
               30 members, 30 Juz. Read together, complete the Quran together.
             </p>
           </div>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <ResponsiveModal open={open} onOpenChange={setOpen}>
+            <ResponsiveModalTrigger asChild>
               <Button className="gap-1.5" disabled={!user}>
                 <Plus className="h-4 w-4" aria-hidden /> New group
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create a Khatm group</DialogTitle>
-              </DialogHeader>
+            </ResponsiveModalTrigger>
+            <ResponsiveModalContent>
+              <ResponsiveModalHeader>
+                <ResponsiveModalTitle>Create a Khatm group</ResponsiveModalTitle>
+              </ResponsiveModalHeader>
               <div className="space-y-3">
                 <div>
                   <Label htmlFor="kg-name">Name</Label>
@@ -196,13 +197,13 @@ export default function GroupKhatmList() {
                   />
                 </div>
               </div>
-              <DialogFooter>
+              <ResponsiveModalFooter>
                 <Button onClick={create} disabled={saving}>
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create group"}
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </ResponsiveModalFooter>
+            </ResponsiveModalContent>
+          </ResponsiveModal>
         </header>
 
         {loading ? (

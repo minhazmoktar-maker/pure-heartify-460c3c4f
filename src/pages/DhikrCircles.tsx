@@ -8,14 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalFooter,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from "@/components/ui/responsive-modal";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
@@ -148,19 +148,19 @@ function CreateCircleDialog({ onCreated }: { onCreated: () => void }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={setOpen}>
+      <ResponsiveModalTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" /> New circle
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Start a dhikr circle</DialogTitle>
-          <DialogDescription>
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent>
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle>Start a dhikr circle</ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             Invite others to hit a shared goal together. Counts update live for everyone.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
@@ -206,7 +206,7 @@ function CreateCircleDialog({ onCreated }: { onCreated: () => void }) {
             />
           </div>
         </div>
-        <DialogFooter>
+        <ResponsiveModalFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
             Cancel
           </Button>
@@ -214,9 +214,9 @@ function CreateCircleDialog({ onCreated }: { onCreated: () => void }) {
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Create
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveModalFooter>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
 

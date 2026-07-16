@@ -6,7 +6,15 @@ import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalFooter,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+  ResponsiveModalTrigger,
+} from "@/components/ui/responsive-modal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { usePlaylists } from "@/hooks/usePlaylists";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,16 +50,16 @@ export default function Playlists() {
           <p className="text-sm text-muted-foreground">
             {playlists.length} {playlists.length === 1 ? "playlist" : "playlists"}
           </p>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+          <ResponsiveModal open={open} onOpenChange={setOpen}>
+            <ResponsiveModalTrigger asChild>
               <Button size="sm">
                 <Plus className="mr-1.5 h-4 w-4" /> New playlist
               </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create a playlist</DialogTitle>
-              </DialogHeader>
+            </ResponsiveModalTrigger>
+            <ResponsiveModalContent>
+              <ResponsiveModalHeader>
+                <ResponsiveModalTitle>Create a playlist</ResponsiveModalTitle>
+              </ResponsiveModalHeader>
               <div className="space-y-3">
                 <Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} />
                 <Textarea placeholder="Description (optional)" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={2000} rows={3} />
@@ -74,8 +82,8 @@ export default function Playlists() {
                   Create
                 </Button>
               </div>
-            </DialogContent>
-          </Dialog>
+            </ResponsiveModalContent>
+          </ResponsiveModal>
         </div>
 
         {isLoading ? (

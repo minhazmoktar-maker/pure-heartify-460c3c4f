@@ -128,6 +128,8 @@ const Signup = () => {
           <AuthField
             icon={User}
             autoComplete="name"
+            autoCapitalize="words"
+            enterKeyHint="next"
             placeholder="Display name"
             value={displayName}
             onChange={(e) => {
@@ -142,6 +144,10 @@ const Signup = () => {
             type="email"
             inputMode="email"
             autoComplete="email"
+            enterKeyHint="next"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="Email address"
             value={email}
             onChange={(e) => {
@@ -156,6 +162,7 @@ const Signup = () => {
               icon={Lock}
               passwordToggle
               autoComplete="new-password"
+              enterKeyHint="go"
               placeholder="Password (min 8 characters)"
               value={password}
               onChange={(e) => {

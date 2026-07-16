@@ -116,6 +116,10 @@ const Login = () => {
             type="email"
             inputMode="email"
             autoComplete="email"
+            enterKeyHint="next"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="Email address"
             value={email}
             onChange={(e) => {
@@ -129,6 +133,7 @@ const Login = () => {
             icon={Lock}
             passwordToggle
             autoComplete="current-password"
+            enterKeyHint="go"
             placeholder="Password"
             value={password}
             onChange={(e) => {
