@@ -181,6 +181,17 @@ const RecentlyAddedRow = () => {
         </div>
       </div>
 
+      {isFetching && videos.length > 0 && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground"
+        >
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+          Refreshing Recently Added…
+        </div>
+      )}
+
       <div
         ref={scrollRef}
         className="mt-4 flex gap-4 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
