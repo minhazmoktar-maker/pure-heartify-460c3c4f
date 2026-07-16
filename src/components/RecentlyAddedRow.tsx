@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import { runDedupedRefresh } from "@/lib/refreshMetrics";
 
 /**
  * Recently Added — newest videos approved into Heartify (moderation-passed).
@@ -132,7 +134,24 @@ const RecentlyAddedRow = () => {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <button
-            onClick={() => refetch()}
+            onClick={() => {
+              void runDedupedRefresh("recently-added-row", async () => {
+                try {
+                  await refetch({ throwOnError: true });
+                } catch (err) {
+                  toast.error("Couldn't refresh Recently Added", {
+                    description: err instanceof Error ? err.message : "Please try again.",
+                    action: {
+                      label: "Retry",
+                      onClick: () => {
+                        void runDedupedRefresh("recently-added-row", async () => { await refetch({ throwOnError: true }); });
+                      },
+                    },
+                  });
+                  throw err;
+                }
+              });
+            }}
             disabled={isFetching}
             aria-label="Refresh Recently Added"
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
@@ -161,6 +180,17 @@ const RecentlyAddedRow = () => {
           </button>
         </div>
       </div>
+
+      {isFetching && videos.length > 0 && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground"
+        >
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+          Refreshing Recently Added…
+        </div>
+      )}
 
       <div
         ref={scrollRef}

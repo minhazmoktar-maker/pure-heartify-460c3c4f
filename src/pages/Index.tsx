@@ -58,12 +58,19 @@ const Index = () => {
   const queryClient = useQueryClient();
 
   const onRefresh = async () => {
+    // invalidateQueries resolves after refetches settle; any failure will
+    // reject and be surfaced by PullToRefresh's toast+retry UI.
     await queryClient.invalidateQueries();
     toast.success("Feed refreshed");
   };
 
   return (
-    <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
+    <PullToRefresh
+      onRefresh={onRefresh}
+      refreshKey={`home:${mainTab}`}
+      refreshingLabel="Refreshing your feed…"
+      disabled={typeof navigator !== "undefined" && !navigator.onLine}
+    >
     <div className="min-h-dvh bg-background pb-24">
       <SEO
         title="Heartify — Curated Halal Video & Audio App"

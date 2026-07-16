@@ -25,13 +25,20 @@ const SectionAll = () => {
     toast.success("Refreshed");
   };
 
+  const ptrKey = `section:${sectionId ?? "unknown"}`;
+
   // "Recently Added" is a synthetic section backed by the feed function's
   // `sort: "recent"` mode (newest moderation-approved videos, personalized).
   // Rendered via InfiniteVideoGrid so it supports true infinite scroll,
   // caching, and the personalization/dismissal/blocked-creator pipeline.
   if (sectionId === "recently-added") {
     return (
-      <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
+      <PullToRefresh
+        onRefresh={onRefresh}
+        refreshKey={ptrKey}
+        refreshingLabel="Refreshing Recently Added…"
+        disabled={typeof navigator !== "undefined" && !navigator.onLine}
+      >
       <div className="min-h-dvh bg-background pb-12">
         <SEO
           title="Recently Added — Heartify"
@@ -98,7 +105,12 @@ const SectionAll = () => {
 
 
   return (
-    <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
+    <PullToRefresh
+      onRefresh={onRefresh}
+      refreshKey={ptrKey}
+      refreshingLabel={`Refreshing ${section?.title ?? "section"}…`}
+      disabled={typeof navigator !== "undefined" && !navigator.onLine}
+    >
     <div className="min-h-dvh bg-background pb-12">
       <SEO title="Browse Section — Heartify" description="Explore curated halal videos and audio across every section on Heartify." path="/section" />
       <Navbar />
