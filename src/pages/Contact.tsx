@@ -81,8 +81,12 @@ export default function Contact() {
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-card border border-border bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-card border border-border bg-background px-3 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               maxLength={100}
+              autoComplete="name"
+              autoCapitalize="words"
+              inputMode="text"
+              enterKeyHint="next"
               required
             />
           </label>
@@ -92,8 +96,14 @@ export default function Contact() {
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full rounded-card border border-border bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-card border border-border bg-background px-3 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               maxLength={255}
+              autoComplete="email"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              inputMode="email"
+              enterKeyHint="next"
               required
             />
           </label>
