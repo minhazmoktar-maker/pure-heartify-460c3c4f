@@ -17,4 +17,29 @@ verify_jwt = true
 [functions.image-proxy]
 verify_jwt = false
 
+# Public content endpoints — anonymous visitors browse /, /watch/:id, /search
+# and /section/* without a session, so JWT verification must be disabled at
+# the edge. Each function still runs its own rate limiting and authz.
+[functions.youtube-proxy]
+verify_jwt = false
+
+[functions.feed]
+verify_jwt = false
+
+[functions.recommendations]
+verify_jwt = false
+
+[functions.search]
+verify_jwt = false
+
+[functions.prayer-times]
+verify_jwt = false
+
+[functions.qibla]
+verify_jwt = false
+
+[functions.client-bootstrap]
+verify_jwt = false
+
+
 

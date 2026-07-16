@@ -45,11 +45,13 @@ export function useExperiment(experimentKey: string): string | null {
           user_id: user?.id ?? null,
           anon_key: user ? null : anonKey,
         });
-        await supabase.from("analytics_events").insert({
-          event_name: "experiment_exposure",
-          user_id: user?.id ?? null,
-          properties: { experiment_key: experimentKey, variant_key: data },
-        });
+        if (user?.id) {
+          await supabase.from("analytics_events").insert({
+            event_name: "experiment_exposure",
+            user_id: user.id,
+            properties: { experiment_key: experimentKey, variant_key: data },
+          });
+        }
       }
     })();
     return () => {

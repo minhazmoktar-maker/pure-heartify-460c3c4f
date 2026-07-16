@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 
 const MAX_PAGE = 604;
+// NOTE: searchtruth.com currently returns text/html for .jpg paths which
+// triggers browser ORB and blocks the request. Tracked as a remaining issue —
+// requires migrating to a self-hosted mushaf image set (KFGQPC) served from
+// Supabase storage. See docs.
 const pageImage = (n: number) =>
   `https://www.searchtruth.com/quran/images1/${String(n).padStart(3, "0")}.jpg`;
 

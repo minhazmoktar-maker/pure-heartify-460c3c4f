@@ -11,9 +11,18 @@ export async function track(
   user_id?: string | null,
 ): Promise<void> {
   try {
+    // Skip insert for anonymous callers — analytics_events RLS requires an
+    // authenticated session and would return 401, flooding the console on
+    // every public page load. Authenticated tracking still runs normally.
+    let uid = user_id ?? null;
+    if (!uid) {
+      const { data } = await supabase.auth.getSession();
+      uid = data.session?.user?.id ?? null;
+      if (!uid) return;
+    }
     const { error } = await supabase.from("analytics_events").insert([{
       event_name,
-      user_id: user_id ?? null,
+      user_id: uid,
       properties: properties as never,
     }]);
     if (error && import.meta.env.DEV) {
