@@ -264,6 +264,10 @@ const Profile = () => {
               Save Changes
             </Button>
 
+            <div className="pt-4 sm:hidden">
+              <UpgradeCTA />
+            </div>
+
             <div className="pt-4">
               <WeeklyRecapCard />
             </div>
