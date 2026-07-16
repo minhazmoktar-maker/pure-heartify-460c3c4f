@@ -1,7 +1,7 @@
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
-import { Shield, Lock, Eye, FileCheck, Users, AlertCircle } from "lucide-react";
+import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server } from "lucide-react";
 
 /**
  * Public Trust page. App-owned editable content maintained by the Heartify team.
