@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
@@ -6,10 +6,7 @@ import { Video, Headphones, Sparkles, Shuffle, TrendingUp, Clock, Zap } from "lu
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import HalalCategoryFilter from "@/components/HalalCategoryFilter";
-import AudioSection from "@/components/AudioSection";
-import AudioPlayer from "@/components/AudioPlayer";
 import CuratedSectionRow from "@/components/CuratedSectionRow";
-import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import DailyDoseHero from "@/components/DailyDoseHero";
 import SEO from "@/components/SEO";
 import NextSalahWidget from "@/components/NextSalahWidget";
@@ -24,6 +21,13 @@ import { CURATED_SECTIONS } from "@/data/curatedSections";
 import { FeedDiversityProvider, useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import type { FeedSort } from "@/hooks/useInfiniteFeed";
 import { cn } from "@/lib/utils";
+
+// Tab-conditional / below-the-fold — kept out of the initial main bundle so
+// mid-range Android phones don't parse framer-motion + audio player + infinite
+// feed code paths until the user actually switches to Browse/Listen.
+const AudioSection = lazy(() => import("@/components/AudioSection"));
+const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
+const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
 
 const DiversityToggle = () => {
   const { showMoreChannels, toggleShowMoreChannels } = useFeedDiversity();
