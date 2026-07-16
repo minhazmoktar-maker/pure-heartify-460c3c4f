@@ -1202,6 +1202,66 @@ export type Database = {
         }
         Relationships: []
       }
+      discovery_jobs: {
+        Row: {
+          api_failures: number
+          cancel_requested: boolean
+          created_at: string
+          enqueued_count: number
+          error: string | null
+          finished_at: string | null
+          heartbeat_at: string | null
+          id: string
+          mode: string
+          quota_used: number
+          requested_by: string | null
+          seeds_processed: number
+          skipped_count: number
+          started_at: string | null
+          stats: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          api_failures?: number
+          cancel_requested?: boolean
+          created_at?: string
+          enqueued_count?: number
+          error?: string | null
+          finished_at?: string | null
+          heartbeat_at?: string | null
+          id?: string
+          mode?: string
+          quota_used?: number
+          requested_by?: string | null
+          seeds_processed?: number
+          skipped_count?: number
+          started_at?: string | null
+          stats?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          api_failures?: number
+          cancel_requested?: boolean
+          created_at?: string
+          enqueued_count?: number
+          error?: string | null
+          finished_at?: string | null
+          heartbeat_at?: string | null
+          id?: string
+          mode?: string
+          quota_used?: number
+          requested_by?: string | null
+          seeds_processed?: number
+          skipped_count?: number
+          started_at?: string | null
+          stats?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discovery_quota_ledger: {
         Row: {
           api_name: string
@@ -4442,6 +4502,13 @@ export type Database = {
           matched_channel_id: string
           matched_title: string
           score: number
+        }[]
+      }
+      check_channel_duplicates_batch: {
+        Args: { _ids: string[] }
+        Returns: {
+          exists_in: string
+          youtube_channel_id: string
         }[]
       }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
