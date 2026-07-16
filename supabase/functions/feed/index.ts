@@ -85,8 +85,13 @@ Deno.serve(async (req) => {
     // NOTE: we intentionally overfetch a bit so post-fetch JS blocklist filter
     // can drop matches without leaving the page short of `limit`.
     // Overfetch more when locale-boosting so we can re-rank without starving pages.
-    const fetchLimit = Math.min(limit * (contentLanguages.length ? 3 : 2), 300);
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=published_at.desc.nullslast,halal_score.desc,ingested_at.desc&limit=${fetchLimit}`;
+    const fetchLimit = Math.min(limit * (contentLanguages.length ? 5 : 4), 400);
+    const orderClause = sort === "trending"
+      ? "view_count.desc.nullslast,published_at.desc.nullslast,halal_score.desc"
+      : sort === "recent"
+      ? "ingested_at.desc,published_at.desc.nullslast,halal_score.desc"
+      : "published_at.desc.nullslast,halal_score.desc,ingested_at.desc";
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=${orderClause}&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
