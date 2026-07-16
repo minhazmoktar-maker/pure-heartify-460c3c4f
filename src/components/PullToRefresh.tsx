@@ -1,6 +1,8 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, ArrowDown } from "lucide-react";
+import { Loader2, ArrowDown, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { runDedupedRefresh, isRefreshing } from "@/lib/refreshMetrics";
 
 interface Props {
   /** Called when the user completes a pull. Must return a promise. */
@@ -12,16 +14,21 @@ interface Props {
   maxPull?: number;
   /** Force disable (e.g. offline). */
   disabled?: boolean;
+  /** Dedupe key — overlapping refreshes on the same key share one promise. */
+  refreshKey?: string;
+  /** Short label shown next to the spinner during refresh. */
+  refreshingLabel?: string;
   className?: string;
 }
 
 /**
- * Native-feeling pull-to-refresh.
- * - Touch-only, mobile-only (`useIsMobile`).
- * - Activates only when the document scrollTop is 0 at the start of the gesture,
- *   so it never fights infinite scroll or inner scrollers.
- * - Applies rubber-band resistance and respects prefers-reduced-motion.
- * - Passes through vertical scrolls that are not "pull down from top".
+ * Native-feeling pull-to-refresh with dedupe, metrics, and error+retry.
+ * - Touch-only (mobile widths OR coarse pointers, covers tablets/foldables).
+ * - Activates only when scrollTop is 0, so it never fights infinite scroll.
+ * - Rubber-band resistance + prefers-reduced-motion support.
+ * - Overlapping pulls on the same key share one in-flight promise.
+ * - Failed refreshes show a Sonner toast with a one-tap Retry action; scroll
+ *   position is preserved because the tree never unmounts on refresh.
  */
 export default function PullToRefresh({
   onRefresh,
@@ -29,35 +36,72 @@ export default function PullToRefresh({
   threshold = 72,
   maxPull = 120,
   disabled,
+  refreshKey = "default",
+  refreshingLabel = "Refreshing…",
   className,
 }: Props) {
   const isMobile = useIsMobile();
+  const [coarse, setCoarse] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const startY = useRef<number | null>(null);
   const active = useRef(false);
   const [pull, setPull] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [errored, setErrored] = useState(false);
   const reduce = useRef(false);
 
   useEffect(() => {
     reduce.current =
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    setCoarse(
+      typeof window !== "undefined" &&
+        window.matchMedia?.("(pointer: coarse)").matches,
+    );
   }, []);
+
+  const enabled = (isMobile || coarse) && !disabled;
 
   const scrollTop = () =>
     document.scrollingElement?.scrollTop ??
     document.documentElement.scrollTop ??
     0;
 
+  const runRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setErrored(false);
+    setPull(threshold);
+    try {
+      await runDedupedRefresh(refreshKey, async () => {
+        await onRefresh();
+      });
+    } catch (err) {
+      setErrored(true);
+      const message = err instanceof Error ? err.message : "Refresh failed";
+      toast.error("Couldn't refresh", {
+        description: message,
+        action: {
+          label: "Retry",
+          onClick: () => {
+            // Scroll position is preserved automatically — the tree stays mounted.
+            void runRefresh();
+          },
+        },
+      });
+    } finally {
+      setRefreshing(false);
+      setPull(0);
+    }
+  }, [onRefresh, threshold, refreshKey]);
+
   const onTouchStart = useCallback(
     (e: TouchEvent) => {
-      if (disabled || refreshing) return;
+      if (!enabled || refreshing || isRefreshing(refreshKey)) return;
       if (scrollTop() > 0) return;
       startY.current = e.touches[0].clientY;
       active.current = true;
     },
-    [disabled, refreshing],
+    [enabled, refreshing, refreshKey],
   );
 
   const onTouchMove = useCallback(
@@ -68,13 +112,11 @@ export default function PullToRefresh({
         setPull(0);
         return;
       }
-      // If page scrolled while dragging (e.g. content grew), bail.
       if (scrollTop() > 0) {
         active.current = false;
         setPull(0);
         return;
       }
-      // Rubber-band: sqrt-based resistance so it never exceeds maxPull.
       const resisted = Math.min(maxPull, Math.sqrt(dy) * 8);
       setPull(resisted);
       if (resisted > 12 && e.cancelable) e.preventDefault();
@@ -82,32 +124,19 @@ export default function PullToRefresh({
     [maxPull],
   );
 
-  const doRefresh = useCallback(async () => {
-    setRefreshing(true);
-    setPull(threshold);
-    try {
-      await onRefresh();
-    } catch {
-      /* swallowed — caller shows its own toast */
-    } finally {
-      setRefreshing(false);
-      setPull(0);
-    }
-  }, [onRefresh, threshold]);
-
   const onTouchEnd = useCallback(() => {
     if (!active.current) return;
     active.current = false;
     startY.current = null;
     if (pull >= threshold && !refreshing) {
-      void doRefresh();
+      void runRefresh();
     } else {
       setPull(0);
     }
-  }, [pull, threshold, refreshing, doRefresh]);
+  }, [pull, threshold, refreshing, runRefresh]);
 
   useEffect(() => {
-    if (!isMobile || disabled) return;
+    if (!enabled) return;
     const opts: AddEventListenerOptions = { passive: false };
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, opts);
@@ -119,17 +148,18 @@ export default function PullToRefresh({
       window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("touchcancel", onTouchEnd);
     };
-  }, [isMobile, disabled, onTouchStart, onTouchMove, onTouchEnd]);
+  }, [enabled, onTouchStart, onTouchMove, onTouchEnd]);
 
   const progress = Math.min(1, pull / threshold);
-  const showIndicator = isMobile && (pull > 0 || refreshing);
+  const showIndicator = enabled && (pull > 0 || refreshing);
 
   return (
     <div ref={containerRef} className={className}>
       {showIndicator && (
         <div
-          aria-hidden={!refreshing}
           role={refreshing ? "status" : undefined}
+          aria-live={refreshing ? "polite" : undefined}
+          aria-hidden={!refreshing}
           className="pointer-events-none fixed left-1/2 z-40 -translate-x-1/2"
           style={{
             top: `calc(env(safe-area-inset-top, 0px) + 12px)`,
@@ -138,10 +168,12 @@ export default function PullToRefresh({
           }}
         >
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-lg ring-1 ring-border"
+            className="flex items-center gap-2 rounded-pill bg-card px-3 py-2 shadow-lg ring-1 ring-border"
             style={{ opacity: Math.max(0.4, progress) }}
           >
-            {refreshing ? (
+            {errored ? (
+              <AlertCircle className="h-4 w-4 text-destructive" />
+            ) : refreshing ? (
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
             ) : (
               <ArrowDown
@@ -152,14 +184,19 @@ export default function PullToRefresh({
                 }}
               />
             )}
+            {refreshing && (
+              <span className="text-xs font-medium text-foreground">
+                {refreshingLabel}
+              </span>
+            )}
           </div>
         </div>
       )}
       <div
         style={
-          isMobile && pull > 0 && !refreshing
+          enabled && pull > 0 && !refreshing
             ? { transform: `translateY(${pull * 0.4}px)`, transition: "none", willChange: "transform" }
-            : isMobile
+            : enabled
             ? { transform: "translateY(0)", transition: reduce.current ? "none" : "transform 200ms cubic-bezier(0.22,1,0.36,1)" }
             : undefined
         }
