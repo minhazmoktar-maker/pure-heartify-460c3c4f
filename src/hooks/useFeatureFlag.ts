@@ -20,15 +20,18 @@ export function useFeatureFlag(key: string, defaultValue = false): boolean {
       if (cancelled) return;
       const value = error ? defaultValue : !!data;
       setEnabled(value);
-      // Fire-and-forget analytics
-      supabase
-        .from("analytics_events")
-        .insert({
-          event_name: "feature_flag_evaluated",
-          user_id: user?.id ?? null,
-          properties: { flag_key: key, enabled: value },
-        })
-        .then(() => {});
+      // Fire-and-forget analytics — skipped for anonymous callers because
+      // analytics_events RLS requires an authenticated session.
+      if (user?.id) {
+        supabase
+          .from("analytics_events")
+          .insert({
+            event_name: "feature_flag_evaluated",
+            user_id: user.id,
+            properties: { flag_key: key, enabled: value },
+          })
+          .then(() => {});
+      }
     })();
     return () => {
       cancelled = true;
