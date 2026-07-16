@@ -59,12 +59,13 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
     >
       <div className="relative overflow-hidden rounded-card">
         <img
-          src={video.thumbnailUrl}
+          src={hiResThumb}
+          onError={handleThumbError}
           alt={video.title}
           loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
-          width={480}
-          height={270}
+          width={1280}
+          height={720}
           className="aspect-video w-full bg-muted object-cover transition-transform duration-short group-hover:scale-105"
           {...({ fetchpriority: index < 2 ? "high" : "low" } as Record<string, string>)}
         />
