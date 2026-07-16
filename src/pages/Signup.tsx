@@ -162,6 +162,7 @@ const Signup = () => {
               icon={Lock}
               passwordToggle
               autoComplete="new-password"
+              enterKeyHint="go"
               placeholder="Password (min 8 characters)"
               value={password}
               onChange={(e) => {
