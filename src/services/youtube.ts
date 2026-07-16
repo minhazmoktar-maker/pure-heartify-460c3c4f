@@ -239,6 +239,13 @@ async function callYouTubeProxy(query: string, maxResults: number): Promise<YouT
   if (Date.now() < rateLimitedUntil) {
     return { degraded: true, code: "RATE_LIMITED" };
   }
+  // youtube-proxy requires a signed-in caller (protects paid API quota).
+  // For anonymous visitors, silently degrade to curated/fallback content
+  // instead of surfacing a 401 in the console on /watch, /shorts, /search.
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData?.session) {
+    return { degraded: true, code: "AUTH_REQUIRED" };
+  }
   const key = `${query.toLowerCase()}::${maxResults}`;
   const existing = inflight.get(key);
   if (existing) return existing;
