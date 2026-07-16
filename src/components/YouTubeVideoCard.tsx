@@ -19,6 +19,14 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const timeAgo = formatTimeAgo(video.publishedAt);
   const liked = isFavorite(video.id);
   const isEmbeddableVideo = /^[a-zA-Z0-9_-]{11}$/.test(video.id);
+  // Prefer maxres (1280x720) with hq fallback for crisper thumbnails.
+  const hiResThumb = isEmbeddableVideo
+    ? `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`
+    : video.thumbnailUrl;
+  const handleThumbError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.src !== video.thumbnailUrl && video.thumbnailUrl) img.src = video.thumbnailUrl;
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
