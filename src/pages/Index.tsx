@@ -160,8 +160,31 @@ const Index = () => {
       {mainTab === "videos" && (
         <>
           <HalalCategoryFilter selected={selectedCategory} onSelect={setSelectedCategory} />
+          <div className="mx-auto flex max-w-[1800px] flex-wrap gap-2 px-4 pt-3 md:px-6" role="tablist" aria-label="Sort videos">
+            {([
+              { id: "fresh", label: "Fresh", icon: Zap },
+              { id: "trending", label: "Trending", icon: TrendingUp },
+              { id: "recent", label: "New Uploads", icon: Clock },
+            ] as const).map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                role="tab"
+                aria-selected={browseSort === id}
+                onClick={() => setBrowseSort(id)}
+                className={cn(
+                  "inline-flex min-h-11 items-center gap-1.5 rounded-pill border px-3 py-1.5 text-sm font-medium transition-colors",
+                  browseSort === id
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {label}
+              </button>
+            ))}
+          </div>
           <main className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">
-            <InfiniteVideoGrid category={selectedCategory} />
+            <InfiniteVideoGrid category={selectedCategory} sort={browseSort} />
           </main>
         </>
       )}
