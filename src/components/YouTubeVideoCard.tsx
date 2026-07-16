@@ -25,6 +25,11 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
     : video.thumbnailUrl;
   const handleThumbError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
+    // Fallback chain: maxresdefault -> hqdefault -> provided thumbnailUrl
+    if (img.src.includes("maxresdefault.jpg") && isEmbeddableVideo) {
+      img.src = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
+      return;
+    }
     if (img.src !== video.thumbnailUrl && video.thumbnailUrl) img.src = video.thumbnailUrl;
   };
 
