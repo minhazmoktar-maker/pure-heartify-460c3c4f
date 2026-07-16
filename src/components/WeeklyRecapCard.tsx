@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, Heart, Sparkles, BookOpen, Flame, Share2 } from "lucide-react";
@@ -7,29 +6,16 @@ import { useWeeklyRecap } from "@/hooks/useWeeklyRecap";
 import { useFeatureFlag } from "@/hooks/useFeatureFlag";
 import { shareContent } from "@/lib/share";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useMyHandle } from "@/hooks/useMyHandle";
 
 export function WeeklyRecapCard() {
   const enabled = useFeatureFlag("viral.weekly_recap", true);
   const { recap, loading } = useWeeklyRecap();
   const { user } = useAuth();
-  const [handle, setHandle] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    void supabase
-      .from("profiles")
-      .select("handle")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!cancelled) setHandle((data?.handle as string | null) ?? null);
-      });
-    return () => { cancelled = true; };
-  }, [user]);
+  const { handle } = useMyHandle();
 
   if (!enabled) return null;
+
 
 
   if (loading) {
