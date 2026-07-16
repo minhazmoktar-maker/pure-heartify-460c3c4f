@@ -217,9 +217,20 @@ export async function gatherSignals(
             const ts = new Date(row.watched_at).getTime();
             const days = Math.max(0, (nowMs - ts) / 86400000);
             const w = decayWeight(days);
-            if (row.category) signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
-            if (row.channel_title) signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
-            if (ts >= sessionCutoffMs && row.channel_title) signals.sessionChannelIds.add(row.channel_title);
+            const wLong = decayWeight(days, LONG_TERM_HALF_LIFE_DAYS);
+            if (row.category) {
+              signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
+              signals.longTermCategoryAffinity.set(row.category, (signals.longTermCategoryAffinity.get(row.category) ?? 0) + wLong);
+            }
+            if (row.channel_title) {
+              signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
+              signals.longTermChannelAffinity.set(row.channel_title, (signals.longTermChannelAffinity.get(row.channel_title) ?? 0) + wLong);
+              signals.seenChannelIds.add(row.channel_title);
+            }
+            if (ts >= sessionCutoffMs) {
+              if (row.channel_title) signals.sessionChannelIds.add(row.channel_title);
+              if (row.category) signals.sessionCategoryIds.add(row.category);
+            }
           }
         })
         .catch(() => {}),
