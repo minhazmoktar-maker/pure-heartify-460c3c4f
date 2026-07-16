@@ -4,6 +4,8 @@ import { Plus, Trash2, Play, Check, RotateCcw, ListPlus, Sparkles } from "lucide
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { toast } from "sonner";
+import { haptic } from "@/lib/haptics";
+
 
 type WirdItem = { id: string; arabic: string; translit: string; meaning: string; target: number };
 type Wird = { id: string; name: string; items: WirdItem[]; createdAt: number };
