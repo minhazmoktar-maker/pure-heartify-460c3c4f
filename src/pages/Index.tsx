@@ -49,6 +49,7 @@ const Index = () => {
   const { user } = useAuth();
   const [mainTab, setMainTab] = useState<MainTab>("curated");
   const [selectedCategory, setSelectedCategory] = useState<HalalCategory>("All");
+  const [browseSort, setBrowseSort] = useState<FeedSort>("fresh");
   const queryClient = useQueryClient();
 
   const onRefresh = async () => {
