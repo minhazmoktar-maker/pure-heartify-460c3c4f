@@ -434,7 +434,7 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
         signals.hiddenGemIds.has(c.video_id) ||
         (c.channel_title && !signals.seenChannelIds.has(c.channel_title) && c.is_trusted_channel === true);
       if (isExplorable) {
-        const r = hash01(`${userSeed}:eps:${c.video_id}`);
+        const r = hash01(`${dailySeed}:eps:${c.video_id}`);
         if (r < epsilon) {
           explorationBonus = 0.08 + r * 0.05;
           reasons.push({ code: "exploration_epsilon", weight: explorationBonus, detail: `ε=${epsilon.toFixed(2)}` });
