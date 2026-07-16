@@ -96,7 +96,7 @@ export default function AdminOps() {
 
   return (
     <div className="container max-w-6xl py-8 space-y-6">
-      <SEO title="Operations · Heartify" description="Owner operations dashboard" noindex />
+      <SEO title="Operations · Heartify" description="Owner operations dashboard" />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Operations</h1>
