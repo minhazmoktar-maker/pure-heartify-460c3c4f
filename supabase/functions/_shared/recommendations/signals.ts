@@ -9,9 +9,10 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import type { RecommendationContext, UserSignals } from "./types.ts";
 
 const AFFINITY_HALF_LIFE_DAYS = 14;
+const LONG_TERM_HALF_LIFE_DAYS = 180;
 
-function decayWeight(daysAgo: number): number {
-  return Math.pow(0.5, daysAgo / AFFINITY_HALF_LIFE_DAYS);
+function decayWeight(daysAgo: number, halfLife = AFFINITY_HALF_LIFE_DAYS): number {
+  return Math.pow(0.5, daysAgo / halfLife);
 }
 
 function buildContext(now: Date = new Date()): RecommendationContext {
