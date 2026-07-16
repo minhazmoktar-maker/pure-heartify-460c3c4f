@@ -55,10 +55,10 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           alt={video.title}
           loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority={index < 2 ? "high" : "low"}
           width={480}
           height={270}
           className="aspect-video w-full bg-muted object-cover transition-transform duration-short group-hover:scale-105"
+          {...({ fetchpriority: index < 2 ? "high" : "low" } as Record<string, string>)}
         />
         <div className="absolute bottom-2 left-2 right-2">
           <TrustBadges channelTitle={video.channelTitle} halalScore={video.halalScore} />
