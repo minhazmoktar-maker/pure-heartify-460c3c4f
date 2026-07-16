@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -20,34 +21,37 @@ function startOfWeekISO(d = new Date()): string {
   return date.toISOString().slice(0, 10);
 }
 
+/**
+ * React Query-backed weekly recap. Perf: the compute_weekly_recap RPC is
+ * idempotent but non-trivial — the previous useEffect implementation fired it
+ * on every mount, meaning each route change re-ran the recomputation. Caching
+ * per user+week eliminates that redundant work entirely between navigations.
+ */
 export function useWeeklyRecap() {
   const { user } = useAuth();
-  const [recap, setRecap] = useState<WeeklyRecap | null>(null);
-  const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
+  const week = startOfWeekISO();
 
-  const load = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    const week = startOfWeekISO();
-    // Recompute (idempotent) and fetch in one round-trip.
-    const { data, error } = await supabase.rpc("compute_weekly_recap", {
-      _user_id: user.id,
-      _week_start: week,
-    });
-    if (error) {
-      setLoading(false);
-      return;
-    }
-    setRecap((data as WeeklyRecap | null) ?? null);
-    setLoading(false);
-  }, [user]);
+  const query = useQuery({
+    queryKey: ["weekly-recap", user?.id ?? "anon", week],
+    enabled: !!user,
+    queryFn: async (): Promise<WeeklyRecap | null> => {
+      if (!user) return null;
+      const { data, error } = await supabase.rpc("compute_weekly_recap", {
+        _user_id: user.id,
+        _week_start: week,
+      });
+      if (error) return null;
+      return (data as WeeklyRecap | null) ?? null;
+    },
+    // Recap only changes on activity; keep it fresh for the whole week bucket
+    // — invalidation on activity is handled by the streak hook's refresh.
+    staleTime: 15 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const refresh = useCallback(async () => {
+    await qc.invalidateQueries({ queryKey: ["weekly-recap", user?.id ?? "anon", week] });
+  }, [qc, user?.id, week]);
 
-  return { recap, loading, refresh: load };
+  return { recap: query.data ?? null, loading: query.isLoading, refresh };
 }

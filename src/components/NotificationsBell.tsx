@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, ShieldAlert, CheckCircle2, XCircle, Loader2, Inbox, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -24,53 +25,66 @@ export default function NotificationsBell({ isAdmin }: Props) {
   const { user } = useAuth();
   const { entitlement, isPremium } = useEntitlement();
   const notif = useNotifications();
+  const qc = useQueryClient();
 
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [pendingReports, setPendingReports] = useState(0);
-  const [myReports, setMyReports] = useState<UserReport[]>([]);
   const [lastSeen, setLastSeen] = useState<number>(() => {
     if (typeof window === "undefined") return 0;
     return Number(window.localStorage.getItem("notif:last_seen") ?? 0);
   });
 
-  const load = useCallback(async () => {
-    if (!user) return;
-    setLoading(true);
-    // 1. My recent reports (any status).
-    const { data: mine } = await supabase
-      .from("video_reports")
-      .select("id, video_id, status, created_at, updated_at, resolution")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false, nullsFirst: false })
-      .limit(10);
-    setMyReports((mine ?? []) as UserReport[]);
+  // Perf: React Query caches these across every route change; previously each
+  // navigation re-fired both the report list and the admin queue count.
+  const reportsKey = ["notif-reports", user?.id ?? "anon"] as const;
+  const reportsQuery = useQuery({
+    queryKey: reportsKey,
+    enabled: !!user,
+    staleTime: 60 * 1000,
+    queryFn: async (): Promise<UserReport[]> => {
+      if (!user) return [];
+      const { data } = await supabase
+        .from("video_reports")
+        .select("id, video_id, status, created_at, updated_at, resolution")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false, nullsFirst: false })
+        .limit(10);
+      return (data ?? []) as UserReport[];
+    },
+  });
+  const myReports = reportsQuery.data ?? [];
 
-    // 2. Admin queue depth.
-    if (isAdmin) {
+  const pendingKey = ["notif-pending-reports"] as const;
+  const pendingQuery = useQuery({
+    queryKey: pendingKey,
+    enabled: !!user && isAdmin,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
       const { count } = await supabase
         .from("video_reports")
         .select("id", { count: "exact", head: true })
         .eq("status", "pending");
-      setPendingReports(count ?? 0);
-    }
-    setLoading(false);
-  }, [user, isAdmin]);
+      return count ?? 0;
+    },
+  });
+  const pendingReports = pendingQuery.data ?? 0;
+  const loading = reportsQuery.isLoading || pendingQuery.isLoading;
 
   useEffect(() => {
     if (!user) return;
-    void load();
-    // Realtime: any change to my reports refreshes the list.
     const ch = supabase
       .channel(`notif:${user.id}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "video_reports", filter: `user_id=eq.${user.id}` },
-        () => void load(),
+        () => {
+          void qc.invalidateQueries({ queryKey: reportsKey });
+          if (isAdmin) void qc.invalidateQueries({ queryKey: pendingKey });
+        },
       )
       .subscribe();
     return () => { void supabase.removeChannel(ch); };
-  }, [user, load]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isAdmin]);
 
   // Count what's "new" since last opened.
   const resolvedItems = myReports.filter((r) => r.status !== "pending");
