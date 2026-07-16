@@ -72,9 +72,9 @@ const Row = ({
   suffix?: string;
 }) => (
   <label className="flex flex-col gap-1">
-    <span className="text-xs font-medium text-foreground">{label}</span>
-    <div className="flex items-center rounded-lg border border-border bg-background focus-within:border-primary">
-      {prefix && <span className="pl-3 text-xs text-muted-foreground">{prefix}</span>}
+    <span className="text-micro font-medium text-foreground">{label}</span>
+    <div className="flex items-center rounded-card border border-border bg-background focus-within:border-primary">
+      {prefix && <span className="pl-3 text-micro text-muted-foreground">{prefix}</span>}
       <input
         type="number"
         min={0}
@@ -83,7 +83,7 @@ const Row = ({
         onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
         className="w-full bg-transparent px-3 py-2 text-sm text-foreground outline-none"
       />
-      {suffix && <span className="pr-3 text-xs text-muted-foreground">{suffix}</span>}
+      {suffix && <span className="pr-3 text-micro text-muted-foreground">{suffix}</span>}
     </div>
     {hint && <span className="text-[11px] text-muted-foreground">{hint}</span>}
   </label>
@@ -143,7 +143,7 @@ const Zakat = () => {
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 py-8 md:py-12">
         <header className="mb-6">
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
+          <h1 className="font-heading text-title font-bold text-foreground md:text-display">
             Zakat Calculator
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -156,15 +156,15 @@ const Zakat = () => {
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <section className="space-y-6">
             {/* Settings */}
-            <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="rounded-card border border-border bg-card p-5">
               <h2 className="mb-3 text-sm font-semibold text-foreground">Settings</h2>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <label className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-foreground">Currency</span>
+                  <span className="text-micro font-medium text-foreground">Currency</span>
                   <input
                     value={form.currency}
                     onChange={(e) => set("currency", e.target.value.toUpperCase().slice(0, 6))}
-                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm uppercase text-foreground"
+                    className="rounded-card border border-border bg-background px-3 py-2 text-sm uppercase text-foreground"
                   />
                 </label>
                 <Row
@@ -178,13 +178,13 @@ const Zakat = () => {
                   onChange={(n) => set("silverPricePerGram", n)}
                 />
                 <label className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-foreground">Nisab basis</span>
+                  <span className="text-micro font-medium text-foreground">Nisab basis</span>
                   <select
                     value={form.nisabBasis}
                     onChange={(e) =>
                       set("nisabBasis", e.target.value as "gold" | "silver")
                     }
-                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                    className="rounded-card border border-border bg-background px-3 py-2 text-sm text-foreground"
                   >
                     <option value="silver">Silver (recommended, lower)</option>
                     <option value="gold">Gold</option>
@@ -199,7 +199,7 @@ const Zakat = () => {
             </div>
 
             {/* Assets */}
-            <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="rounded-card border border-border bg-card p-5">
               <h2 className="mb-3 text-sm font-semibold text-foreground">
                 Zakatable assets
               </h2>
@@ -255,7 +255,7 @@ const Zakat = () => {
             </div>
 
             {/* Liabilities */}
-            <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="rounded-card border border-border bg-card p-5">
               <h2 className="mb-3 text-sm font-semibold text-foreground">
                 Immediate liabilities
               </h2>
@@ -274,7 +274,7 @@ const Zakat = () => {
               </div>
               <button
                 onClick={() => setForm(defaults)}
-                className="mt-4 inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs hover:bg-secondary"
+                className="mt-4 inline-flex items-center gap-1 rounded-pill border border-border bg-background px-3 py-1.5 text-micro hover:bg-secondary"
               >
                 <RotateCcw className="h-3 w-3" /> Reset all fields
               </button>
@@ -283,24 +283,24 @@ const Zakat = () => {
 
           {/* Summary */}
           <aside className="lg:sticky lg:top-24 h-fit space-y-4">
-            <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6">
+            <div className="rounded-card border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6">
               <div className="flex items-center gap-2 text-primary">
                 <Calculator className="h-4 w-4" />
-                <span className="text-xs font-semibold uppercase tracking-wide">
+                <span className="text-micro font-semibold uppercase tracking-wide">
                   Your Zakat
                 </span>
               </div>
-              <p className="mt-3 text-4xl font-bold text-foreground">
+              <p className="mt-3 text-display font-bold text-foreground">
                 {fmt.format(zakatDue)}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-micro text-muted-foreground">
                 {meetsNisab
                   ? "Payable this hawl. Distribute to eligible recipients (Q 9:60)."
                   : "Below nisab — no zakat is due right now."}
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-5 text-sm">
+            <div className="rounded-card border border-border bg-card p-5 text-sm">
               <div className="flex items-center justify-between py-1">
                 <span className="text-muted-foreground">Total assets</span>
                 <span className="font-medium text-foreground">
@@ -334,14 +334,14 @@ const Zakat = () => {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-5">
+            <div className="rounded-card border border-border bg-card p-5">
               <div className="mb-2 flex items-center gap-2">
                 <Coins className="h-4 w-4 text-[hsl(var(--gold))]" />
                 <h3 className="text-sm font-semibold text-foreground">
                   Eight categories of recipients
                 </h3>
               </div>
-              <ol className="list-decimal space-y-0.5 pl-5 text-xs text-muted-foreground">
+              <ol className="list-decimal space-y-0.5 pl-5 text-micro text-muted-foreground">
                 <li>The poor (fuqara)</li>
                 <li>The needy (masakin)</li>
                 <li>Zakat administrators</li>

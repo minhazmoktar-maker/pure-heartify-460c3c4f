@@ -113,7 +113,7 @@ export default function DuaWall() {
           <CardHeader><CardTitle className="text-base">Post a du'a</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {!user ? (
-              <div className="rounded-md border p-4 text-sm text-muted-foreground">
+              <div className="rounded-card border p-4 text-sm text-muted-foreground">
                 <Link to="/login" className="text-primary underline">Sign in</Link> to post a du'a or say Ameen.
               </div>
             ) : (
@@ -154,7 +154,7 @@ export default function DuaWall() {
                   <Card>
                     <CardContent className="space-y-3 py-4">
                       <p className="whitespace-pre-wrap text-sm leading-relaxed">{d.body}</p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center justify-between text-micro text-muted-foreground">
                         <span>{d.is_anonymous || !mine ? (d.is_anonymous ? "Anonymous" : "Community member") : "You"} · {formatDistanceToNow(new Date(d.created_at), { addSuffix: true })}</span>
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary" className="gap-1">

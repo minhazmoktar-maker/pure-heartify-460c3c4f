@@ -42,11 +42,11 @@ export default function PublicHijriMonth() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-10 pb-10 space-y-6 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Moon className="h-4 w-4 text-primary" />
               Month {m.n} of 12 · Hijri Calendar
               {sacred && (
-                <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-primary">
+                <span className="ml-2 rounded-pill bg-primary/10 px-2 py-0.5 text-primary">
                   Sacred month
                 </span>
               )}
@@ -54,19 +54,19 @@ export default function PublicHijriMonth() {
             <p
               dir="rtl"
               lang="ar"
-              className="text-6xl md:text-7xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {m.ar}
             </p>
-            <h1 className="text-3xl md:text-4xl font-semibold">
+            <h1 className="text-title md:text-display font-semibold">
               {m.translit}{" "}
-              <span className="text-muted-foreground text-2xl md:text-3xl">
+              <span className="text-muted-foreground text-title md:text-title">
                 ({m.en})
               </span>
             </h1>
             <p className="text-sm text-muted-foreground italic">Meaning: {m.meaning}</p>
-            <p className="text-base md:text-lg text-muted-foreground max-w-prose mx-auto">
+            <p className="text-base md:text-heading text-muted-foreground max-w-prose mx-auto">
               {m.summary}
             </p>
           </CardContent>

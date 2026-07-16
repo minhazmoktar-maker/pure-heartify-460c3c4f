@@ -27,20 +27,20 @@ const Pillars = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="The Five Pillars of Islam — Shahadah, Salah, Zakah, Sawm, Hajj" description="The five foundational pillars of Islam explained from the Qur'an and authentic Sunnah, with references." path="/pillars" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Columns className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">The Five Pillars of Islam</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Columns className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">The Five Pillars of Islam</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Pillars reviewed</span><span className="text-sm font-medium">{count} / {PILLARS.length}</span></div><Progress value={(count / PILLARS.length) * 100} /></Card>
         <div className="flex justify-end"><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4 mr-2" />Reset</Button></div>
         {PILLARS.map((p, i) => (
           <Card key={p.id} className="p-5 cursor-pointer hover:border-primary transition" onClick={() => persist({ ...done, [p.id]: !done[p.id] })}>
             <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="flex items-center gap-3"><Badge variant="secondary">#{i + 1}</Badge><h2 className="font-semibold text-lg">{p.name}</h2></div>
+              <div className="flex items-center gap-3"><Badge variant="secondary">#{i + 1}</Badge><h2 className="font-semibold text-heading">{p.name}</h2></div>
               {done[p.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
             </div>
-            <div className="text-2xl text-right font-arabic mb-2">{p.arabic}</div>
+            <div className="text-title text-right font-arabic mb-2">{p.arabic}</div>
             <p className="text-sm mb-2">{p.summary}</p>
             <p className="text-sm text-muted-foreground mb-2">{p.detail}</p>
-            <p className="text-xs text-muted-foreground italic">{p.reference}</p>
+            <p className="text-micro text-muted-foreground italic">{p.reference}</p>
           </Card>
         ))}
       </div>

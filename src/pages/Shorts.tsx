@@ -51,7 +51,7 @@ export default function Shorts() {
           type="button"
           onClick={() => setMuted((m) => !m)}
           aria-label={muted ? "Unmute" : "Mute"}
-          className="rounded-full bg-white/10 p-2 backdrop-blur hover:bg-white/20"
+          className="rounded-pill bg-white/10 p-2 backdrop-blur hover:bg-white/20"
         >
           {muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
         </button>
@@ -94,7 +94,7 @@ export default function Shorts() {
                   )}
                 </div>
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 space-y-1 bg-gradient-to-t from-black/80 to-transparent p-4 pb-8">
-                  <p className="text-xs font-medium uppercase tracking-wide text-white/70">
+                  <p className="text-micro font-medium uppercase tracking-wide text-white/70">
                     {v.channelTitle}
                   </p>
                   <h2 className="line-clamp-3 text-base font-semibold">{v.title}</h2>

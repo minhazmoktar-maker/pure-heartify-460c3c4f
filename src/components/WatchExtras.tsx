@@ -45,7 +45,7 @@ export function WatchLaterButton({ videoId }: Props) {
     <button
       onClick={onClick}
       disabled={busy}
-      className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors hover:bg-accent disabled:opacity-60"
+      className="inline-flex items-center gap-1 rounded-pill border border-border px-3 py-1 text-micro font-medium transition-colors hover:bg-accent disabled:opacity-60"
     >
       {saved ? <Check className="h-3.5 w-3.5 text-primary" /> : <Clock className="h-3.5 w-3.5" />}
       {saved ? "Saved" : "Watch later"}
@@ -80,7 +80,7 @@ export function ShareAtTimeButton({ videoId, getCurrentTime }: Props) {
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors hover:bg-accent"
+      className="inline-flex items-center gap-1 rounded-pill border border-border px-3 py-1 text-micro font-medium transition-colors hover:bg-accent"
     >
       <Share2 className="h-3.5 w-3.5" />
       Share at time

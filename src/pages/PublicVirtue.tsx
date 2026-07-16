@@ -59,20 +59,20 @@ export default function PublicVirtue() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-5 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Heart className="h-4 w-4 text-primary" />
               Akhlāq · {idx + 1} of {VIRTUES.length}
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-5xl md:text-6xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {v.ar}
             </p>
-            <h1 className="text-2xl md:text-3xl font-semibold">{v.translit}</h1>
-            <p className="text-base md:text-lg text-primary/90 font-medium">{v.en}</p>
+            <h1 className="text-title md:text-title font-semibold">{v.translit}</h1>
+            <p className="text-base md:text-heading text-primary/90 font-medium">{v.en}</p>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
               <Badge variant="outline" className="text-[10px] uppercase">Prophetic virtue</Badge>
             </div>
@@ -81,21 +81,21 @@ export default function PublicVirtue() {
 
         <Card className="mt-6 border-border/60">
           <CardContent className="pt-5 pb-5 space-y-4">
-            <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+            <div className="rounded-card border border-primary/30 bg-primary/5 p-3">
               <div className="text-[10px] uppercase text-primary/80 mb-1 inline-flex items-center gap-1">
                 <Quote className="h-3 w-3" /> From the Qurʾān
               </div>
               <p className="text-sm md:text-base leading-relaxed italic">"{v.ayah}"</p>
-              <p className="text-xs text-muted-foreground mt-2 inline-flex items-center gap-1">
+              <p className="text-micro text-muted-foreground mt-2 inline-flex items-center gap-1">
                 <BookMarked className="h-3 w-3" /> {v.ayahRef}
               </p>
             </div>
-            <div className="rounded-md border border-border/60 p-3">
+            <div className="rounded-card border border-border/60 p-3">
               <div className="text-[10px] uppercase text-muted-foreground mb-1 inline-flex items-center gap-1">
                 <Quote className="h-3 w-3" /> From the Sunnah
               </div>
               <p className="text-sm md:text-base leading-relaxed italic">"{v.hadith}"</p>
-              <p className="text-xs text-muted-foreground mt-2 inline-flex items-center gap-1">
+              <p className="text-micro text-muted-foreground mt-2 inline-flex items-center gap-1">
                 <BookMarked className="h-3 w-3" /> {v.hadithRef}
               </p>
             </div>

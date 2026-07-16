@@ -40,11 +40,11 @@ export default function PublicKalimah() {
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-10 pb-10 space-y-6">
             <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+              <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
                 <Feather className="h-4 w-4 text-primary" />
                 Kalimah {num} of {KALIMAHS.length}
               </div>
-              <h1 className="mt-3 text-2xl md:text-3xl font-semibold">
+              <h1 className="mt-3 text-title md:text-title font-semibold">
                 {k.translit}
               </h1>
               <p className="text-sm text-muted-foreground">{k.name_en}</p>
@@ -53,7 +53,7 @@ export default function PublicKalimah() {
             <p
               dir="rtl"
               lang="ar"
-              className="text-3xl md:text-4xl leading-loose text-primary text-center"
+              className="text-title md:text-display leading-loose text-primary text-center"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {k.arabic}
@@ -62,11 +62,11 @@ export default function PublicKalimah() {
             <p className="italic text-center text-muted-foreground">
               {k.transliteration}
             </p>
-            <p className="text-center text-base md:text-lg">
+            <p className="text-center text-base md:text-heading">
               {k.translation}
             </p>
             {k.note && (
-              <p className="text-center text-xs text-muted-foreground max-w-prose mx-auto">
+              <p className="text-center text-micro text-muted-foreground max-w-prose mx-auto">
                 {k.note}
               </p>
             )}

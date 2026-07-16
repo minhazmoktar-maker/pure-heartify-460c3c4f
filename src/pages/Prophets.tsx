@@ -130,7 +130,7 @@ const Prophets = () => {
           />
         </div>
 
-        <p className="mb-3 text-xs text-muted-foreground">
+        <p className="mb-3 text-micro text-muted-foreground">
           Showing {filtered.length} prophet{filtered.length === 1 ? "" : "s"}
         </p>
 
@@ -142,14 +142,14 @@ const Prophets = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <CardTitle className="text-lg">
+                      <CardTitle className="text-heading">
                         {p.name}{" "}
-                        <span dir="rtl" lang="ar" className="ml-1 text-xl font-normal text-muted-foreground">
+                        <span dir="rtl" lang="ar" className="ml-1 text-heading font-normal text-muted-foreground">
                           {p.arabic}
                         </span>
                       </CardTitle>
                       {p.title && (
-                        <p className="mt-0.5 text-xs italic text-muted-foreground">{p.title}</p>
+                        <p className="mt-0.5 text-micro italic text-muted-foreground">{p.title}</p>
                       )}
                     </div>
                     <Badge variant="secondary" className="shrink-0">
@@ -158,15 +158,15 @@ const Prophets = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-micro text-muted-foreground">
                     <span className="font-semibold text-foreground">People:</span> {p.people}
                   </p>
                   <p className="text-sm leading-relaxed">{p.summary}</p>
-                  <div className="rounded-md border border-primary/20 bg-primary/5 p-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-primary">Lesson</p>
+                  <div className="rounded-card border border-primary/20 bg-primary/5 p-3">
+                    <p className="text-micro font-semibold uppercase tracking-wide text-primary">Lesson</p>
                     <p className="mt-1 text-sm">{p.lesson}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">Ref: {p.primaryRef}</p>
+                  <p className="text-micro text-muted-foreground">Ref: {p.primaryRef}</p>
                   <Button
                     size="sm"
                     variant={done ? "default" : "outline"}

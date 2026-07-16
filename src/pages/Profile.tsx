@@ -197,7 +197,7 @@ const Profile = () => {
         <div className="mb-4 flex flex-wrap gap-2">
           <Link
             to="/offline"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-secondary"
+            className="inline-flex items-center gap-2 rounded-pill border border-border bg-card px-3 py-1.5 text-micro font-medium text-foreground hover:bg-secondary"
           >
             <Download className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
             Offline downloads
@@ -231,16 +231,16 @@ const Profile = () => {
         {tab === "profile" && (
           <div className="space-y-5">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground">
+              <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-primary text-title font-bold text-primary-foreground">
                 {avatarUrl ? (
-                  <img src={avatarUrl} className="h-full w-full rounded-full object-cover" alt="avatar" />
+                  <img src={avatarUrl} className="h-full w-full rounded-pill object-cover" alt="avatar" />
                 ) : (
                   displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"
                 )}
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">{user?.email}</p>
-                <p className="text-xs text-muted-foreground">Member since {new Date(user?.created_at ?? "").toLocaleDateString()}</p>
+                <p className="text-micro text-muted-foreground">Member since {new Date(user?.created_at ?? "").toLocaleDateString()}</p>
               </div>
             </div>
 
@@ -295,12 +295,12 @@ const Profile = () => {
             </div>
 
             {/* Danger zone — required by Apple App Store guideline 5.1.1(v). */}
-            <div className="mt-8 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+            <div className="mt-8 rounded-card border border-destructive/40 bg-destructive/5 p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="text-sm font-semibold text-foreground">Delete account</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-1 text-micro text-muted-foreground">
                     Permanently removes your profile, favorites, watch history, playback progress,
                     device tokens, and search history. This cannot be undone.
                   </p>
@@ -320,7 +320,7 @@ const Profile = () => {
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-foreground">
+                        <label className="text-micro font-medium text-foreground">
                           Type <span className="font-mono">DELETE</span> to confirm
                         </label>
                         <Input
@@ -378,7 +378,7 @@ const Profile = () => {
                     <div
                       key={h.id}
                       onClick={() => navigate(`/watch/${h.video_id}`)}
-                      className="flex gap-3 rounded-lg border border-border bg-card p-3 cursor-pointer hover:bg-accent transition-colors"
+                      className="flex gap-3 rounded-card border border-border bg-card p-3 cursor-pointer hover:bg-accent transition-colors"
                     >
                       {h.thumbnail_url && (
                         <div className="relative shrink-0">
@@ -392,9 +392,9 @@ const Profile = () => {
                       )}
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-foreground line-clamp-2">{h.video_title}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{h.channel_title}</p>
+                        <p className="text-micro text-muted-foreground mt-1">{h.channel_title}</p>
                         {pct > 0 && (
-                          <p className="text-xs text-primary mt-1">{pct}% watched</p>
+                          <p className="text-micro text-primary mt-1">{pct}% watched</p>
                         )}
                       </div>
                     </div>
@@ -422,14 +422,14 @@ const Profile = () => {
                   <div
                     key={fav.id}
                     onClick={() => navigate(`/watch/${fav.video_id}`)}
-                    className="flex gap-3 rounded-lg border border-border bg-card p-3 cursor-pointer hover:bg-accent transition-colors"
+                    className="flex gap-3 rounded-card border border-border bg-card p-3 cursor-pointer hover:bg-accent transition-colors"
                   >
                     {fav.thumbnail_url && (
                       <img src={fav.thumbnail_url} className="h-20 w-32 rounded object-cover shrink-0 bg-muted" alt="" loading="lazy" decoding="async" />
                     )}
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground line-clamp-2">{fav.video_title}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{fav.channel_title}</p>
+                      <p className="text-micro text-muted-foreground mt-1">{fav.channel_title}</p>
                     </div>
                   </div>
                 ))}
@@ -459,14 +459,14 @@ const Profile = () => {
                   <div
                     key={h.id}
                     onClick={() => navigate(`/watch/${h.video_id}`)}
-                    className="flex gap-3 rounded-lg border border-border bg-card p-3 cursor-pointer hover:bg-accent transition-colors"
+                    className="flex gap-3 rounded-card border border-border bg-card p-3 cursor-pointer hover:bg-accent transition-colors"
                   >
                     {h.thumbnail_url && (
                       <img src={h.thumbnail_url} className="h-20 w-32 rounded object-cover shrink-0 bg-muted" alt="" loading="lazy" decoding="async" />
                     )}
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground line-clamp-2">{h.video_title}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-micro text-muted-foreground mt-1">
                         {new Date(h.watched_at).toLocaleDateString()}
                       </p>
                     </div>

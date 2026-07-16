@@ -207,7 +207,7 @@ const Watch = () => {
           </button>
 
           {isEmbeddableVideo ? (
-            <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
+            <div className="relative aspect-video w-full overflow-hidden rounded-card bg-black">
               {playerActivated ? (
                 <iframe
                   ref={iframeRef}
@@ -248,7 +248,7 @@ const Watch = () => {
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <div className="relative flex h-16 w-24 items-center justify-center rounded-2xl bg-red-600/90 shadow-2xl transition-transform group-hover:scale-110">
+                  <div className="relative flex h-16 w-24 items-center justify-center rounded-card bg-red-600/90 shadow-2xl transition-transform group-hover:scale-110">
                     <Play className="h-8 w-8 fill-white text-white" />
                   </div>
                 </button>
@@ -256,26 +256,26 @@ const Watch = () => {
               {/* Overlay to block YouTube end-screen suggestions */}
               {showOverlay && nextVideo && (
                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-background/95 backdrop-blur-sm">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Up Next</p>
+                  <p className="text-micro font-medium uppercase tracking-wide text-muted-foreground">Up Next</p>
                   <div className="w-full max-w-md px-4">
                     <img
                       src={nextVideo.thumbnailUrl}
                       alt={nextVideo.title}
-                      className="aspect-video w-full rounded-lg object-cover"
+                      className="aspect-video w-full rounded-card object-cover"
                     />
                     <h3 className="mt-3 line-clamp-2 text-center text-sm font-semibold text-foreground">{nextVideo.title}</h3>
-                    <p className="mt-1 text-center text-xs text-muted-foreground">{nextVideo.channelTitle}</p>
+                    <p className="mt-1 text-center text-micro text-muted-foreground">{nextVideo.channelTitle}</p>
                   </div>
                   <button
                     onClick={handleNext}
-                    className="mt-2 flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                    className="mt-2 flex items-center gap-2 rounded-pill bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                   >
                     <Play className="h-4 w-4 fill-current" />
                     {autoNextIn !== null ? `Play now (${autoNextIn})` : "Play Now"}
                   </button>
                   <button
                     onClick={() => { setAutoNextIn(null); setShowOverlay(false); }}
-                    className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-micro text-muted-foreground transition-colors hover:text-foreground"
                   >
                     Cancel autoplay & replay
                   </button>
@@ -283,14 +283,14 @@ const Watch = () => {
               )}
             </div>
           ) : (
-            <div className="flex aspect-video w-full flex-col items-center justify-center rounded-xl border border-border bg-card px-6 text-center">
-              <p className="text-lg font-semibold text-foreground">This video isn't available for in-app playback.</p>
+            <div className="flex aspect-video w-full flex-col items-center justify-center rounded-card border border-border bg-card px-6 text-center">
+              <p className="text-heading font-semibold text-foreground">This video isn't available for in-app playback.</p>
               <p className="mt-2 text-sm text-muted-foreground">Try searching for it on the Browse tab.</p>
             </div>
           )}
 
           <div className="mt-4 space-y-2">
-            <h1 className="text-lg font-bold text-foreground md:text-xl">
+            <h1 className="text-heading font-bold text-foreground md:text-heading">
               {currentVideo?.title ?? "Loading…"}
             </h1>
             <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
@@ -305,7 +305,7 @@ const Watch = () => {
                   />
                   <button
                     onClick={handleBookmark}
-                    className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs font-medium transition-colors hover:bg-accent"
+                    className="inline-flex items-center gap-1 rounded-pill border border-border px-3 py-1 text-micro font-medium transition-colors hover:bg-accent"
                   >
                     <Heart className={`h-3.5 w-3.5 ${liked ? "fill-red-500 text-red-500" : ""}`} />
                     {liked ? "Bookmarked" : "Bookmark"}
@@ -332,10 +332,10 @@ const Watch = () => {
           {nextVideo && (
             <button
               onClick={handleNext}
-              className="mt-4 flex w-full items-center justify-between rounded-lg border border-border bg-card p-3 text-left transition-colors hover:bg-accent"
+              className="mt-4 flex w-full items-center justify-between rounded-card border border-border bg-card p-3 text-left transition-colors hover:bg-accent"
             >
               <div className="min-w-0">
-                <p className="text-xs font-medium text-muted-foreground">Up next</p>
+                <p className="text-micro font-medium text-muted-foreground">Up next</p>
                 <p className="truncate text-sm font-semibold text-foreground">{nextVideo.title}</p>
               </div>
               <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />

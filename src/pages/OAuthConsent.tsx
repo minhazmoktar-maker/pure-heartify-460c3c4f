@@ -71,15 +71,15 @@ export default function OAuthConsent() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 px-6 py-10">
       {error ? (
-        <div className="w-full rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+        <div className="w-full rounded-card border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
           {error}
         </div>
       ) : !details ? (
         <p className="text-sm text-muted-foreground">Loading authorization request…</p>
       ) : (
-        <div className="w-full space-y-5 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="w-full space-y-5 rounded-card border border-border bg-card p-6 shadow-sm">
           <div>
-            <h1 className="font-heading text-xl font-semibold">
+            <h1 className="font-heading text-heading font-semibold">
               Connect {details.client?.name ?? "an app"} to Heartify
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -88,7 +88,7 @@ export default function OAuthConsent() {
             </p>
           </div>
           {details.client?.redirect_uri && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-micro text-muted-foreground">
               Redirects to: <span className="font-mono">{details.client.redirect_uri}</span>
             </p>
           )}

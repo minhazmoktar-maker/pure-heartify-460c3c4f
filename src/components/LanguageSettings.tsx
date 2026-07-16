@@ -83,7 +83,7 @@ export function LanguageSettings() {
             </SelectContent>
           </Select>
           {preferences.detected_language && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-micro text-muted-foreground">
               {t("language.detected", { value: preferences.detected_language })}
             </p>
           )}
@@ -108,7 +108,7 @@ export function LanguageSettings() {
           {activeMix && (
             <div className="flex flex-wrap gap-1 pt-1">
               {Object.entries(activeMix.language_mix).map(([lang, ratio]) => (
-                <Badge key={lang} variant="secondary" className="text-xs">
+                <Badge key={lang} variant="secondary" className="text-micro">
                   {lang.toUpperCase()} · {Math.round(ratio * 100)}%
                 </Badge>
               ))}
@@ -127,7 +127,7 @@ export function LanguageSettings() {
                   key={l.code}
                   type="button"
                   onClick={() => toggleContentLanguage(l.code)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  className={`rounded-pill border px-3 py-1 text-micro font-medium transition-colors ${
                     active
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:text-foreground"
@@ -144,7 +144,7 @@ export function LanguageSettings() {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <Label>{t("language.auto")}</Label>
-            <p className="text-xs text-muted-foreground">{t("language.autoHint")}</p>
+            <p className="text-micro text-muted-foreground">{t("language.autoHint")}</p>
           </div>
           <Switch
             checked={preferences.auto_personalize}
@@ -171,7 +171,7 @@ export function LanguageSettings() {
             step={5}
             onValueCommit={(v) => save({ diversity_level: v[0] })}
           />
-          <p className="text-xs text-muted-foreground">{t("language.diversityHint")}</p>
+          <p className="text-micro text-muted-foreground">{t("language.diversityHint")}</p>
         </div>
       </CardContent>
     </Card>

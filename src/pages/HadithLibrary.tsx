@@ -100,10 +100,10 @@ export default function HadithLibrary() {
         {loading ? (
           <div className="space-y-4" role="status" aria-label="Loading hadith">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-lg border border-border bg-card p-4">
+              <div key={i} className="rounded-card border border-border bg-card p-4">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-5 w-16 rounded-pill" />
                 </div>
                 <Skeleton className="mt-4 ml-auto h-4 w-3/4" />
                 <Skeleton className="mt-2 h-3 w-full" />
@@ -137,7 +137,7 @@ export default function HadithLibrary() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {ar && (
-                      <p dir="rtl" lang="ar" className="text-right text-2xl leading-loose">
+                      <p dir="rtl" lang="ar" className="text-right text-title leading-loose">
                         {ar}
                       </p>
                     )}

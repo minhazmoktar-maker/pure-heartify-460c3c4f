@@ -89,7 +89,7 @@ const AuditPage = () => {
         <header className="mb-6 flex items-center gap-3">
           <ShieldCheck className="h-7 w-7 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Compliance & Health Audit</h1>
+            <h1 className="text-title font-bold text-foreground">Compliance & Health Audit</h1>
             <p className="text-sm text-muted-foreground">
               Scans the curated catalog for halal-policy violations and broken thumbnails.
             </p>
@@ -107,7 +107,7 @@ const AuditPage = () => {
         </div>
 
         {err && (
-          <div className="mt-6 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          <div className="mt-6 rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
             {err}
           </div>
         )}
@@ -136,7 +136,7 @@ const AuditPage = () => {
             <section>
               <h2 className="mb-2 text-sm font-semibold text-foreground">Reasons</h2>
               {Object.entries(report.by_reason).length === 0 ? (
-                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                <div className="rounded-card border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4" /> No violations detected.
                 </div>
               ) : (
@@ -153,8 +153,8 @@ const AuditPage = () => {
             {report.sample_flagged.length > 0 && (
               <section>
                 <h2 className="mb-2 text-sm font-semibold text-foreground">Sample flagged items</h2>
-                <div className="overflow-hidden rounded-lg border border-border">
-                  <table className="heartify-table min-w-full text-xs">
+                <div className="overflow-hidden rounded-card border border-border">
+                  <table className="heartify-table min-w-full text-micro">
                     <thead>
                       <tr><th>Reason</th><th>Rule</th><th>Title</th><th>Channel</th></tr>
                     </thead>
@@ -179,7 +179,7 @@ const AuditPage = () => {
                 <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
                   <ImageOff className="h-4 w-4" /> Broken thumbnails
                 </h2>
-                <ul className="space-y-1 text-xs text-muted-foreground">
+                <ul className="space-y-1 text-micro text-muted-foreground">
                   {report.broken_thumbnails.map((t) => (
                     <li key={t.video_id} className="font-mono">{t.video_id} → HTTP {t.status}</li>
                   ))}
@@ -187,7 +187,7 @@ const AuditPage = () => {
               </section>
             )}
 
-            <p className="text-xs text-muted-foreground">Completed in {report.elapsed_ms} ms</p>
+            <p className="text-micro text-muted-foreground">Completed in {report.elapsed_ms} ms</p>
           </div>
         )}
       </div>
@@ -196,13 +196,13 @@ const AuditPage = () => {
 };
 
 const Stat = ({ label, value, tone = "neutral" }: { label: string; value: string; tone?: "ok" | "warn" | "neutral" }) => (
-  <div className={`rounded-lg border p-4 ${
+  <div className={`rounded-card border p-4 ${
     tone === "warn" ? "border-amber-500/40 bg-amber-500/5"
     : tone === "ok" ? "border-emerald-500/40 bg-emerald-500/5"
     : "border-border bg-card"
   }`}>
-    <div className="text-xs text-muted-foreground">{label}</div>
-    <div className="mt-1 text-xl font-bold text-foreground">{value}</div>
+    <div className="text-micro text-muted-foreground">{label}</div>
+    <div className="mt-1 text-heading font-bold text-foreground">{value}</div>
   </div>
 );
 

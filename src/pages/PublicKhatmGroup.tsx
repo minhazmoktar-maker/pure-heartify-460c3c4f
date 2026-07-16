@@ -83,8 +83,8 @@ export default function PublicKhatmGroup() {
       />
       <main className="container mx-auto max-w-lg px-4 py-12 space-y-6">
         <header className="text-center">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Group Khatm</p>
-          <h1 className="mt-2 text-3xl font-bold text-foreground">{group.name}</h1>
+          <p className="text-micro uppercase tracking-wider text-muted-foreground">Group Khatm</p>
+          <h1 className="mt-2 text-title font-bold text-foreground">{group.name}</h1>
           {group.intention && (
             <p className="mt-2 text-sm text-muted-foreground italic">Intention: {group.intention}</p>
           )}
@@ -102,7 +102,7 @@ export default function PublicKhatmGroup() {
               <span className="font-semibold">{group.juz_completed}/30 juz</span>
             </div>
             <Progress value={pct} />
-            <div className="mt-1 text-xs text-muted-foreground">
+            <div className="mt-1 text-micro text-muted-foreground">
               {group.juz_claimed} claimed · {group.juz_completed} completed
             </div>
           </div>
@@ -110,12 +110,12 @@ export default function PublicKhatmGroup() {
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <Users className="h-5 w-5 mx-auto text-primary" />
-              <div className="mt-1 text-2xl font-bold text-foreground">{group.member_count}</div>
-              <div className="text-xs text-muted-foreground">Reciters</div>
+              <div className="mt-1 text-title font-bold text-foreground">{group.member_count}</div>
+              <div className="text-micro text-muted-foreground">Reciters</div>
             </div>
             <div>
               <CheckCircle2 className={`h-5 w-5 mx-auto ${group.completed_at ? "text-emerald-500" : "text-muted-foreground"}`} />
-              <div className="mt-1 text-2xl font-bold text-foreground">{pct}%</div>
+              <div className="mt-1 text-title font-bold text-foreground">{pct}%</div>
               <div className="mt-1">
                 <span className={`heartify-chip ${group.completed_at ? "heartify-chip--primary" : "heartify-chip--muted"}`}>
                   {group.completed_at ? "Completed" : "In progress"}
@@ -129,7 +129,7 @@ export default function PublicKhatmGroup() {
               <Link to={joinTarget}>Join & claim a juz</Link>
             </Button>
           )}
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-micro text-center text-muted-foreground">
             You'll be asked to sign in first. Every juz counts toward one shared completion.
           </p>
         </Card>

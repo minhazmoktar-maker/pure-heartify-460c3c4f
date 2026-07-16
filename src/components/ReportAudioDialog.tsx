@@ -73,7 +73,7 @@ const ReportAudioDialog = ({ track, errorCode, compact, triggerClassName }: Prop
             triggerClassName ??
             (compact
               ? "text-muted-foreground hover:text-destructive"
-              : "inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-destructive hover:text-destructive")
+              : "inline-flex items-center gap-1 rounded-pill border border-border px-3 py-1 text-micro text-muted-foreground transition-colors hover:border-destructive hover:text-destructive")
           }
         >
           <Flag className={compact ? "h-3.5 w-3.5" : "h-3 w-3"} />
@@ -96,19 +96,19 @@ const ReportAudioDialog = ({ track, errorCode, compact, triggerClassName }: Prop
             <label
               key={r.value}
               htmlFor={`reason-${r.value}`}
-              className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm hover:bg-secondary"
+              className="flex cursor-pointer items-start gap-3 rounded-card border border-border bg-card p-3 text-sm hover:bg-secondary"
             >
               <RadioGroupItem id={`reason-${r.value}`} value={r.value} className="mt-0.5" />
               <div>
                 <p className="font-medium text-foreground">{r.label}</p>
-                <p className="text-xs text-muted-foreground">{r.hint}</p>
+                <p className="text-micro text-muted-foreground">{r.hint}</p>
               </div>
             </label>
           ))}
         </RadioGroup>
 
         <div className="space-y-1.5">
-          <Label htmlFor="details" className="text-xs">
+          <Label htmlFor="details" className="text-micro">
             Details (optional)
           </Label>
           <Textarea

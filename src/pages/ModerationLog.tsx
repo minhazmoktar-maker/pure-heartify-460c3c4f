@@ -69,7 +69,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
       <div className={embedded ? "" : "min-h-dvh bg-background"}>
         {!embedded && <Navbar />}
         <main className={embedded ? "py-4 text-center" : "container mx-auto px-4 py-16 text-center"}>
-          <h1 className="text-2xl font-bold">Sign in required</h1>
+          <h1 className="text-title font-bold">Sign in required</h1>
           <p className="mt-2 text-muted-foreground">
             <Link to="/login" className="text-primary underline">Log in</Link> as an admin to view the moderation log.
           </p>
@@ -100,7 +100,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
           <div className="mb-6 flex items-center gap-3">
             <ShieldAlert className="h-7 w-7 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold">Moderation Log</h1>
+              <h1 className="text-title font-bold">Moderation Log</h1>
               <p className="text-sm text-muted-foreground">
                 Videos rejected by the halal filter, with the exact rule that triggered each block.
               </p>
@@ -109,7 +109,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
         )}
 
         {forbidden && (
-          <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          <div className="rounded-card border border-destructive/40 bg-destructive/10 p-4 text-sm">
             You don't have admin access to view the moderation log.
           </div>
         )}
@@ -126,7 +126,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
               <select
                 value={reasonFilter}
                 onChange={(e) => setReasonFilter(e.target.value)}
-                className="rounded-md border bg-background px-3 py-2 text-sm"
+                className="rounded-card border bg-background px-3 py-2 text-sm"
               >
                 <option value="all">All reasons ({rows.length})</option>
                 {reasons.map((r) => (
@@ -146,7 +146,7 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
                 description="Either nothing has been auto-rejected under these filters, or the pipeline is running clean. Try widening the search or clearing filters."
               />
             ) : (
-              <div className="overflow-x-auto rounded-lg border">
+              <div className="overflow-x-auto rounded-card border">
                 <table className="heartify-table w-full text-sm">
                   <thead>
                     <tr>
@@ -175,10 +175,10 @@ const ModerationLog = ({ embedded = false }: { embedded?: boolean } = {}) => {
                             {r.reject_reason}
                           </span>
                         </td>
-                        <td className="font-mono text-xs">{r.matched_rule ?? "—"}</td>
+                        <td className="font-mono text-micro">{r.matched_rule ?? "—"}</td>
                         <td>{r.halal_score ?? 0}</td>
-                        <td className="text-xs text-muted-foreground">{r.source}</td>
-                        <td className="text-xs text-muted-foreground">
+                        <td className="text-micro text-muted-foreground">{r.source}</td>
+                        <td className="text-micro text-muted-foreground">
                           {new Date(r.created_at).toLocaleString()}
                         </td>
                       </tr>

@@ -184,7 +184,7 @@ const Ruqya = () => {
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Ruqya — Spiritual Healing</h1>
+            <h1 className="text-title font-bold tracking-tight">Ruqya — Spiritual Healing</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Authentic Qur'anic recitations and prophetic supplications for protection and healing.
             </p>
@@ -202,7 +202,7 @@ const Ruqya = () => {
               <span className="text-muted-foreground">{progress}%</span>
             </div>
             <Progress value={progress} />
-            <p className="mt-3 text-xs text-muted-foreground">
+            <p className="mt-3 text-micro text-muted-foreground">
               Suggested flow: begin with wudu, face the qiblah, recite each item the recommended number of times,
               blow lightly into your palms after each Surah, and wipe over yourself or the person seeking healing.
             </p>
@@ -227,8 +227,8 @@ const Ruqya = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <CardTitle className="text-lg">{r.title}</CardTitle>
-                        <p className="mt-1 text-xs text-muted-foreground">{r.reference}</p>
+                        <CardTitle className="text-heading">{r.title}</CardTitle>
+                        <p className="mt-1 text-micro text-muted-foreground">{r.reference}</p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <Badge variant="secondary" className={meta.color}>
@@ -240,7 +240,7 @@ const Ruqya = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <p dir="rtl" lang="ar" className="text-right text-2xl leading-loose">
+                    <p dir="rtl" lang="ar" className="text-right text-title leading-loose">
                       {r.arabic}
                     </p>
                     <p className="text-sm italic text-muted-foreground">{r.translit}</p>

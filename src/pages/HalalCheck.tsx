@@ -95,7 +95,7 @@ export default function HalalCheck() {
       <main className="container mx-auto max-w-4xl px-4 pb-24 pt-24">
         <header className="mb-6">
           <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground"><Utensils className="h-4 w-4" /> Food & Drink</div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Halal Ingredient Checker</h1>
+          <h1 className="text-title font-bold tracking-tight md:text-display">Halal Ingredient Checker</h1>
           <p className="mt-1 text-muted-foreground">Paste an ingredient list — separated by commas or new lines — and each token is flagged as halal, doubtful, or haram.</p>
         </header>
 
@@ -154,7 +154,7 @@ export default function HalalCheck() {
           )}
         </div>
 
-        <p className="mt-8 text-xs text-muted-foreground">
+        <p className="mt-8 text-micro text-muted-foreground">
           Disclaimer: This tool is a starting point, not a fatwa. Rulings on ambiguous items (gelatin, enzymes, natural flavors, E-numbers) differ between scholars and certification bodies. When in doubt, consult a trusted halal certifier or scholar.
         </p>
       </main>

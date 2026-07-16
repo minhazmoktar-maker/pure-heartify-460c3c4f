@@ -53,13 +53,13 @@ const Field = ({ label, value, onChange, type = "text", placeholder }: {
   label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string;
 }) => (
   <label className="block">
-    <span className="mb-1 block text-xs font-medium text-muted-foreground">{label}</span>
+    <span className="mb-1 block text-micro font-medium text-muted-foreground">{label}</span>
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
+      className="h-10 w-full rounded-card border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
     />
   </label>
 );
@@ -68,12 +68,12 @@ const Area = ({ label, value, onChange, rows = 3 }: {
   label: string; value: string; onChange: (v: string) => void; rows?: number;
 }) => (
   <label className="block">
-    <span className="mb-1 block text-xs font-medium text-muted-foreground">{label}</span>
+    <span className="mb-1 block text-micro font-medium text-muted-foreground">{label}</span>
     <textarea
       rows={rows}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+      className="w-full rounded-card border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
     />
   </label>
 );
@@ -87,18 +87,18 @@ const RowList = ({ title, rows, setRows, labels, sum }: {
 }) => {
   const total = sum ? rows.reduce((s, r) => s + (parseFloat(r.value) || 0), 0) : 0;
   return (
-    <section className="rounded-2xl border border-border bg-card p-4">
+    <section className="rounded-card border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-heading font-semibold text-foreground">{title}</h3>
         <button
           onClick={() => setRows([...rows, { id: uid(), label: "", value: "" }])}
-          className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs hover:border-primary hover:text-primary"
+          className="inline-flex items-center gap-1 rounded-card border border-border px-2 py-1 text-micro hover:border-primary hover:text-primary"
         >
           <Plus className="h-3 w-3" /> Add
         </button>
       </div>
       {rows.length === 0 ? (
-        <p className="text-xs text-muted-foreground">None added yet.</p>
+        <p className="text-micro text-muted-foreground">None added yet.</p>
       ) : (
         <ul className="space-y-2">
           {rows.map((r) => (
@@ -107,17 +107,17 @@ const RowList = ({ title, rows, setRows, labels, sum }: {
                 placeholder={labels[0]}
                 value={r.label}
                 onChange={(e) => setRows(rows.map((x) => x.id === r.id ? { ...x, label: e.target.value } : x))}
-                className="h-9 rounded-md border border-border bg-background px-2 text-sm"
+                className="h-9 rounded-card border border-border bg-background px-2 text-sm"
               />
               <input
                 placeholder={labels[1]}
                 value={r.value}
                 onChange={(e) => setRows(rows.map((x) => x.id === r.id ? { ...x, value: e.target.value } : x))}
-                className="h-9 rounded-md border border-border bg-background px-2 text-sm"
+                className="h-9 rounded-card border border-border bg-background px-2 text-sm"
               />
               <button
                 onClick={() => setRows(rows.filter((x) => x.id !== r.id))}
-                className="rounded-md p-2 text-muted-foreground hover:bg-secondary"
+                className="rounded-card p-2 text-muted-foreground hover:bg-secondary"
                 aria-label="Remove"
               >
                 <Trash2 className="h-4 w-4" />
@@ -127,7 +127,7 @@ const RowList = ({ title, rows, setRows, labels, sum }: {
         </ul>
       )}
       {sum && rows.length > 0 && (
-        <p className="mt-3 text-right text-xs text-muted-foreground">
+        <p className="mt-3 text-right text-micro text-muted-foreground">
           Total: <span className="font-semibold text-foreground">{total.toLocaleString()}</span>
         </p>
       )}
@@ -220,18 +220,18 @@ const Wasiyyah = () => {
 
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <header className="mb-4 flex items-start gap-3">
-          <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+          <div className="rounded-card bg-primary/10 p-3 text-primary">
             <Scroll className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">Wasiyyah Builder</h1>
+            <h1 className="font-heading text-title font-bold text-foreground md:text-display">Wasiyyah Builder</h1>
             <p className="mt-1 text-muted-foreground">
               "It is not permissible for any Muslim who has something to will to stay for two nights without having his last will written." — Bukhari
             </p>
           </div>
         </header>
 
-        <div className="mb-6 flex items-start gap-2 rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm text-foreground">
+        <div className="mb-6 flex items-start gap-2 rounded-card border border-primary/30 bg-primary/5 p-4 text-sm text-foreground">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>
             This is a private on-device draft to help you articulate your wishes. Have it reviewed and formalized by a qualified scholar and a licensed lawyer in your jurisdiction before treating it as legally binding.
@@ -239,8 +239,8 @@ const Wasiyyah = () => {
         </div>
 
         <div className="space-y-6">
-          <section className="rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Personal details</h2>
+          <section className="rounded-card border border-border bg-card p-5">
+            <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Personal details</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Full legal name" value={w.fullName} onChange={(v) => set("fullName", v)} />
               <Field label="Other known names (optional)" value={w.otherNames} onChange={(v) => set("otherNames", v)} />
@@ -254,8 +254,8 @@ const Wasiyyah = () => {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Executors & guardian</h2>
+          <section className="rounded-card border border-border bg-card p-5">
+            <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Executors & guardian</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Primary executor" value={w.executor1} onChange={(v) => set("executor1", v)} />
               <Field label="Alternate executor" value={w.executor2} onChange={(v) => set("executor2", v)} />
@@ -271,7 +271,7 @@ const Wasiyyah = () => {
           <div>
             <RowList title="Bequests (max 1/3 of net estate to non-heirs)" rows={w.bequests} setRows={(r) => set("bequests", r)} labels={["Beneficiary & purpose", "Amount"]} sum />
             {netEstate > 0 && (
-              <p className={`mt-2 text-xs ${overThird ? "text-destructive" : "text-muted-foreground"}`}>
+              <p className={`mt-2 text-micro ${overThird ? "text-destructive" : "text-muted-foreground"}`}>
                 Net estate: <span className="font-semibold text-foreground">{netEstate.toLocaleString()}</span> · 1/3 cap: <span className="font-semibold text-foreground">{thirdCap.toLocaleString()}</span> · Bequests: <span className={`font-semibold ${overThird ? "text-destructive" : "text-foreground"}`}>{bequestTotal.toLocaleString()}</span>
                 {overThird && " — reduce; a Muslim may only bequeath up to 1/3 to non-heirs."}
               </p>
@@ -280,8 +280,8 @@ const Wasiyyah = () => {
 
           <RowList title="Charitable wishes (sadaqah jariyah)" rows={w.charities} setRows={(r) => set("charities", r)} labels={["Cause / organization", "Amount"]} />
 
-          <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
-            <h2 className="font-heading text-lg font-semibold text-foreground">Funeral & additional</h2>
+          <section className="rounded-card border border-border bg-card p-5 space-y-3">
+            <h2 className="font-heading text-heading font-semibold text-foreground">Funeral & additional</h2>
             <Area label="Funeral wishes" value={w.funeralWishes} onChange={(v) => set("funeralWishes", v)} rows={3} />
             <Area label="Additional notes" value={w.notes} onChange={(v) => set("notes", v)} rows={3} />
             <div className="grid gap-3 sm:grid-cols-2">
@@ -293,13 +293,13 @@ const Wasiyyah = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={exportText}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-card bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
               <Download className="h-4 w-4" /> Download draft
             </button>
             <button
               onClick={() => { if (confirm("Clear the entire draft?")) { setW(empty); toast.success("Cleared"); } }}
-              className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium hover:bg-secondary"
+              className="rounded-card border border-border px-4 py-2.5 text-sm font-medium hover:bg-secondary"
             >
               Clear draft
             </button>

@@ -24,7 +24,7 @@ export default function Changelog() {
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8 md:py-12">
         <header className="mb-8">
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">What's new</h1>
+          <h1 className="font-heading text-title font-bold text-foreground md:text-display">What's new</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             The latest updates to Heartify. Newest first.
           </p>
@@ -36,24 +36,24 @@ export default function Changelog() {
             const Icon = meta.icon;
             return (
               <FadeIn key={entry.id} index={i} as="li" className="relative">
-                <span className="absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-background ring-2 ring-primary/60">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                <span className="absolute -left-[31px] top-1 flex h-4 w-4 items-center justify-center rounded-pill bg-background ring-2 ring-primary/60">
+                  <span className="h-1.5 w-1.5 rounded-pill bg-primary" />
                 </span>
-                <article className="rounded-2xl border border-border bg-card p-5">
+                <article className="rounded-card border border-border bg-card p-5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <time className="text-xs uppercase tracking-wide text-muted-foreground" dateTime={entry.date}>
+                    <time className="text-micro uppercase tracking-wide text-muted-foreground" dateTime={entry.date}>
                       {new Date(entry.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                     </time>
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${meta.className}`}>
+                    <span className={`inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${meta.className}`}>
                       <Icon className="h-3 w-3" />
                       {meta.label}
                     </span>
                   </div>
-                  <h2 className="mt-2 text-lg font-semibold text-foreground">{entry.title}</h2>
+                  <h2 className="mt-2 text-heading font-semibold text-foreground">{entry.title}</h2>
                   <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
                     {entry.bullets.map((b, j) => (
                       <li key={j} className="flex gap-2">
-                        <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary/60" />
+                        <span className="mt-1.5 h-1 w-1 shrink-0 rounded-pill bg-primary/60" />
                         <span>{b}</span>
                       </li>
                     ))}

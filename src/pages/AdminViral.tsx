@@ -89,7 +89,7 @@ export default function AdminViral() {
       <Navbar />
       <main className="container mx-auto max-w-4xl px-4 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-bold text-foreground">Viral mechanisms</h1>
+          <h1 className="text-title font-bold text-foreground">Viral mechanisms</h1>
           <p className="text-sm text-muted-foreground">
             Feature flags, referral & streak stats, fraud watch.
           </p>
@@ -136,10 +136,10 @@ export default function AdminViral() {
                           <span className="heartify-chip heartify-chip--warning">{f.rollout_percent}% rollout</span>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground">{f.description}</div>
+                      <div className="text-micro text-muted-foreground">{f.description}</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Label htmlFor={`ro-${f.key}`} className="text-xs">Rollout %</Label>
+                      <Label htmlFor={`ro-${f.key}`} className="text-micro">Rollout %</Label>
                       <Input
                         id={`ro-${f.key}`}
                         type="number"
@@ -172,10 +172,10 @@ export default function AdminViral() {
 function Stat({ icon, label, value }: { icon?: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
     <Card className="p-4">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <div className="flex items-center gap-1.5 text-micro text-muted-foreground">
         {icon} {label}
       </div>
-      <div className="mt-1 text-lg font-semibold text-foreground">{value}</div>
+      <div className="mt-1 text-heading font-semibold text-foreground">{value}</div>
     </Card>
   );
 }

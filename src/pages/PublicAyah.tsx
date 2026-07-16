@@ -106,7 +106,7 @@ export default function PublicAyah() {
           <>
             <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
               <CardContent className="pt-8 pb-8 space-y-6">
-                <div className="flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground">
+                <div className="flex items-center justify-between text-micro uppercase tracking-widest text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5">
                     <BookOpen className="h-4 w-4 text-primary" />
                     Sūrah {arabic.surah.englishName} · {arabic.surah.number}:{arabic.numberInSurah}
@@ -117,14 +117,14 @@ export default function PublicAyah() {
                 <p
                   dir="rtl"
                   lang="ar"
-                  className="text-3xl md:text-4xl leading-loose text-right font-arabic text-foreground"
+                  className="text-title md:text-display leading-loose text-right font-arabic text-foreground"
                   style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
                 >
                   {arabic.text}
                 </p>
 
                 {english && (
-                  <p className="text-base md:text-lg leading-relaxed text-muted-foreground border-l-2 border-primary/40 pl-4">
+                  <p className="text-base md:text-heading leading-relaxed text-muted-foreground border-l-2 border-primary/40 pl-4">
                     {english.text}
                   </p>
                 )}
@@ -152,7 +152,7 @@ export default function PublicAyah() {
               </Button>
             </div>
 
-            <p className="mt-6 text-center text-xs text-muted-foreground">
+            <p className="mt-6 text-center text-micro text-muted-foreground">
               Translation: Saheeh International · Recitation: Mishary Alafasy
             </p>
           </>

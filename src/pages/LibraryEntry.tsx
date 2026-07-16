@@ -34,13 +34,13 @@ export default function LibraryEntry() {
             </Button>
           </Link>
           <BookOpen className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold">{entry.title}</h1>
+          <h1 className="text-title font-bold">{entry.title}</h1>
         </div>
       </div>
       <article className="container mx-auto px-4 py-6 max-w-3xl space-y-4">
         <Badge variant="secondary">{entry.category}</Badge>
         {entry.description && (
-          <p className="text-muted-foreground text-lg">{entry.description}</p>
+          <p className="text-muted-foreground text-heading">{entry.description}</p>
         )}
         <div className="space-y-3">
           {entry.sections.map((s, i) => (

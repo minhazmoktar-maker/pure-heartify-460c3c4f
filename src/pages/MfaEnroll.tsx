@@ -72,7 +72,7 @@ export default function MfaEnroll() {
       <main className="mx-auto max-w-xl px-4 py-8">
         <div className="mb-6 flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-primary" />
-          <h1 className="font-heading text-2xl font-bold">Two-factor authentication</h1>
+          <h1 className="font-heading text-title font-bold">Two-factor authentication</h1>
         </div>
 
         {authLoading || loading ? (
@@ -85,9 +85,9 @@ export default function MfaEnroll() {
         ) : (
           <Card className="p-6 space-y-4">
             <p className="text-sm text-muted-foreground">Scan this QR code with an authenticator app (1Password, Google Authenticator, Authy) or enter the secret manually.</p>
-            {qr && <img src={qr} alt="TOTP QR code" className="mx-auto h-56 w-56 rounded-lg border border-border bg-white p-2" />}
+            {qr && <img src={qr} alt="TOTP QR code" className="mx-auto h-56 w-56 rounded-card border border-border bg-white p-2" />}
             {secret && (
-              <div className="rounded-lg border border-border bg-muted p-3 text-center font-mono text-xs break-all">{secret}</div>
+              <div className="rounded-card border border-border bg-muted p-3 text-center font-mono text-micro break-all">{secret}</div>
             )}
             <div className="flex items-center gap-2">
               <KeyRound className="h-4 w-4 text-muted-foreground" />

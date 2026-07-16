@@ -37,14 +37,14 @@ const AhlulBayt = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="The Family of the Prophet ﷺ — Ahl al-Bayt" description="The blessed family of Prophet Muḥammad ﷺ — parents, uncles, wives, children, and grandchildren from authentic sīrah." path="/ahlul-bayt" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Users className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Ahl al-Bayt — Family of the Prophet ﷺ</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Users className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Ahl al-Bayt — Family of the Prophet ﷺ</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Learned</span><span className="text-sm font-medium">{count} / {PEOPLE.length}</span></div><Progress value={(count / PEOPLE.length) * 100} /></Card>
         <div className="flex gap-2"><Input placeholder="Search family members…" value={q} onChange={e => setQ(e.target.value)} /><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>
         {filtered.map(p => (
           <Card key={p.id} className="p-5 cursor-pointer hover:border-primary transition" onClick={() => persist({ ...done, [p.id]: !done[p.id] })}>
             <div className="flex items-start justify-between gap-3 mb-2">
-              <div><h2 className="font-semibold text-lg">{p.name}</h2><Badge variant="secondary" className="mt-1">{p.relation}</Badge></div>
+              <div><h2 className="font-semibold text-heading">{p.name}</h2><Badge variant="secondary" className="mt-1">{p.relation}</Badge></div>
               {done[p.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
             </div>
             <p className="text-sm text-muted-foreground">{p.summary}</p>

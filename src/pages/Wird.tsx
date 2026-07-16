@@ -112,14 +112,14 @@ const Wird = () => {
         <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h1 className="font-heading text-2xl font-bold text-foreground">{running.name}</h1>
+              <h1 className="font-heading text-title font-bold text-foreground">{running.name}</h1>
               <p className="text-sm text-muted-foreground">Tap each card to count. Reach the target for each.</p>
             </div>
             <div className="flex gap-2">
-              <button onClick={resetRunning} className="rounded-full border border-border p-2 hover:bg-secondary" aria-label="Reset">
+              <button onClick={resetRunning} className="rounded-pill border border-border p-2 hover:bg-secondary" aria-label="Reset">
                 <RotateCcw className="h-4 w-4" />
               </button>
-              <button onClick={() => setRunning(null)} className="rounded-full border border-border px-3 py-1 text-sm hover:bg-secondary">
+              <button onClick={() => setRunning(null)} className="rounded-pill border border-border px-3 py-1 text-sm hover:bg-secondary">
                 Done
               </button>
             </div>
@@ -135,24 +135,24 @@ const Wird = () => {
                   <button
                     onClick={() => bump(it.id, it.target)}
                     disabled={done}
-                    className={`w-full rounded-2xl border p-5 text-left transition ${
+                    className={`w-full rounded-card border p-5 text-left transition ${
                       done ? "border-primary/40 bg-primary/5" : "border-border bg-card hover:border-primary"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p dir="rtl" className="font-heading text-2xl text-foreground">{it.arabic}</p>
+                        <p dir="rtl" className="font-heading text-title text-foreground">{it.arabic}</p>
                         <p className="mt-1 text-sm italic text-muted-foreground">{it.translit}</p>
-                        <p className="text-xs text-muted-foreground">{it.meaning}</p>
+                        <p className="text-micro text-muted-foreground">{it.meaning}</p>
                       </div>
                       <div className="shrink-0 text-right">
-                        <div className={`text-3xl font-bold tabular-nums ${done ? "text-primary" : "text-foreground"}`}>
+                        <div className={`text-title font-bold tabular-nums ${done ? "text-primary" : "text-foreground"}`}>
                           {c}<span className="text-base text-muted-foreground">/{it.target}</span>
                         </div>
                         {done && <Check className="ml-auto mt-1 h-5 w-5 text-primary" />}
                       </div>
                     </div>
-                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                    <div className="mt-3 h-1.5 w-full overflow-hidden rounded-pill bg-secondary">
                       <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
                     </div>
                   </button>
@@ -175,56 +175,56 @@ const Wird = () => {
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <header className="mb-6 flex items-start gap-3">
-          <div className="rounded-2xl bg-primary/10 p-3 text-primary">
+          <div className="rounded-card bg-primary/10 p-3 text-primary">
             <Sparkles className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">Wird Builder</h1>
+            <h1 className="font-heading text-title font-bold text-foreground md:text-display">Wird Builder</h1>
             <p className="mt-1 text-muted-foreground">Assemble your daily awrad. Save, run, and repeat.</p>
           </div>
         </header>
 
         <section className="mb-6 grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">Saved awrad</p>
-            <p className="font-heading text-2xl font-bold text-foreground">{wirds.length}</p>
+          <div className="rounded-card border border-border bg-card p-4">
+            <p className="text-micro text-muted-foreground">Saved awrad</p>
+            <p className="font-heading text-title font-bold text-foreground">{wirds.length}</p>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">Completed today</p>
-            <p className="font-heading text-2xl font-bold text-primary">{doneToday.length}</p>
+          <div className="rounded-card border border-border bg-card p-4">
+            <p className="text-micro text-muted-foreground">Completed today</p>
+            <p className="font-heading text-title font-bold text-primary">{doneToday.length}</p>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-xs text-muted-foreground">Total sessions</p>
-            <p className="font-heading text-2xl font-bold text-foreground">{totalReps}</p>
+          <div className="rounded-card border border-border bg-card p-4">
+            <p className="text-micro text-muted-foreground">Total sessions</p>
+            <p className="font-heading text-title font-bold text-foreground">{totalReps}</p>
           </div>
         </section>
 
         {/* Existing wirds */}
         {wirds.length > 0 && (
           <section className="mb-8">
-            <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Your awrad</h2>
+            <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Your awrad</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {wirds.map((w) => {
                 const done = doneToday.includes(w.id);
                 return (
-                  <div key={w.id} className={`rounded-2xl border p-4 ${done ? "border-primary/40 bg-primary/5" : "border-border bg-card"}`}>
+                  <div key={w.id} className={`rounded-card border p-4 ${done ? "border-primary/40 bg-primary/5" : "border-border bg-card"}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <h3 className="font-heading font-semibold text-foreground">{w.name}</h3>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-micro text-muted-foreground">
                           {w.items.length} items · {w.items.reduce((s, i) => s + i.target, 0)} reps total
                         </p>
                       </div>
                       <div className="flex gap-1">
-                        <button onClick={() => startWird(w)} className="rounded-full bg-primary p-2 text-primary-foreground hover:opacity-90" aria-label="Start">
+                        <button onClick={() => startWird(w)} className="rounded-pill bg-primary p-2 text-primary-foreground hover:opacity-90" aria-label="Start">
                           <Play className="h-4 w-4" />
                         </button>
-                        <button onClick={() => deleteWird(w.id)} className="rounded-full p-2 text-muted-foreground hover:bg-secondary" aria-label="Delete">
+                        <button onClick={() => deleteWird(w.id)} className="rounded-pill p-2 text-muted-foreground hover:bg-secondary" aria-label="Delete">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
-                    {done && <p className="mt-2 text-xs font-medium text-primary">Completed today ✓</p>}
+                    {done && <p className="mt-2 text-micro font-medium text-primary">Completed today ✓</p>}
                   </div>
                 );
               })}
@@ -233,31 +233,31 @@ const Wird = () => {
         )}
 
         {/* Builder */}
-        <section className="rounded-2xl border border-border bg-card p-5">
-          <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Build a new wird</h2>
+        <section className="rounded-card border border-border bg-card p-5">
+          <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Build a new wird</h2>
           <input
             type="text"
             placeholder="Name (e.g. Morning wird, After Fajr)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="mb-4 h-11 w-full rounded-lg border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
+            className="mb-4 h-11 w-full rounded-card border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
           />
 
           <div className="mb-4">
-            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Quick add</p>
+            <p className="mb-2 text-micro font-medium uppercase tracking-wide text-muted-foreground">Quick add</p>
             <div className="flex flex-wrap gap-2">
               {PRESET_ITEMS.map((p, i) => (
                 <button
                   key={i}
                   onClick={() => addPreset(i)}
-                  className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1 text-xs hover:border-primary hover:text-primary"
+                  className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-3 py-1 text-micro hover:border-primary hover:text-primary"
                 >
                   <Plus className="h-3 w-3" /> {p.translit}
                 </button>
               ))}
               <button
                 onClick={addCustom}
-                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border bg-background px-3 py-1 text-xs hover:border-primary hover:text-primary"
+                className="inline-flex items-center gap-1 rounded-pill border border-dashed border-border bg-background px-3 py-1 text-micro hover:border-primary hover:text-primary"
               >
                 <ListPlus className="h-3 w-3" /> Custom
               </button>
@@ -267,35 +267,35 @@ const Wird = () => {
           {drafts.length > 0 && (
             <ul className="mb-4 space-y-2">
               {drafts.map((d) => (
-                <li key={d.id} className="rounded-lg border border-border bg-background p-3">
+                <li key={d.id} className="rounded-card border border-border bg-background p-3">
                   <div className="grid gap-2 sm:grid-cols-[1fr_1fr_1fr_100px_auto]">
                     <input
                       dir="rtl"
                       placeholder="Arabic"
                       value={d.arabic}
                       onChange={(e) => updateDraft(d.id, { arabic: e.target.value })}
-                      className="h-9 rounded-md border border-border bg-card px-2 text-sm"
+                      className="h-9 rounded-card border border-border bg-card px-2 text-sm"
                     />
                     <input
                       placeholder="Transliteration"
                       value={d.translit}
                       onChange={(e) => updateDraft(d.id, { translit: e.target.value })}
-                      className="h-9 rounded-md border border-border bg-card px-2 text-sm"
+                      className="h-9 rounded-card border border-border bg-card px-2 text-sm"
                     />
                     <input
                       placeholder="Meaning"
                       value={d.meaning}
                       onChange={(e) => updateDraft(d.id, { meaning: e.target.value })}
-                      className="h-9 rounded-md border border-border bg-card px-2 text-sm"
+                      className="h-9 rounded-card border border-border bg-card px-2 text-sm"
                     />
                     <input
                       type="number"
                       min={1}
                       value={d.target}
                       onChange={(e) => updateDraft(d.id, { target: Math.max(1, Number(e.target.value) || 1) })}
-                      className="h-9 rounded-md border border-border bg-card px-2 text-sm"
+                      className="h-9 rounded-card border border-border bg-card px-2 text-sm"
                     />
-                    <button onClick={() => removeDraft(d.id)} className="rounded-md p-2 text-muted-foreground hover:bg-secondary" aria-label="Remove">
+                    <button onClick={() => removeDraft(d.id)} className="rounded-card p-2 text-muted-foreground hover:bg-secondary" aria-label="Remove">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -306,7 +306,7 @@ const Wird = () => {
 
           <button
             onClick={createWird}
-            className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            className="w-full rounded-card bg-primary py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90"
           >
             Save wird
           </button>

@@ -121,7 +121,7 @@ export default function Glossary() {
             <Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <Library className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Islamic Glossary</h1>
+          <h1 className="text-heading font-semibold">Islamic Glossary</h1>
         </div>
       </header>
 
@@ -149,7 +149,7 @@ export default function Glossary() {
           ))}
         </div>
 
-        <div className="text-xs text-muted-foreground">
+        <div className="text-micro text-muted-foreground">
           {filtered.length} term{filtered.length === 1 ? "" : "s"}
         </div>
 
@@ -165,7 +165,7 @@ export default function Glossary() {
                     <Badge variant="secondary" className="mt-1">{t.category}</Badge>
                   </div>
                   {t.arabic && (
-                    <div className="text-xl" dir="rtl" lang="ar">{t.arabic}</div>
+                    <div className="text-heading" dir="rtl" lang="ar">{t.arabic}</div>
                   )}
                 </div>
                 <p className="mt-2 text-sm text-muted-foreground">{t.definition}</p>

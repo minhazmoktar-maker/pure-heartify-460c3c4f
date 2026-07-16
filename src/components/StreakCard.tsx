@@ -48,12 +48,12 @@ export function StreakCard() {
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-3 w-40" />
           </div>
-          <Skeleton className="h-9 w-12 rounded-md" />
+          <Skeleton className="h-9 w-12 rounded-card" />
         </div>
-        <Skeleton className="h-2 w-full rounded-full" />
+        <Skeleton className="h-2 w-full rounded-pill" />
         <div className="flex items-center justify-between">
           <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-8 w-20 rounded-md" />
+          <Skeleton className="h-8 w-20 rounded-card" />
         </div>
       </Card>
     );
@@ -86,14 +86,14 @@ export function StreakCard() {
           </p>
         </div>
         <div className="text-right">
-          <div className={`text-3xl font-bold text-foreground tabular-nums ${celebrate ? "animate-milestone-pop text-primary" : ""}`}>{s.current}</div>
-          <div className="text-xs text-muted-foreground">longest: {s.longest}</div>
+          <div className={`text-title font-bold text-foreground tabular-nums ${celebrate ? "animate-milestone-pop text-primary" : ""}`}>{s.current}</div>
+          <div className="text-micro text-muted-foreground">longest: {s.longest}</div>
         </div>
       </div>
 
       {s.nextMilestone && (
         <div>
-          <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+          <div className="mb-1 flex items-center justify-between text-micro text-muted-foreground">
             <span>Next milestone</span>
             <span className="tabular-nums">
               {s.current}/{s.nextMilestone}

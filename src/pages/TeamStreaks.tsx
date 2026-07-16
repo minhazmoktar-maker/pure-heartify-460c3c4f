@@ -81,7 +81,7 @@ export default function TeamStreaks() {
         <Navbar />
         <main className="container mx-auto max-w-lg px-4 py-16 text-center">
           <Users className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h1 className="mt-4 text-2xl font-bold text-foreground">Team streaks</h1>
+          <h1 className="mt-4 text-title font-bold text-foreground">Team streaks</h1>
           <p className="mt-2 text-muted-foreground">Sign in to build a shared streak with friends.</p>
           <Button asChild className="mt-4"><Link to="/login">Sign in</Link></Button>
         </main>
@@ -95,7 +95,7 @@ export default function TeamStreaks() {
       <Navbar />
       <main className="container mx-auto max-w-3xl px-4 py-6 space-y-6">
         <header>
-          <h1 className="text-2xl font-bold text-foreground">Team streaks</h1>
+          <h1 className="text-title font-bold text-foreground">Team streaks</h1>
           <p className="text-sm text-muted-foreground">
             Small groups (2–10) share one streak. It advances only when everyone completes their daily dose.
           </p>
@@ -106,7 +106,7 @@ export default function TeamStreaks() {
             <h2 className="font-semibold text-foreground flex items-center gap-2">
               <Plus className="h-4 w-4" /> Create a team
             </h2>
-            <Label htmlFor="team-name" className="text-xs">Team name</Label>
+            <Label htmlFor="team-name" className="text-micro">Team name</Label>
             <Input
               id="team-name"
               value={name}
@@ -123,7 +123,7 @@ export default function TeamStreaks() {
             <h2 className="font-semibold text-foreground flex items-center gap-2">
               <Users className="h-4 w-4" /> Join a team
             </h2>
-            <Label htmlFor="team-code" className="text-xs">Invite code</Label>
+            <Label htmlFor="team-code" className="text-micro">Invite code</Label>
             <Input
               id="team-code"
               value={code}
@@ -143,12 +143,12 @@ export default function TeamStreaks() {
             <div className="space-y-3" aria-label="Loading your teams" role="status">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Card key={i} className="flex items-center gap-3 p-4">
-                  <Skeleton className="h-10 w-10 rounded-lg" />
+                  <Skeleton className="h-10 w-10 rounded-card" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-1/2" />
                     <Skeleton className="h-3 w-1/3" />
                   </div>
-                  <Skeleton className="h-8 w-16 rounded-md" />
+                  <Skeleton className="h-8 w-16 rounded-card" />
                 </Card>
               ))}
             </div>
@@ -197,7 +197,7 @@ function TeamRow({ team, onLeave }: { team: TeamStreak; onLeave: () => Promise<v
               <Users className="h-3.5 w-3.5" /> {team.member_count}/{team.member_limit}
             </span>
           </div>
-          <div className={`mt-2 text-xs ${allDoneToday ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
+          <div className={`mt-2 text-micro ${allDoneToday ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
             Today: {team.completed_today_count}/{team.member_count} completed
             {allDoneToday ? " · streak advanced 🎉" : team.i_completed_today ? " · waiting on teammates" : " · your turn"}
           </div>
@@ -205,7 +205,7 @@ function TeamRow({ team, onLeave }: { team: TeamStreak; onLeave: () => Promise<v
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <code className="text-xs bg-muted px-2 py-1 rounded font-mono">{team.invite_code}</code>
+        <code className="text-micro bg-muted px-2 py-1 rounded font-mono">{team.invite_code}</code>
         <Button
           size="sm"
           variant="secondary"

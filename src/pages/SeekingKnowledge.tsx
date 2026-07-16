@@ -26,10 +26,10 @@ export default function SeekingKnowledge() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Ṭalab al-'Ilm — Seeking Islamic Knowledge" description="Virtues of knowledge from Qur'an and Sunnah, and eight adab (etiquettes) of the student of sacred knowledge." path="/seeking-knowledge" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><BookOpen className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Ṭalab al-'Ilm</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><BookOpen className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Ṭalab al-'Ilm</h1></div></div>
       <div className="container mx-auto px-4 py-6 max-w-3xl space-y-4">
         <h2 className="font-semibold">Virtues of Knowledge</h2>
-        {VIRTUES.map((v, i) => (<Card key={i} className="p-4"><div>{v.v}</div><div className="text-xs text-muted-foreground mt-1">{v.ref}</div></Card>))}
+        {VIRTUES.map((v, i) => (<Card key={i} className="p-4"><div>{v.v}</div><div className="text-micro text-muted-foreground mt-1">{v.ref}</div></Card>))}
         <h2 className="font-semibold pt-2">Adab of the Student</h2>
         {ADAB.map((a, i) => (<Card key={i} className="p-4"><div>{i + 1}. {a}</div></Card>))}
       </div>

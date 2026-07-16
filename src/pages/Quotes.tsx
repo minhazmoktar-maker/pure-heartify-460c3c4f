@@ -84,7 +84,7 @@ export default function Quotes() {
         {/* Daily reflection */}
         <Card className="mb-8 overflow-hidden border-primary/30 bg-gradient-to-br from-primary/10 via-background to-background p-6 sm:p-8">
           <Badge variant="secondary" className="mb-3">Today's reflection</Badge>
-          <blockquote className="font-heading text-xl leading-relaxed text-foreground sm:text-2xl">
+          <blockquote className="font-heading text-heading leading-relaxed text-foreground sm:text-title">
             "{daily.text}"
           </blockquote>
           <p className="mt-4 text-sm text-muted-foreground">
@@ -131,7 +131,7 @@ export default function Quotes() {
         <div className="space-y-10">
           {themes.map((theme) => (
             <section key={theme.slug} id={theme.slug} className="scroll-mt-20">
-              <h2 className="font-heading text-2xl font-bold text-foreground">
+              <h2 className="font-heading text-title font-bold text-foreground">
                 {theme.title}
               </h2>
               <p className="mb-5 mt-1 text-sm text-muted-foreground sm:text-base">
@@ -148,7 +148,7 @@ export default function Quotes() {
                       </blockquote>
                       <div className="mt-4 flex items-end justify-between gap-3">
                         <div>
-                          <p className="text-xs font-medium text-muted-foreground">
+                          <p className="text-micro font-medium text-muted-foreground">
                             {q.source}
                           </p>
                           <Badge variant="outline" className="mt-1 text-[10px] uppercase tracking-wide">

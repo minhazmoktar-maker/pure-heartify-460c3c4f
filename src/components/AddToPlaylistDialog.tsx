@@ -32,7 +32,7 @@ export default function AddToPlaylistDialog({ videoId, variant = "button" }: Pro
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {variant === "icon" ? (
-          <button aria-label="Add to playlist" className="rounded-full border border-border p-2 hover:bg-accent">
+          <button aria-label="Add to playlist" className="rounded-pill border border-border p-2 hover:bg-accent">
             <Plus className="h-4 w-4" />
           </button>
         ) : (
@@ -56,7 +56,7 @@ export default function AddToPlaylistDialog({ videoId, variant = "button" }: Pro
               {playlists.map((p: Playlist) => (
                 <li key={p.id}>
                   <button
-                    className="flex w-full items-center justify-between rounded-md border border-border px-3 py-2 text-left text-sm transition hover:bg-accent"
+                    className="flex w-full items-center justify-between rounded-card border border-border px-3 py-2 text-left text-sm transition hover:bg-accent"
                     onClick={async () => {
                       await addItem.mutateAsync({ playlistId: p.id, videoId });
                       setOpen(false);
@@ -68,7 +68,7 @@ export default function AddToPlaylistDialog({ videoId, variant = "button" }: Pro
                       {p.visibility === "public" && <Globe2 className="h-3.5 w-3.5 text-muted-foreground" />}
                       {p.title}
                     </span>
-                    <span className="text-xs text-muted-foreground">{p.items_count}</span>
+                    <span className="text-micro text-muted-foreground">{p.items_count}</span>
                   </button>
                 </li>
               ))}

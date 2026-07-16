@@ -147,22 +147,22 @@ export default function IslamicEvents() {
             <Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <CalendarDays className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Islamic Events</h1>
+          <h1 className="text-heading font-semibold">Islamic Events</h1>
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl space-y-4 px-4 py-6">
         <Card className="p-4">
-          <div className="text-xs text-muted-foreground">Today</div>
-          <div className="text-lg font-semibold">
+          <div className="text-micro text-muted-foreground">Today</div>
+          <div className="text-heading font-semibold">
             {hijriToday.day} {H_MONTHS[hijriToday.month - 1]} {hijriToday.year} AH
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-micro text-muted-foreground">
             {today.toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
           </div>
         </Card>
 
-        <p className="text-xs text-muted-foreground">
+        <p className="text-micro text-muted-foreground">
           Dates are computed via the Umm al-Qura / Kuwaiti algorithm and can differ ±1 day from
           local moon-sighting announcements.
         </p>
@@ -179,13 +179,13 @@ export default function IslamicEvents() {
                   <Badge className={`mt-1 ${catColor(event.category)}`} variant="secondary">
                     {event.category}
                   </Badge>
-                  <div className="mt-2 text-xs text-muted-foreground">
+                  <div className="mt-2 text-micro text-muted-foreground">
                     {event.hijri.day} {H_MONTHS[event.hijri.month - 1]} {hijriYear} AH ·{" "}
                     {date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                   </div>
                 </div>
                 <div className="shrink-0 text-right">
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-title font-bold text-primary">
                     {days === 0 ? "Today" : days === 1 ? "Tomorrow" : `${days}d`}
                   </div>
                   <div className="text-[10px] uppercase text-muted-foreground">
@@ -195,7 +195,7 @@ export default function IslamicEvents() {
               </div>
               <p className="mt-2 text-sm">{event.significance}</p>
               {event.note && (
-                <p className="mt-2 rounded-md border border-border/60 bg-muted/40 p-2 text-xs text-muted-foreground">
+                <p className="mt-2 rounded-card border border-border/60 bg-muted/40 p-2 text-micro text-muted-foreground">
                   {event.note}
                 </p>
               )}

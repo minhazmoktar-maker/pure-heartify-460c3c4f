@@ -74,7 +74,7 @@ const Stories = () => {
         <div className="mx-auto flex max-w-4xl items-center gap-3 px-4 py-3">
           <Button asChild variant="ghost" size="icon" aria-label="Back"><Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link></Button>
           <BookOpen className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Islamic Stories</h1>
+          <h1 className="text-heading font-semibold">Islamic Stories</h1>
         </div>
       </header>
 
@@ -100,7 +100,7 @@ const Stories = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="leading-relaxed">{active.body}</p>
-              <div className="rounded-md border-l-4 border-primary bg-primary/5 p-3 text-sm">
+              <div className="rounded-card border-l-4 border-primary bg-primary/5 p-3 text-sm">
                 <b>Lesson:</b> {active.lesson}
               </div>
               {!read[active.id] && (
@@ -116,7 +116,7 @@ const Stories = () => {
             {cats.map((c) => (
               <TabsContent key={c} value={c} className="space-y-2">
                 {STORIES.filter((s) => s.category === c).map((s) => (
-                  <button key={s.id} onClick={() => setActive(s)} className="flex w-full items-center justify-between rounded-md border p-4 text-left hover:bg-accent">
+                  <button key={s.id} onClick={() => setActive(s)} className="flex w-full items-center justify-between rounded-card border p-4 text-left hover:bg-accent">
                     <div>
                       <div className="font-medium">{s.title}</div>
                       <div className="text-sm text-muted-foreground line-clamp-1">{s.lesson}</div>

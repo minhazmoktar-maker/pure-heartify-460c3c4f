@@ -159,10 +159,10 @@ const Bookmarks = () => {
                 actionHref="/quran"
                 secondaryAction={
                   <>
-                    <Link to="/hadith" className="tap-target inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition-transform hover:bg-accent active:scale-[0.97]">
+                    <Link to="/hadith" className="tap-target inline-flex items-center gap-2 rounded-pill border border-border px-5 py-2 text-sm font-semibold transition-transform hover:bg-accent active:scale-[0.97]">
                       Open Hadith
                     </Link>
-                    <Link to="/adhkar" className="tap-target inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition-transform hover:bg-accent active:scale-[0.97]">
+                    <Link to="/adhkar" className="tap-target inline-flex items-center gap-2 rounded-pill border border-border px-5 py-2 text-sm font-semibold transition-transform hover:bg-accent active:scale-[0.97]">
                       Open Adhkar
                     </Link>
                   </>
@@ -177,7 +177,7 @@ const Bookmarks = () => {
                     <li key={item.id}>
                       <Card className="p-4">
                         <div className="flex items-start gap-3">
-                          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary">
+                          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-card bg-secondary">
                             <Icon className="h-4 w-4 text-primary" />
                           </div>
                           <div className="min-w-0 flex-1">
@@ -185,11 +185,11 @@ const Bookmarks = () => {
                               <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                                 {kindMeta[item.kind].label}
                               </span>
-                              <span className="text-xs text-muted-foreground">{item.reference}</span>
+                              <span className="text-micro text-muted-foreground">{item.reference}</span>
                             </div>
                             <h3 className="mt-1 font-medium text-foreground">{item.title}</h3>
                             {item.arabic && (
-                              <p className="mt-2 text-right font-heading text-lg leading-relaxed text-foreground" dir="rtl">
+                              <p className="mt-2 text-right font-heading text-heading leading-relaxed text-foreground" dir="rtl">
                                 {item.arabic}
                               </p>
                             )}
@@ -215,8 +215,8 @@ const Bookmarks = () => {
                                 </div>
                               </div>
                             ) : item.note ? (
-                              <div className="mt-3 rounded-md border border-border bg-secondary/50 p-3 text-sm">
-                                <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                              <div className="mt-3 rounded-card border border-border bg-secondary/50 p-3 text-sm">
+                                <div className="mb-1 flex items-center gap-1.5 text-micro font-semibold uppercase tracking-wide text-muted-foreground">
                                   <StickyNote className="h-3 w-3" /> Note
                                 </div>
                                 <p className="whitespace-pre-wrap text-foreground">{item.note}</p>

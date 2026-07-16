@@ -123,7 +123,7 @@ const CuratedSectionRow = ({ section }: Props) => {
         data-video-count={0}
         data-loading="true"
       >
-        <h2 className="text-lg font-bold text-foreground">{section.icon} {section.title}</h2>
+        <h2 className="text-heading font-bold text-foreground">{section.icon} {section.title}</h2>
         <div className="mt-3 flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span className="text-sm">Loading…</span>
@@ -154,20 +154,20 @@ const CuratedSectionRow = ({ section }: Props) => {
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-foreground">{section.icon} {section.title}</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">{section.description}</p>
+          <h2 className="text-heading font-bold text-foreground">{section.icon} {section.title}</h2>
+          <p className="mt-0.5 text-micro text-muted-foreground">{section.description}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => navigate(`/section/${section.id}`)}
-            className="rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="rounded-pill border border-border px-3 py-1 text-micro font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
             Show All
           </button>
-          <button onClick={() => scroll("left")} aria-label={`Scroll ${section.title} left`} className="rounded-full border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
+          <button onClick={() => scroll("left")} aria-label={`Scroll ${section.title} left`} className="rounded-pill border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
             <ChevronLeft className="h-4 w-4" />
           </button>
-          <button onClick={() => scroll("right")} aria-label={`Scroll ${section.title} right`} className="rounded-full border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
+          <button onClick={() => scroll("right")} aria-label={`Scroll ${section.title} right`} className="rounded-pill border border-border p-1.5 text-muted-foreground transition-colors hover:text-foreground">
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>

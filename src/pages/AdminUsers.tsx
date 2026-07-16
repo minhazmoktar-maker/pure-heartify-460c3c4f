@@ -33,7 +33,7 @@ export default function AdminUsers() {
         <header className="mb-6 flex items-center gap-3">
           <Crown className="h-6 w-6 text-gold" />
           <div>
-            <h1 className="text-2xl font-semibold">Users & Access</h1>
+            <h1 className="text-title font-semibold">Users & Access</h1>
             <p className="text-sm text-muted-foreground">
               Consolidated hub for roles, MFA, and premium entitlements.
             </p>

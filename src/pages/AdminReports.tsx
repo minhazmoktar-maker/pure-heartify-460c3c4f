@@ -226,7 +226,7 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
         {!embedded && (
           <header className="mb-6 flex items-center justify-between">
             <div>
-              <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
+              <h1 className="flex items-center gap-2 text-title font-bold tracking-tight">
                 <ShieldAlert className="h-6 w-6 text-primary" /> Community reports
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -243,9 +243,9 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
           {STATUS_TABS.map((s) => (
             <Card key={s.value}>
               <CardHeader className="p-3 pb-1">
-                <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">{s.label}</CardTitle>
+                <CardTitle className="text-micro uppercase tracking-wide text-muted-foreground">{s.label}</CardTitle>
               </CardHeader>
-              <CardContent className="p-3 pt-0 text-2xl font-bold">
+              <CardContent className="p-3 pt-0 text-title font-bold">
                 {loading ? "—" : grouped[s.value]?.length ?? 0}
               </CardContent>
             </Card>
@@ -263,10 +263,10 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
               {loading ? (
                 <div className="space-y-3" role="status" aria-label="Loading reports">
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="rounded-lg border border-border bg-card p-4">
+                    <div key={i} className="rounded-card border border-border bg-card p-4">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Skeleton className="h-5 w-16 rounded-full" />
-                        <Skeleton className="h-5 w-24 rounded-full" />
+                        <Skeleton className="h-5 w-16 rounded-pill" />
+                        <Skeleton className="h-5 w-24 rounded-pill" />
                       </div>
                       <Skeleton className="mt-3 h-4 w-2/3" />
                       <Skeleton className="mt-2 h-3 w-1/2" />
@@ -287,7 +287,7 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                     <button
                       key={r.id}
                       onClick={() => setSelected(r)}
-                      className="w-full rounded-lg border border-border bg-card p-4 text-left transition-colors hover:bg-accent"
+                      className="w-full rounded-card border border-border bg-card p-4 text-left transition-colors hover:bg-accent"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -299,9 +299,9 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                           <div className="mt-2 truncate text-sm font-medium">
                             {r.video_title ?? r.channel_title ?? r.video_id ?? r.channel_id ?? "(untitled)"}
                           </div>
-                          {r.details && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{r.details}</p>}
+                          {r.details && <p className="mt-1 line-clamp-2 text-micro text-muted-foreground">{r.details}</p>}
                         </div>
-                        <div className="text-right text-xs text-muted-foreground">
+                        <div className="text-right text-micro text-muted-foreground">
                           {formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}
                         </div>
                       </div>
@@ -328,9 +328,9 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
               </SheetHeader>
 
               <div className="mt-4 space-y-4 text-sm">
-                <div className="rounded-md border border-border bg-muted/30 p-3">
+                <div className="rounded-card border border-border bg-muted/30 p-3">
                   <div className="font-medium">{selected.video_title ?? selected.channel_title ?? "(untitled)"}</div>
-                  <div className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                  <div className="mt-1 space-y-0.5 text-micro text-muted-foreground">
                     {selected.video_id && <div>Video ID: <code>{selected.video_id}</code></div>}
                     {selected.channel_id && <div>Channel ID: <code>{selected.channel_id}</code></div>}
                     {selected.channel_title && <div>Channel: {selected.channel_title}</div>}
@@ -339,7 +339,7 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                     <a
                       href={`/watch/${selected.video_id}`}
                       target="_blank" rel="noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                      className="mt-2 inline-flex items-center gap-1 text-micro text-primary hover:underline"
                     >
                       Open video <ExternalLink className="h-3 w-3" />
                     </a>
@@ -348,13 +348,13 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
 
                 {selected.details && (
                   <div>
-                    <Label className="text-xs uppercase tracking-wide text-muted-foreground">Reporter details</Label>
-                    <p className="mt-1 whitespace-pre-wrap rounded-md border border-border bg-background p-3 text-sm">{selected.details}</p>
+                    <Label className="text-micro uppercase tracking-wide text-muted-foreground">Reporter details</Label>
+                    <p className="mt-1 whitespace-pre-wrap rounded-card border border-border bg-background p-3 text-sm">{selected.details}</p>
                   </div>
                 )}
 
                 <div>
-                  <Label htmlFor="mod-note" className="text-xs uppercase tracking-wide text-muted-foreground">Moderator note</Label>
+                  <Label htmlFor="mod-note" className="text-micro uppercase tracking-wide text-muted-foreground">Moderator note</Label>
                   <Textarea
                     id="mod-note"
                     value={note}
@@ -413,13 +413,13 @@ export default function AdminReports({ embedded = false }: { embedded?: boolean 
                 </div>
 
                 <div>
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Audit trail</Label>
+                  <Label className="text-micro uppercase tracking-wide text-muted-foreground">Audit trail</Label>
                   {actions.length === 0 ? (
-                    <p className="mt-1 text-xs text-muted-foreground">No actions recorded yet.</p>
+                    <p className="mt-1 text-micro text-muted-foreground">No actions recorded yet.</p>
                   ) : (
                     <ul className="mt-1 space-y-2">
                       {actions.map((a) => (
-                        <li key={a.id} className="rounded-md border border-border bg-background p-2 text-xs">
+                        <li key={a.id} className="rounded-card border border-border bg-background p-2 text-micro">
                           <div className="flex items-center justify-between">
                             <span className="font-medium">{a.action.replace(/_/g, " ")}</span>
                             <span className="text-muted-foreground">

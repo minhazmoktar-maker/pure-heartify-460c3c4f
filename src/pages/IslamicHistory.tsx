@@ -49,7 +49,7 @@ const IslamicHistory = () => {
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>
         <header className="mt-4 mb-6">
-          <div className="flex items-center gap-3"><Clock className="h-7 w-7 text-primary" /><h1 className="text-3xl font-bold">Islamic History Timeline</h1></div>
+          <div className="flex items-center gap-3"><Clock className="h-7 w-7 text-primary" /><h1 className="text-title font-bold">Islamic History Timeline</h1></div>
           <p className="mt-2 text-muted-foreground">20 defining moments across 14 centuries of Islamic civilization.</p>
         </header>
         <Card className="p-4 mb-6">
@@ -65,7 +65,7 @@ const IslamicHistory = () => {
           {filtered.map(e => (
             <Card key={e.id} className={`p-5 cursor-pointer transition ${read[e.id] ? "bg-primary/5 border-primary/40" : "hover:bg-muted/40"}`} onClick={() => persist({ ...read, [e.id]: !read[e.id] })}>
               <div className="flex items-start justify-between gap-4">
-                <div><div className="flex flex-wrap items-baseline gap-x-3"><h2 className="text-xl font-semibold">{e.title}</h2><span className="text-sm text-muted-foreground">{e.year}</span></div><Badge variant="outline" className="mt-1">{e.era}</Badge></div>
+                <div><div className="flex flex-wrap items-baseline gap-x-3"><h2 className="text-heading font-semibold">{e.title}</h2><span className="text-sm text-muted-foreground">{e.year}</span></div><Badge variant="outline" className="mt-1">{e.era}</Badge></div>
                 {read[e.id] && <Badge>Read</Badge>}
               </div>
               <p className="mt-3 text-sm text-muted-foreground">{e.summary}</p>

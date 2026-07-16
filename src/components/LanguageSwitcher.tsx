@@ -21,12 +21,12 @@ const LanguageSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="tap-target flex items-center gap-1 rounded-full px-2 hover:bg-secondary transition-colors"
+        className="tap-target flex items-center gap-1 rounded-pill px-2 hover:bg-secondary transition-colors"
         aria-label="Change language"
         title="Change language"
       >
         <Globe className="h-5 w-5 text-foreground" />
-        <span className="hidden text-xs font-medium uppercase text-muted-foreground sm:inline">
+        <span className="hidden text-micro font-medium uppercase text-muted-foreground sm:inline">
           {current?.code ?? "en"}
         </span>
       </DropdownMenuTrigger>
@@ -39,7 +39,7 @@ const LanguageSwitcher = () => {
             onClick={() => setLocale(l.code as LanguageCode)}
             className={l.code === locale ? "font-semibold text-primary" : ""}
           >
-            <span className="mr-2 w-8 text-xs uppercase text-muted-foreground">
+            <span className="mr-2 w-8 text-micro uppercase text-muted-foreground">
               {l.code}
             </span>
             {l.native}

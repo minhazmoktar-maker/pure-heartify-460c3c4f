@@ -71,7 +71,7 @@ export default function CreatorDashboard() {
         {loading ? (
           <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
         ) : channels.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border py-16 text-center">
+          <div className="rounded-card border border-dashed border-border py-16 text-center">
             <p className="text-sm text-muted-foreground">
               You don't have any approved channels linked to this account.
             </p>
@@ -80,11 +80,11 @@ export default function CreatorDashboard() {
         ) : (
           <ul className="space-y-4">
             {channels.map((c) => (
-              <li key={c.id} className="rounded-xl border border-border bg-card p-5">
+              <li key={c.id} className="rounded-card border border-border bg-card p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">{c.title}</h3>
-                    <p className="text-xs text-muted-foreground">
+                    <h3 className="text-heading font-semibold text-foreground">{c.title}</h3>
+                    <p className="text-micro text-muted-foreground">
                       {c.handle && <span className="mr-2">{c.handle}</span>}
                       <a
                         href={`https://youtube.com/channel/${c.youtube_channel_id}`}
@@ -96,7 +96,7 @@ export default function CreatorDashboard() {
                       </a>
                     </p>
                   </div>
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium capitalize text-primary">
+                  <span className="rounded-pill bg-primary/10 px-3 py-1 text-micro font-medium capitalize text-primary">
                     {c.status}
                   </span>
                 </div>
@@ -108,11 +108,11 @@ export default function CreatorDashboard() {
                     value={c.last_rechecked_at ? new Date(c.last_rechecked_at).toLocaleDateString() : "—"}
                   />
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                  <Link to={`/appeals?kind=channel&ref=${c.id}`} className="rounded-full border border-border px-3 py-1 hover:bg-accent">
+                <div className="mt-4 flex flex-wrap gap-2 text-micro">
+                  <Link to={`/appeals?kind=channel&ref=${c.id}`} className="rounded-pill border border-border px-3 py-1 hover:bg-accent">
                     File an appeal
                   </Link>
-                  <Link to="/contact" className="rounded-full border border-border px-3 py-1 hover:bg-accent">
+                  <Link to="/contact" className="rounded-pill border border-border px-3 py-1 hover:bg-accent">
                     Contact moderation team
                   </Link>
                 </div>
@@ -127,9 +127,9 @@ export default function CreatorDashboard() {
 
 function Stat({ label, value, icon }: { label: string; value: string | number; icon?: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-border bg-background p-3">
-      <p className="flex items-center gap-1 text-xs text-muted-foreground">{icon} {label}</p>
-      <p className="mt-1 text-lg font-semibold text-foreground">{value}</p>
+    <div className="rounded-card border border-border bg-background p-3">
+      <p className="flex items-center gap-1 text-micro text-muted-foreground">{icon} {label}</p>
+      <p className="mt-1 text-heading font-semibold text-foreground">{value}</p>
     </div>
   );
 }

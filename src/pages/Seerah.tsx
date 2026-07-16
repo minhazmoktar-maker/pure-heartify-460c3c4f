@@ -70,7 +70,7 @@ const Seerah = () => {
 
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6">
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
+          <h1 className="font-heading text-title font-bold text-foreground md:text-display">
             Seerah Timeline
           </h1>
           <p className="mt-2 text-muted-foreground">
@@ -79,14 +79,14 @@ const Seerah = () => {
         </header>
 
         {/* Progress + filters */}
-        <section className="mb-6 rounded-2xl border border-border bg-card p-5">
+        <section className="mb-6 rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-medium text-foreground">
               {read.size} of {SEERAH_EVENTS.length} events read
             </span>
             <span className="text-muted-foreground">{progress}%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+          <div className="h-2 w-full overflow-hidden rounded-pill bg-secondary">
             <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
           </div>
 
@@ -95,7 +95,7 @@ const Seerah = () => {
               <button
                 key={p}
                 onClick={() => setPhase(p)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                className={`rounded-pill border px-3 py-1 text-micro font-medium transition ${
                   phase === p
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-background text-foreground hover:bg-secondary"
@@ -111,7 +111,7 @@ const Seerah = () => {
             placeholder="Search events, places, keywords…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="mt-3 h-10 w-full rounded-lg border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
+            className="mt-3 h-10 w-full rounded-card border border-border bg-background px-3 text-sm focus:border-primary focus:outline-none"
           />
         </section>
 
@@ -122,27 +122,27 @@ const Seerah = () => {
             return (
               <li key={e.id} className="mb-6 last:mb-0">
                 <span
-                  className={`absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                  className={`absolute -left-[11px] flex h-5 w-5 items-center justify-center rounded-pill border-2 ${
                     done ? "border-primary bg-primary" : "border-border bg-background"
                   }`}
                   aria-hidden
                 />
-                <article className="rounded-2xl border border-border bg-card p-5">
+                <article className="rounded-card border border-border bg-card p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span className={`rounded-full px-2 py-0.5 font-medium ${phaseColor[e.phase]}`}>{e.phase}</span>
+                      <div className="mb-1 flex flex-wrap items-center gap-2 text-micro text-muted-foreground">
+                        <span className={`rounded-pill px-2 py-0.5 font-medium ${phaseColor[e.phase]}`}>{e.phase}</span>
                         <span className="inline-flex items-center gap-1"><Calendar className="h-3 w-3" />{e.year}{e.hijri ? ` · ${e.hijri}` : ""}</span>
                         <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{e.place}</span>
                       </div>
-                      <h2 className="font-heading text-lg font-semibold text-foreground">{e.title}</h2>
+                      <h2 className="font-heading text-heading font-semibold text-foreground">{e.title}</h2>
                       <p className="mt-1 text-sm text-muted-foreground">{e.summary}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => bookmark(e)}
                         aria-label="Bookmark"
-                        className="rounded-full p-2 hover:bg-secondary"
+                        className="rounded-pill p-2 hover:bg-secondary"
                         title="Bookmark"
                       >
                         <BookMarked className="h-4 w-4 text-muted-foreground" />
@@ -150,7 +150,7 @@ const Seerah = () => {
                       <button
                         onClick={() => toggle(e.id)}
                         aria-label={done ? "Mark as unread" : "Mark as read"}
-                        className="rounded-full p-2 hover:bg-secondary"
+                        className="rounded-pill p-2 hover:bg-secondary"
                         title={done ? "Mark as unread" : "Mark as read"}
                       >
                         {done ? (
@@ -166,7 +166,7 @@ const Seerah = () => {
             );
           })}
           {filtered.length === 0 && (
-            <li className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            <li className="rounded-card border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
               No events match your filters.
             </li>
           )}

@@ -45,7 +45,7 @@ const Akhlaq = () => {
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>
         <header className="mt-4 mb-6">
-          <div className="flex items-center gap-3"><Heart className="h-7 w-7 text-primary" /><h1 className="text-3xl font-bold">Akhlaq — Character</h1></div>
+          <div className="flex items-center gap-3"><Heart className="h-7 w-7 text-primary" /><h1 className="text-title font-bold">Akhlaq — Character</h1></div>
           <p className="mt-2 text-muted-foreground">"I was only sent to perfect noble character." — Al-Adab al-Mufrad 273</p>
         </header>
         <Card className="p-4 mb-6">
@@ -60,10 +60,10 @@ const Akhlaq = () => {
         <div className="grid gap-4">
           {filtered.map(t => (
             <Card key={t.id} className={`p-5 cursor-pointer transition ${read[t.id] ? "bg-primary/5 border-primary/40" : "hover:bg-muted/40"}`} onClick={() => persist({ ...read, [t.id]: !read[t.id] })}>
-              <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold">{t.name}</h2><Badge variant={t.type === "Virtue" ? "default" : "destructive"} className="mt-1">{t.type}</Badge></div>{read[t.id] && <Badge>Read</Badge>}</div>
+              <div className="flex items-start justify-between gap-4"><div><h2 className="text-heading font-semibold">{t.name}</h2><Badge variant={t.type === "Virtue" ? "default" : "destructive"} className="mt-1">{t.type}</Badge></div>{read[t.id] && <Badge>Read</Badge>}</div>
               <p className="mt-3 text-sm text-muted-foreground">{t.description}</p>
-              <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-3"><div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">Remedy / Practice</div><p className="text-sm">{t.remedy}</p></div>
-              <p className="mt-2 text-xs text-muted-foreground italic">Source: {t.source}</p>
+              <div className="mt-3 rounded-card border border-primary/30 bg-primary/5 p-3"><div className="text-micro font-semibold uppercase tracking-wide text-primary mb-1">Remedy / Practice</div><p className="text-sm">{t.remedy}</p></div>
+              <p className="mt-2 text-micro text-muted-foreground italic">Source: {t.source}</p>
             </Card>
           ))}
         </div>

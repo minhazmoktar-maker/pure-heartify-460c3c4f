@@ -58,26 +58,26 @@ export default function PublicScholar() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-6 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <GraduationCap className="h-4 w-4 text-primary" />
               Scholar {idx + 1} of {SCHOLARS.length}
             </div>
-            <p dir="rtl" lang="ar" className="text-5xl md:text-6xl leading-loose text-primary"
+            <p dir="rtl" lang="ar" className="text-display md:text-display leading-loose text-primary"
                style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
               {s.name_ar}
             </p>
             <div>
-              <h1 className="text-3xl md:text-4xl font-semibold">{s.translit}</h1>
+              <h1 className="text-title md:text-display font-semibold">{s.translit}</h1>
               {s.kunya && <p className="mt-1 text-sm text-muted-foreground italic">{s.kunya}</p>}
             </div>
             <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1.5"><Calendar className="h-4 w-4" /> {s.lifespan}</span>
               <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {s.region}</span>
             </div>
-            <div className="inline-block rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium">
+            <div className="inline-block rounded-pill border border-primary/30 bg-primary/5 px-3 py-1 text-micro font-medium">
               {s.field}
             </div>
-            <p className="text-base md:text-lg text-muted-foreground max-w-prose mx-auto">
+            <p className="text-base md:text-heading text-muted-foreground max-w-prose mx-auto">
               {s.summary}
             </p>
             {s.works && (
@@ -87,7 +87,7 @@ export default function PublicScholar() {
                 <span className="font-medium">{s.works}</span>
               </p>
             )}
-            <p className="text-xs text-muted-foreground">raḥimahu-Llāh</p>
+            <p className="text-micro text-muted-foreground">raḥimahu-Llāh</p>
           </CardContent>
         </Card>
 

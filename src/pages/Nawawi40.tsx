@@ -107,7 +107,7 @@ const Nawawi40 = () => {
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
+            <h1 className="flex items-center gap-2 text-title font-bold tracking-tight">
               <BookOpen className="h-7 w-7 text-primary" />
               40 Hadith of Imam an-Nawawi
             </h1>
@@ -141,7 +141,7 @@ const Nawawi40 = () => {
           />
         </div>
 
-        <p className="mb-3 text-xs text-muted-foreground">
+        <p className="mb-3 text-micro text-muted-foreground">
           Showing {filtered.length} hadith{filtered.length === 1 ? "" : "s"}
         </p>
 

@@ -48,7 +48,7 @@ export default function NextSalahWidget() {
     return (
       <Link
         to="/prayer"
-        className="mx-auto mt-3 flex max-w-[1800px] items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm transition-colors hover:bg-primary/10 md:mx-6"
+        className="mx-auto mt-3 flex max-w-[1800px] items-center gap-3 rounded-card border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm transition-colors hover:bg-primary/10 md:mx-6"
         aria-label="Set your location to see the next prayer time"
       >
         <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
@@ -69,7 +69,7 @@ export default function NextSalahWidget() {
   return (
     <Link
       to="/prayer"
-      className="mx-auto mt-3 flex max-w-[1800px] items-center gap-3 rounded-xl border border-border bg-card px-4 py-2.5 text-sm shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40 md:mx-6"
+      className="mx-auto mt-3 flex max-w-[1800px] items-center gap-3 rounded-card border border-border bg-card px-4 py-2.5 text-sm shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40 md:mx-6"
       aria-label={`Next prayer: ${label} in ${countdown}`}
     >
       <Compass className="h-4 w-4 shrink-0 text-primary" aria-hidden />
@@ -78,7 +78,7 @@ export default function NextSalahWidget() {
         {formatTime(next.time)} · in <span className="tabular-nums font-medium text-foreground">{countdown}</span>
       </span>
       {settings.location.label ? (
-        <span className="ml-auto flex items-center gap-1 truncate text-xs text-muted-foreground">
+        <span className="ml-auto flex items-center gap-1 truncate text-micro text-muted-foreground">
           <MapPin className="h-3 w-3" aria-hidden />
           {settings.location.label}
         </span>

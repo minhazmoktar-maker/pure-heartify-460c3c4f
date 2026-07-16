@@ -36,7 +36,7 @@ const UmrahGuide = () => {
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>
         <header className="mt-4 mb-6">
-          <div className="flex items-center gap-3"><MapPin className="h-7 w-7 text-primary" /><h1 className="text-3xl font-bold">Umrah Step-by-Step</h1></div>
+          <div className="flex items-center gap-3"><MapPin className="h-7 w-7 text-primary" /><h1 className="text-title font-bold">Umrah Step-by-Step</h1></div>
           <p className="mt-2 text-muted-foreground">Follow along and tap each step as you complete it, insha'Allah.</p>
         </header>
         <Card className="p-4 mb-6">
@@ -50,10 +50,10 @@ const UmrahGuide = () => {
         <div className="grid gap-4">
           {filtered.map(s => (
             <Card key={s.id} className={`p-5 cursor-pointer transition ${done[s.id] ? "bg-primary/5 border-primary/40" : "hover:bg-muted/40"}`} onClick={() => persist({ ...done, [s.id]: !done[s.id] })}>
-              <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold">{s.title}</h2><Badge variant="outline" className="mt-1">{s.where}</Badge></div>{done[s.id] && <Badge>Done</Badge>}</div>
+              <div className="flex items-start justify-between gap-4"><div><h2 className="text-heading font-semibold">{s.title}</h2><Badge variant="outline" className="mt-1">{s.where}</Badge></div>{done[s.id] && <Badge>Done</Badge>}</div>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground list-disc pl-5">{s.points.map((p,i) => <li key={i}>{p}</li>)}</ul>
-              {s.dua && <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-3 text-sm"><div className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">Du'a</div>{s.dua}</div>}
-              <p className="mt-2 text-xs text-muted-foreground italic">Source: {s.source}</p>
+              {s.dua && <div className="mt-3 rounded-card border border-primary/30 bg-primary/5 p-3 text-sm"><div className="text-micro font-semibold uppercase tracking-wide text-primary mb-1">Du'a</div>{s.dua}</div>}
+              <p className="mt-2 text-micro text-muted-foreground italic">Source: {s.source}</p>
             </Card>
           ))}
         </div>

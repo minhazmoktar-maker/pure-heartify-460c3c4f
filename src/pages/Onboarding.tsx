@@ -167,9 +167,9 @@ const Onboarding = () => {
       />
       <div className="mx-auto flex min-h-dvh max-w-3xl flex-col px-4 py-8 md:py-16">
         {/* Progress bar */}
-        <div className="mb-6 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div className="mb-6 h-1.5 w-full overflow-hidden rounded-pill bg-muted">
           <div
-            className="h-full bg-primary transition-all duration-500"
+            className="h-full bg-primary transition-all duration-medium"
             style={{ width: `${progress}%` }}
             aria-label={`Step ${currentIdx + 1} of ${STEP_KEYS.length}`}
           />
@@ -279,7 +279,7 @@ const Onboarding = () => {
           <button
             type="button"
             onClick={goBack}
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-pill px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             {currentIdx === 0 ? "Skip for now" : "Back"}
@@ -289,7 +289,7 @@ const Onboarding = () => {
             disabled={!canAdvance() || saving}
             onClick={goNext}
             className={cn(
-              "inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors",
+              "inline-flex items-center gap-2 rounded-pill bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors",
               (!canAdvance() || saving) ? "opacity-50" : "hover:bg-primary/90",
             )}
           >
@@ -313,10 +313,10 @@ function StepHeader({ icon, stepLabel, title, subtitle }: {
 }) {
   return (
     <>
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+      <div className="flex items-center gap-2 text-micro font-semibold uppercase tracking-wider text-primary">
         {icon}{stepLabel}
       </div>
-      <h1 className="mt-2 font-heading text-3xl font-bold text-foreground md:text-4xl">{title}</h1>
+      <h1 className="mt-2 font-heading text-title font-bold text-foreground md:text-display">{title}</h1>
       <p className="mt-2 max-w-xl text-sm text-muted-foreground md:text-base">{subtitle}</p>
     </>
   );
@@ -342,18 +342,18 @@ function InterestStep({
               disabled={disabled}
               onClick={() => onSelect(opt.id)}
               className={cn(
-                "relative flex flex-col items-start gap-1.5 rounded-xl border p-4 text-left transition-all",
+                "relative flex flex-col items-start gap-1.5 rounded-card border p-4 text-left transition-all",
                 selected
                   ? "border-primary bg-primary/10 ring-2 ring-primary/40"
                   : "border-border bg-card hover:border-primary/40 hover:bg-card/80",
                 disabled && "cursor-not-allowed opacity-40",
               )}
             >
-              <span className="text-2xl">{opt.icon}</span>
+              <span className="text-title">{opt.icon}</span>
               <span className="font-semibold leading-tight text-foreground">{opt.title}</span>
-              <span className="text-xs leading-snug text-muted-foreground">{opt.description}</span>
+              <span className="text-micro leading-snug text-muted-foreground">{opt.description}</span>
               {selected && (
-                <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-pill bg-primary text-primary-foreground">
                   <Check className="h-3 w-3" />
                 </span>
               )}
@@ -383,7 +383,7 @@ function ChoiceStep({
               type="button"
               onClick={() => onSelect(opt.id)}
               className={cn(
-                "relative rounded-xl border p-4 text-left text-sm font-medium transition-all",
+                "relative rounded-card border p-4 text-left text-sm font-medium transition-all",
                 selected
                   ? "border-primary bg-primary/10 ring-2 ring-primary/40"
                   : "border-border bg-card hover:border-primary/40",
@@ -391,7 +391,7 @@ function ChoiceStep({
             >
               {opt.label}
               {selected && (
-                <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-pill bg-primary text-primary-foreground">
                   <Check className="h-3 w-3" />
                 </span>
               )}
@@ -417,7 +417,7 @@ function PushStep({
         title="Stay connected"
         subtitle="A single gentle push a day for your Daily Dose. You can change or turn this off any time in Settings."
       />
-      <div className="mt-8 rounded-xl border border-border bg-card p-6">
+      <div className="mt-8 rounded-card border border-border bg-card p-6">
         {!supported ? (
           <p className="text-sm text-muted-foreground">
             Your browser doesn't support push notifications. You'll still get in-app reminders.
@@ -433,7 +433,7 @@ function PushStep({
             <button
               type="button"
               onClick={onEnable}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              className="inline-flex items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <BellRing className="h-4 w-4" /> Enable notifications
             </button>
@@ -464,7 +464,7 @@ function InstallStep({
         title="Put Heartify on your home screen"
         subtitle="Opens like a real app. No app store needed."
       />
-      <div className="mt-8 rounded-xl border border-border bg-card p-6 text-sm">
+      <div className="mt-8 rounded-card border border-border bg-card p-6 text-sm">
         {isStandalone ? (
           <p className="text-foreground">You're already using the installed app. Alhamdulillah.</p>
         ) : isIOS ? (
@@ -477,7 +477,7 @@ function InstallStep({
           <button
             type="button"
             onClick={onInstall}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             <DownloadCloud className="h-4 w-4" /> Install Heartify
           </button>
@@ -500,7 +500,7 @@ function DoneStep() {
         title="Your first Daily Dose is ready"
         subtitle="One tap and you're in — mabrūk 🌿"
       />
-      <div className="mt-8 rounded-xl border border-primary/30 bg-primary/5 p-6 text-sm text-foreground">
+      <div className="mt-8 rounded-card border border-primary/30 bg-primary/5 p-6 text-sm text-foreground">
         Personalization is live. We'll refine your feed as you watch.
       </div>
     </>

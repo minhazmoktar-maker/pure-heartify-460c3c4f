@@ -27,7 +27,7 @@ export default function Trust() {
             <div className="flex gap-3 items-start">
               <Shield className="w-5 h-5 text-primary mt-1 shrink-0" />
               <div>
-                <h2 className="text-lg font-semibold mb-2">Content trust</h2>
+                <h2 className="text-heading font-semibold mb-2">Content trust</h2>
                 <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                   <li>Every video and audio track is reviewed through a multi-stage moderation pipeline before appearing on the feed.</li>
                   <li>Approved creators are tracked in a public channel-trust ledger with per-channel scores and revocation history.</li>
@@ -42,7 +42,7 @@ export default function Trust() {
             <div className="flex gap-3 items-start">
               <Lock className="w-5 h-5 text-primary mt-1 shrink-0" />
               <div>
-                <h2 className="text-lg font-semibold mb-2">Access & authentication</h2>
+                <h2 className="text-heading font-semibold mb-2">Access & authentication</h2>
                 <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                   <li>Email/password with leaked-password (HIBP) protection enabled.</li>
                   <li>Google Sign-In and optional multi-factor authentication (TOTP).</li>
@@ -57,7 +57,7 @@ export default function Trust() {
             <div className="flex gap-3 items-start">
               <Eye className="w-5 h-5 text-primary mt-1 shrink-0" />
               <div>
-                <h2 className="text-lg font-semibold mb-2">Data collection & use</h2>
+                <h2 className="text-heading font-semibold mb-2">Data collection & use</h2>
                 <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                   <li>Row-level security is enforced on every user-owned table so users can only read and write their own data.</li>
                   <li>Playback progress, streaks, and preferences are stored to power your experience — never sold.</li>
@@ -72,7 +72,7 @@ export default function Trust() {
             <div className="flex gap-3 items-start">
               <Users className="w-5 h-5 text-primary mt-1 shrink-0" />
               <div>
-                <h2 className="text-lg font-semibold mb-2">Your rights</h2>
+                <h2 className="text-heading font-semibold mb-2">Your rights</h2>
                 <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
                   <li>Export or delete your account and all associated data from Profile → Settings.</li>
                   <li>Household seats on Heartify+ can be revoked at any time by the primary account.</li>
@@ -86,7 +86,7 @@ export default function Trust() {
             <div className="flex gap-3 items-start">
               <FileCheck className="w-5 h-5 text-primary mt-1 shrink-0" />
               <div>
-                <h2 className="text-lg font-semibold mb-2">Platform & hosting</h2>
+                <h2 className="text-heading font-semibold mb-2">Platform & hosting</h2>
                 <p className="text-sm text-muted-foreground">
                   Heartify runs on a managed cloud backend with encryption in transit (TLS 1.2+) and at rest. Database access is scoped by role and enforced by row-level security policies. The hosting platform provides infrastructure controls; Heartify is responsible for application-level access rules and content moderation.
                 </p>
@@ -98,7 +98,7 @@ export default function Trust() {
             <div className="flex gap-3 items-start">
               <AlertCircle className="w-5 h-5 text-primary mt-1 shrink-0" />
               <div>
-                <h2 className="text-lg font-semibold mb-2">Report a security issue</h2>
+                <h2 className="text-heading font-semibold mb-2">Report a security issue</h2>
                 <p className="text-sm text-muted-foreground">
                   If you believe you've found a vulnerability, please email{" "}
                   <a className="underline" href="mailto:security@heartify.app">security@heartify.app</a>.
@@ -109,7 +109,7 @@ export default function Trust() {
           </Card>
         </div>
 
-        <p className="text-xs text-muted-foreground mt-8 text-center">
+        <p className="text-micro text-muted-foreground mt-8 text-center">
           Last reviewed: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long" })}
         </p>
       </div>

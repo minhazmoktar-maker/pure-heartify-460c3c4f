@@ -19,7 +19,7 @@ export function BadgeShelf() {
     <Card className="p-5">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="font-semibold text-foreground">Badges</h3>
-        <span className="text-xs text-muted-foreground tabular-nums">
+        <span className="text-micro text-muted-foreground tabular-nums">
           {earned.length}/{catalog.length}
         </span>
       </div>
@@ -29,14 +29,14 @@ export function BadgeShelf() {
           return (
             <div
               key={b.key}
-              className={`relative flex flex-col items-center gap-1 rounded-lg border p-3 text-center transition-colors ${
+              className={`relative flex flex-col items-center gap-1 rounded-card border p-3 text-center transition-colors ${
                 got
                   ? "border-primary/40 bg-primary/5"
                   : "border-border bg-muted/20 opacity-60"
               }`}
               title={got ? `${b.name} — earned` : `${b.name} — locked`}
             >
-              <span className="text-2xl" aria-hidden>
+              <span className="text-title" aria-hidden>
                 {b.icon}
               </span>
               <span className="text-[11px] font-medium text-foreground leading-tight">{b.name}</span>

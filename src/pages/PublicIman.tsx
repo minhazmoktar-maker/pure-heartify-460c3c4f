@@ -39,25 +39,25 @@ export default function PublicIman() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-10 pb-10 space-y-6 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Heart className="h-4 w-4 text-primary" />
               Article {num} of 6 · Arkān al-Īmān
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-5xl md:text-6xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {a.ar}
             </p>
-            <h1 className="text-3xl md:text-4xl font-semibold">
+            <h1 className="text-title md:text-display font-semibold">
               {a.translit}{" "}
-              <span className="text-muted-foreground text-2xl md:text-3xl">
+              <span className="text-muted-foreground text-title md:text-title">
                 ({a.en})
               </span>
             </h1>
-            <p className="text-base md:text-lg text-muted-foreground max-w-prose mx-auto">
+            <p className="text-base md:text-heading text-muted-foreground max-w-prose mx-auto">
               {a.summary}
             </p>
           </CardContent>

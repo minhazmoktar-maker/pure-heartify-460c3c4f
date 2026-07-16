@@ -61,14 +61,14 @@ export default function SamplePreviewPlayer({
         type="button" size="sm" variant="outline"
         onClick={toggle}
         aria-label={playing ? `Pause ${label}` : `Play ${seconds}-second ${label}`}
-        className="h-8 gap-1.5 rounded-full"
+        className="h-8 gap-1.5 rounded-pill"
       >
         {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-        <span className="text-xs">{playing ? "Pause" : `${seconds}s ${label}`}</span>
+        <span className="text-micro">{playing ? "Pause" : `${seconds}s ${label}`}</span>
       </Button>
-      <div className="relative h-1 flex-1 overflow-hidden rounded-full bg-muted" aria-hidden>
+      <div className="relative h-1 flex-1 overflow-hidden rounded-pill bg-muted" aria-hidden>
         <div
-          className="h-full rounded-full bg-[hsl(var(--gold))] transition-[width] duration-150"
+          className="h-full rounded-pill bg-[hsl(var(--gold))] transition-[width] duration-short"
           style={{ width: `${Math.round(progress * 100)}%` }}
         />
       </div>

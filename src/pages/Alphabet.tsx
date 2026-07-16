@@ -107,7 +107,7 @@ export default function Alphabet() {
             <Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <Languages className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Arabic Alphabet</h1>
+          <h1 className="text-heading font-semibold">Arabic Alphabet</h1>
         </div>
       </header>
 
@@ -133,9 +133,9 @@ export default function Alphabet() {
                 <Card key={l.name} className={`p-4 ${done ? "border-primary/50" : ""}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-4xl font-bold" dir="rtl" lang="ar">{l.isolated}</div>
+                      <div className="text-display font-bold" dir="rtl" lang="ar">{l.isolated}</div>
                       <div className="mt-1 text-sm font-medium">{l.name} <span className="text-muted-foreground">({l.translit})</span></div>
-                      <div className="text-xs text-muted-foreground">{l.sound}</div>
+                      <div className="text-micro text-muted-foreground">{l.sound}</div>
                     </div>
                     <Button
                       size="icon"
@@ -153,8 +153,8 @@ export default function Alphabet() {
                       { k: "Medial", v: l.medial },
                       { k: "Final", v: l.final },
                     ].map((c) => (
-                      <div key={c.k} className="rounded-md border border-border/50 p-2">
-                        <div className="text-xl">{c.v}</div>
+                      <div key={c.k} className="rounded-card border border-border/50 p-2">
+                        <div className="text-heading">{c.v}</div>
                         <div className="text-[10px] text-muted-foreground" dir="ltr">{c.k}</div>
                       </div>
                     ))}
@@ -197,7 +197,7 @@ function QuizPanel() {
     return (
       <Card className="p-6 text-center">
         <div className="text-sm text-muted-foreground">Quiz complete</div>
-        <div className="mt-2 text-4xl font-bold">{score} / {TOTAL}</div>
+        <div className="mt-2 text-display font-bold">{score} / {TOTAL}</div>
         <Button className="mt-4" onClick={() => { setScore(0); setRound(0); }}>
           <RotateCcw className="mr-2 h-4 w-4" /> Play again
         </Button>
@@ -222,8 +222,8 @@ function QuizPanel() {
         <span className="font-medium">Score {score}</span>
       </div>
       <div className="my-6 text-center">
-        <div className="text-xs uppercase text-muted-foreground">Which letter is this?</div>
-        <div className="mt-2 text-7xl font-bold" dir="rtl" lang="ar">{answer.isolated}</div>
+        <div className="text-micro uppercase text-muted-foreground">Which letter is this?</div>
+        <div className="mt-2 text-display font-bold" dir="rtl" lang="ar">{answer.isolated}</div>
       </div>
       <div className="grid grid-cols-2 gap-2">
         {choices.map((c) => {

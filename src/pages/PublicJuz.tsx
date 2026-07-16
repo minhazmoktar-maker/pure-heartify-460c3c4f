@@ -39,21 +39,21 @@ export default function PublicJuz() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-10 pb-10 space-y-6 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <BookOpen className="h-4 w-4 text-primary" />
               Juzʾ {num} of 30 · Ajzāʾ al-Qurʾān
             </div>
-            <p dir="rtl" lang="ar" className="text-5xl md:text-6xl leading-loose text-primary"
+            <p dir="rtl" lang="ar" className="text-display md:text-display leading-loose text-primary"
                style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
               {j.name_ar}
             </p>
-            <h1 className="text-3xl md:text-4xl font-semibold">{j.translit}</h1>
+            <h1 className="text-title md:text-display font-semibold">{j.translit}</h1>
             <div className="text-sm text-muted-foreground">
               <div>{j.start}</div>
               <div className="opacity-60">↓</div>
               <div>{j.end}</div>
             </div>
-            <p className="text-base md:text-lg text-muted-foreground max-w-prose mx-auto">
+            <p className="text-base md:text-heading text-muted-foreground max-w-prose mx-auto">
               {j.summary}
             </p>
             <div className="flex flex-wrap justify-center gap-2 pt-2">

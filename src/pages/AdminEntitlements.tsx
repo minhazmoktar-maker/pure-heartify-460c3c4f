@@ -158,14 +158,14 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
             </Link>
             <div className="mb-6 flex items-center gap-3">
               <Crown className="h-6 w-6 text-gold" />
-              <h1 className="font-heading text-2xl font-bold">Entitlements</h1>
+              <h1 className="font-heading text-title font-bold">Entitlements</h1>
             </div>
           </>
         )}
 
 
         {/* Grant form */}
-        <div className="mb-8 rounded-2xl border bg-card p-5 shadow-sm">
+        <div className="mb-8 rounded-card border bg-card p-5 shadow-sm">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Grant / update entitlement
           </h2>
@@ -176,11 +176,11 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
                 onChange={(e) => setTargetId(e.target.value)}
                 placeholder="User ID (uuid)"
                 aria-invalid={!!targetIdError}
-                className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
+                className="w-full rounded-card border bg-background px-3 py-2 text-sm"
               />
-              {targetIdError && <p className="mt-1 text-xs text-destructive">{targetIdError}</p>}
+              {targetIdError && <p className="mt-1 text-micro text-destructive">{targetIdError}</p>}
               {!targetIdError && existingForTarget && (
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-micro text-muted-foreground">
                   Existing plan: <span className="font-semibold">{existingForTarget.plan}</span>
                   {existingForTarget.expires_at
                     ? ` — expires ${new Date(existingForTarget.expires_at).toLocaleString()}`
@@ -191,7 +191,7 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
             <select
               value={plan}
               onChange={(e) => setPlan(e.target.value as (typeof VALID_PLANS)[number])}
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+              className="rounded-card border bg-background px-3 py-2 text-sm"
             >
               {VALID_PLANS.map((p) => (
                 <option key={p} value={p}>{p}{p === "free" ? " (downgrade)" : ""}</option>
@@ -204,29 +204,29 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
                 onChange={(e) => setExpiresAt(e.target.value)}
                 disabled={plan === "premium_lifetime" || plan === "free"}
                 aria-invalid={!!expiresAtError}
-                className="w-full rounded-lg border bg-background px-3 py-2 text-sm disabled:opacity-50"
+                className="w-full rounded-card border bg-background px-3 py-2 text-sm disabled:opacity-50"
               />
               {expiresAtError
-                ? <p className="mt-1 text-xs text-destructive">{expiresAtError}</p>
-                : <p className="mt-1 text-xs text-muted-foreground">Leave empty for open-ended access.</p>}
+                ? <p className="mt-1 text-micro text-destructive">{expiresAtError}</p>
+                : <p className="mt-1 text-micro text-muted-foreground">Leave empty for open-ended access.</p>}
             </div>
             <input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Reason (audit log, min 3 chars)"
-              className="rounded-lg border bg-background px-3 py-2 text-sm"
+              className="rounded-card border bg-background px-3 py-2 text-sm"
               maxLength={280}
             />
           </div>
           <button
             onClick={openGrantConfirm}
             disabled={busy === "grant" || !canGrant}
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+            className="mt-4 inline-flex items-center gap-2 rounded-pill bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
           >
             {busy === "grant" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
             {existingForTarget ? "Update entitlement" : "Grant entitlement"}
           </button>
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-2 text-micro text-muted-foreground">
             All grants and revocations are written to <code>privileged_actions_log</code>.
           </p>
         </div>
@@ -238,12 +238,12 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Filter by user id, name, or plan…"
-            className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm"
+            className="flex-1 rounded-card border bg-background px-3 py-2 text-sm"
           />
         </div>
 
         {/* Table */}
-        <div className="overflow-hidden rounded-2xl border bg-card">
+        <div className="overflow-hidden rounded-card border bg-card">
           {loading ? (
             <div className="p-4">
               <PageSkeleton variant="list" className="max-w-none px-0 py-0" />
@@ -271,7 +271,7 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
                     <tr key={r.id}>
                       <td>
                         <div className="font-medium">{r.display_name ?? "—"}</div>
-                        <div className="text-xs text-muted-foreground font-mono">{r.user_id}</div>
+                        <div className="text-micro text-muted-foreground font-mono">{r.user_id}</div>
                       </td>
                       <td>
                         <span className={`heartify-chip ${active ? "heartify-chip--gold" : "heartify-chip--muted"}`}>
@@ -279,10 +279,10 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
                           {r.plan}
                         </span>
                       </td>
-                      <td className="text-xs text-muted-foreground whitespace-nowrap">
+                      <td className="text-micro text-muted-foreground whitespace-nowrap">
                         {r.expires_at ? new Date(r.expires_at).toLocaleString() : "never"}
                       </td>
-                      <td className="text-xs text-muted-foreground whitespace-nowrap">
+                      <td className="text-micro text-muted-foreground whitespace-nowrap">
                         {new Date(r.updated_at).toLocaleString()}
                       </td>
                       <td className="text-right">
@@ -290,7 +290,7 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
                           <button
                             onClick={() => setRevokeTarget(r)}
                             disabled={busy === r.user_id}
-                            className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-pill border px-3 py-1 text-micro font-semibold text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40 disabled:opacity-50"
                           >
                             {busy === r.user_id ? <Loader2 className="h-3 w-3 animate-spin" /> : <ShieldOff className="h-3 w-3" />}
                             Revoke
@@ -327,7 +327,7 @@ export default function AdminEntitlements({ embedded = false }: { embedded?: boo
             {plan === "premium_lifetime" || !expiresAt ? "never" : new Date(expiresAt).toLocaleString()}
           </div>
           {existingForTarget && (
-            <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-2 text-xs">
+            <div className="flex items-start gap-2 rounded-card bg-muted/50 p-2 text-micro">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
               <span>
                 This overwrites the existing <strong>{existingForTarget.plan}</strong> entitlement

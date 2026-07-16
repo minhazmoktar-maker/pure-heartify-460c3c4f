@@ -34,7 +34,7 @@ const KidsDuas = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Du'ās for Children — Easy Sunnah Supplications to Memorize" description="Short authentic Sunnah du'ās for children to memorize — waking, eating, sleeping, toilet, dressing, sneezing, riding, and for parents." path="/kids-duas" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Baby className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Du'ās for Children</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Baby className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Du'ās for Children</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4 max-w-3xl">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Memorized</span><span className="text-sm font-medium">{count} / {DUAS.length}</span></div><Progress value={(count / DUAS.length) * 100} /></Card>
         <div className="flex gap-2"><Input placeholder="Search occasions…" value={q} onChange={e => setQ(e.target.value)} /><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4" /></Button></div>
@@ -44,10 +44,10 @@ const KidsDuas = () => {
               <h2 className="font-semibold">{d.occasion}</h2>
               {done[d.id] && <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />}
             </div>
-            <p className="text-2xl text-right font-arabic leading-loose mb-2">{d.arabic}</p>
+            <p className="text-title text-right font-arabic leading-loose mb-2">{d.arabic}</p>
             <p className="text-sm italic text-muted-foreground mb-1">{d.translit}</p>
             <p className="text-sm mb-1">{d.english}</p>
-            <p className="text-xs text-muted-foreground">{d.reference}</p>
+            <p className="text-micro text-muted-foreground">{d.reference}</p>
           </Card>
         ))}
       </div>

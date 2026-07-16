@@ -28,14 +28,14 @@ const Kalimahs = () => {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="The Six Kalimahs — Arabic, Transliteration, Meaning" description="Learn and memorize the Six Kalimahs of Islam with Arabic text, transliteration and English translation." path="/kalimahs" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><BookOpen className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">The Six Kalimahs</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><BookOpen className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">The Six Kalimahs</h1></div></div>
       <div className="container mx-auto px-4 py-6 space-y-4">
         <Card className="p-4"><div className="flex items-center justify-between mb-2"><span className="text-sm text-muted-foreground">Memorized</span><span className="text-sm font-medium">{count} / {KALIMAHS.length}</span></div><Progress value={(count / KALIMAHS.length) * 100} /></Card>
         <div className="flex justify-end"><Button variant="outline" size="sm" onClick={() => persist({})}><RotateCcw className="w-4 h-4 mr-2" />Reset</Button></div>
         <div className="grid gap-3">{KALIMAHS.map(k => (
           <Card key={k.id} className={`p-5 cursor-pointer ${done[k.id] ? "border-primary/60 bg-primary/5" : ""}`} onClick={() => persist({ ...done, [k.id]: !done[k.id] })}>
             <div className="flex items-start justify-between mb-3"><h3 className="font-semibold">{k.name}</h3><Badge variant="secondary">#{k.number}</Badge></div>
-            <p className="text-2xl md:text-3xl text-right leading-loose mb-3 font-arabic" dir="rtl">{k.arabic}</p>
+            <p className="text-title md:text-title text-right leading-loose mb-3 font-arabic" dir="rtl">{k.arabic}</p>
             <p className="text-sm italic text-muted-foreground mb-2">{k.translit}</p>
             <p className="text-sm">{k.meaning}</p>
           </Card>

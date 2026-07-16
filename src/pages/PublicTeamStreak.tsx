@@ -75,33 +75,33 @@ export default function PublicTeamStreak() {
       />
       <main className="container mx-auto max-w-lg px-4 py-12 space-y-6">
         <header className="text-center">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Team streak</p>
-          <h1 className="mt-2 text-3xl font-bold text-foreground">{team.name}</h1>
+          <p className="text-micro uppercase tracking-wider text-muted-foreground">Team streak</p>
+          <h1 className="mt-2 text-title font-bold text-foreground">{team.name}</h1>
         </header>
 
         <Card className="p-6 space-y-4">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <Flame className="h-5 w-5 mx-auto text-primary" />
-              <div className="mt-1 text-2xl font-bold text-foreground">{team.current_streak}</div>
-              <div className="text-xs text-muted-foreground">Day streak</div>
+              <div className="mt-1 text-title font-bold text-foreground">{team.current_streak}</div>
+              <div className="text-micro text-muted-foreground">Day streak</div>
             </div>
             <div>
               <Users className="h-5 w-5 mx-auto text-primary" />
-              <div className="mt-1 text-2xl font-bold text-foreground">
+              <div className="mt-1 text-title font-bold text-foreground">
                 {team.member_count}/{team.member_limit}
               </div>
-              <div className="text-xs text-muted-foreground">Members</div>
+              <div className="text-micro text-muted-foreground">Members</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-foreground">{team.longest_streak}</div>
-              <div className="text-xs text-muted-foreground">Longest</div>
+              <div className="text-title font-bold text-foreground">{team.longest_streak}</div>
+              <div className="text-micro text-muted-foreground">Longest</div>
             </div>
           </div>
 
-          <div className="rounded-md bg-muted p-3 text-center">
-            <div className="text-xs text-muted-foreground">Invite code</div>
-            <div className="font-mono text-lg font-semibold tracking-widest text-foreground">
+          <div className="rounded-card bg-muted p-3 text-center">
+            <div className="text-micro text-muted-foreground">Invite code</div>
+            <div className="font-mono text-heading font-semibold tracking-widest text-foreground">
               {team.invite_code}
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function PublicTeamStreak() {
               {full ? "Team is full" : "Join this team"}
             </Link>
           </Button>
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-micro text-center text-muted-foreground">
             You'll be asked to sign in first. Streak advances only when every member finishes their daily dose.
           </p>
         </Card>

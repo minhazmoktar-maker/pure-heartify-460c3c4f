@@ -58,23 +58,23 @@ export default function PublicDurood() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-5 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Heart className="h-4 w-4 text-primary" /> Ṣalawāt · {idx + 1} of {DUROOD.length}
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-pill bg-primary/10 text-primary text-micro font-medium">
               {d.category}
             </div>
-            <h1 className="text-2xl md:text-3xl font-semibold">{d.title}</h1>
+            <h1 className="text-title md:text-title font-semibold">{d.title}</h1>
             <p
               dir="rtl"
               lang="ar"
-              className="text-2xl md:text-3xl leading-loose text-primary text-right"
+              className="text-title md:text-title leading-loose text-primary text-right"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {d.arabic}
             </p>
             <p className="text-sm md:text-base italic text-muted-foreground">{d.translit}</p>
-            <p className="text-base md:text-lg leading-relaxed border-l-2 border-primary/40 pl-4 text-left max-w-prose mx-auto">
+            <p className="text-base md:text-heading leading-relaxed border-l-2 border-primary/40 pl-4 text-left max-w-prose mx-auto">
               {d.meaning}
             </p>
           </CardContent>
@@ -82,11 +82,11 @@ export default function PublicDurood() {
 
         <Card className="mt-6 border-primary/20">
           <CardContent className="pt-5 pb-5 space-y-3">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-primary">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-primary">
               <Sparkles className="h-3.5 w-3.5" /> Virtue
             </div>
             <p className="text-sm md:text-base leading-relaxed">{d.virtue}</p>
-            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
+            <p className="text-micro text-muted-foreground inline-flex items-center gap-1">
               <BookMarked className="h-3.5 w-3.5" /> {d.reference}
             </p>
           </CardContent>

@@ -70,7 +70,7 @@ function CircleCard({ circle, isHost }: { circle: DhikrCircle; isHost: boolean }
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between text-base">
           <span className="truncate">{circle.title}</span>
-          <span className="text-xs font-normal text-muted-foreground">{circle.phrase}</span>
+          <span className="text-micro font-normal text-muted-foreground">{circle.phrase}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -242,7 +242,7 @@ export default function DhikrCircles() {
       <main className="container mx-auto max-w-4xl px-4 py-8">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="flex items-center gap-2 text-2xl font-semibold">
+            <h1 className="flex items-center gap-2 text-title font-semibold">
               <Sparkles className="h-6 w-6 text-primary" /> Dhikr Circles
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -261,19 +261,19 @@ export default function DhikrCircles() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="space-y-3 rounded-xl border border-border/50 p-4"
+                className="space-y-3 rounded-card border border-border/50 p-4"
               >
                 <div className="flex items-center gap-3">
-                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-9 w-9 rounded-pill" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-2/3" />
                     <Skeleton className="h-3 w-1/3" />
                   </div>
                 </div>
-                <Skeleton className="h-2 w-full rounded-full" />
+                <Skeleton className="h-2 w-full rounded-pill" />
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-3 w-16" />
-                  <Skeleton className="h-8 w-24 rounded-full" />
+                  <Skeleton className="h-8 w-24 rounded-pill" />
                 </div>
               </div>
             ))}

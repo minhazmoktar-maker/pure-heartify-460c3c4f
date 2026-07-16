@@ -151,7 +151,7 @@ const Journal = () => {
         </div>
 
         {/* Composer */}
-        <div className="mb-8 rounded-2xl border border-border bg-card p-5">
+        <div className="mb-8 rounded-card border border-border bg-card p-5">
           <div className="mb-3 flex flex-wrap gap-2">
             {(Object.keys(typeMeta) as Entry["type"][]).map((t) => {
               const Icon = typeMeta[t].icon;
@@ -160,7 +160,7 @@ const Journal = () => {
                 <button
                   key={t}
                   onClick={() => setType(t)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`inline-flex items-center gap-1.5 rounded-pill border px-3 py-1.5 text-micro font-medium transition-colors ${
                     active
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:text-foreground"
@@ -172,20 +172,20 @@ const Journal = () => {
               );
             })}
           </div>
-          <p className="mb-3 text-xs italic text-muted-foreground">{meta.hint}</p>
+          <p className="mb-3 text-micro italic text-muted-foreground">{meta.hint}</p>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={4}
             maxLength={600}
             placeholder="Write from the heart…"
-            className="w-full resize-none rounded-lg border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+            className="w-full resize-none rounded-card border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
           />
           <div className="mt-2 flex items-center justify-between">
             <span className="text-[11px] text-muted-foreground">{text.length}/600</span>
             <button
               onClick={addEntry}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              className="inline-flex items-center gap-1.5 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
               <Plus className="h-4 w-4" />
               Save entry
@@ -205,7 +205,7 @@ const Journal = () => {
           <div className="space-y-6">
             {grouped.map(([date, list]) => (
               <section key={date}>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <h2 className="mb-2 text-micro font-semibold uppercase tracking-wide text-muted-foreground">
                   {new Date(date).toLocaleDateString(undefined, {
                     weekday: "long",
                     month: "long",
@@ -218,16 +218,16 @@ const Journal = () => {
                     const m = typeMeta[e.type];
                     const Icon = m.icon;
                     return (
-                      <article key={e.id} className="group rounded-xl border border-border bg-card p-4">
+                      <article key={e.id} className="group rounded-card border border-border bg-card p-4">
                         <div className="mb-2 flex items-center justify-between">
-                          <div className={`inline-flex items-center gap-1.5 text-xs font-medium ${m.color}`}>
+                          <div className={`inline-flex items-center gap-1.5 text-micro font-medium ${m.color}`}>
                             <Icon className="h-3.5 w-3.5" />
                             {m.label}
                           </div>
                           <button
                             onClick={() => removeEntry(e.id)}
                             aria-label="Delete entry"
-                            className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-secondary hover:text-destructive group-hover:opacity-100"
+                            className="rounded-card p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-secondary hover:text-destructive group-hover:opacity-100"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>

@@ -115,9 +115,9 @@ export default function Challenges() {
             <Badge variant="secondary" className="text-[10px]">+{c.points} pts</Badge>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p className="text-xs text-muted-foreground">{c.description}</p>
+            <p className="text-micro text-muted-foreground">{c.description}</p>
             <Progress value={pct} className="h-2" />
-            <p className="text-right text-xs font-mono">{cur.toLocaleString()} / {c.target.toLocaleString()}</p>
+            <p className="text-right text-micro font-mono">{cur.toLocaleString()} / {c.target.toLocaleString()}</p>
           </CardContent>
         </Card>
       </Link>
@@ -131,11 +131,11 @@ export default function Challenges() {
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="flex items-center gap-2 text-3xl font-bold"><Target className="h-7 w-7 text-primary" />Daily Challenges</h1>
+            <h1 className="flex items-center gap-2 text-title font-bold"><Target className="h-7 w-7 text-primary" />Daily Challenges</h1>
             <p className="mt-1 text-muted-foreground">Fresh goals every day. Complete them for points and streak momentum.</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="rounded-full border bg-card px-4 py-2 text-sm">
+            <div className="rounded-pill border bg-card px-4 py-2 text-sm">
               <Trophy className="mr-1 inline h-4 w-4 text-yellow-500" />
               <span className="font-bold text-primary">{earnedPoints}</span>
               <span className="text-muted-foreground"> / {totalPoints} pts</span>

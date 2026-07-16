@@ -40,45 +40,45 @@ export default function PublicSalah() {
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-10 pb-10 space-y-6">
             <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+              <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
                 <Sun className="h-4 w-4 text-primary" />
                 Prayer {idx + 1} of {SALAWAT.length} · Ṣalāt al-Mafrūḍah
               </div>
               <p
                 dir="rtl"
                 lang="ar"
-                className="mt-4 text-5xl md:text-6xl leading-loose text-primary"
+                className="mt-4 text-display md:text-display leading-loose text-primary"
                 style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
               >
                 {s.ar}
               </p>
-              <h1 className="mt-2 text-3xl md:text-4xl font-semibold">
+              <h1 className="mt-2 text-title md:text-display font-semibold">
                 {s.translit}{" "}
-                <span className="text-muted-foreground text-2xl md:text-3xl">
+                <span className="text-muted-foreground text-title md:text-title">
                   ({s.en})
                 </span>
               </h1>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-              <div className="rounded-lg border border-border/60 bg-background/40 p-3">
-                <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Farḍ</p>
-                <p className="text-2xl font-semibold">{s.fard}<span className="text-sm text-muted-foreground ml-1">rakʿahs</span></p>
+              <div className="rounded-card border border-border/60 bg-background/40 p-3">
+                <p className="text-muted-foreground text-micro uppercase tracking-wider mb-1">Farḍ</p>
+                <p className="text-title font-semibold">{s.fard}<span className="text-sm text-muted-foreground ml-1">rakʿahs</span></p>
               </div>
-              <div className="rounded-lg border border-border/60 bg-background/40 p-3 md:col-span-2">
-                <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1 inline-flex items-center gap-1.5">
+              <div className="rounded-card border border-border/60 bg-background/40 p-3 md:col-span-2">
+                <p className="text-muted-foreground text-micro uppercase tracking-wider mb-1 inline-flex items-center gap-1.5">
                   <Clock className="h-3 w-3" /> Time
                 </p>
                 <p>{s.when}</p>
               </div>
             </div>
 
-            <div className="rounded-lg border border-border/60 bg-background/40 p-3 text-sm">
-              <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Regular Sunnah</p>
+            <div className="rounded-card border border-border/60 bg-background/40 p-3 text-sm">
+              <p className="text-muted-foreground text-micro uppercase tracking-wider mb-1">Regular Sunnah</p>
               <p>{s.sunnah}</p>
             </div>
 
-            <p className="text-center text-base md:text-lg text-muted-foreground italic max-w-prose mx-auto">
+            <p className="text-center text-base md:text-heading text-muted-foreground italic max-w-prose mx-auto">
               {s.virtue}
             </p>
           </CardContent>

@@ -90,7 +90,7 @@ const IslamicFinance = () => {
         <header className="mt-4 mb-6">
           <div className="flex items-center gap-3">
             <Landmark className="h-7 w-7 text-primary" />
-            <h1 className="text-3xl font-bold">Islamic Finance Guide</h1>
+            <h1 className="text-title font-bold">Islamic Finance Guide</h1>
           </div>
           <p className="mt-2 text-muted-foreground">
             Foundations of muamalat: what riba, gharar, and maysir are, and the Shari'ah-compliant contracts that replace them.
@@ -130,7 +130,7 @@ const IslamicFinance = () => {
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <h2 className="text-xl font-semibold">{t.title}</h2>
+                  <h2 className="text-heading font-semibold">{t.title}</h2>
                   <div className="mt-1 flex flex-wrap gap-2">
                     {rulingBadge(t.ruling)}
                     <Badge variant="outline">{t.category}</Badge>
@@ -140,7 +140,7 @@ const IslamicFinance = () => {
               </div>
               <p className="mt-3 font-medium">{t.summary}</p>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{t.detail}</p>
-              <p className="mt-2 text-xs text-muted-foreground italic">Reference: {t.reference}</p>
+              <p className="mt-2 text-micro text-muted-foreground italic">Reference: {t.reference}</p>
             </Card>
           ))}
           {filtered.length === 0 && (
@@ -148,7 +148,7 @@ const IslamicFinance = () => {
           )}
         </div>
 
-        <p className="mt-6 text-xs text-muted-foreground text-center">
+        <p className="mt-6 text-micro text-muted-foreground text-center">
           Educational summary — consult a qualified scholar or certified Shari'ah advisor for personal rulings.
         </p>
       </div>

@@ -122,7 +122,7 @@ export default function Dreams() {
             </Link>
           </Button>
           <Moon className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Dream Journal</h1>
+          <h1 className="text-heading font-semibold">Dream Journal</h1>
         </div>
       </header>
 
@@ -137,16 +137,16 @@ export default function Dreams() {
 
         <div className="grid grid-cols-3 gap-3">
           <Card className="p-3 text-center">
-            <div className="text-xs text-muted-foreground">Good</div>
-            <div className="text-2xl font-bold text-emerald-500">{counts.good}</div>
+            <div className="text-micro text-muted-foreground">Good</div>
+            <div className="text-title font-bold text-emerald-500">{counts.good}</div>
           </Card>
           <Card className="p-3 text-center">
-            <div className="text-xs text-muted-foreground">Neutral</div>
-            <div className="text-2xl font-bold">{counts.neutral}</div>
+            <div className="text-micro text-muted-foreground">Neutral</div>
+            <div className="text-title font-bold">{counts.neutral}</div>
           </Card>
           <Card className="p-3 text-center">
-            <div className="text-xs text-muted-foreground">Bad</div>
-            <div className="text-2xl font-bold text-red-500">{counts.bad}</div>
+            <div className="text-micro text-muted-foreground">Bad</div>
+            <div className="text-title font-bold text-red-500">{counts.bad}</div>
           </Card>
         </div>
 
@@ -189,7 +189,7 @@ export default function Dreams() {
                 </div>
               </div>
               {draft.kind === "bad" && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-micro text-muted-foreground">
                   Sunnah: spit lightly 3× to the left, say A'udhu billahi min ash-shaytan,
                   change sides, pray 2 rak'ahs, and don't share it.
                 </p>
@@ -225,7 +225,7 @@ export default function Dreams() {
                             {d.kind}
                           </Badge>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="mt-1 text-micro text-muted-foreground">
                           {new Date(d.date).toLocaleString()}
                         </p>
                         {d.body && (
@@ -257,7 +257,7 @@ export default function Dreams() {
                 onChange={(e) => setQ(e.target.value)}
               />
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-micro text-muted-foreground">
               Concise notes inspired by Ibn Sirin's <em>Ta'bir al-Ru'ya</em>. Interpretations
               vary by context and dreamer — treat as guidance, not verdicts.
             </p>

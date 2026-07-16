@@ -63,7 +63,7 @@ const Learn = () => {
                 <button
                   key={c}
                   onClick={() => setCat(c)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  className={`rounded-pill border px-3 py-1 text-micro font-medium transition ${
                     cat === c
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border bg-background text-foreground hover:bg-secondary"
@@ -81,24 +81,24 @@ const Learn = () => {
                   <button
                     key={course.id}
                     onClick={() => setOpenCourse(course)}
-                    className="group flex flex-col rounded-2xl border border-border bg-card p-5 text-left transition hover:border-primary hover:shadow-md"
+                    className="group flex flex-col rounded-card border border-border bg-card p-5 text-left transition hover:border-primary hover:shadow-md"
                   >
                     <div className="mb-2 flex items-center justify-between">
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      <span className="rounded-pill bg-primary/10 px-2 py-0.5 text-micro font-medium text-primary">
                         {course.category}
                       </span>
-                      <span className="text-xs text-muted-foreground">{course.level}</span>
+                      <span className="text-micro text-muted-foreground">{course.level}</span>
                     </div>
-                    <h2 className="font-heading text-lg font-semibold text-foreground group-hover:text-primary">
+                    <h2 className="font-heading text-heading font-semibold text-foreground group-hover:text-primary">
                       {course.title}
                     </h2>
                     <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{course.summary}</p>
                     <div className="mt-4">
-                      <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="mb-1 flex items-center justify-between text-micro text-muted-foreground">
                         <span>{p.done} / {p.total} lessons</span>
                         <span>{p.pct}%</span>
                       </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                      <div className="h-1.5 w-full overflow-hidden rounded-pill bg-secondary">
                         <div className="h-full bg-primary transition-all" style={{ width: `${p.pct}%` }} />
                       </div>
                     </div>
@@ -117,10 +117,10 @@ const Learn = () => {
             </button>
 
             <header className="mb-6">
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+              <span className="rounded-pill bg-primary/10 px-2 py-0.5 text-micro font-medium text-primary">
                 {openCourse.category} · {openCourse.level}
               </span>
-              <h1 className="mt-2 font-heading text-3xl font-bold text-foreground">{openCourse.title}</h1>
+              <h1 className="mt-2 font-heading text-title font-bold text-foreground">{openCourse.title}</h1>
               <p className="mt-1 text-muted-foreground">{openCourse.summary}</p>
             </header>
 
@@ -130,13 +130,13 @@ const Learn = () => {
                 return (
                   <li
                     key={lesson.id}
-                    className={`rounded-2xl border p-5 transition ${
+                    className={`rounded-card border p-5 transition ${
                       done ? "border-primary/40 bg-primary/5" : "border-border bg-card"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="mb-1 flex items-center gap-2 text-micro text-muted-foreground">
                           <span>Lesson {i + 1}</span>
                           <span className="inline-flex items-center gap-1">
                             <Clock className="h-3 w-3" /> {lesson.minutes} min read
@@ -152,7 +152,7 @@ const Learn = () => {
                       <button
                         onClick={() => toggleLesson(openCourse.id, lesson.id)}
                         aria-label={done ? "Mark as not done" : "Mark as done"}
-                        className="shrink-0 rounded-full p-2 hover:bg-secondary"
+                        className="shrink-0 rounded-pill p-2 hover:bg-secondary"
                       >
                         {done ? (
                           <CheckCircle2 className="h-6 w-6 text-primary" />

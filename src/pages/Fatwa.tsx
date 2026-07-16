@@ -82,7 +82,7 @@ const Fatwa = () => {
         <header className="mb-6 flex items-center gap-3">
           <BookOpen className="h-7 w-7 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">Fatwa Q&A Library</h1>
+            <h1 className="text-title font-bold">Fatwa Q&A Library</h1>
             <p className="text-sm text-muted-foreground">Curated answers from mainstream Sunni scholarship. For personal cases, consult a qualified local scholar.</p>
           </div>
         </header>
@@ -101,7 +101,7 @@ const Fatwa = () => {
           </div>
         </div>
 
-        <p className="mb-3 text-xs text-muted-foreground">{filtered.length} result{filtered.length === 1 ? "" : "s"}</p>
+        <p className="mb-3 text-micro text-muted-foreground">{filtered.length} result{filtered.length === 1 ? "" : "s"}</p>
 
         <div className="space-y-3">
           {filtered.map((f) => (
@@ -114,7 +114,7 @@ const Fatwa = () => {
               </CardHeader>
               <CardContent className="pt-0">
                 <p className="text-sm text-muted-foreground">{f.a}</p>
-                {f.scholar && <p className="mt-2 text-xs text-muted-foreground/70">— {f.scholar}</p>}
+                {f.scholar && <p className="mt-2 text-micro text-muted-foreground/70">— {f.scholar}</p>}
               </CardContent>
             </Card>
           ))}
@@ -123,7 +123,7 @@ const Fatwa = () => {
           )}
         </div>
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">
+        <p className="mt-8 text-center text-micro text-muted-foreground">
           Disclaimer: This library is for general education. Rulings can vary by madhhab and personal circumstance.
         </p>
       </main>

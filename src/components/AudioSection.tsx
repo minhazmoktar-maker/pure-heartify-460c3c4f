@@ -71,29 +71,29 @@ const CollectionRow = ({
             onClick={() => playQueue(items, items.indexOf(t))}
             disabled={t.comingSoon}
             className={cn(
-              "group flex w-44 shrink-0 snap-start flex-col overflow-hidden rounded-xl bg-card text-left shadow-card transition-all hover:shadow-card-hover disabled:cursor-not-allowed disabled:opacity-60",
+              "group flex w-44 shrink-0 snap-start flex-col overflow-hidden rounded-card bg-card text-left shadow-card transition-all hover:shadow-card-hover disabled:cursor-not-allowed disabled:opacity-60",
             )}
           >
             <div className="relative aspect-square overflow-hidden">
               <SmartImage
                 src={t.cover}
                 alt=""
-                className="transition-transform duration-500 group-hover:scale-105"
+                className="transition-transform duration-medium group-hover:scale-105"
               />
               <div className="absolute inset-0 flex items-end justify-end p-2 opacity-0 transition-opacity group-hover:opacity-100">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary shadow-lg">
+                <span className="flex h-10 w-10 items-center justify-center rounded-pill bg-primary shadow-lg">
                   <Play className="ml-0.5 h-4 w-4 fill-primary-foreground text-primary-foreground" />
                 </span>
               </div>
               {t.isPremium && (
-                <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-accent-foreground">
+                <span className="absolute left-2 top-2 flex items-center gap-1 rounded-pill bg-gold px-2 py-0.5 text-[10px] font-bold text-accent-foreground">
                   <Crown className="h-3 w-3" />PREMIUM
                 </span>
               )}
             </div>
             <div className="p-3">
               <p className="truncate text-sm font-semibold text-foreground">{t.title}</p>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">{t.artist}</p>
+              <p className="mt-0.5 truncate text-micro text-muted-foreground">{t.artist}</p>
               <p className="mt-1 flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
                 <span>{t.language}</span>·<span>{t.duration}</span>
               </p>
@@ -176,16 +176,16 @@ const AudioSection = () => {
         <div
           role="status"
           aria-live="polite"
-          className="mb-10 flex items-center gap-3 rounded-3xl border border-dashed bg-card p-6 text-sm text-muted-foreground"
+          className="mb-10 flex items-center gap-3 rounded-card border border-dashed bg-card p-6 text-sm text-muted-foreground"
         >
-          <span className="h-4 w-4 animate-pulse rounded-full bg-gold/40" />
+          <span className="h-4 w-4 animate-pulse rounded-pill bg-gold/40" />
           Checking your Premium status…
         </div>
       ) : !isPremiumUser ? (
         FEATURE_FLAGS.PREMIUM_UPGRADE_CTA ? (
           <FadeIn
             y={10}
-            className="mb-10 overflow-hidden rounded-3xl bg-gradient-hero p-6 md:p-10 shadow-card-hover"
+            className="mb-10 overflow-hidden rounded-card bg-gradient-hero p-6 md:p-10 shadow-card-hover"
           >
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -196,7 +196,7 @@ const AudioSection = () => {
                       Heartify Premium
                     </span>
                   </div>
-                  <h2 className="mt-2 font-heading text-2xl font-bold text-cream md:text-3xl">
+                  <h2 className="mt-2 font-heading text-title font-bold text-cream md:text-title">
                     A quieter, richer way to listen.
                   </h2>
                   <p className="mt-2 max-w-xl text-sm text-cream/70">
@@ -206,7 +206,7 @@ const AudioSection = () => {
                 </div>
                 <a
                   href="mailto:premium@heartify.app?subject=Premium%20access%20request"
-                  className="shrink-0 rounded-full bg-gold px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.02]"
+                  className="shrink-0 rounded-pill bg-gold px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg transition-all hover:brightness-110 hover:scale-[1.02]"
                 >
                   <Sparkles className="mr-1.5 inline h-4 w-4" />
                   Request Premium access
@@ -214,10 +214,10 @@ const AudioSection = () => {
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {PREMIUM_BENEFITS.map((b) => (
-                  <div key={b.title} className="flex items-start gap-2.5 rounded-xl bg-background/10 p-3 backdrop-blur-sm ring-1 ring-cream/10">
+                  <div key={b.title} className="flex items-start gap-2.5 rounded-card bg-background/10 p-3 backdrop-blur-sm ring-1 ring-cream/10">
                     <b.icon className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
                     <div>
-                      <p className="text-xs font-semibold text-cream">{b.title}</p>
+                      <p className="text-micro font-semibold text-cream">{b.title}</p>
                       <p className="text-[11px] text-cream/70">{b.desc}</p>
                     </div>
                   </div>
@@ -233,7 +233,7 @@ const AudioSection = () => {
         <div
           role="status"
           aria-live="polite"
-          className="mb-6 flex items-center gap-2 rounded-full bg-gold/10 px-3 py-1.5"
+          className="mb-6 flex items-center gap-2 rounded-pill bg-gold/10 px-3 py-1.5"
         >
           <Crown className="h-4 w-4 text-gold" />
           <span className="text-sm font-semibold text-gold">Premium Active</span>
@@ -244,8 +244,8 @@ const AudioSection = () => {
       {/* Featured playlists */}
       <div className="mb-3 flex items-end justify-between">
         <div>
-          <h2 className="font-heading text-xl font-bold text-foreground">Featured Collections</h2>
-          <p className="text-xs text-muted-foreground">Hand-picked playlists for daily practice.</p>
+          <h2 className="font-heading text-heading font-bold text-foreground">Featured Collections</h2>
+          <p className="text-micro text-muted-foreground">Hand-picked playlists for daily practice.</p>
         </div>
       </div>
       <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
@@ -291,11 +291,11 @@ const AudioSection = () => {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <ListMusic className="h-4 w-4 text-primary" />
-          <h2 className="font-heading text-xl font-bold text-foreground">Browse the library</h2>
+          <h2 className="font-heading text-heading font-bold text-foreground">Browse the library</h2>
         </div>
         <button
           onClick={playAll}
-          className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
+          className="rounded-pill bg-primary px-4 py-2 text-micro font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:shadow-md"
         >
           <Play className="mr-1 inline h-3 w-3" />
           Play {filteredTracks.length > 0 ? `${filteredTracks.length} tracks` : "all"}
@@ -311,7 +311,7 @@ const AudioSection = () => {
             value={rawQuery}
             onChange={(e) => setRawQuery(e.target.value)}
             placeholder="Search Premium — title, speaker, tag…"
-            className="w-full rounded-full border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-pill border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             aria-label="Search Premium audio"
           />
         </label>
@@ -322,7 +322,7 @@ const AudioSection = () => {
         {audioCategories.map((cat) => (
           <button key={cat} onClick={() => setAudioCat(cat)}
             className={cn(
-              "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
+              "shrink-0 rounded-pill px-3 py-1.5 text-micro font-medium transition-all",
               audioCat === cat
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "bg-secondary text-secondary-foreground hover:bg-muted",
@@ -335,13 +335,13 @@ const AudioSection = () => {
         <select
           value={language} onChange={(e) => setLanguage(e.target.value as AudioLanguage | "Any")}
           aria-label="Filter by language"
-          className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-none">
+          className="rounded-card border border-border bg-card px-3 py-2 text-micro text-foreground focus:border-primary focus:outline-none">
           {LANGUAGES.map((l) => <option key={l} value={l}>Language: {l}</option>)}
         </select>
         <select
           value={durationBand} onChange={(e) => setDurationBand(e.target.value as DurationBand)}
           aria-label="Filter by duration"
-          className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-none">
+          className="rounded-card border border-border bg-card px-3 py-2 text-micro text-foreground focus:border-primary focus:outline-none">
           {DURATIONS.map((d) => (
             <option key={d} value={d}>
               Duration: {d === "Short" ? "Short (≤5m)" : d === "Medium" ? "Medium (≤30m)" : d === "Long" ? "Long (30m+)" : "Any"}
@@ -351,22 +351,22 @@ const AudioSection = () => {
         <select
           value={speaker} onChange={(e) => setSpeaker(e.target.value)}
           aria-label="Filter by speaker"
-          className="rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-none">
+          className="rounded-card border border-border bg-card px-3 py-2 text-micro text-foreground focus:border-primary focus:outline-none">
           {speakerOptions.map((s) => <option key={s} value={s}>Speaker: {s}</option>)}
         </select>
       </div>
 
       {/* Track list */}
       {filteredTracks.length === 0 ? (
-        <div className="mx-auto flex max-w-md flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
+        <div className="mx-auto flex max-w-md flex-col items-center gap-2 rounded-card border border-dashed border-border bg-card/60 p-10 text-center">
           <Search className="h-6 w-6 text-muted-foreground" />
           <p className="text-sm font-semibold text-foreground">Nothing matched your filters.</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-micro text-muted-foreground">
             Try clearing the search, switching category, or widening the language filter.
           </p>
           <button
             onClick={() => { setRawQuery(""); setAudioCat("All"); setLanguage("Any"); setDurationBand("Any"); setSpeaker("Any"); }}
-            className="mt-2 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground"
+            className="mt-2 rounded-pill bg-primary px-4 py-1.5 text-micro font-semibold text-primary-foreground"
           >
             Reset filters
           </button>

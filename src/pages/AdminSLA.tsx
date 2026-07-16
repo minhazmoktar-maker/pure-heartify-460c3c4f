@@ -100,7 +100,7 @@ export default function AdminSLA({ embedded = false }: { embedded?: boolean } = 
       <div className={embedded ? "space-y-6" : "mx-auto max-w-6xl p-4 space-y-6"}>
         <header className="flex items-center justify-between gap-3">
           <div>
-            <h1 className={embedded ? "text-lg font-semibold" : "text-2xl font-bold"}>Moderation SLA & content freshness</h1>
+            <h1 className={embedded ? "text-heading font-semibold" : "text-title font-bold"}>Moderation SLA & content freshness</h1>
             <p className="text-sm text-muted-foreground">
               Queue age, time-to-decision, reversal rate, and recheck freshness across the platform.
             </p>
@@ -175,7 +175,7 @@ export default function AdminSLA({ embedded = false }: { embedded?: boolean } = 
               </Button>
             </div>
             {sloBreached && (
-              <p className="text-xs text-destructive">
+              <p className="text-micro text-destructive">
                 SLO breach: oldest recheck exceeds {fresh?.slo_target_hours}h target. Run recheck to restore freshness.
               </p>
             )}
@@ -183,7 +183,7 @@ export default function AdminSLA({ embedded = false }: { embedded?: boolean } = 
         </Card>
 
         {sla && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-micro text-muted-foreground">
             Computed {new Date(sla.computed_at).toLocaleString()}
           </p>
         )}
@@ -206,12 +206,12 @@ function Metric({
   const toneClass =
     tone === "danger" ? "text-destructive" : tone === "warning" ? "text-amber-600" : "text-foreground";
   return (
-    <div className="rounded-lg border bg-card p-3">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+    <div className="rounded-card border bg-card p-3">
+      <div className="flex items-center gap-2 text-micro text-muted-foreground">
         {icon}
         <span>{label}</span>
       </div>
-      <div className={`mt-1 text-2xl font-semibold ${toneClass}`}>{value}</div>
+      <div className={`mt-1 text-title font-semibold ${toneClass}`}>{value}</div>
     </div>
   );
 }

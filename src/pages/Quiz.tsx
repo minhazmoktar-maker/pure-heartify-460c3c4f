@@ -95,7 +95,7 @@ const Quiz = () => {
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
           <Button asChild variant="ghost" size="icon" aria-label="Back"><Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link></Button>
           <Brain className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">Islamic Quiz</h1>
+          <h1 className="text-heading font-semibold">Islamic Quiz</h1>
         </div>
       </header>
 
@@ -122,7 +122,7 @@ const Quiz = () => {
                 <span className="text-sm text-muted-foreground">Q {i + 1} / {deck.length}</span>
               </div>
               <Progress value={pct} className="mt-2 h-1.5" />
-              <CardTitle className="pt-4 text-xl leading-snug">{current.q}</CardTitle>
+              <CardTitle className="pt-4 text-heading leading-snug">{current.q}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {current.choices.map((c, idx) => {
@@ -133,7 +133,7 @@ const Quiz = () => {
                     key={idx}
                     onClick={() => pick(idx)}
                     disabled={picked !== null}
-                    className={`flex w-full items-center justify-between rounded-md border p-3 text-left transition ${
+                    className={`flex w-full items-center justify-between rounded-card border p-3 text-left transition ${
                       isRight ? "border-primary bg-primary/10" : isWrongPick ? "border-destructive bg-destructive/10" : "hover:bg-accent"
                     }`}
                   >
@@ -145,7 +145,7 @@ const Quiz = () => {
               })}
               {picked !== null && (
                 <>
-                  {current.explain && <p className="rounded-md bg-muted p-3 text-sm">{current.explain}</p>}
+                  {current.explain && <p className="rounded-card bg-muted p-3 text-sm">{current.explain}</p>}
                   <Button onClick={next} className="w-full">{i + 1 >= deck.length ? "See results" : "Next question"}</Button>
                 </>
               )}
@@ -157,7 +157,7 @@ const Quiz = () => {
           <Card>
             <CardHeader><CardTitle className="flex items-center gap-2"><Trophy className="h-5 w-5 text-primary" /> Results</CardTitle></CardHeader>
             <CardContent className="space-y-3 text-center">
-              <div className="text-5xl font-bold">{score}<span className="text-2xl text-muted-foreground">/{deck.length}</span></div>
+              <div className="text-display font-bold">{score}<span className="text-title text-muted-foreground">/{deck.length}</span></div>
               <p className="text-muted-foreground">{percent}% — {percent >= 80 ? "Masha'Allah, excellent!" : percent >= 50 ? "Good effort — keep learning." : "Keep going — every step counts."}</p>
               <div className="flex justify-center gap-2 pt-2">
                 <Button onClick={() => start(cat)}><RotateCcw className="mr-2 h-4 w-4" />Play again</Button>

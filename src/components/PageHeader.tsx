@@ -44,12 +44,12 @@ export default function PageHeader({
         </Link>
       </Button>
       {Icon && (
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-card bg-primary/10 text-primary">
           <Icon className="h-5 w-5" />
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <h1 className="truncate font-heading text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+        <h1 className="truncate font-heading text-title font-bold tracking-tight text-foreground sm:text-title">
           {title}
         </h1>
         {subtitle && (

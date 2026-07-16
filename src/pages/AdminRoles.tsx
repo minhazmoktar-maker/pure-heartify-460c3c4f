@@ -164,7 +164,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
                   />
                   <Button onClick={() => refreshUsers()} disabled={busy}>Search</Button>
                 </div>
-                <div className="rounded-md border overflow-x-auto">
+                <div className="rounded-card border overflow-x-auto">
                   <table className="heartify-table">
                     <thead>
                       <tr>
@@ -183,7 +183,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
                           : "heartify-chip--muted";
                         return (
                           <tr key={u.id}>
-                            <td className="font-mono text-xs">{u.email}</td>
+                            <td className="font-mono text-micro">{u.email}</td>
                             <td>
                               <span className={`heartify-chip ${chipTone}`}>{cur}</span>
                             </td>
@@ -218,7 +218,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
               <CardContent className="space-y-3">
                 <p className="text-sm text-muted-foreground">Select a user from the list below, then remove any stale factor.</p>
                 <div className="grid gap-2 md:grid-cols-2">
-                  <div className="rounded-md border max-h-64 overflow-auto">
+                  <div className="rounded-card border max-h-64 overflow-auto">
                     {users.map(u => (
                       <button key={u.id}
                         onClick={() => loadFactors(u)}
@@ -227,15 +227,15 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
                       </button>
                     ))}
                   </div>
-                  <div className="rounded-md border p-3">
+                  <div className="rounded-card border p-3">
                     {!selectedUser && <p className="text-sm text-muted-foreground">Pick a user to see factors.</p>}
                     {selectedUser && (
                       <div className="space-y-2">
-                        <p className="text-xs text-muted-foreground">{selectedUser.email}</p>
+                        <p className="text-micro text-muted-foreground">{selectedUser.email}</p>
                         {factors.length === 0 && <p className="text-sm text-muted-foreground">No MFA factors enrolled.</p>}
                         {factors.map(f => (
                           <div key={f.id} className="flex items-center justify-between rounded border p-2">
-                            <div className="text-xs">
+                            <div className="text-micro">
                               <div className="font-medium">{f.friendly_name || f.factor_type}</div>
                               <div className="text-muted-foreground">{f.status} · {new Date(f.created_at).toLocaleDateString()}</div>
                             </div>
@@ -259,8 +259,8 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
                 <Button size="sm" variant="outline" onClick={refreshAudit}>Refresh</Button>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border overflow-auto max-h-[600px]">
-                  <table className="heartify-table text-xs">
+                <div className="rounded-card border overflow-auto max-h-[600px]">
+                  <table className="heartify-table text-micro">
                     <thead>
                       <tr>
                         <th>When</th>
@@ -316,7 +316,7 @@ export default function AdminRoles({ embedded = false }: { embedded?: boolean } 
         <header className="mb-6 flex items-center gap-3">
           <Shield className="h-6 w-6 text-primary" />
           <div>
-            <h1 className="text-2xl font-semibold">Roles & Permissions</h1>
+            <h1 className="text-title font-semibold">Roles & Permissions</h1>
             <p className="text-sm text-muted-foreground">Owner-only control panel for admin, owner, and MFA access.</p>
           </div>
         </header>

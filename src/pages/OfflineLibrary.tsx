@@ -93,11 +93,11 @@ export default function OfflineLibrary() {
             {items.map((m) => (
               <li
                 key={m.id}
-                className="flex items-center justify-between rounded-lg border p-3"
+                className="flex items-center justify-between rounded-card border p-3"
               >
                 <div className="min-w-0">
                   <p className="font-mono text-sm truncate">{m.id}</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                  <p className="text-micro text-muted-foreground flex items-center gap-1 mt-1">
                     <Clock className="w-3 h-3" />
                     {formatRemaining(m.expiresAt)}
                     {m.plan === "premium" && (

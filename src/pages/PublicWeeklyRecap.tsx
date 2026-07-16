@@ -83,10 +83,10 @@ export default function PublicWeeklyRecap() {
       />
       <main className="container mx-auto max-w-lg px-4 py-12 space-y-6">
         <header className="text-center">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1 justify-center">
+          <p className="text-micro uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1 justify-center">
             <CalendarDays className="h-3.5 w-3.5" /> Week of {weekLabel}
           </p>
-          <h1 className="mt-2 text-3xl font-bold text-foreground">
+          <h1 className="mt-2 text-title font-bold text-foreground">
             {label}'s Heartify week
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -112,7 +112,7 @@ export default function PublicWeeklyRecap() {
           <Button asChild className="w-full">
             <Link to="/achievements">Get your own weekly recap</Link>
           </Button>
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-micro text-center text-muted-foreground">
             Track your minutes, dhikr, and streak — every week, automatically.
           </p>
         </Card>
@@ -123,11 +123,11 @@ export default function PublicWeeklyRecap() {
 
 function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: number }) {
   return (
-    <div className="rounded-md border bg-muted/30 px-3 py-2 text-center">
-      <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+    <div className="rounded-card border bg-muted/30 px-3 py-2 text-center">
+      <div className="flex items-center justify-center gap-1.5 text-micro text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
-      <div className="mt-0.5 text-lg font-semibold tabular-nums">{value.toLocaleString()}</div>
+      <div className="mt-0.5 text-heading font-semibold tabular-nums">{value.toLocaleString()}</div>
     </div>
   );
 }

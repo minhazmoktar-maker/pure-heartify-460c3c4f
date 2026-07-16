@@ -146,7 +146,7 @@ export default function SalahGuide() {
             <Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <BookOpen className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">How to Pray</h1>
+          <h1 className="text-heading font-semibold">How to Pray</h1>
         </div>
       </header>
 
@@ -154,9 +154,9 @@ export default function SalahGuide() {
         <Card className="p-4">
           <div className="grid grid-cols-5 gap-2 text-center">
             {PRAYERS.map((p) => (
-              <div key={p.name} className="rounded-md border border-border/60 p-2">
-                <div className="text-xs font-medium">{p.name}</div>
-                <div className="text-lg font-bold text-primary">{p.rakat}</div>
+              <div key={p.name} className="rounded-card border border-border/60 p-2">
+                <div className="text-micro font-medium">{p.name}</div>
+                <div className="text-heading font-bold text-primary">{p.rakat}</div>
                 <div className="text-[10px] text-muted-foreground">rak'ah</div>
               </div>
             ))}
@@ -164,17 +164,17 @@ export default function SalahGuide() {
         </Card>
 
         <Card className="p-4">
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-micro">
             <span className="text-muted-foreground">Step {i + 1} / {STEPS.length}</span>
             <Badge variant="secondary">{step.posture}</Badge>
           </div>
           <Progress value={pct} className="mt-2 h-2" />
 
           <div className="mt-4">
-            <h2 className="text-lg font-semibold">{step.name}</h2>
+            <h2 className="text-heading font-semibold">{step.name}</h2>
             {step.arabic && (
-              <div className="mt-3 rounded-md border border-border/60 bg-muted/40 p-3">
-                <div className="text-2xl leading-loose" dir="rtl" lang="ar">{step.arabic}</div>
+              <div className="mt-3 rounded-card border border-border/60 bg-muted/40 p-3">
+                <div className="text-title leading-loose" dir="rtl" lang="ar">{step.arabic}</div>
                 {step.translit && (
                   <div className="mt-2 text-sm italic text-muted-foreground">{step.translit}</div>
                 )}
@@ -182,7 +182,7 @@ export default function SalahGuide() {
             )}
             <p className="mt-3 text-sm">{step.english}</p>
             {step.note && (
-              <p className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-3 text-xs text-muted-foreground">
+              <p className="mt-3 rounded-card border border-primary/30 bg-primary/5 p-3 text-micro text-muted-foreground">
                 <span className="font-medium text-primary">Note:</span> {step.note}
               </p>
             )}
@@ -192,7 +192,7 @@ export default function SalahGuide() {
             <Button variant="outline" onClick={() => setI((x) => Math.max(0, x - 1))} disabled={i === 0}>
               <ChevronLeft className="mr-1 h-4 w-4" /> Prev
             </Button>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-micro text-muted-foreground">
               {i === STEPS.length - 1 ? "End of walkthrough" : `Next: ${STEPS[i + 1].name}`}
             </div>
             <Button onClick={() => setI((x) => Math.min(STEPS.length - 1, x + 1))} disabled={i === STEPS.length - 1}>
@@ -201,7 +201,7 @@ export default function SalahGuide() {
           </div>
         </Card>
 
-        <Card className="p-4 text-xs text-muted-foreground">
+        <Card className="p-4 text-micro text-muted-foreground">
           <strong className="text-foreground">Repetition:</strong> steps 4–11 form one rak'ah.
           After the 2nd rak'ah sit for the first tashahhud; on the final rak'ah add the
           Ibrahimiyyah and end with tasleem.

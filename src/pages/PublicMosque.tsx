@@ -59,20 +59,20 @@ export default function PublicMosque() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-5 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Building2 className="h-4 w-4 text-primary" />
               Sacred Mosque · {idx + 1} of {SACRED_MOSQUES.length}
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-4xl md:text-5xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {m.ar}
             </p>
-            <h1 className="text-2xl md:text-3xl font-semibold">{m.translit}</h1>
-            <p className="text-base md:text-lg text-primary/90 font-medium">{m.en}</p>
+            <h1 className="text-title md:text-title font-semibold">{m.translit}</h1>
+            <p className="text-base md:text-heading text-primary/90 font-medium">{m.en}</p>
             <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
               <Badge variant="outline" className="text-[10px] uppercase inline-flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> {m.city}, {m.country}
@@ -89,7 +89,7 @@ export default function PublicMosque() {
             <p className="text-sm md:text-base leading-relaxed border-l-2 border-primary/40 pl-4">
               {m.summary}
             </p>
-            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
+            <p className="text-micro text-muted-foreground inline-flex items-center gap-1">
               <BookMarked className="h-3.5 w-3.5" /> Sacred sites of the ummah
             </p>
           </CardContent>

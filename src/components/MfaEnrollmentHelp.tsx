@@ -65,14 +65,14 @@ export default function MfaEnrollmentHelp({ error }: { error?: string | null }) 
         <AlertCircle className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
         <div>
           <h3 className="text-sm font-semibold">Enrollment troubleshooting</h3>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-micro text-muted-foreground">
             If enrollment fails, match the exact error text below.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="rounded border border-destructive/40 bg-destructive/5 p-2 text-xs">
+        <div className="rounded border border-destructive/40 bg-destructive/5 p-2 text-micro">
           <div className="font-mono break-all text-destructive">{error}</div>
           {match && (
             <div className="mt-2">
@@ -85,7 +85,7 @@ export default function MfaEnrollmentHelp({ error }: { error?: string | null }) 
         </div>
       )}
 
-      <details className="text-xs">
+      <details className="text-micro">
         <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
           Common Supabase Auth MFA errors →
         </summary>
@@ -105,7 +105,7 @@ export default function MfaEnrollmentHelp({ error }: { error?: string | null }) 
         href="https://supabase.com/docs/guides/auth/auth-mfa/totp"
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+        className="inline-flex items-center gap-1 text-micro text-primary hover:underline"
       >
         Supabase MFA docs <ExternalLink className="h-3 w-3" />
       </a>

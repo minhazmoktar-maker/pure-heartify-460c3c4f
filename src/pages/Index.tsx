@@ -26,7 +26,7 @@ const DiversityToggle = () => {
     <button
       onClick={toggleShowMoreChannels}
       className={cn(
-        "mb-2 mt-2 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+        "mb-2 mt-2 inline-flex items-center gap-2 rounded-pill border px-3 py-1.5 text-micro font-medium transition-colors",
         showMoreChannels
           ? "border-primary bg-primary/10 text-primary"
           : "border-border text-muted-foreground hover:text-foreground",
@@ -157,7 +157,7 @@ const Index = () => {
       <footer className="border-t border-border bg-card py-8">
         <div className="mx-auto max-w-[1800px] px-4 text-center md:px-6 space-y-2">
           <p className="text-sm text-muted-foreground">© 2026 HalalTube — Curated halal content for the Ummah ✦</p>
-          <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-micro text-muted-foreground">
             <a href="/privacy" className="hover:text-foreground underline">Privacy</a>
             <a href="/terms" className="hover:text-foreground underline">Terms</a>
             <a href="/trust" className="hover:text-foreground underline">Trust &amp; Security</a>

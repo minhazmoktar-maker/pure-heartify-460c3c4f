@@ -38,7 +38,7 @@ const SectionAll = () => {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="py-20 text-center">
-          <p className="text-lg font-medium text-muted-foreground">Section not found.</p>
+          <p className="text-heading font-medium text-muted-foreground">Section not found.</p>
         </div>
       </div>
     );
@@ -59,7 +59,7 @@ const SectionAll = () => {
         </button>
 
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-title font-bold text-foreground">
             {section.icon} {section.title}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
@@ -87,7 +87,7 @@ const SectionAll = () => {
 
         {!isLoading && videos?.length === 0 && (
           <div className="py-20 text-center">
-            <p className="text-lg font-medium text-muted-foreground">No content found for this section.</p>
+            <p className="text-heading font-medium text-muted-foreground">No content found for this section.</p>
           </div>
         )}
       </div>

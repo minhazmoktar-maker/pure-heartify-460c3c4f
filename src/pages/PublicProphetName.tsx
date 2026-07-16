@@ -58,19 +58,19 @@ export default function PublicProphetName() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-5 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Star className="h-4 w-4 text-primary" /> Name of the Prophet ﷺ · {idx + 1} of {PROPHET_NAMES.length}
             </div>
             <p
               dir="rtl"
               lang="ar"
-              className="text-5xl md:text-6xl leading-loose text-primary"
+              className="text-display md:text-display leading-loose text-primary"
               style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
             >
               {n.arabic}
             </p>
-            <h1 className="text-2xl md:text-3xl font-semibold">{n.translit} ﷺ</h1>
-            <p className="text-lg md:text-xl text-primary/90 font-medium">{n.meaning}</p>
+            <h1 className="text-title md:text-title font-semibold">{n.translit} ﷺ</h1>
+            <p className="text-heading md:text-heading text-primary/90 font-medium">{n.meaning}</p>
           </CardContent>
         </Card>
 
@@ -79,7 +79,7 @@ export default function PublicProphetName() {
             <p className="text-sm md:text-base leading-relaxed border-l-2 border-primary/40 pl-4">
               {n.explanation}
             </p>
-            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
+            <p className="text-micro text-muted-foreground inline-flex items-center gap-1">
               <BookMarked className="h-3.5 w-3.5" /> {n.reference}
             </p>
           </CardContent>

@@ -57,7 +57,7 @@ const TrustBadges = ({ channelTitle, halalScore, category, size = "sm", classNam
     muted: "bg-muted text-muted-foreground",
   };
 
-  const padding = size === "sm" ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-0.5 text-xs";
+  const padding = size === "sm" ? "px-1.5 py-0.5 text-[10px]" : "px-2 py-0.5 text-micro";
 
   return (
     <div className={cn("flex flex-wrap items-center gap-1", className)}>
@@ -65,7 +65,7 @@ const TrustBadges = ({ channelTitle, halalScore, category, size = "sm", classNam
         <span
           key={t.label}
           className={cn(
-            "inline-flex items-center gap-1 rounded-full font-medium",
+            "inline-flex items-center gap-1 rounded-pill font-medium",
             padding,
             toneClasses[t.tone],
           )}

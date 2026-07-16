@@ -64,20 +64,20 @@ export default function QiblaCompass({ bearing }: Props) {
     <div className="flex flex-col items-center gap-3">
       <div className="relative h-56 w-56">
         <div
-          className="absolute inset-0 rounded-full border-4 border-border bg-card shadow-inner transition-transform duration-200"
+          className="absolute inset-0 rounded-pill border-4 border-border bg-card shadow-inner transition-transform duration-200"
           style={{ transform: heading != null ? `rotate(${-heading}deg)` : undefined }}
         >
-          <div className="absolute left-1/2 top-2 -translate-x-1/2 text-xs font-bold text-muted-foreground">N</div>
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-bold text-muted-foreground">S</div>
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">E</div>
-          <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">W</div>
+          <div className="absolute left-1/2 top-2 -translate-x-1/2 text-micro font-bold text-muted-foreground">N</div>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-micro font-bold text-muted-foreground">S</div>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 text-micro font-bold text-muted-foreground">E</div>
+          <div className="absolute left-2 top-1/2 -translate-y-1/2 text-micro font-bold text-muted-foreground">W</div>
         </div>
         <div
           className="absolute inset-0 flex items-start justify-center transition-transform duration-200"
           style={{ transform: `rotate(${arrowRotation}deg)` }}
         >
           <div className="mt-3 flex flex-col items-center">
-            <div className="text-2xl">🕋</div>
+            <div className="text-title">🕋</div>
             <div className="mt-1 h-24 w-1 rounded bg-primary" />
           </div>
         </div>
@@ -89,13 +89,13 @@ export default function QiblaCompass({ bearing }: Props) {
       {supported && needsPermission && (
         <button
           onClick={requestPermission}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          className="rounded-card bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
         >
           Enable compass
         </button>
       )}
       {!supported && (
-        <p className="max-w-xs text-center text-xs text-muted-foreground">
+        <p className="max-w-xs text-center text-micro text-muted-foreground">
           Live compass unavailable on this device. Arrow shows Qibla bearing from true North.
         </p>
       )}

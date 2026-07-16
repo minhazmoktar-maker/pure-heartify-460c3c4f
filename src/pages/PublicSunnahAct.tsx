@@ -70,27 +70,27 @@ export default function PublicSunnahAct() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-5">
-            <div className="flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center justify-between text-micro uppercase tracking-widest text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4 text-primary" /> Sunnah · {idx + 1} of {SUNNAH_ACTS.length}
               </span>
-              <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-medium normal-case tracking-normal ${CAT_STYLE[s.category] ?? ""}`}>
+              <span className={`inline-flex items-center gap-1 rounded-pill border px-2.5 py-0.5 text-[11px] font-medium normal-case tracking-normal ${CAT_STYLE[s.category] ?? ""}`}>
                 <Tag className="h-3 w-3" /> {s.category}
               </span>
             </div>
-            <p dir="rtl" lang="ar" className="text-4xl md:text-5xl leading-loose text-primary text-center"
+            <p dir="rtl" lang="ar" className="text-display md:text-display leading-loose text-primary text-center"
                style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
               {s.ar}
             </p>
-            <h1 className="text-2xl md:text-3xl font-semibold text-center">{s.title}</h1>
-            <p className="text-base md:text-lg leading-relaxed border-l-2 border-primary/40 pl-4">
+            <h1 className="text-title md:text-title font-semibold text-center">{s.title}</h1>
+            <p className="text-base md:text-heading leading-relaxed border-l-2 border-primary/40 pl-4">
               {s.reward}
             </p>
-            <div className="rounded-lg bg-muted/50 border p-4 space-y-1">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">How to do it</p>
+            <div className="rounded-card bg-muted/50 border p-4 space-y-1">
+              <p className="text-micro uppercase tracking-wider text-muted-foreground">How to do it</p>
               <p className="text-sm md:text-base">{s.how}</p>
             </div>
-            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
+            <p className="text-micro text-muted-foreground inline-flex items-center gap-1">
               <BookMarked className="h-3.5 w-3.5" /> {s.ref}
             </p>
           </CardContent>

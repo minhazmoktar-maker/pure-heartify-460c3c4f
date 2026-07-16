@@ -118,7 +118,7 @@ export default function Today() {
       <main className="mx-auto max-w-5xl px-4 py-8 md:px-6">
         <header className="mb-6">
           <p className="text-sm text-muted-foreground">{greeting}</p>
-          <h1 className="mt-1 flex items-center gap-2 text-3xl font-bold"><Sunrise className="h-7 w-7 text-primary" />Today</h1>
+          <h1 className="mt-1 flex items-center gap-2 text-title font-bold"><Sunrise className="h-7 w-7 text-primary" />Today</h1>
         </header>
 
         {/* Streak strip */}
@@ -126,8 +126,8 @@ export default function Today() {
           <Card>
             <CardContent className="flex items-center justify-between p-4">
               <div>
-                <p className="text-xs text-muted-foreground">Salah streak</p>
-                <p className="text-2xl font-bold">{stats.salahStreak}<span className="ml-1 text-sm font-normal text-muted-foreground">days</span></p>
+                <p className="text-micro text-muted-foreground">Salah streak</p>
+                <p className="text-title font-bold">{stats.salahStreak}<span className="ml-1 text-sm font-normal text-muted-foreground">days</span></p>
               </div>
               <Flame className="h-8 w-8 text-orange-500" />
             </CardContent>
@@ -135,8 +135,8 @@ export default function Today() {
           <Card>
             <CardContent className="flex items-center justify-between p-4">
               <div>
-                <p className="text-xs text-muted-foreground">Prayers today</p>
-                <p className="text-2xl font-bold">{stats.salahDone}<span className="ml-1 text-sm font-normal text-muted-foreground">/ 5</span></p>
+                <p className="text-micro text-muted-foreground">Prayers today</p>
+                <p className="text-title font-bold">{stats.salahDone}<span className="ml-1 text-sm font-normal text-muted-foreground">/ 5</span></p>
               </div>
               <Target className="h-8 w-8 text-primary" />
             </CardContent>
@@ -144,8 +144,8 @@ export default function Today() {
           <Card>
             <CardContent className="flex items-center justify-between p-4">
               <div>
-                <p className="text-xs text-muted-foreground">Lifetime dhikr</p>
-                <p className="text-2xl font-bold">{stats.dhikrTotal.toLocaleString()}</p>
+                <p className="text-micro text-muted-foreground">Lifetime dhikr</p>
+                <p className="text-title font-bold">{stats.dhikrTotal.toLocaleString()}</p>
               </div>
               <Sparkles className="h-8 w-8 text-primary" />
             </CardContent>
@@ -156,7 +156,7 @@ export default function Today() {
           {/* Ayah */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg"><BookOpen className="h-5 w-5 text-primary" />Ayah of the day</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-heading"><BookOpen className="h-5 w-5 text-primary" />Ayah of the day</CardTitle>
               <Badge variant="secondary" className="text-[10px]">{daily?.ayah?.ref || "…"}</Badge>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -164,7 +164,7 @@ export default function Today() {
                 <div className="flex justify-center py-4"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
               ) : daily?.ayah ? (
                 <>
-                  <p dir="rtl" lang="ar" className="text-right text-2xl leading-loose">{daily.ayah.arabic}</p>
+                  <p dir="rtl" lang="ar" className="text-right text-title leading-loose">{daily.ayah.arabic}</p>
                   <p className="text-sm leading-relaxed text-foreground/90">{daily.ayah.english}</p>
                 </>
               ) : (
@@ -179,7 +179,7 @@ export default function Today() {
           {/* Hadith */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg"><BookText className="h-5 w-5 text-primary" />Hadith of the day</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-heading"><BookText className="h-5 w-5 text-primary" />Hadith of the day</CardTitle>
               <Badge variant="secondary" className="text-[10px]">{daily?.hadith?.ref || "…"}</Badge>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -199,11 +199,11 @@ export default function Today() {
           {/* Name of Allah */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg"><Sparkles className="h-5 w-5 text-primary" />Name of Allah</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-heading"><Sparkles className="h-5 w-5 text-primary" />Name of Allah</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-center">
-              <p dir="rtl" lang="ar" className="text-4xl font-semibold">{nameOfDay.ar}</p>
-              <p className="text-lg font-medium text-primary">{nameOfDay.translit}</p>
+              <p dir="rtl" lang="ar" className="text-display font-semibold">{nameOfDay.ar}</p>
+              <p className="text-heading font-medium text-primary">{nameOfDay.translit}</p>
               <p className="text-sm text-muted-foreground">{nameOfDay.meaning}</p>
               <Button asChild size="sm" variant="ghost" className="mt-2 w-full justify-between">
                 <Link to="/names">Explore all 99 Names <ArrowRight className="h-3 w-3" /></Link>
@@ -213,7 +213,7 @@ export default function Today() {
 
           {/* Quick actions */}
           <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-lg">Quick actions</CardTitle></CardHeader>
+            <CardHeader className="pb-3"><CardTitle className="text-heading">Quick actions</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-2 gap-2">
               <Button asChild variant="outline" size="sm"><Link to="/prayer"><Compass className="mr-1 h-4 w-4" />Prayer times</Link></Button>
               <Button asChild variant="outline" size="sm"><Link to="/salah"><Target className="mr-1 h-4 w-4" />Mark salah</Link></Button>

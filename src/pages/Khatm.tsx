@@ -128,18 +128,18 @@ const Khatm = () => {
 
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <header className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+          <div className="flex h-11 w-11 items-center justify-center rounded-card bg-primary/10">
             <BookOpen className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="font-heading text-2xl font-bold text-foreground md:text-3xl">Khatm Tracker</h1>
+            <h1 className="font-heading text-title font-bold text-foreground md:text-title">Khatm Tracker</h1>
             <p className="text-sm text-muted-foreground">
               Complete the Quran at your own pace — {state.completedKhatms} khatm{state.completedKhatms === 1 ? "" : "s"} completed.
             </p>
           </div>
           <Link
             to="/khatm/groups"
-            className="ml-auto rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10"
+            className="ml-auto rounded-card border border-primary/40 bg-primary/5 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10"
           >
             Group Khatm →
           </Link>
@@ -150,9 +150,9 @@ const Khatm = () => {
         <Card className="mb-6 p-6">
           <div className="mb-4 flex items-baseline justify-between">
             <div>
-              <div className="text-4xl font-bold text-foreground">
+              <div className="text-display font-bold text-foreground">
                 {state.pagesRead}
-                <span className="text-lg font-normal text-muted-foreground"> / {TOTAL_PAGES} pages</span>
+                <span className="text-heading font-normal text-muted-foreground"> / {TOTAL_PAGES} pages</span>
               </div>
               <div className="text-sm text-muted-foreground">
                 Juz {stats.juzDone} of {TOTAL_JUZ} · {stats.pct.toFixed(1)}%
@@ -163,9 +163,9 @@ const Khatm = () => {
               <div>Streak day: {stats.daysElapsed}</div>
             </div>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-secondary">
+          <div className="h-3 w-full overflow-hidden rounded-pill bg-secondary">
             <div
-              className="h-full rounded-full bg-primary transition-all"
+              className="h-full rounded-pill bg-primary transition-all"
               style={{ width: `${Math.min(100, stats.pct)}%` }}
             />
           </div>
@@ -202,29 +202,29 @@ const Khatm = () => {
         {/* Pacing */}
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <Card className="p-4">
-            <div className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <div className="mb-1 flex items-center gap-2 text-micro uppercase tracking-wide text-muted-foreground">
               <Target className="h-3.5 w-3.5" /> Required pace
             </div>
-            <div className="text-2xl font-bold text-foreground">
+            <div className="text-title font-bold text-foreground">
               {stats.requiredPace.toFixed(1)}<span className="text-sm font-normal text-muted-foreground"> pages/day</span>
             </div>
-            <div className="mt-1 text-xs text-muted-foreground">
+            <div className="mt-1 text-micro text-muted-foreground">
               {stats.pagesLeft} pages left · {stats.daysLeft} day{stats.daysLeft === 1 ? "" : "s"} to target
             </div>
           </Card>
           <Card className="p-4">
-            <div className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <div className="mb-1 flex items-center gap-2 text-micro uppercase tracking-wide text-muted-foreground">
               <TrendingUp className="h-3.5 w-3.5" /> Your pace
             </div>
-            <div className="text-2xl font-bold text-foreground">
+            <div className="text-title font-bold text-foreground">
               {stats.dailyPace.toFixed(1)}<span className="text-sm font-normal text-muted-foreground"> pages/day</span>
             </div>
-            <div className="mt-1 text-xs text-muted-foreground">
+            <div className="mt-1 text-micro text-muted-foreground">
               Over {stats.daysElapsed} day{stats.daysElapsed === 1 ? "" : "s"} since start
             </div>
           </Card>
           <Card className="p-4">
-            <div className="mb-1 flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+            <div className="mb-1 flex items-center gap-2 text-micro uppercase tracking-wide text-muted-foreground">
               <CalendarDays className="h-3.5 w-3.5" /> Target date
             </div>
             <Input
@@ -234,7 +234,7 @@ const Khatm = () => {
               onChange={(e) => setState((p) => ({ ...p, targetDate: e.target.value }))}
               className="h-9"
             />
-            <div className="mt-1 text-xs text-muted-foreground">
+            <div className="mt-1 text-micro text-muted-foreground">
               Started {new Date(state.startedAt).toLocaleDateString()}
             </div>
           </Card>
@@ -242,7 +242,7 @@ const Khatm = () => {
 
         {/* Recent log */}
         <Card className="mb-6 p-6">
-          <h2 className="mb-3 font-heading text-lg font-semibold text-foreground">Last 7 sessions</h2>
+          <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Last 7 sessions</h2>
           {recentLog.length === 0 ? (
             <EmptyState
               icon={History}

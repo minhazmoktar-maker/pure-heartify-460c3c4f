@@ -5,7 +5,7 @@ import SEO from "@/components/SEO";
 
 const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
   <section id={id} className="scroll-mt-24">
-    <h2 className="font-heading text-xl font-bold text-foreground">{title}</h2>
+    <h2 className="font-heading text-heading font-bold text-foreground">{title}</h2>
     <div className="mt-3 space-y-3 text-muted-foreground">{children}</div>
   </section>
 );
@@ -31,7 +31,7 @@ const Terms = () => {
         </Link>
 
         <header>
-          <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">Terms of Service</h1>
+          <h1 className="font-heading text-title font-bold text-foreground md:text-display">Terms of Service</h1>
           <p className="mt-2 text-sm text-muted-foreground">Effective date: {effective}</p>
           <p className="mt-4 text-sm text-foreground/90">
             These Terms of Service ("Terms") govern your access to and use of the
@@ -234,7 +234,7 @@ const Terms = () => {
           </Section>
 
           <section className="border-t border-border pt-6">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-micro text-muted-foreground">
               These Terms are provided for informational purposes only and do not
               constitute legal advice. Heartify may adapt this document to
               reflect the specific legal requirements of the jurisdictions in

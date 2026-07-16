@@ -58,11 +58,11 @@ export default function PublicAdhkarSet() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-4 text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="inline-flex items-center gap-1.5 text-micro uppercase tracking-widest text-muted-foreground">
               <Sunrise className="h-4 w-4 text-primary" /> Adhkār · {idx + 1} of {ADHKAR.length}
             </div>
-            <h1 className="text-3xl md:text-4xl font-semibold">{set.title}</h1>
-            <p className="text-base md:text-lg text-muted-foreground max-w-prose mx-auto">{set.description}</p>
+            <h1 className="text-title md:text-display font-semibold">{set.title}</h1>
+            <p className="text-base md:text-heading text-muted-foreground max-w-prose mx-auto">{set.description}</p>
           </CardContent>
         </Card>
 
@@ -70,11 +70,11 @@ export default function PublicAdhkarSet() {
           {set.items.map((d, i) => (
             <Card key={d.id} className="border-border/60">
               <CardContent className="pt-5 pb-5 space-y-3">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center justify-between text-micro text-muted-foreground">
                   <span className="font-medium">#{i + 1} · {d.translit}</span>
                   <span className="inline-flex items-center gap-1"><Repeat className="h-3.5 w-3.5" /> ×{d.repeat}</span>
                 </div>
-                <p dir="rtl" lang="ar" className="text-2xl md:text-3xl leading-loose text-primary text-right"
+                <p dir="rtl" lang="ar" className="text-title md:text-title leading-loose text-primary text-right"
                    style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
                   {d.arabic}
                 </p>
@@ -82,7 +82,7 @@ export default function PublicAdhkarSet() {
                   {d.meaning}
                 </p>
                 {d.reference && (
-                  <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                  <p className="text-micro text-muted-foreground inline-flex items-center gap-1">
                     <BookMarked className="h-3.5 w-3.5" /> {d.reference}
                   </p>
                 )}

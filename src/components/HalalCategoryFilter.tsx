@@ -16,7 +16,7 @@ const HalalCategoryFilter = ({ selected, onSelect }: HalalCategoryFilterProps) =
               key={cat}
               onClick={() => onSelect(cat)}
               className={cn(
-                "shrink-0 rounded-lg px-4 py-1.5 text-sm font-medium transition-all",
+                "shrink-0 rounded-card px-4 py-1.5 text-sm font-medium transition-all",
                 selected === cat
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-secondary text-secondary-foreground hover:bg-muted"

@@ -86,7 +86,7 @@ export function GiftDialog({ freezesAvailable = 0, trigger }: Props) {
 
           {freezeFlag && (
             <TabsContent value="freeze" className="space-y-3">
-              <p className="text-xs text-muted-foreground">You have <b>{freezesAvailable}</b> unused freeze(s). Gifting spends one from your balance.</p>
+              <p className="text-micro text-muted-foreground">You have <b>{freezesAvailable}</b> unused freeze(s). Gifting spends one from your balance.</p>
               <div className="space-y-1.5">
                 <Label htmlFor="freeze-recipient">Recipient user ID</Label>
                 <Input id="freeze-recipient" value={recipient} onChange={(e) => setRecipient(e.target.value)} placeholder="uuid" />

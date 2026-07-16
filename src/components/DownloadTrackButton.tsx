@@ -81,7 +81,7 @@ export default function DownloadTrackButton({ track, className }: Props) {
         aria-label={label}
         title={label}
         className={cn(
-          "inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+          "inline-flex h-8 w-8 items-center justify-center rounded-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
           status === "saved" && "text-primary",
           className,
         )}

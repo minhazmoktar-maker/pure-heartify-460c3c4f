@@ -52,7 +52,7 @@ export default function MfaVerify() {
       <Card className="w-full max-w-md p-6 space-y-4">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-6 w-6 text-primary" />
-          <h1 className="font-heading text-xl font-bold">Verify it's you</h1>
+          <h1 className="font-heading text-heading font-bold">Verify it's you</h1>
         </div>
         {authLoading || loading ? (
           <PageSkeleton variant="default" className="max-w-md px-0 py-2" />

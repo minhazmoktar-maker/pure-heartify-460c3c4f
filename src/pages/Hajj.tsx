@@ -71,7 +71,7 @@ export default function Hajj() {
       <main className="container mx-auto max-w-5xl px-4 pb-24 pt-24">
         <header className="mb-6">
           <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground"><Plane className="h-4 w-4" /> Sacred Journey</div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Hajj & Umrah Planner</h1>
+          <h1 className="text-title font-bold tracking-tight md:text-display">Hajj & Umrah Planner</h1>
           <p className="mt-1 text-muted-foreground">Rites checklists, packing, and a simple budget tracker — stored on this device.</p>
         </header>
 
@@ -104,7 +104,7 @@ export default function Hajj() {
                         const done = !!state.done[k];
                         return (
                           <li key={ii}>
-                            <button onClick={() => toggle(k)} className="flex w-full items-start gap-3 rounded-md border border-transparent p-2 text-left hover:border-border hover:bg-muted/40">
+                            <button onClick={() => toggle(k)} className="flex w-full items-start gap-3 rounded-card border border-transparent p-2 text-left hover:border-border hover:bg-muted/40">
                               {done ? <CheckCircle2 className="mt-0.5 h-5 w-5 text-primary" /> : <Circle className="mt-0.5 h-5 w-5 text-muted-foreground" />}
                               <span className={done ? "line-through text-muted-foreground" : ""}>{item}</span>
                             </button>
@@ -129,7 +129,7 @@ export default function Hajj() {
                   const done = !!state.done[k];
                   return (
                     <li key={i}>
-                      <button onClick={() => toggle(k)} className="flex w-full items-start gap-3 rounded-md p-1 text-left hover:bg-muted/40">
+                      <button onClick={() => toggle(k)} className="flex w-full items-start gap-3 rounded-card p-1 text-left hover:bg-muted/40">
                         {done ? <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" /> : <Circle className="mt-0.5 h-4 w-4 text-muted-foreground" />}
                         <span className={done ? "line-through text-muted-foreground" : ""}>{item}</span>
                       </button>
@@ -145,11 +145,11 @@ export default function Hajj() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs text-muted-foreground">Goal</label>
+                  <label className="mb-1 block text-micro text-muted-foreground">Goal</label>
                   <Input type="number" min={0} value={state.budgetGoal || ""} onChange={(e) => setState((s) => ({ ...s, budgetGoal: Number(e.target.value) || 0 }))} placeholder="e.g. 6000" />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs text-muted-foreground">Spent so far</label>
+                  <label className="mb-1 block text-micro text-muted-foreground">Spent so far</label>
                   <Input type="number" min={0} value={state.budgetSpent || ""} onChange={(e) => setState((s) => ({ ...s, budgetSpent: Number(e.target.value) || 0 }))} placeholder="e.g. 1200" />
                 </div>
               </div>

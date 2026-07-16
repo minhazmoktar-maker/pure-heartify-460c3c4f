@@ -68,11 +68,11 @@ export default function AdminAppeals() {
 function AppealCard({ appeal, onResolve }: { appeal: Appeal; onResolve: (id: string, status: "approved" | "denied", resolution: string) => Promise<void> }) {
   const [resolution, setResolution] = useState(appeal.resolution ?? "");
   return (
-    <li className="rounded-xl border border-border bg-card p-4">
+    <li className="rounded-card border border-border bg-card p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-sm font-medium capitalize">{appeal.subject_kind} · {appeal.subject_ref}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-micro text-muted-foreground">
             User {appeal.user_id.slice(0, 8)}… · {formatDistanceToNow(new Date(appeal.created_at), { addSuffix: true })}
           </p>
         </div>

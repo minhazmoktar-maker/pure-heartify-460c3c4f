@@ -100,7 +100,7 @@ export default function Mushaf() {
         <button
           type="button"
           onClick={toggle}
-          className="block w-full overflow-hidden rounded-xl border border-border bg-card shadow-sm"
+          className="block w-full overflow-hidden rounded-card border border-border bg-card shadow-sm"
           aria-label="Tap to play recitation"
         >
           <img
@@ -115,7 +115,7 @@ export default function Mushaf() {
           />
         </button>
         {audioError && (
-          <p className="mt-3 text-center text-xs text-muted-foreground">
+          <p className="mt-3 text-center text-micro text-muted-foreground">
             Recitation audio unavailable for this page. Try opening the surah page for full audio.
           </p>
         )}

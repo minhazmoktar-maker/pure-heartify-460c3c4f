@@ -25,7 +25,7 @@ export default function StatCard({
   return (
     <div
       className={cn(
-        "group rounded-xl border border-border bg-card p-4 transition-all duration-200",
+        "group rounded-card border border-border bg-card p-4 transition-all duration-200",
         "hover:-translate-y-0.5 hover:shadow-card-hover",
         className,
       )}
@@ -34,7 +34,7 @@ export default function StatCard({
         <div className="min-w-0">
           <div
             className={cn(
-              "font-heading text-2xl font-bold leading-none tracking-tight",
+              "font-heading text-title font-bold leading-none tracking-tight",
               tone === "primary" && "text-primary",
               tone === "accent" && "text-gradient-gold",
               tone === "default" && "text-foreground",
@@ -42,7 +42,7 @@ export default function StatCard({
           >
             {value}
           </div>
-          <div className="mt-2 truncate text-xs text-muted-foreground">{label}</div>
+          <div className="mt-2 truncate text-micro text-muted-foreground">{label}</div>
           {hint && <div className="mt-0.5 truncate text-[11px] text-muted-foreground/80">{hint}</div>}
         </div>
         {Icon && (

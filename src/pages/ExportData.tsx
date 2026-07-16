@@ -38,13 +38,13 @@ export default function ExportData() {
         description="Download a full copy of the data Heartify holds about your account."
         path="/account/export-data"
       />
-      <h1 className="font-heading text-3xl font-bold text-foreground">Download my data</h1>
+      <h1 className="font-heading text-title font-bold text-foreground">Download my data</h1>
       <p className="mt-2 text-muted-foreground">
         Under GDPR Article 15/20 and the CCPA, you can request a copy of everything we hold about your account.
         We'll generate a JSON file with every record tied to you.
       </p>
 
-      <div className="mt-6 rounded-xl border border-border bg-card p-6">
+      <div className="mt-6 rounded-card border border-border bg-card p-6">
         <div className="flex items-start gap-3">
           <ShieldCheck className="mt-0.5 h-5 w-5 text-primary" />
           <div className="text-sm text-muted-foreground">
@@ -56,23 +56,23 @@ export default function ExportData() {
         <button
           onClick={requestExport}
           disabled={busy}
-          className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          className="mt-6 inline-flex items-center gap-2 rounded-card bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           {busy ? "Preparing your data…" : "Request my data export"}
         </button>
 
         {result && (
-          <div className="mt-6 rounded-lg border border-border bg-background p-4">
+          <div className="mt-6 rounded-card border border-border bg-background p-4">
             <p className="text-sm font-medium text-foreground">Your export is ready</p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-micro text-muted-foreground">
               {(result.bytes / 1024).toFixed(1)} KB · {result.tables.length} table
               {result.tables.length === 1 ? "" : "s"} included
             </p>
             <a
               href={result.url}
               download
-              className="mt-3 inline-flex items-center gap-2 rounded-md border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+              className="mt-3 inline-flex items-center gap-2 rounded-card border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
             >
               <Download className="h-4 w-4" />
               Download JSON

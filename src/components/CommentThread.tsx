@@ -20,7 +20,7 @@ function Composer({ videoId, parentId, onDone, autoFocus }: { videoId: string; p
 
   if (!user) {
     return (
-      <div className="rounded-lg border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+      <div className="rounded-card border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
         <Link to="/login" className="font-medium text-primary underline-offset-2 hover:underline">
           Sign in
         </Link>{" "}
@@ -31,7 +31,7 @@ function Composer({ videoId, parentId, onDone, autoFocus }: { videoId: string; p
 
   return (
     <div className="flex gap-3">
-      <div className="h-9 w-9 shrink-0 rounded-full bg-primary/20" />
+      <div className="h-9 w-9 shrink-0 rounded-pill bg-primary/20" />
       <div className="flex-1 space-y-2">
         <Textarea
           value={text}
@@ -42,7 +42,7 @@ function Composer({ videoId, parentId, onDone, autoFocus }: { videoId: string; p
           autoFocus={autoFocus}
         />
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{text.length}/2000</p>
+          <p className="text-micro text-muted-foreground">{text.length}/2000</p>
           <div className="flex gap-2">
             {onDone && (
               <Button size="sm" variant="ghost" onClick={onDone}>
@@ -78,13 +78,13 @@ function CommentItem({ videoId, c, children }: { videoId: string; c: CommentRow;
 
   return (
     <div className="flex gap-3">
-      <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted">
+      <div className="h-9 w-9 shrink-0 overflow-hidden rounded-pill bg-muted">
         {c.author_avatar && <img src={c.author_avatar} alt="" className="h-full w-full object-cover" />}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 text-sm">
           <span className="font-semibold text-foreground">{c.author_name}</span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-micro text-muted-foreground">
             {formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}
             {c.edited_at && " · edited"}
           </span>
@@ -110,7 +110,7 @@ function CommentItem({ videoId, c, children }: { videoId: string; c: CommentRow;
         ) : (
           <p className="mt-1 whitespace-pre-wrap break-words text-sm text-foreground">{c.body}</p>
         )}
-        <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="mt-2 flex items-center gap-4 text-micro text-muted-foreground">
           <button
             className="flex items-center gap-1 transition hover:text-foreground"
             onClick={() => toggleLike.mutate({ id: c.id, liked: !!c.liked_by_me })}

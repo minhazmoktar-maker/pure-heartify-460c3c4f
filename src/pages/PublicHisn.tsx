@@ -56,21 +56,21 @@ export default function PublicHisn() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center justify-between text-micro uppercase tracking-widest text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <Shield className="h-4 w-4 text-primary" /> Hisn al-Muslim
               </span>
               {dua.count && <span>Repeat × {dua.count}</span>}
             </div>
-            <h1 className="text-2xl md:text-3xl font-semibold">{dua.title}</h1>
-            <p dir="rtl" lang="ar" className="text-2xl md:text-3xl leading-loose text-right" style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
+            <h1 className="text-title md:text-title font-semibold">{dua.title}</h1>
+            <p dir="rtl" lang="ar" className="text-title md:text-title leading-loose text-right" style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
               {dua.arabic}
             </p>
             <p className="text-base italic text-foreground/80">{dua.translit}</p>
             <p className="text-base leading-relaxed text-muted-foreground border-l-2 border-primary/40 pl-4">
               {dua.english}
             </p>
-            <p className="text-xs text-muted-foreground">{dua.ref}</p>
+            <p className="text-micro text-muted-foreground">{dua.ref}</p>
           </CardContent>
         </Card>
 

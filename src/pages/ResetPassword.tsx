@@ -67,7 +67,7 @@ const ResetPassword = () => {
       <SEO title="Set a new Password — Heartify" description="Choose a new password for your Heartify account." path="/reset-password" />
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <h1 className="font-heading text-xl font-bold text-foreground">Set New Password</h1>
+          <h1 className="font-heading text-heading font-bold text-foreground">Set New Password</h1>
           <p className="mt-1 text-sm text-muted-foreground">Choose a strong password (min 8 characters)</p>
         </div>
 
@@ -106,7 +106,7 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.45)] transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.45)] transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Update Password

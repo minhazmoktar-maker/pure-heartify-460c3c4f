@@ -24,7 +24,7 @@ export default function BackToTop() {
           animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.9 }}
           transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed right-4 bottom-28 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-border/70 bg-card/95 text-foreground shadow-lg backdrop-blur transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background md:right-6"
+          className="fixed right-4 bottom-28 z-40 flex h-11 w-11 items-center justify-center rounded-pill border border-border/70 bg-card/95 text-foreground shadow-lg backdrop-blur transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background md:right-6"
           style={{ marginBottom: "env(safe-area-inset-bottom, 0px)" }}
         >
           <ArrowUp className="h-5 w-5" />

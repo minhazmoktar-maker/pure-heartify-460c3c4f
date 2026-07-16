@@ -115,7 +115,7 @@ const NewMuslim = () => {
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
           <Button asChild variant="ghost" size="icon" aria-label="Back"><Link to="/" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link></Button>
           <Sparkles className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">New Muslim Guide</h1>
+          <h1 className="text-heading font-semibold">New Muslim Guide</h1>
         </div>
       </header>
 
@@ -141,7 +141,7 @@ const NewMuslim = () => {
             return (
               <Card key={s.id} className={isDone ? "border-primary/40" : ""}>
                 <button onClick={() => setOpen(isOpen ? null : s.id)} className="flex w-full items-center gap-3 p-4 text-left">
-                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${isDone ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-pill ${isDone ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                     {isDone ? <Check className="h-4 w-4" /> : <span className="text-sm">{STEPS.indexOf(s) + 1}</span>}
                   </div>
                   <div className="flex-1">
@@ -153,7 +153,7 @@ const NewMuslim = () => {
                 {isOpen && (
                   <CardContent className="space-y-3 pt-0">
                     {s.arabic && (
-                      <div className="rounded-md bg-muted p-3 text-right text-xl leading-loose" dir="rtl" lang="ar">
+                      <div className="rounded-card bg-muted p-3 text-right text-heading leading-loose" dir="rtl" lang="ar">
                         {s.arabic}
                       </div>
                     )}

@@ -32,7 +32,7 @@ export default function WomensPurity() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO title="Fiqh of Ḥayḍ, Nifās & Istiḥāḍah — Women's Purity in Islam" description="A concise, evidence-based guide to menstruation, post-natal bleeding, and irregular bleeding in Islam — with rulings on prayer, fasting, and ghusl." path="/womens-purity" />
-      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Droplets className="w-6 h-6 text-primary" /><h1 className="text-2xl font-bold">Women's Purity</h1></div></div>
+      <div className="border-b bg-card"><div className="container mx-auto px-4 py-4 flex items-center gap-3"><Link to="/"><Button variant="ghost" size="icon" aria-label="Back to home"><ArrowLeft className="w-5 h-5" /></Button></Link><Droplets className="w-6 h-6 text-primary" /><h1 className="text-title font-bold">Women's Purity</h1></div></div>
       <div className="container mx-auto px-4 py-6 max-w-3xl">
         <Tabs defaultValue="hayd">
           <TabsList className="grid grid-cols-3 w-full"><TabsTrigger value="hayd">Ḥayḍ</TabsTrigger><TabsTrigger value="nifas">Nifās</TabsTrigger><TabsTrigger value="istih">Istiḥāḍah</TabsTrigger></TabsList>

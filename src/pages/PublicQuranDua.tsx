@@ -69,7 +69,7 @@ export default function PublicQuranDua() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center justify-between text-micro uppercase tracking-widest text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <HandHeart className="h-4 w-4 text-primary" /> Duʿāʾ from the Qurʾān · {idx + 1} of {QURAN_DUAS.length}
               </span>
@@ -77,18 +77,18 @@ export default function PublicQuranDua() {
                 <BookOpen className="h-3.5 w-3.5" /> Qurʾān {d.ref}
               </span>
             </div>
-            <p dir="rtl" lang="ar" className="text-3xl md:text-4xl leading-loose text-primary text-right"
+            <p dir="rtl" lang="ar" className="text-title md:text-display leading-loose text-primary text-right"
                style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}>
               {d.arabic}
             </p>
             <p className="text-sm md:text-base italic text-muted-foreground">{d.translit}</p>
-            <p className="text-base md:text-lg leading-relaxed border-l-2 border-primary/40 pl-4">
+            <p className="text-base md:text-heading leading-relaxed border-l-2 border-primary/40 pl-4">
               {d.translation}
             </p>
-            <div className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${THEME_STYLE[d.theme] ?? ""}`}>
+            <div className={`inline-flex items-center gap-1.5 rounded-pill border px-3 py-1 text-micro font-medium ${THEME_STYLE[d.theme] ?? ""}`}>
               <Tag className="h-3.5 w-3.5" /> {d.theme}
             </div>
-            <p className="text-xs text-muted-foreground">{d.context}</p>
+            <p className="text-micro text-muted-foreground">{d.context}</p>
           </CardContent>
         </Card>
 

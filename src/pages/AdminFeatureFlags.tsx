@@ -62,7 +62,7 @@ export default function AdminFeatureFlags() {
 
         <Card className="p-5">
           <table className="w-full text-sm">
-            <thead className="text-xs text-muted-foreground">
+            <thead className="text-micro text-muted-foreground">
               <tr>
                 <th className="text-left py-2">Key</th>
                 <th className="text-center">Enabled</th>
@@ -74,7 +74,7 @@ export default function AdminFeatureFlags() {
             <tbody>
               {flags.map((f) => (
                 <tr key={f.key} className="border-t border-border">
-                  <td className="py-2 font-mono text-xs">{f.key}</td>
+                  <td className="py-2 font-mono text-micro">{f.key}</td>
                   <td className="text-center">
                     <Switch checked={f.enabled} onCheckedChange={(v) => update(f.key, { enabled: v })} />
                   </td>

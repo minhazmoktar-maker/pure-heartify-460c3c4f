@@ -67,7 +67,7 @@ export default function MfaStatusCard() {
             : <ShieldAlert className="h-5 w-5 text-destructive mt-0.5" />}
           <div>
             <h3 className="text-sm font-semibold">Two-factor authentication</h3>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-micro text-muted-foreground">
               {verified.length > 0
                 ? `${verified.length} factor${verified.length > 1 ? "s" : ""} active`
                 : "No verified factors — recommended for all admins"}
@@ -82,7 +82,7 @@ export default function MfaStatusCard() {
       {loading ? (
         <div className="flex items-center justify-center py-6"><Loader2 className="h-4 w-4 animate-spin" /></div>
       ) : factors.length === 0 ? (
-        <p className="mt-3 text-xs text-muted-foreground">No factors enrolled yet.</p>
+        <p className="mt-3 text-micro text-muted-foreground">No factors enrolled yet.</p>
       ) : (
         <ul className="mt-3 space-y-2">
           {[...verified, ...pending].map(f => {
@@ -94,7 +94,7 @@ export default function MfaStatusCard() {
                   <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
                   <div className="min-w-0">
                     <div className="truncate font-medium">{f.friendly_name || meta.label}</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-micro text-muted-foreground">
                       {meta.label} · updated {new Date(f.updated_at).toLocaleString()}
                     </div>
                   </div>

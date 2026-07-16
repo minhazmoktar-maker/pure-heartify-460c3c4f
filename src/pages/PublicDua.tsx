@@ -120,7 +120,7 @@ export default function PublicDuaPage() {
         ) : (
           <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
             <CardContent className="space-y-6 py-8">
-              <p className="whitespace-pre-wrap text-lg leading-relaxed text-foreground">{dua.body}</p>
+              <p className="whitespace-pre-wrap text-heading leading-relaxed text-foreground">{dua.body}</p>
 
               <div className="flex items-center justify-between border-t border-border pt-4 text-sm text-muted-foreground">
                 <span>
@@ -133,7 +133,7 @@ export default function PublicDuaPage() {
                 </span>
               </div>
 
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-center space-y-3">
+              <div className="rounded-card border border-primary/30 bg-primary/5 p-4 text-center space-y-3">
                 <div className="text-sm text-muted-foreground inline-flex items-center gap-1.5 justify-center">
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
                   {dua.ameen_count === 0
@@ -144,12 +144,12 @@ export default function PublicDuaPage() {
                   onClick={onAmeen}
                   disabled={ameened || busy}
                   size="lg"
-                  className="w-full text-lg h-14"
+                  className="w-full text-heading h-14"
                 >
                   {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : ameened ? "Āmīn 🤲 recorded" : "🤲 Say Āmīn"}
                 </Button>
                 {ameened && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-micro text-muted-foreground">
                     Share so more brothers &amp; sisters can say Āmīn — every share may bring reward.
                   </p>
                 )}

@@ -58,18 +58,18 @@ export default function PublicSeerah() {
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
         <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
           <CardContent className="pt-8 pb-8 space-y-6">
-            <div className="flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center justify-between text-micro uppercase tracking-widest text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <Scroll className="h-4 w-4 text-primary" /> Seerah · {event.phase}
               </span>
               <span>Event {idx + 1} of {SEERAH_EVENTS.length}</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-semibold">{event.title}</h1>
+            <h1 className="text-title md:text-display font-semibold">{event.title}</h1>
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1.5"><Calendar className="h-4 w-4" /> {event.year}{event.hijri ? ` · ${event.hijri}` : ""}</span>
               <span className="inline-flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {event.place}</span>
             </div>
-            <p className="text-base md:text-lg leading-relaxed border-l-2 border-primary/40 pl-4">
+            <p className="text-base md:text-heading leading-relaxed border-l-2 border-primary/40 pl-4">
               {event.summary}
             </p>
           </CardContent>

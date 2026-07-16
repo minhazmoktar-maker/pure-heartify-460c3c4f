@@ -123,7 +123,7 @@ export default function MosqueFinder() {
       <Navbar />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <header className="mb-6">
-          <h1 className="flex items-center gap-2 text-3xl font-bold">
+          <h1 className="flex items-center gap-2 text-title font-bold">
             <MapPin className="h-7 w-7 text-primary" />
             Mosque Finder
           </h1>
@@ -159,7 +159,7 @@ export default function MosqueFinder() {
               <Button type="submit" variant="outline" size="sm">Search</Button>
             </form>
             {loc && (
-              <p className="text-xs text-muted-foreground">
+              <p className="text-micro text-muted-foreground">
                 Searching within {radiusKm} km of {loc.lat.toFixed(4)}, {loc.lon.toFixed(4)}
               </p>
             )}
@@ -169,9 +169,9 @@ export default function MosqueFinder() {
         {loading && (
           <div className="space-y-3" role="status" aria-label="Loading nearby mosques">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="rounded-lg border border-border bg-card p-4">
+              <div key={i} className="rounded-card border border-border bg-card p-4">
                 <div className="flex items-start gap-3">
-                  <Skeleton className="h-10 w-10 rounded-lg" />
+                  <Skeleton className="h-10 w-10 rounded-card" />
                   <div className="flex-1 space-y-2">
                     <Skeleton className="h-4 w-2/3" />
                     <Skeleton className="h-3 w-1/2" />
@@ -200,9 +200,9 @@ export default function MosqueFinder() {
                 <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                   <div>
                     <CardTitle className="text-base">{m.name}</CardTitle>
-                    {m.address && <p className="text-xs text-muted-foreground">{m.address}</p>}
+                    {m.address && <p className="text-micro text-muted-foreground">{m.address}</p>}
                   </div>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
+                  <span className="rounded-pill bg-secondary px-2 py-0.5 text-micro font-medium">
                     {m.distanceKm < 1 ? `${Math.round(m.distanceKm * 1000)} m` : `${m.distanceKm.toFixed(1)} km`}
                   </span>
                 </CardHeader>
