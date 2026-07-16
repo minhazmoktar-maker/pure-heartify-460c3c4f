@@ -283,6 +283,7 @@ const App = () => (
                 <Route path="/mushaf/:page" element={<Mushaf />} />
                 <Route path="/redeem" element={<Redeem />} />
                 <Route path="/changelog" element={<Changelog />} />
+                <Route path="/connect" element={<Connect />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/section/:sectionId" element={<SectionAll />} />
                 <Route path="/login" element={<Login />} />
