@@ -12,6 +12,7 @@ import ThemeModeSetting from "@/components/ThemeModeSetting";
 import SoundSetting from "@/components/SoundSetting";
 import MfaStatusCard from "@/components/MfaStatusCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
+import ProfileCompletenessCard from "@/components/ProfileCompletenessCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
