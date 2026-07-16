@@ -12,6 +12,7 @@ import ThemeModeSetting from "@/components/ThemeModeSetting";
 import SoundSetting from "@/components/SoundSetting";
 import MfaStatusCard from "@/components/MfaStatusCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
+import ProfileCompletenessCard from "@/components/ProfileCompletenessCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -230,6 +231,7 @@ const Profile = () => {
         {/* Profile edit */}
         {tab === "profile" && (
           <div className="space-y-5">
+            <ProfileCompletenessCard />
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-primary text-title font-bold text-primary-foreground">
                 {avatarUrl ? (

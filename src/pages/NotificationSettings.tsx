@@ -27,6 +27,22 @@ const KINDS: { key: string; title: string; description: string }[] = [
   { key: "weekly_recap", title: "Weekly recap", description: "Your progress summary each Friday." },
 ];
 
+/**
+ * Recommended defaults — chosen so a fresh viewer gets high-signal reminders
+ * (Daily Dose, streak protection, prayer times) without inbox spam.
+ * Social + khatm + dua_ameen default to in-app only. Weekly recap is the
+ * only email-on default so returning users get one summary a week.
+ */
+const RECOMMENDED_DEFAULTS: Record<string, { push: boolean; email: boolean; inApp: boolean }> = {
+  daily_dose:   { push: true,  email: false, inApp: true },
+  streak_risk:  { push: true,  email: false, inApp: true },
+  prayer_time:  { push: true,  email: false, inApp: true },
+  khatm:        { push: false, email: false, inApp: true },
+  dua_ameen:    { push: false, email: false, inApp: true },
+  social:       { push: false, email: false, inApp: true },
+  weekly_recap: { push: false, email: true,  inApp: true },
+};
+
 export default function NotificationSettings() {
   const { user, loading: authLoading } = useAuth();
   const push = useWebPush();
@@ -79,6 +95,38 @@ export default function NotificationSettings() {
     }
   };
 
+  const restoreDefaults = async () => {
+    if (!user) return;
+    const rows = KINDS.map((k) => {
+      const d = RECOMMENDED_DEFAULTS[k.key];
+      return {
+        user_id: user.id,
+        kind: k.key,
+        push_enabled: d.push,
+        email_enabled: d.email,
+        in_app_enabled: d.inApp,
+      };
+    });
+    const nextMap: Record<string, Pref> = {};
+    for (const r of rows) {
+      nextMap[r.kind] = {
+        kind: r.kind,
+        push_enabled: r.push_enabled,
+        email_enabled: r.email_enabled,
+        in_app_enabled: r.in_app_enabled,
+      };
+    }
+    setPrefs(nextMap);
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert(rows, { onConflict: "user_id,kind" });
+    if (error) {
+      toast({ title: "Couldn't restore defaults", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Recommended defaults restored" });
+    }
+  };
+
   if (authLoading) return null;
   if (!user) {
     return (
@@ -100,11 +148,21 @@ export default function NotificationSettings() {
       />
       <Navbar />
       <main className="mx-auto max-w-3xl px-4 py-8 md:py-12">
-        <header className="mb-6">
-          <h1 className="text-title font-bold">Notifications</h1>
-          <p className="mt-1 text-muted-foreground">
-            Pick exactly what you want, exactly where you want it.
-          </p>
+        <header className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-title font-bold">Notifications</h1>
+            <p className="mt-1 text-muted-foreground">
+              Pick exactly what you want, exactly where you want it.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={restoreDefaults}
+            aria-label="Restore recommended notification defaults"
+          >
+            Recommended defaults
+          </Button>
         </header>
 
         {/* Browser push status */}
