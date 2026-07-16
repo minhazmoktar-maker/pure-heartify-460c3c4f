@@ -95,6 +95,38 @@ export default function NotificationSettings() {
     }
   };
 
+  const restoreDefaults = async () => {
+    if (!user) return;
+    const rows = KINDS.map((k) => {
+      const d = RECOMMENDED_DEFAULTS[k.key];
+      return {
+        user_id: user.id,
+        kind: k.key,
+        push_enabled: d.push,
+        email_enabled: d.email,
+        in_app_enabled: d.inApp,
+      };
+    });
+    const nextMap: Record<string, Pref> = {};
+    for (const r of rows) {
+      nextMap[r.kind] = {
+        kind: r.kind,
+        push_enabled: r.push_enabled,
+        email_enabled: r.email_enabled,
+        in_app_enabled: r.in_app_enabled,
+      };
+    }
+    setPrefs(nextMap);
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert(rows, { onConflict: "user_id,kind" });
+    if (error) {
+      toast({ title: "Couldn't restore defaults", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Recommended defaults restored" });
+    }
+  };
+
   if (authLoading) return null;
   if (!user) {
     return (
