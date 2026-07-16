@@ -116,6 +116,8 @@ const Bookmarks = () => {
       <Navbar />
 
       <PullToRefresh
+        refreshKey="bookmarks"
+        refreshingLabel="Refreshing bookmarks…"
         onRefresh={async () => {
           setItems(loadAll());
           toast.success("Bookmarks refreshed");
