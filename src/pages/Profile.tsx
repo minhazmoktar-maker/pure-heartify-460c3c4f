@@ -231,6 +231,7 @@ const Profile = () => {
         {/* Profile edit */}
         {tab === "profile" && (
           <div className="space-y-5">
+            <ProfileCompletenessCard />
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-primary text-title font-bold text-primary-foreground">
                 {avatarUrl ? (
