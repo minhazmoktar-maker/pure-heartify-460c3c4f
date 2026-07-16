@@ -11,7 +11,8 @@
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=()" />
     <link rel="icon" href="/favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/app-icon-1024.png" />
-    <link rel="canonical" href="https://pure-heartify.lovable.app/" />
+    <!-- Per-route <link rel="canonical"> is emitted by src/components/SEO.tsx via react-helmet-async. -->
+    <!-- Do not hardcode a sitewide canonical here — it would duplicate/override subpage canonicals for non-JS crawlers. -->
 
     <!-- Perf: eager DNS + TCP + TLS to critical origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
