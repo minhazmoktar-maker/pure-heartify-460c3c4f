@@ -260,6 +260,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <SkipLink />
             <ScrollRestoration />
             <MobileBridge />
             <ReferralBridge />
