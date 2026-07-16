@@ -69,6 +69,8 @@ export interface RecommendationReason {
     | "channel_affinity"
     | "favorite_channel"
     | "trending"
+    | "heartify_trending"
+    | "hidden_gem"
     | "trusted_channel"
     | "high_halal_score"
     | "ai_confidence"
@@ -76,6 +78,7 @@ export interface RecommendationReason {
     | "session_continuity"
     | "cold_start_popular"
     | "diversity_boost"
+    | "recently_shown_penalty"
     | "language_match"
     | "context_boost";
   weight: number;
