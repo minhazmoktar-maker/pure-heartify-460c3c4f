@@ -25,7 +25,9 @@ const W = {
   categoryAff:     Number(Deno.env.get("REC_W_CATEGORY") ?? 0.16),
   channelAff:      Number(Deno.env.get("REC_W_CHANNEL")  ?? 0.14),
   favoriteChannel: Number(Deno.env.get("REC_W_FAV_CHAN") ?? 0.06),
-  trending:        Number(Deno.env.get("REC_W_TRENDING") ?? 0.10),
+  trending:        Number(Deno.env.get("REC_W_TRENDING") ?? 0.08),
+  heartifyTrend:   Number(Deno.env.get("REC_W_HEARTIFY_TREND") ?? 0.12),
+  hiddenGem:       Number(Deno.env.get("REC_W_HIDDEN_GEM") ?? 0.10),
   trusted:         Number(Deno.env.get("REC_W_TRUSTED")  ?? 0.10),
   halal:           Number(Deno.env.get("REC_W_HALAL")    ?? 0.08),
   aiConfidence:    Number(Deno.env.get("REC_W_AI")       ?? 0.06),
@@ -33,6 +35,10 @@ const W = {
   session:         Number(Deno.env.get("REC_W_SESSION")  ?? 0.04),
   language:        Number(Deno.env.get("REC_W_LANGUAGE") ?? 0.10),
   context:         Number(Deno.env.get("REC_W_CONTEXT")  ?? 0.12),
+  // Penalty applied per prior impression in the last 24h (soft cooldown).
+  repeatPenalty:   Number(Deno.env.get("REC_W_REPEAT")   ?? 0.15),
+  // Exploration ε — probability of injecting a hidden gem near the top.
+  exploration:     Number(Deno.env.get("REC_EXPLORATION") ?? 0.10),
 };
 
 /**
