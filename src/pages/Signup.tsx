@@ -144,6 +144,10 @@ const Signup = () => {
             type="email"
             inputMode="email"
             autoComplete="email"
+            enterKeyHint="next"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="Email address"
             value={email}
             onChange={(e) => {
