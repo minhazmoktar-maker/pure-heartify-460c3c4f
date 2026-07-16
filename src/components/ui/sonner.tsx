@@ -13,10 +13,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       position="top-center"
       closeButton
       richColors={false}
+      // Phase 3 — standardized durations (short-lived acks vs. persistent errors are set at call sites).
+      duration={4000}
+      gap={8}
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-border group-[.toaster]:shadow-lg group-[.toaster]:rounded-xl group-[.toaster]:backdrop-blur-sm",
+            "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-border group-[.toaster]:shadow-e2 group-[.toaster]:rounded-card group-[.toaster]:backdrop-blur-sm",
           title: "group-[.toast]:font-medium group-[.toast]:text-[0.925rem]",
           description: "group-[.toast]:text-muted-foreground group-[.toast]:text-sm",
           actionButton:
