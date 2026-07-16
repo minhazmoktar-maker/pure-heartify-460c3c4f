@@ -482,6 +482,25 @@ async function loadApprovedSeeds(admin: Admin, limit: number): Promise<Array<{ y
   return (data as any[] | null) ?? [];
 }
 
+interface AllocationRow { source: string; share_percent: number; enabled: boolean }
+
+// P1.3: owner-editable quota allocations. Falls back to a safe default split
+// so a missing/empty table never blocks discovery.
+async function loadAllocations(admin: Admin): Promise<AllocationRow[]> {
+  const { data } = await admin
+    .from('discovery_quota_allocations')
+    .select('source, share_percent, enabled');
+  const rows = (data as AllocationRow[] | null) ?? [];
+  if (rows.length === 0) {
+    return [
+      { source: 'topic_search', share_percent: 50, enabled: true },
+      { source: 'playlist_collab', share_percent: 25, enabled: true },
+      { source: 'description_mention', share_percent: 25, enabled: true },
+    ];
+  }
+  return rows;
+}
+
 // ─────────────────────────── Job worker ─────────────────────────────────────
 
 async function updateJob(admin: Admin, jobId: string, patch: Record<string, unknown>) {
