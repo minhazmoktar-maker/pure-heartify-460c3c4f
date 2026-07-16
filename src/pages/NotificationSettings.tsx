@@ -27,6 +27,22 @@ const KINDS: { key: string; title: string; description: string }[] = [
   { key: "weekly_recap", title: "Weekly recap", description: "Your progress summary each Friday." },
 ];
 
+/**
+ * Recommended defaults — chosen so a fresh viewer gets high-signal reminders
+ * (Daily Dose, streak protection, prayer times) without inbox spam.
+ * Social + khatm + dua_ameen default to in-app only. Weekly recap is the
+ * only email-on default so returning users get one summary a week.
+ */
+const RECOMMENDED_DEFAULTS: Record<string, { push: boolean; email: boolean; inApp: boolean }> = {
+  daily_dose:   { push: true,  email: false, inApp: true },
+  streak_risk:  { push: true,  email: false, inApp: true },
+  prayer_time:  { push: true,  email: false, inApp: true },
+  khatm:        { push: false, email: false, inApp: true },
+  dua_ameen:    { push: false, email: false, inApp: true },
+  social:       { push: false, email: false, inApp: true },
+  weekly_recap: { push: false, email: true,  inApp: true },
+};
+
 export default function NotificationSettings() {
   const { user, loading: authLoading } = useAuth();
   const push = useWebPush();
