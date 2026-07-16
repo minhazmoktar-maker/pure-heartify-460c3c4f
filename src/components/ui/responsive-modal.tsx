@@ -59,18 +59,18 @@ export function ResponsiveModalTrigger(props: TriggerProps) {
   return isMobile ? <DrawerTrigger {...props} /> : <DialogTrigger {...props} />;
 }
 
-interface ContentProps {
+interface ContentProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children: React.ReactNode;
 }
-export function ResponsiveModalContent({ className, children }: ContentProps) {
+export function ResponsiveModalContent({ className, children, ...rest }: ContentProps) {
   const isMobile = useIsMobile();
   return isMobile ? (
-    <DrawerContent className={cn("max-h-[92vh] px-4 pb-[max(1rem,env(safe-area-inset-bottom))]", className)}>
+    <DrawerContent className={cn("max-h-[92vh] px-4 pb-[max(1rem,env(safe-area-inset-bottom))]", className)} {...rest}>
       <div className="overflow-y-auto">{children}</div>
     </DrawerContent>
   ) : (
-    <DialogContent className={className}>{children}</DialogContent>
+    <DialogContent className={className} {...rest}>{children}</DialogContent>
   );
 }
 
