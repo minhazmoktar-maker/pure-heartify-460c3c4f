@@ -201,6 +201,17 @@ Deno.serve(async (req) => {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+  // Restrict kind to a known allow-list so anonymous callers can't inject
+  // arbitrary text into admin email/Slack fan-out.
+  const ALLOWED_KINDS = new Set(Object.keys(KIND_LABEL));
+  if (!ALLOWED_KINDS.has(p.kind)) {
+    return new Response(JSON.stringify({ error: "unknown kind" }), {
+      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  // Cap free-text fields to reasonable lengths.
+  p.message = String(p.message).slice(0, 500);
+  if (p.route) p.route = String(p.route).slice(0, 200);
   p.severity = (p.severity ?? "warn").toLowerCase();
 
   const emoji = SEV_EMOJI[p.severity] ?? "•";

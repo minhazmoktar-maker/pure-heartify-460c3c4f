@@ -151,10 +151,9 @@ export default function GroupKhatmDetail() {
       toast.error("Please sign in first");
       return;
     }
-    const { error } = await supabase.from("khatm_group_members").insert({
-      group_id: id,
-      user_id: user.id,
-      role: "member",
+    const { error } = await supabase.rpc("join_khatm_group", {
+      _group_id: id,
+      _invite_code: group?.invite_code ?? null,
     });
     if (error) {
       toast.error(error.message);
