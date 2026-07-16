@@ -131,15 +131,15 @@ export default function SuggestContentDialog({ trigger }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
+      <ResponsiveModalTrigger asChild>
         {trigger ?? (
           <button className="inline-flex items-center gap-1.5 rounded-pill border border-primary/40 bg-primary/5 px-3 py-1.5 text-micro font-semibold text-primary hover:bg-primary/10">
             <Lightbulb className="h-3.5 w-3.5" /> Suggest content
           </button>
         )}
-      </DialogTrigger>
-      <DialogContent
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent
         className="max-w-lg"
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !submitting) {
@@ -148,14 +148,14 @@ export default function SuggestContentDialog({ trigger }: Props) {
           }
         }}
       >
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle className="flex items-center gap-2">
             <Lightbulb className="h-4 w-4 text-primary" /> Suggest halal content
-          </DialogTitle>
-          <DialogDescription>
+          </ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             Recommend a video or channel for the library. Nothing goes live until a moderator has reviewed it.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as "video" | "channel")} className="mt-2">
           <TabsList className="grid w-full grid-cols-2">
@@ -198,7 +198,7 @@ export default function SuggestContentDialog({ trigger }: Props) {
           </TabsContent>
         </Tabs>
 
-        <DialogFooter className="mt-2 sm:items-center">
+        <ResponsiveModalFooter className="mt-2 sm:items-center">
           <p className="mr-auto hidden text-[11px] text-muted-foreground sm:block">
             Tip: press <kbd className="rounded border border-border bg-muted px-1">⌘</kbd>+<kbd className="rounded border border-border bg-muted px-1">Enter</kbd> to submit
           </p>
@@ -207,8 +207,8 @@ export default function SuggestContentDialog({ trigger }: Props) {
             {submitting ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Lightbulb className="mr-1.5 h-3.5 w-3.5" />}
             Submit for review
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveModalFooter>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }

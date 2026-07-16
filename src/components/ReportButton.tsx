@@ -109,20 +109,20 @@ export function ReportButton({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
+      <ResponsiveModalTrigger asChild>
         <Button variant={variant} size={size} className={className}>
           <Flag className="mr-1.5 h-3.5 w-3.5" />
           Report
         </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Report content</DialogTitle>
-          <DialogDescription>
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent className="max-w-lg">
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle>Report content</ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             Reports are reviewed by a human moderator. False or spammy reports may be rate-limited.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
 
         <div className="space-y-4">
           <div>
@@ -166,7 +166,7 @@ export function ReportButton({
           </label>
         </div>
 
-        <DialogFooter>
+        <ResponsiveModalFooter>
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={submitting}>
             Cancel
           </Button>
@@ -174,9 +174,9 @@ export function ReportButton({
             {submitting ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Flag className="mr-1.5 h-4 w-4" />}
             Submit report
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveModalFooter>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
 

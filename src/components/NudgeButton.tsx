@@ -68,20 +68,20 @@ export default function NudgeButton({ handle, displayName }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <ResponsiveModal open={open} onOpenChange={setOpen}>
+      <ResponsiveModalTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1.5">
           <Bell className="h-4 w-4" /> Nudge
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Send a nudge</DialogTitle>
-          <DialogDescription>
+      </ResponsiveModalTrigger>
+      <ResponsiveModalContent>
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle>Send a nudge</ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             Encourage {displayName ? <b>{displayName}</b> : <>@{handle}</>} with a quick reminder.
             Limit: 5 nudges/day, 1 per person/day.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
         <RadioGroup value={kind} onValueChange={(v) => setKind(v as keyof typeof PRESETS)} className="space-y-2">
           {Object.entries(PRESETS).map(([k, p]) => (
             <div key={k} className="flex items-start gap-2 rounded-card border p-3">
@@ -93,13 +93,13 @@ export default function NudgeButton({ handle, displayName }: Props) {
             </div>
           ))}
         </RadioGroup>
-        <DialogFooter>
+        <ResponsiveModalFooter>
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>Cancel</Button>
           <Button onClick={onSend} disabled={busy}>
             {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Send nudge
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveModalFooter>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
