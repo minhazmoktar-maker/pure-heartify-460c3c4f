@@ -34,7 +34,12 @@ export interface UserSignals {
   categoryAffinity: Map<string, number>;     // normalized 0..1
   channelAffinity: Map<string, number>;      // normalized 0..1
   sessionChannelIds: Set<string>;            // channels seen in last hour
-  trendingIds: Set<string>;                  // globally trending, last 14d
+  trendingIds: Set<string>;                  // legacy trending pool (clicks+converts, 14d)
+  heartifyTrendingIds: Set<string>;          // native Heartify trending (72h, weighted)
+  hiddenGemIds: Set<string>;                 // high-halal, low-exposure promotion pool
+  dismissedVideoIds: Set<string>;            // "Not Interested" / hidden by user
+  blockedChannelPatterns: string[];          // lowercased substrings from blocked_creators
+  recentImpressionCounts: Map<string, number>; // per-video impressions in last 24h
   contentLanguages: string[];                // preferred content languages
   diversityLevel: number;                    // 0..100, higher = more out-of-language content
   context: RecommendationContext;            // time-of-day / Ramadan / weekday
@@ -64,6 +69,8 @@ export interface RecommendationReason {
     | "channel_affinity"
     | "favorite_channel"
     | "trending"
+    | "heartify_trending"
+    | "hidden_gem"
     | "trusted_channel"
     | "high_halal_score"
     | "ai_confidence"
@@ -71,6 +78,7 @@ export interface RecommendationReason {
     | "session_continuity"
     | "cold_start_popular"
     | "diversity_boost"
+    | "recently_shown_penalty"
     | "language_match"
     | "context_boost";
   weight: number;

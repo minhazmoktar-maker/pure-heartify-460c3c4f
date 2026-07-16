@@ -70,6 +70,40 @@ export async function fetchCandidates(
     );
   }
 
+  // 2b) Heartify-native trending pool (72h, weighted by clicks+converts).
+  if (signals.heartifyTrendingIds.size > 0) {
+    jobs.push(
+      admin
+        .from("curated_videos")
+        .select(select)
+        .in("moderation_state", ["approved", "auto_approved"])
+        .in("video_id", Array.from(signals.heartifyTrendingIds).slice(0, 200))
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+            pool.set(String(row.video_id), project(row));
+          }
+        })
+        .catch(() => {}),
+    );
+  }
+
+  // 2c) Hidden gems pool — high-halal, low-exposure promotion.
+  if (signals.hiddenGemIds.size > 0) {
+    jobs.push(
+      admin
+        .from("curated_videos")
+        .select(select)
+        .in("moderation_state", ["approved", "auto_approved"])
+        .in("video_id", Array.from(signals.hiddenGemIds).slice(0, 120))
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+            pool.set(String(row.video_id), project(row));
+          }
+        })
+        .catch(() => {}),
+    );
+  }
+
   // 3) Category-affinity pool (top 3 categories, most-recent first).
   const topCategories = Array.from(signals.categoryAffinity.entries())
     .sort((a, b) => b[1] - a[1])

@@ -25,7 +25,9 @@ const W = {
   categoryAff:     Number(Deno.env.get("REC_W_CATEGORY") ?? 0.16),
   channelAff:      Number(Deno.env.get("REC_W_CHANNEL")  ?? 0.14),
   favoriteChannel: Number(Deno.env.get("REC_W_FAV_CHAN") ?? 0.06),
-  trending:        Number(Deno.env.get("REC_W_TRENDING") ?? 0.10),
+  trending:        Number(Deno.env.get("REC_W_TRENDING") ?? 0.08),
+  heartifyTrend:   Number(Deno.env.get("REC_W_HEARTIFY_TREND") ?? 0.12),
+  hiddenGem:       Number(Deno.env.get("REC_W_HIDDEN_GEM") ?? 0.10),
   trusted:         Number(Deno.env.get("REC_W_TRUSTED")  ?? 0.10),
   halal:           Number(Deno.env.get("REC_W_HALAL")    ?? 0.08),
   aiConfidence:    Number(Deno.env.get("REC_W_AI")       ?? 0.06),
@@ -33,6 +35,10 @@ const W = {
   session:         Number(Deno.env.get("REC_W_SESSION")  ?? 0.04),
   language:        Number(Deno.env.get("REC_W_LANGUAGE") ?? 0.10),
   context:         Number(Deno.env.get("REC_W_CONTEXT")  ?? 0.12),
+  // Penalty applied per prior impression in the last 24h (soft cooldown).
+  repeatPenalty:   Number(Deno.env.get("REC_W_REPEAT")   ?? 0.15),
+  // Exploration ε — probability of injecting a hidden gem near the top.
+  exploration:     Number(Deno.env.get("REC_EXPLORATION") ?? 0.10),
 };
 
 /**
@@ -125,12 +131,29 @@ function scoreCandidate(
   }
 
   score += push("trending", s.trendingIds.has(candidate.video_id) ? 1 : 0, W.trending,
-    "recent global engagement");
+    "recent global engagement (14d)");
+
+  // Native Heartify trending — clicks+converts inside the app in the last 72h.
+  score += push("heartify_trending", s.heartifyTrendingIds.has(candidate.video_id) ? 1 : 0,
+    W.heartifyTrend, "trending inside Heartify (72h)");
+
+  // Hidden Gem — high halal, low exposure. Promoted so famous creators can't monopolize.
+  score += push("hidden_gem", s.hiddenGemIds.has(candidate.video_id) ? 1 : 0,
+    W.hiddenGem, "high-quality creator with limited exposure");
 
   score += push("trusted_channel", candidate.is_trusted_channel ? 1 : 0, W.trusted);
   score += push("high_halal_score", (candidate.halal_score ?? 0) / 100, W.halal);
   score += push("ai_confidence", (candidate.moderation_confidence ?? 0) / 100, W.aiConfidence);
   score += push("freshness", freshnessScore(candidate.published_at), W.freshness);
+
+  // Anti-repeat cooldown: subtract per prior impression in last 24h.
+  const shownCount = s.recentImpressionCounts.get(candidate.video_id) ?? 0;
+  if (shownCount > 0) {
+    const penalty = W.repeatPenalty * Math.min(shownCount, 4);
+    reasons.push({ code: "recently_shown_penalty", weight: -penalty, detail: `shown ${shownCount}× in last 24h` });
+    components["recently_shown_penalty"] = shownCount;
+    score -= penalty;
+  }
 
   if (candidate.channel_title && s.sessionChannelIds.has(candidate.channel_title)) {
     score += push("session_continuity", 1, W.session, "continues current session");
@@ -223,6 +246,15 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
     const scored: Recommendation[] = [];
     for (const c of candidates) {
       if (excludeWatched && signals.watchedVideoIds.has(c.video_id)) continue;
+      // Hard filter: "Not Interested" / user-hidden — never resurface.
+      if (signals.dismissedVideoIds.has(c.video_id)) continue;
+      // Hard filter: globally blocked creators.
+      if (c.channel_title && signals.blockedChannelPatterns.length) {
+        const ch = c.channel_title.toLowerCase();
+        if (signals.blockedChannelPatterns.some((p) => ch.includes(p))) continue;
+      }
+      // Anti-repeat hard cutoff: shown 4+ times in last 24h → drop entirely.
+      if ((signals.recentImpressionCounts.get(c.video_id) ?? 0) >= 4) continue;
       if (opts.categoryFilter && c.category !== opts.categoryFilter) continue;
       const { score, reasons, components } = scoreCandidate(c, signals);
       if (score <= 0) continue;

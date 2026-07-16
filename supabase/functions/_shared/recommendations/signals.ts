@@ -61,6 +61,11 @@ export async function gatherSignals(
     channelAffinity: new Map(),
     sessionChannelIds: new Set(),
     trendingIds: new Set(),
+    heartifyTrendingIds: new Set(),
+    hiddenGemIds: new Set(),
+    dismissedVideoIds: new Set(),
+    blockedChannelPatterns: [],
+    recentImpressionCounts: new Map(),
     contentLanguages: [],
     diversityLevel: 50,
     context: buildContext(),
@@ -80,6 +85,43 @@ export async function gatherSignals(
         for (const row of (data ?? []) as Array<{ video_id: string }>) {
           signals.trendingIds.add(row.video_id);
         }
+      })
+      .catch(() => {}),
+  );
+
+  // Heartify-native trending (72h, weighted by clicks+converts).
+  jobs.push(
+    admin
+      .rpc("get_heartify_trending_ids", { _limit: 200, _window_hours: 72 })
+      .then(({ data }) => {
+        for (const row of (data ?? []) as Array<{ video_id: string }>) {
+          signals.heartifyTrendingIds.add(row.video_id);
+        }
+      })
+      .catch(() => {}),
+  );
+
+  // Hidden gems — high-halal, low-exposure promotion pool.
+  jobs.push(
+    admin
+      .rpc("get_hidden_gem_ids", { _limit: 120, _max_impressions: 300 })
+      .then(({ data }) => {
+        for (const row of (data ?? []) as Array<{ video_id: string }>) {
+          signals.hiddenGemIds.add(row.video_id);
+        }
+      })
+      .catch(() => {}),
+  );
+
+  // Globally blocked creators — hard filter, all users.
+  jobs.push(
+    admin
+      .from("blocked_creators")
+      .select("pattern")
+      .then(({ data }) => {
+        signals.blockedChannelPatterns = ((data ?? []) as Array<{ pattern: string }>)
+          .map((r) => (r.pattern ?? "").toLowerCase().trim())
+          .filter(Boolean);
       })
       .catch(() => {}),
   );
@@ -199,6 +241,45 @@ export async function gatherSignals(
           }
           if (typeof data.diversity_level === "number") {
             signals.diversityLevel = data.diversity_level;
+          }
+        })
+        .catch(() => {}),
+    );
+
+    // "Not Interested" / hidden — hard-filter memory (persistent).
+    jobs.push(
+      admin
+        .from("user_hidden_videos")
+        .select("video_id")
+        .eq("user_id", userId)
+        .limit(1000)
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<{ video_id: string }>) {
+            signals.dismissedVideoIds.add(row.video_id);
+          }
+        })
+        .catch(() => {}),
+    );
+
+    // Dismissed via recommendation surface (also hard filter).
+    jobs.push(
+      admin
+        .rpc("get_user_dismissed_video_ids", { _user_id: userId, _limit: 500 })
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<{ video_id: string }>) {
+            signals.dismissedVideoIds.add(row.video_id);
+          }
+        })
+        .catch(() => {}),
+    );
+
+    // Anti-repeat memory — how many times each video was shown in last 24h.
+    jobs.push(
+      admin
+        .rpc("get_recent_impression_ids", { _user_id: userId, _hours: 24, _limit: 400 })
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<{ video_id: string; shown_count: number }>) {
+            signals.recentImpressionCounts.set(row.video_id, Number(row.shown_count) || 1);
           }
         })
         .catch(() => {}),
