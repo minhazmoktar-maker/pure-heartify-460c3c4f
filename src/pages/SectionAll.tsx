@@ -60,7 +60,8 @@ const SectionAll = () => {
             <InfiniteVideoGrid sort="recent" limit={40} />
           </Suspense>
         </div>
-      </div>
+        </div>
+      </PullToRefresh>
     );
   }
 
