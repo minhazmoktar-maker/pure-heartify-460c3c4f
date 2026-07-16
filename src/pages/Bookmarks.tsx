@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const STORAGE_KEY = "heartify.bookmarks.v1";
 
