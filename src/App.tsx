@@ -25,7 +25,7 @@ import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
 import AgeGate from "./components/AgeGate";
 import CookieConsent from "./components/CookieConsent";
-import CommandPalette from "./components/CommandPalette";
+const CommandPalette = lazy(() => import("./components/CommandPalette"));
 import BottomTabBar from "./components/BottomTabBar";
 import EdgeSwipeBack from "./components/EdgeSwipeBack";
 import KeyboardFocusScroller from "./components/KeyboardFocusScroller";
