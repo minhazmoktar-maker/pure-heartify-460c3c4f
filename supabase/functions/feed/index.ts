@@ -62,6 +62,11 @@ Deno.serve(async (req) => {
     const sectionId = body?.section_id as string | undefined;
     const cursor = body?.cursor as string | undefined; // ISO timestamp of last item's ingested_at
     const limit = Math.min(Math.max(body?.limit ?? 20, 1), 100);
+    // Sort mode: 'fresh' (default) | 'trending' (view_count desc) | 'recent' (ingested_at desc)
+    const sort = (["fresh", "trending", "recent"] as const).includes(body?.sort as any)
+      ? (body.sort as "fresh" | "trending" | "recent") : "fresh";
+    // Max videos per channel per page — creator diversity guard.
+    const maxPerChannel = Math.min(Math.max(Number(body?.max_per_channel ?? 3), 1), 10);
     // Locale-aware filtering: soft filter to caller's content languages.
     // Sanitized to 2-3 char ISO codes to prevent injection.
     const rawLangs = Array.isArray(body?.content_languages) ? body.content_languages : [];
