@@ -9,14 +9,15 @@ on:
     branches: [main]
 
 jobs:
-  report:
+  enforce:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      # Baseline / report mode during Phase 1 rollout. Flip to enforce
-      # (drop --report) once Phase 2 migrates product surfaces to tokens.
-      - name: design-lint (report)
-        run: node scripts/design-lint.mjs --report
+      # Phase 4 flipped this to enforce mode. All violations fail the build.
+      # Legitimate exceptions use `// design-lint-disable` (line) or
+      # `// design-lint-disable-file` (file header).
+      - name: design-lint (enforce)
+        run: node scripts/design-lint.mjs
