@@ -181,8 +181,16 @@ export async function gatherSignals(
             signals.favoriteVideoIds.add(row.video_id);
             const days = Math.max(0, (nowMs - new Date(row.created_at).getTime()) / 86400000);
             const w = decayWeight(days) * 2;
-            if (row.category) signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
-            if (row.channel_title) signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
+            const wLong = decayWeight(days, LONG_TERM_HALF_LIFE_DAYS) * 2;
+            if (row.category) {
+              signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
+              signals.longTermCategoryAffinity.set(row.category, (signals.longTermCategoryAffinity.get(row.category) ?? 0) + wLong);
+            }
+            if (row.channel_title) {
+              signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
+              signals.longTermChannelAffinity.set(row.channel_title, (signals.longTermChannelAffinity.get(row.channel_title) ?? 0) + wLong);
+              signals.seenChannelIds.add(row.channel_title);
+            }
           }
         })
         .catch(() => {}),
