@@ -139,3 +139,67 @@ training and online bandit updates.
 - `recommendation_events` is RLS-scoped: users see only their own, admins see all.
 - No raw user data leaves the edge function; only aggregated `signalsSummary` is returned to the client.
 - All moderation gates (`moderation_state IN ('approved','auto_approved')`) apply to the candidate pool.
+
+## v2 — Per-user personalization (halal-first invariant preserved)
+
+Problem: two viewers with different tastes were seeing nearly identical
+Home feeds. Root cause: `/feed` was a global freshness sort with only a
+±3-position jitter, and the hybrid ranker applied identical weights to
+every user with a ±5–18% score jitter as its only personalization.
+
+Changes (all edits are additive; no signal was weakened, no moderation
+gate was bypassed):
+
+1. **`_shared/recommendations/types.ts`** — new signal fields:
+   `longTermCategoryAffinity`, `longTermChannelAffinity`,
+   `sessionCategoryIds`, `seenChannelIds`, `skippedVideoIds`,
+   `recentChannelImpressionCounts`; new reason codes
+   `long_term_taste`, `novelty_new_channel`, `recently_skipped_penalty`,
+   `channel_overexposure_penalty`, `exploration_epsilon`.
+2. **`_shared/recommendations/signals.ts`** — dual-decay affinity
+   (14-day short-term + 180-day long-term), session category tracking,
+   `seenChannelIds` for novelty, `skippedVideoIds` derived from
+   impression-without-engagement in the last 14 days.
+3. **`_shared/recommendations/hybridRules.ts` (v1 → v2):**
+   - Per-user stable weight perturbation: every viewer optimizes a
+     bounded-range multiplier (±25%) on each signal weight, seeded by
+     user id + weekly bucket. Halal / trust / AI-confidence weights
+     have a higher floor (85%) so the halal-first ranking cannot be
+     undermined by personalization.
+   - Per-user pool partitioning: trending (55% keep) and hidden-gem
+     (45% keep) pools are hash-partitioned against the user seed, so
+     two viewers see different subsets of the same global pool. Only
+     applied to items with no personal affinity — items in the user's
+     history are always eligible.
+   - Epsilon-greedy exploration: user-specific ε (5–30%, higher for
+     cold-start / high-diversity-preference users) injects a small
+     bounded bonus into hidden-gem or novel-trusted-channel items.
+   - New scoring components: `long_term_taste` (persistent interest),
+     `novelty_new_channel` (only for trusted channels), skip penalty,
+     channel-overexposure penalty.
+4. **`feed/index.ts`** — replaced the previous ±3-position jitter with a
+   real signal-based re-ranker for signed-in users. The re-ranker is
+   timeboxed (≤900ms) with a clean fallback to fresh order on error, and
+   only *reorders* moderation-approved items already in the fetched
+   page — no new videos are introduced. Anonymous callers keep the
+   per-device seeded shuffle.
+
+Halal-first invariants (still enforced):
+
+- Dismissed / user-hidden IDs → hard filter (unchanged).
+- Globally blocked creators → hard filter (unchanged).
+- Only moderation-approved rows (`approved` / `auto_approved`) enter
+  the candidate pool (unchanged).
+- Halal/trust/AI-confidence weight floor of 85% guarantees a
+  trusted+high-halal item always outranks an untrusted low-halal item
+  regardless of user seed.
+
+Verification:
+- `deno check` — no new errors introduced (pre-existing `.catch`
+  typing warnings on Supabase builders remain; runtime is unaffected).
+- Frontend `tsgo --noEmit` clean.
+- Before/after: two users with identical fresh pages previously saw the
+  same 20 items in nearly the same order; they now share the freshness
+  anchor but diverge in the top-N by weight vector + affinity signals +
+  per-user pool partitioning + exploration ε. Divergence rate is
+  seeded and stable, so pagination remains consistent.
