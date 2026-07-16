@@ -343,6 +343,15 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
     const weekBucket = Math.floor(Date.now() / (7 * 86400000)).toString(36);
     const userSeed = `${identity}:${weekBucket}`;
 
+    // Daily freshness salt — rotates every UTC day so ordering shifts each
+    // morning without disturbing the underlying weight vector (which stays
+    // on the weekly seed to avoid daily churn erasing short-term learning).
+    // Applied only to jitter + pool partitioning: what changes day-to-day is
+    // which slice of the trending/hidden-gem pools you see and how ties break,
+    // never the halal-first ranking floor.
+    const dayBucket = Math.floor(Date.now() / 86400000).toString(36);
+    const dailySeed = `${identity}:${dayBucket}`;
+
     // Personalized weight vector — two users literally optimize different
     // linear combinations of the same signals. Halal/trust weights have a
     // higher floor (see perturbWeights) so the halal-first invariant holds.
@@ -366,27 +375,26 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
       Math.max(0.05, W.exploration + (1 - signalStrength) * 0.15 + diversityPref * 0.05),
     );
 
-    // Per-user pool partitioning. Global trending/hidden-gem pools are the
-    // main reason two viewers with identical taste see identical feeds. We
-    // bucket each pool id against the user seed and, for the top slot in
-    // each pool, drop the tail of items whose bucket doesn't match. This
-    // is deterministic per user + per week so pagination stays stable, and
-    // strictly a *subset* operation — never adds unmoderated content.
+    // Per-user pool partitioning — now salted daily so the specific ~55% of
+    // trending / ~45% of hidden-gem items a user sees rotates each day.
+    // Pagination within a session is still stable because the salt is fixed
+    // for the whole render call.
     const inUserPartition = (videoId: string, keepFraction: number): boolean => {
       if (keepFraction >= 1) return true;
-      const r = hash01(`${userSeed}:part:${videoId}`);
+      const r = hash01(`${dailySeed}:part:${videoId}`);
       return r < keepFraction;
     };
     const trendingKeep = 0.55;         // each user sees ~55% of the trending pool
     const hiddenGemKeep = 0.45;        // deeper divergence on discovery pool
 
-    // Adaptive per-user score jitter. Ranking stays halal-first — even the
-    // maximum jitter cannot overturn a trusted+high-halal candidate against
-    // an untrusted low-halal one, because the halal/trusted contributions
+    // Adaptive per-user score jitter, salted daily so tie-break ordering
+    // refreshes every morning. Amplitude is bounded — even the maximum
+    // jitter cannot overturn a trusted+high-halal candidate against an
+    // untrusted low-halal one, because the halal/trusted contributions
     // already sit at the top of the weight vector.
     const jitterAmp = 0.05 + (1 - signalStrength) * 0.13;
     const jitter = (videoId: string): number => {
-      const r = hash01(`${userSeed}:j:${videoId}`);
+      const r = hash01(`${dailySeed}:j:${videoId}`);
       return (r - 0.5) * 2 * jitterAmp;
     };
 
@@ -426,7 +434,7 @@ export class HybridRulesRecommendationProvider implements RecommendationProvider
         signals.hiddenGemIds.has(c.video_id) ||
         (c.channel_title && !signals.seenChannelIds.has(c.channel_title) && c.is_trusted_channel === true);
       if (isExplorable) {
-        const r = hash01(`${userSeed}:eps:${c.video_id}`);
+        const r = hash01(`${dailySeed}:eps:${c.video_id}`);
         if (r < epsilon) {
           explorationBonus = 0.08 + r * 0.05;
           reasons.push({ code: "exploration_epsilon", weight: explorationBonus, detail: `ε=${epsilon.toFixed(2)}` });
