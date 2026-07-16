@@ -65,6 +65,18 @@ const Seerah = () => {
         title="Seerah Timeline — Life of the Prophet ﷺ | Heartify"
         description="Interactive timeline of the life of Prophet Muhammad ﷺ, from birth in Makkah through the Farewell Ḥajj — with progress tracking and bookmarks."
         path="/seerah"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Seerah Timeline",
+          numberOfItems: SEERAH_EVENTS.length,
+          itemListElement: SEERAH_EVENTS.map((e, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: e.title,
+            description: e.summary,
+          })),
+        }}
       />
       <Navbar />
 

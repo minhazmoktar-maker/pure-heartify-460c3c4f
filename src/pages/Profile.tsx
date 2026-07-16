@@ -235,7 +235,7 @@ const Profile = () => {
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-pill bg-primary text-title font-bold text-primary-foreground">
                 {avatarUrl ? (
-                  <img src={avatarUrl} className="h-full w-full rounded-pill object-cover" alt="avatar" />
+                  <img src={avatarUrl} className="h-full w-full rounded-pill object-cover" alt={displayName ? `${displayName}'s profile photo` : "User profile photo"} />
                 ) : (
                   displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"
                 )}

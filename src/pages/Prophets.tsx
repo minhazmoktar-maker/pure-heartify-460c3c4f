@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -86,14 +86,24 @@ const Prophets = () => {
 
   return (
     <div className="min-h-dvh bg-background pb-24">
-      <Helmet>
-        <title>Stories of the Prophets — Qisas al-Anbiya | Heartify</title>
-        <meta
-          name="description"
-          content="Read concise, Qur'an-based biographies of the 25 prophets named in the Qur'an, with lessons and references."
-        />
-        <link rel="canonical" href="https://pure-heartify.lovable.app/prophets" />
-      </Helmet>
+      <SEO
+        title="Stories of the Prophets — Qisas al-Anbiya | Heartify"
+        description="Read concise, Qur'an-based biographies of the 25 prophets named in the Qur'an, with lessons, themes, and primary references."
+        path="/prophets"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Stories of the Prophets",
+          itemListOrder: "https://schema.org/ItemListOrderAscending",
+          numberOfItems: PROPHETS.length,
+          itemListElement: PROPHETS.map((p, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: p.name,
+            description: p.summary,
+          })),
+        }}
+      />
 
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <SectionHeader

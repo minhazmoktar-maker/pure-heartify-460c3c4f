@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -172,14 +172,11 @@ const Ruqya = () => {
 
   return (
     <div className="min-h-dvh bg-background pb-24">
-      <Helmet>
-        <title>Ruqya Guide — Sunnah Spiritual Healing | Heartify</title>
-        <meta
-          name="description"
-          content="Perform Ruqya with authentic Qur'anic verses and prophetic du'as for protection, healing, anxiety, and restful sleep."
-        />
-        <link rel="canonical" href="https://pure-heartify.lovable.app/ruqya" />
-      </Helmet>
+      <SEO
+        title="Ruqya Guide — Sunnah Spiritual Healing | Heartify"
+        description="Perform Ruqya with authentic Qur'anic verses and prophetic du'as for protection, healing, anxiety, and restful sleep."
+        path="/ruqya"
+      />
 
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
         <div className="mb-6 flex items-start justify-between gap-4">

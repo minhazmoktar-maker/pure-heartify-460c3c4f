@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import SEO from "@/components/SEO";
 import { Compass, MapPin, Navigation2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -89,10 +89,11 @@ export default function Qibla() {
 
   return (
     <div className="min-h-dvh bg-background">
-      <Helmet>
-        <title>Qibla Compass — Heartify</title>
-        <meta name="description" content="Find the direction of the Kaaba from your location with a live compass." />
-      </Helmet>
+      <SEO
+        title="Qibla Compass — Direction to the Kaaba | Heartify"
+        description="Find the exact great-circle direction of the Kaaba in Makkah from your location with a live, sensor-based compass."
+        path="/qibla"
+      />
       <Navbar />
       <main className="container mx-auto max-w-3xl px-4 pb-24 pt-24">
         <header className="mb-6">
