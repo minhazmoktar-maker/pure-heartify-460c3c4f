@@ -33,7 +33,12 @@ const SectionAll = () => {
   // caching, and the personalization/dismissal/blocked-creator pipeline.
   if (sectionId === "recently-added") {
     return (
-      <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
+      <PullToRefresh
+        onRefresh={onRefresh}
+        refreshKey={ptrKey}
+        refreshingLabel="Refreshing Recently Added…"
+        disabled={typeof navigator !== "undefined" && !navigator.onLine}
+      >
       <div className="min-h-dvh bg-background pb-12">
         <SEO
           title="Recently Added — Heartify"
