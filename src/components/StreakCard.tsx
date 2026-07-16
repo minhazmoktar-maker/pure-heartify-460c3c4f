@@ -5,25 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useStreak } from "@/hooks/useStreak";
+import { useMyHandle } from "@/hooks/useMyHandle";
 import { shareContent } from "@/lib/share";
-import { supabase } from "@/integrations/supabase/client";
 
 export function StreakCard() {
   const s = useStreak();
-  const [handle, setHandle] = useState<string | null>(null);
+  const { handle } = useMyHandle();
   const [celebrate, setCelebrate] = useState(false);
   const MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user || !mounted) return;
-      const { data } = await supabase.from("profiles").select("handle").eq("id", user.id).maybeSingle();
-      if (mounted && data?.handle) setHandle(data.handle);
-    })();
-    return () => { mounted = false; };
-  }, []);
 
   // One-shot celebration when the current streak lands on a milestone day.
   // Persists a "seen" marker per (user × milestone) so returning users don't
