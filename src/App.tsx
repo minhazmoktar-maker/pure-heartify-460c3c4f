@@ -31,6 +31,7 @@ import EdgeSwipeBack from "./components/EdgeSwipeBack";
 import KeyboardFocusScroller from "./components/KeyboardFocusScroller";
 import ScrollRestoration from "./components/ScrollRestoration";
 import SkipLink from "./components/SkipLink";
+import OfflineBanner from "./components/OfflineBanner";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
@@ -238,9 +239,15 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       refetchOnReconnect: "always",
+      // Serve cached data even when offline so feeds/bookmarks don't
+      // collapse to spinners on flaky mobile networks.
+      networkMode: "offlineFirst",
     },
     mutations: {
       retry: 0,
+      // Queue mutations issued while offline; they fire once the network
+      // returns rather than failing immediately.
+      networkMode: "offlineFirst",
     },
   },
 });
