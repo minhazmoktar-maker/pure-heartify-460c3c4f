@@ -98,6 +98,7 @@ const SectionAll = () => {
 
 
   return (
+    <PullToRefresh onRefresh={onRefresh} disabled={typeof navigator !== "undefined" && !navigator.onLine}>
     <div className="min-h-dvh bg-background pb-12">
       <SEO title="Browse Section — Heartify" description="Explore curated halal videos and audio across every section on Heartify." path="/section" />
       <Navbar />
