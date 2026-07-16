@@ -11,9 +11,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import Index from "./pages/Index.tsx";
-import Login from "./pages/Login.tsx";
-import Signup from "./pages/Signup.tsx";
-import NotFound from "./pages/NotFound.tsx";
+const Login = lazy(() => import("./pages/Login.tsx"));
+const Signup = lazy(() => import("./pages/Signup.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
 import { MobileBridge } from "./components/MobileBridge";
 import ReferralBridge from "./components/ReferralBridge";
@@ -25,7 +25,7 @@ import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
 import AgeGate from "./components/AgeGate";
 import CookieConsent from "./components/CookieConsent";
-import CommandPalette from "./components/CommandPalette";
+const CommandPalette = lazy(() => import("./components/CommandPalette"));
 import BottomTabBar from "./components/BottomTabBar";
 import EdgeSwipeBack from "./components/EdgeSwipeBack";
 import KeyboardFocusScroller from "./components/KeyboardFocusScroller";
@@ -283,7 +283,7 @@ const App = () => (
             <BackToTop />
             <AgeGate />
             <CookieConsent />
-            <CommandPalette />
+            <Suspense fallback={null}><CommandPalette /></Suspense>
             <BottomTabBar />
             <EdgeSwipeBack />
             <KeyboardFocusScroller />
