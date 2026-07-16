@@ -56,6 +56,7 @@ const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
 const AdminModeration = lazy(() => import("./pages/AdminModeration.tsx"));
 const AdminSLA = lazy(() => import("./pages/AdminSLA.tsx"));
 const AdminDiscovery = lazy(() => import("./pages/AdminDiscovery.tsx"));
+const AdminOps = lazy(() => import("./pages/AdminOps.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
