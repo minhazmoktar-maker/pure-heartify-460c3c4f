@@ -89,6 +89,43 @@ export async function gatherSignals(
       .catch(() => {}),
   );
 
+  // Heartify-native trending (72h, weighted by clicks+converts).
+  jobs.push(
+    admin
+      .rpc("get_heartify_trending_ids", { _limit: 200, _window_hours: 72 })
+      .then(({ data }) => {
+        for (const row of (data ?? []) as Array<{ video_id: string }>) {
+          signals.heartifyTrendingIds.add(row.video_id);
+        }
+      })
+      .catch(() => {}),
+  );
+
+  // Hidden gems — high-halal, low-exposure promotion pool.
+  jobs.push(
+    admin
+      .rpc("get_hidden_gem_ids", { _limit: 120, _max_impressions: 300 })
+      .then(({ data }) => {
+        for (const row of (data ?? []) as Array<{ video_id: string }>) {
+          signals.hiddenGemIds.add(row.video_id);
+        }
+      })
+      .catch(() => {}),
+  );
+
+  // Globally blocked creators — hard filter, all users.
+  jobs.push(
+    admin
+      .from("blocked_creators")
+      .select("pattern")
+      .then(({ data }) => {
+        signals.blockedChannelPatterns = ((data ?? []) as Array<{ pattern: string }>)
+          .map((r) => (r.pattern ?? "").toLowerCase().trim())
+          .filter(Boolean);
+      })
+      .catch(() => {}),
+  );
+
   if (userId) {
     // Interests + favorite categories.
     jobs.push(
