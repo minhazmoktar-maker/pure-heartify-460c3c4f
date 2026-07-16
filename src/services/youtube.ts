@@ -325,9 +325,12 @@ export async function fetchHalalVideos(query?: string, maxResults = 20): Promise
 
     return approved;
   } catch (error) {
-    console.warn("Falling back from live YouTube data:", error);
+    // Silently fall back — this happens on rate limits / quota exhaustion
+    // and the UX degrades gracefully to cached/seeded content.
+    if (import.meta.env.DEV) console.debug("YouTube fallback:", error);
     return readCachedVideos(cacheKey, STALE_QUERY_CACHE_TTL_MS) ?? searchFallbackVideos(q, normalizedMax);
   }
+
 }
 
 export async function fetchMultiQueryVideos(maxTotal = 24): Promise<YouTubeVideo[]> {
