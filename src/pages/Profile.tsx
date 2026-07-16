@@ -9,6 +9,7 @@ import HandleClaimCard from "@/components/HandleClaimCard";
 import LanguageSettings from "@/components/LanguageSettings";
 import AppIconPicker from "@/components/AppIconPicker";
 import ThemeModeSetting from "@/components/ThemeModeSetting";
+import UpgradeCTA from "@/components/UpgradeCTA";
 import SoundSetting from "@/components/SoundSetting";
 import MfaStatusCard from "@/components/MfaStatusCard";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
@@ -262,6 +263,10 @@ const Profile = () => {
               {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Save Changes
             </Button>
+
+            <div className="pt-4 sm:hidden">
+              <UpgradeCTA />
+            </div>
 
             <div className="pt-4">
               <WeeklyRecapCard />

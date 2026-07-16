@@ -95,12 +95,12 @@ const TrackRow = ({ track, index, queue, showAlbum = false }: TrackRowProps) => 
       <button
         onClick={(e) => { e.stopPropagation(); if (!disabled) addToQueue(track); }}
         aria-label="Add to queue"
-        className="hidden text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground md:inline-flex"
+        className="inline-flex text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
       >
         <Plus className="h-3.5 w-3.5" />
       </button>
       <span
-        className="hidden opacity-0 transition-opacity group-hover:opacity-100 md:inline-flex"
+        className="inline-flex opacity-0 transition-opacity group-hover:opacity-100"
         onClick={(e) => e.stopPropagation()}
       >
         <ReportAudioDialog track={track} compact />
