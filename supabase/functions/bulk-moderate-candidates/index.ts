@@ -9,29 +9,13 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 type Action = "approve" | "reject" | "escalate" | "revert";
 const MAX = 500;
 
-async function upsertLearning(admin: any, featureType: string, featureValue: string, action: Action) {
+async function upsertLearning(admin: any, actor: string, featureType: string, featureValue: string, action: Action) {
   if (!featureValue) return;
-  const { data: row } = await admin
-    .from("moderation_learned_signals")
-    .select("id, approvals, rejections, reverts, version")
-    .eq("feature_type", featureType).eq("feature_value", featureValue).maybeSingle();
-  const approvals = (row?.approvals ?? 0) + (action === "approve" ? 1 : 0);
-  const rejections = (row?.rejections ?? 0) + (action === "reject" ? 1 : 0);
-  const reverts = (row?.reverts ?? 0) + (action === "revert" ? 1 : 0);
-  const total = approvals + rejections + reverts;
-  // Bounded weight in [-0.25, 0.25]. Reverts pull toward reject.
-  const raw = total === 0 ? 0 : (approvals - rejections - reverts) / total;
-  const weight = Math.max(-0.25, Math.min(0.25, raw * 0.25));
-  if (row?.id) {
-    await admin.from("moderation_learned_signals").update({
-      approvals, rejections, reverts, weight, version: (row.version ?? 1) + 1,
-    }).eq("id", row.id);
-  } else {
-    await admin.from("moderation_learned_signals").insert({
-      feature_type: featureType, feature_value: featureValue,
-      approvals, rejections, reverts, weight,
-    });
-  }
+  // Uses SECURITY DEFINER RPC which stamps `app.actor` so the guard trigger
+  // on moderation_learned_signals allows the write. Human decisions only.
+  await admin.rpc("record_learned_signal", {
+    _actor: actor, _feature_type: featureType, _feature_value: featureValue, _action: action,
+  });
 }
 
 Deno.serve(async (req) => {
@@ -68,12 +52,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    let query = admin.from("channel_candidates").select("id, youtube_channel_id, title, handle, category, status, tier, language_detected, cluster_id, confidence");
+    const force: boolean = body.force === true;
+
+    let query = admin.from("channel_candidates").select("id, youtube_channel_id, title, handle, category, status, tier, language_detected, cluster_id, confidence, clean_samples, failed_samples, required_samples");
     query = clusterId ? query.eq("cluster_id", clusterId).limit(MAX) : query.in("id", ids);
     const { data: rows } = await query;
     const candidates = rows ?? [];
 
     let approved = 0, rejected = 0, escalated = 0, reverted = 0, skipped = 0;
+    const skippedDetail: Array<{ id: string; reason: string }> = [];
 
     for (const c of candidates) {
       let newStatus: string | null = null;
@@ -82,12 +69,27 @@ Deno.serve(async (req) => {
       else if (action === "escalate") newStatus = "pending";
       else if (action === "revert") newStatus = "pending";
 
-      // Guard: never approve if there's an active hard block on the candidate row.
-      if (action === "approve" && c.tier === "D") { skipped++; continue; }
+      // Safety invariant: never approve a Tier D row.
+      if (action === "approve" && c.tier === "D") {
+        skipped++; skippedDetail.push({ id: c.id, reason: "tier_D_blocked" }); continue;
+      }
+      // Safety invariant: Tier S / A rows must clear the video sampling pipeline
+      // before a human can approve them, unless the admin explicitly forces it.
+      if (action === "approve" && (c.tier === "S" || c.tier === "A") && !force) {
+        const need = c.required_samples ?? 15;
+        const clean = c.clean_samples ?? 0;
+        const failed = c.failed_samples ?? 0;
+        if (failed > 0 || clean < need) {
+          skipped++;
+          skippedDetail.push({ id: c.id, reason: `sampling_incomplete:${clean}/${need}${failed ? `,failed:${failed}` : ""}` });
+          continue;
+        }
+      }
 
       await admin.from("channel_candidates").update({
         status: newStatus,
         auto_action: action === "escalate" ? "queued_full" : action === "revert" ? "queued_fast" : undefined,
+        promoted_at: action === "approve" ? new Date().toISOString() : undefined,
       }).eq("id", c.id);
 
       if (action === "approve") {
@@ -100,7 +102,6 @@ Deno.serve(async (req) => {
         }, { onConflict: "youtube_channel_id" });
       }
       if (action === "revert") {
-        // pull back from approved_channels if present
         await admin.from("approved_channels").delete().eq("youtube_channel_id", c.youtube_channel_id);
       }
 
@@ -111,10 +112,10 @@ Deno.serve(async (req) => {
         previous_status: c.status, new_status: newStatus, reversible: true,
       });
 
-      // Feed active learning (skip escalate — no signal)
+      // Active learning — human-only (RPC enforces actor).
       if (action !== "escalate") {
-        await upsertLearning(admin, "language", c.language_detected ?? "und", action);
-        await upsertLearning(admin, "topic", c.category ?? "unknown", action);
+        await upsertLearning(admin, user.id, "language", c.language_detected ?? "und", action);
+        await upsertLearning(admin, user.id, "topic", c.category ?? "unknown", action);
       }
 
       if (action === "approve") approved++;
