@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({
       ok: true, action, total: candidates.length,
-      approved, rejected, escalated, reverted, skipped,
+      approved, rejected, escalated, reverted, skipped, skippedDetail,
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("bulk-moderate-candidates error", e);
