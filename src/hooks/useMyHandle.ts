@@ -20,7 +20,7 @@ export function useMyHandle() {
       const { data } = await supabase
         .from("profiles")
         .select("handle")
-        .eq("id", user.id)
+        .eq("user_id", user.id)
         .maybeSingle();
       return (data?.handle as string | null) ?? null;
     },
