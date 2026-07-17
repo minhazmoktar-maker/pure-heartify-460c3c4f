@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { useRole } from "@/hooks/useRole";
-import { Loader2, PlayCircle, ShieldCheck, ShieldAlert, ExternalLink, Sparkles, Layers } from "lucide-react";
+import { Loader2, PlayCircle, ShieldCheck, ShieldAlert, ExternalLink, Sparkles, Layers, Wand2, Trash2 } from "lucide-react";
 
 type Tier = "S" | "A" | "B" | "C" | "D";
 
@@ -74,6 +74,7 @@ const AdminChannelPipeline = () => {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [classifying, setClassifying] = useState(false);
+  const [resolving, setResolving] = useState(false);
   const [samplingId, setSamplingId] = useState<string | null>(null);
 
   const load = async () => {
@@ -158,6 +159,21 @@ const AdminChannelPipeline = () => {
     await load();
   };
 
+  const runResolver = async () => {
+    setResolving(true);
+    const { data, error } = await supabase.functions.invoke("resolve-channel-handles", {
+      body: { limit: 100, classify: true },
+    });
+    setResolving(false);
+    if (error) {
+      toast({ title: "Resolver failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    const s = (data as any)?.stats ?? {};
+    toast({ title: "Handles resolved", description: `resolved ${s.resolved ?? 0} · duplicates ${s.duplicates ?? 0} · not_found ${s.not_found ?? 0}` });
+    await load();
+  };
+
   const counts = useMemo(() => ({
     selected: selected.size,
     total: rows.length,
@@ -176,7 +192,11 @@ const AdminChannelPipeline = () => {
             <h1 className="text-2xl font-semibold">Channel moderation pipeline</h1>
             <p className="text-sm text-muted-foreground">Tiered review · halal-first · every decision reversible.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button variant="secondary" size="sm" onClick={runResolver} disabled={resolving}>
+              {resolving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              <span className="ml-1">Resolve handles</span>
+            </Button>
             <Button variant="outline" size="sm" onClick={() => runClassifier(true)} disabled={classifying}>
               {classifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               <span className="ml-1">Dry-run classify</span>
@@ -184,6 +204,7 @@ const AdminChannelPipeline = () => {
             <Button size="sm" onClick={() => runClassifier(false)} disabled={classifying}>
               <PlayCircle className="h-4 w-4" /><span className="ml-1">Classify & auto-act</span>
             </Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/admin/approved-channels">Approved →</Link></Button>
             <Button asChild variant="ghost" size="sm"><Link to="/admin/discovery">Discovery →</Link></Button>
           </div>
         </header>
