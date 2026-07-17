@@ -239,9 +239,23 @@ Deno.serve(async (req) => {
       related: related ?? [],
       provider: provider.name,
       viewer: { isPremium: viewerIsPremium },
+      degraded: providerDegraded,
+      fallback: providerDegraded && filteredHits.length === 0,
     });
   } catch (e) {
-    return json({ error: (e as Error).message }, 500);
+    console.error("search handler unrecoverable error:", (e as Error).message);
+    // Return 200 with a fallback signal so the client UI never crashes.
+    return json({
+      hits: [],
+      intent: null,
+      trending: [],
+      related: [],
+      provider: "unavailable",
+      viewer: { isPremium: false },
+      degraded: true,
+      fallback: true,
+      error: "SEARCH_SERVICE_UNAVAILABLE",
+    });
   }
 });
 
