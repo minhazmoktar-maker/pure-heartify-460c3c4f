@@ -103,30 +103,41 @@ Deno.serve(async (req) => {
       };
     }
 
-    const hits = await provider.search({
-      q,
-      category,
-      channel,
-      limit,
-      offset,
-      userId,
-      intent,
-    });
+    let hits: Array<Record<string, unknown>> = [];
+    let providerDegraded = false;
+    try {
+      hits = await provider.search({
+        q,
+        category,
+        channel,
+        limit,
+        offset,
+        userId,
+        intent,
+      });
+    } catch (err) {
+      console.error("search provider failed:", (err as Error).message);
+      providerDegraded = true;
+    }
 
     // Semantic recall: blend in vector matches for the query so we surface
     // conceptually-related videos even when keywords do not overlap. Best-effort
     // and additive — never blocks the lexical result.
     let semanticHits: Array<Record<string, unknown>> = [];
     if (useAi && q.length >= 3) {
-      const vec = await embedOne(q);
-      if (vec) {
-        const { data: matches } = await admin.rpc("match_curated_videos", {
-          query_embedding: toPgVector(vec) as unknown as number[],
-          match_count: Math.min(limit, 30),
-          category_filter: category,
-          exclude_premium: false,
-        });
-        semanticHits = (matches ?? []) as Array<Record<string, unknown>>;
+      try {
+        const vec = await embedOne(q);
+        if (vec) {
+          const { data: matches } = await admin.rpc("match_curated_videos", {
+            query_embedding: toPgVector(vec) as unknown as number[],
+            match_count: Math.min(limit, 30),
+            category_filter: category,
+            exclude_premium: false,
+          });
+          semanticHits = (matches ?? []) as Array<Record<string, unknown>>;
+        }
+      } catch (err) {
+        console.error("semantic recall failed:", (err as Error).message);
       }
     }
     const seen = new Set(hits.map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string));
@@ -139,20 +150,29 @@ Deno.serve(async (req) => {
     }
 
     // Server-side premium gate for search results.
-    const viewerIsPremium = await hasActivePremium(userId);
+    let viewerIsPremium = false;
+    try {
+      viewerIsPremium = await hasActivePremium(userId);
+    } catch (err) {
+      console.error("premium check failed:", (err as Error).message);
+    }
     let filteredHits = hits;
     if (!viewerIsPremium && hits.length > 0) {
       const ids = hits.map((h: Record<string, unknown>) => h.video_id ?? h.id).filter(Boolean);
       if (ids.length > 0) {
-        const { data: premiumRows } = await admin
-          .from("curated_videos")
-          .select("video_id")
-          .in("video_id", ids as string[])
-          .eq("is_premium_only", true);
-        const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
-        filteredHits = hits.filter((h: Record<string, unknown>) =>
-          !premiumSet.has((h.video_id ?? h.id) as string),
-        );
+        try {
+          const { data: premiumRows } = await admin
+            .from("curated_videos")
+            .select("video_id")
+            .in("video_id", ids as string[])
+            .eq("is_premium_only", true);
+          const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
+          filteredHits = hits.filter((h: Record<string, unknown>) =>
+            !premiumSet.has((h.video_id ?? h.id) as string),
+          );
+        } catch (err) {
+          console.error("premium filter failed:", (err as Error).message);
+        }
       }
     }
 
@@ -161,35 +181,41 @@ Deno.serve(async (req) => {
     // are treated as neutral to avoid starving markets whose catalog isn't
     // fully tagged yet. If lookup fails we silently keep lexical order.
     if (contentLanguages.length && filteredHits.length > 0) {
-      const ids = filteredHits
-        .map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string)
-        .filter(Boolean);
-      const { data: langRows } = await admin
-        .from("curated_videos")
-        .select("video_id, content_language")
-        .in("video_id", ids);
-      const langById = new Map(
-        (langRows ?? []).map((r) => [r.video_id as string, (r.content_language as string | null)?.toLowerCase() ?? null]),
-      );
-      const langSet = new Set(contentLanguages);
-      const matches: typeof filteredHits = [];
-      const untagged: typeof filteredHits = [];
-      const others: typeof filteredHits = [];
-      for (const h of filteredHits) {
-        const id = (h.video_id ?? h.id) as string;
-        const cl = langById.get(id) ?? null;
-        if (!cl) untagged.push(h);
-        else if (langSet.has(cl)) matches.push(h);
-        else others.push(h);
+      try {
+        const ids = filteredHits
+          .map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string)
+          .filter(Boolean);
+        const { data: langRows } = await admin
+          .from("curated_videos")
+          .select("video_id, content_language")
+          .in("video_id", ids);
+        const langById = new Map(
+          (langRows ?? []).map((r) => [r.video_id as string, (r.content_language as string | null)?.toLowerCase() ?? null]),
+        );
+        const langSet = new Set(contentLanguages);
+        const matches: typeof filteredHits = [];
+        const untagged: typeof filteredHits = [];
+        const others: typeof filteredHits = [];
+        for (const h of filteredHits) {
+          const id = (h.video_id ?? h.id) as string;
+          const cl = langById.get(id) ?? null;
+          if (!cl) untagged.push(h);
+          else if (langSet.has(cl)) matches.push(h);
+          else others.push(h);
+        }
+        filteredHits = [...matches, ...untagged, ...others];
+      } catch (err) {
+        console.error("locale re-rank failed:", (err as Error).message);
       }
-      filteredHits = [...matches, ...untagged, ...others];
     }
 
-    const [{ data: trending }, { data: related }] = await Promise.all([
-
+    const [trendingRes, relatedRes] = await Promise.allSettled([
       admin.rpc("get_trending_searches", { _limit: 10, _window_hours: 168 }),
       q ? admin.rpc("get_related_searches", { _query: q, _limit: 6 }) : Promise.resolve({ data: [] }),
     ]);
+    const trending = trendingRes.status === "fulfilled" ? trendingRes.value.data : [];
+    const related = relatedRes.status === "fulfilled" ? relatedRes.value.data : [];
+
 
     // Log the search (fire-and-forget).
     if (q) {
