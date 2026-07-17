@@ -165,7 +165,7 @@ Deno.serve(async (req) => {
         _institution_match: !!institution,
         _subs: subs,
       });
-      const tier: "A" | "B" | "C" | "D" = (tierRow as any) ?? "D";
+      const tier: "S" | "A" | "B" | "C" | "D" = (tierRow as any) ?? "D";
       const reasons: string[] = [];
       if (institution) reasons.push(`institution:${institution.name}`);
       if (musicSignal) reasons.push("music_signal");
@@ -176,19 +176,32 @@ Deno.serve(async (req) => {
       const clusterId = await ensureCluster(admin, raw, institution);
       const riskScore = Math.max(0, Math.min(100, 100 - confidence + exclusionHits * 15 + (musicSignal ? 25 : 0) + (femaleSignal ? 25 : 0)));
 
-      let autoAction: "auto_approved" | "queued_fast" | "queued_full" | "auto_rejected" | "quarantined" =
-        tier === "A" ? "auto_approved" : tier === "B" ? "queued_fast" : tier === "C" ? "queued_full" : "auto_rejected";
-      let newStatus = raw.status;
+      // NEW POLICY (safety invariant #1 + #7):
+      //   Tier S/A ─► `pre_approved`; a channel MUST clear the video sampling
+      //               pipeline before it becomes `approved`.
+      //   Tier B/C ─► human queue (fast / full review).
+      //   Tier D   ─► auto_rejected.
+      // We never mirror rows into `approved_channels` from here — that only
+      // happens when the sampling trigger promotes the candidate.
+      const autoAction:
+        "queued_pre_approve" | "queued_fast" | "queued_full" | "auto_rejected" =
+          tier === "S" || tier === "A" ? "queued_pre_approve"
+          : tier === "B" ? "queued_fast"
+          : tier === "C" ? "queued_full"
+          : "auto_rejected";
 
-      if (!dryRun && tier === "A") { newStatus = "approved"; stats.auto_approved++; }
-      if (!dryRun && tier === "D") { newStatus = "rejected"; stats.auto_rejected++; }
+      let newStatus = raw.status;
+      if (!dryRun) {
+        if (tier === "S" || tier === "A") { newStatus = "pre_approved"; stats.auto_approved++; }
+        else if (tier === "D") { newStatus = "rejected"; stats.auto_rejected++; }
+      }
 
       await admin.from("channel_candidates").update({
         tier, tier_reason: reasons, auto_action: autoAction, risk_score: riskScore,
         cluster_id: clusterId, status: newStatus,
+        pre_approved_at: !dryRun && (tier === "S" || tier === "A") ? new Date().toISOString() : null,
       }).eq("id", raw.id);
 
-      // Persist decision
       await admin.from("channel_moderation_decisions").insert({
         candidate_id: raw.id,
         youtube_channel_id: raw.youtube_channel_id,
@@ -199,26 +212,26 @@ Deno.serve(async (req) => {
         previous_status: raw.status, new_status: newStatus, reversible: true,
       });
 
-      // If auto-approved in effective mode, also mirror into approved_channels
-      if (!dryRun && tier === "A" && raw.status !== "approved") {
-        const ownerKeySource = raw.handle ?? raw.title;
-        const { data: ownerKeyRow } = await admin.rpc("compute_owner_key", { _name: ownerKeySource });
-        await admin.from("approved_channels").upsert({
-          youtube_channel_id: raw.youtube_channel_id,
-          title: raw.title, handle: raw.handle, category: raw.category,
-          owner_key: ownerKeyRow ?? "",
-          last_rechecked_at: new Date().toISOString(),
-          consistency_score: confidence,
-        }, { onConflict: "youtube_channel_id" });
+      // Kick off video sampling for pre-approved candidates. Fire-and-forget;
+      // the DB trigger promotes them only after enough clean samples land.
+      if (!dryRun && (tier === "S" || tier === "A")) {
+        fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/sample-channel-videos`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-cron-secret": Deno.env.get("CRON_SECRET") ?? "",
+          },
+          body: JSON.stringify({ candidate_id: raw.id }),
+        }).catch(() => {});
       }
 
-      // Request AI summary async if missing (skip Tier D auto-reject to save cost)
       if (!summary && tier !== "D") {
         stats.summaries_requested++;
-        requestAISummary(raw.id); // fire-and-forget
+        requestAISummary(raw.id);
       }
 
-      if (tier === "A") stats.tierA++;
+      if (tier === "S") (stats as any).tierS = ((stats as any).tierS ?? 0) + 1;
+      else if (tier === "A") stats.tierA++;
       else if (tier === "B") stats.tierB++;
       else if (tier === "C") stats.tierC++;
       else stats.tierD++;

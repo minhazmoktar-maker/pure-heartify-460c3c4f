@@ -12,7 +12,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useRole } from "@/hooks/useRole";
 import { Loader2, PlayCircle, ShieldCheck, ShieldAlert, ExternalLink, Sparkles, Layers } from "lucide-react";
 
-type Tier = "A" | "B" | "C" | "D";
+type Tier = "S" | "A" | "B" | "C" | "D";
 
 type Candidate = {
   id: string;
@@ -33,6 +33,9 @@ type Candidate = {
   moderation_summary: Record<string, unknown> | null;
   auto_action: string | null;
   created_at: string;
+  clean_samples: number | null;
+  failed_samples: number | null;
+  required_samples: number | null;
 };
 
 type Cluster = {
@@ -47,13 +50,15 @@ type Cluster = {
 };
 
 const TIER_LABEL: Record<Tier, string> = {
-  A: "A · Auto-approve",
+  S: "S · Trusted (sampled)",
+  A: "A · Pre-approved (sampling)",
   B: "B · Fast review",
   C: "C · Full review",
   D: "D · Rejected / quarantine",
 };
 
 const TIER_VARIANT: Record<Tier, "default" | "secondary" | "outline" | "destructive"> = {
+  S: "default",
   A: "default",
   B: "secondary",
   C: "outline",
@@ -69,19 +74,25 @@ const AdminChannelPipeline = () => {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [classifying, setClassifying] = useState(false);
+  const [samplingId, setSamplingId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
     setSelected(new Set());
-    const statusFilter = tier === "A" ? "approved" : tier === "D" ? "rejected" : "pending";
-    const { data, error } = await supabase
+    // S / A → pre_approved or sampling (waiting for enough clean samples)
+    //     B / C → pending human queue
+    //     D    → rejected
+    let query = supabase
       .from("channel_candidates")
-      .select("id, youtube_channel_id, title, handle, description, subscriber_count, language_detected, category, status, tier, tier_reason, risk_score, confidence, duplicate_risk, cluster_id, moderation_summary, auto_action, created_at")
+      .select("id, youtube_channel_id, title, handle, description, subscriber_count, language_detected, category, status, tier, tier_reason, risk_score, confidence, duplicate_risk, cluster_id, moderation_summary, auto_action, created_at, clean_samples, failed_samples, required_samples")
       .eq("tier", tier)
-      .eq("status", statusFilter)
       .order("risk_score", { ascending: tier !== "D" })
       .order("created_at", { ascending: false })
       .limit(300);
+    if (tier === "S" || tier === "A") query = query.in("status", ["pre_approved", "sampling", "approved"]);
+    else if (tier === "D") query = query.eq("status", "rejected");
+    else query = query.eq("status", "pending");
+    const { data, error } = await query;
     if (error) toast({ title: "Failed to load", description: error.message, variant: "destructive" });
     setRows((data ?? []) as Candidate[]);
     const { data: cl } = await supabase
@@ -96,6 +107,16 @@ const AdminChannelPipeline = () => {
   useEffect(() => {
     if (!roleLoading && isAdmin) load();
   }, [roleLoading, isAdmin, tier]);
+
+  const runSampling = async (id: string) => {
+    setSamplingId(id);
+    const { data, error } = await supabase.functions.invoke("sample-channel-videos", { body: { candidate_id: id } });
+    setSamplingId(null);
+    if (error) return toast({ title: "Sampling failed", description: error.message, variant: "destructive" });
+    const b = (data as any)?.breakdown ?? {};
+    toast({ title: (data as any)?.violated ? "Sample found a violation" : "Sampling complete", description: `clean ${b.clean ?? 0} · warn ${b.warn ?? 0} · violation ${b.violation ?? 0}` });
+    await load();
+  };
 
   const toggle = (id: string) => setSelected((prev) => {
     const next = new Set(prev);
@@ -168,18 +189,18 @@ const AdminChannelPipeline = () => {
         </header>
 
         <Tabs value={tier} onValueChange={(v) => setTier(v as Tier)}>
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-            {(["A","B","C","D"] as Tier[]).map((t) => (
+          <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+            {(["S","A","B","C","D"] as Tier[]).map((t) => (
               <TabsTrigger key={t} value={t}>{TIER_LABEL[t]}</TabsTrigger>
             ))}
           </TabsList>
 
-          {(["A","B","C","D"] as Tier[]).map((t) => (
+          {(["S","A","B","C","D"] as Tier[]).map((t) => (
             <TabsContent key={t} value={t} className="space-y-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between gap-2 py-3">
                   <CardTitle className="text-base flex items-center gap-2">
-                    {t === "A" && <ShieldCheck className="h-4 w-4 text-green-600" />}
+                    {(t === "S" || t === "A") && <ShieldCheck className="h-4 w-4 text-green-600" />}
                     {t === "D" && <ShieldAlert className="h-4 w-4 text-red-600" />}
                     {TIER_LABEL[t]} · {counts.total} rows · {counts.selected} selected
                   </CardTitle>
@@ -187,10 +208,10 @@ const AdminChannelPipeline = () => {
                     <Button size="sm" variant="outline" onClick={toggleAll} disabled={rows.length === 0}>
                       {selected.size === rows.length && rows.length > 0 ? "Unselect all" : "Select all"}
                     </Button>
-                    {t !== "A" && <Button size="sm" onClick={() => bulk("approve")} disabled={busy || counts.selected === 0}>Approve {counts.selected}</Button>}
+                    {(t === "B" || t === "C" || t === "D") && <Button size="sm" onClick={() => bulk("approve")} disabled={busy || counts.selected === 0}>Approve {counts.selected}</Button>}
                     {t !== "D" && <Button size="sm" variant="destructive" onClick={() => bulk("reject")} disabled={busy || counts.selected === 0}>Reject {counts.selected}</Button>}
                     {t === "B" && <Button size="sm" variant="secondary" onClick={() => bulk("escalate")} disabled={busy || counts.selected === 0}>Escalate to full review</Button>}
-                    {t === "A" && <Button size="sm" variant="destructive" onClick={() => bulk("revert")} disabled={busy || counts.selected === 0}>Revert auto-approval</Button>}
+                    {(t === "S" || t === "A") && <Button size="sm" variant="destructive" onClick={() => bulk("revert")} disabled={busy || counts.selected === 0}>Revert pre-approval</Button>}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
@@ -198,6 +219,9 @@ const AdminChannelPipeline = () => {
                     rows.length === 0 ? <p className="text-sm text-muted-foreground py-6 text-center">No rows in Tier {t}.</p> :
                     rows.map((r) => {
                       const summary = r.moderation_summary as any;
+                      const need = r.required_samples ?? 15;
+                      const clean = r.clean_samples ?? 0;
+                      const failed = r.failed_samples ?? 0;
                       return (
                         <div key={r.id} className="flex items-start gap-3 rounded-md border p-3">
                           <Checkbox checked={selected.has(r.id)} onCheckedChange={() => toggle(r.id)} className="mt-1" />
@@ -207,11 +231,17 @@ const AdminChannelPipeline = () => {
                                 {r.title} <ExternalLink className="h-3 w-3" />
                               </a>
                               {r.tier && <Badge variant={TIER_VARIANT[r.tier]}>Tier {r.tier}</Badge>}
+                              <Badge variant={r.status === "approved" ? "default" : r.status === "rejected" ? "destructive" : "outline"}>{r.status}</Badge>
                               {typeof r.confidence === "number" && <Badge variant="outline">conf {r.confidence}</Badge>}
                               {typeof r.risk_score === "number" && <Badge variant="outline">risk {r.risk_score}</Badge>}
                               {r.duplicate_risk && <Badge variant={r.duplicate_risk === "high" ? "destructive" : "outline"}>dup {r.duplicate_risk}</Badge>}
                               {r.language_detected && <Badge variant="outline">{r.language_detected}</Badge>}
                               {r.subscriber_count != null && <Badge variant="outline">{Intl.NumberFormat().format(r.subscriber_count)} subs</Badge>}
+                              {(t === "S" || t === "A") && (
+                                <Badge variant={failed > 0 ? "destructive" : clean >= need ? "default" : "secondary"}>
+                                  samples {clean}/{need}{failed > 0 ? ` · ${failed} failed` : ""}
+                                </Badge>
+                              )}
                             </div>
                             {r.tier_reason && r.tier_reason.length > 0 && (
                               <p className="mt-1 text-xs text-muted-foreground truncate">{r.tier_reason.join(" · ")}</p>
@@ -226,9 +256,14 @@ const AdminChannelPipeline = () => {
                             )}
                           </div>
                           <div className="flex flex-col gap-1">
-                            {t !== "A" && <Button size="sm" onClick={() => bulk("approve", { ids: [r.id] })} disabled={busy}>Approve</Button>}
+                            {(t === "S" || t === "A") && (
+                              <Button size="sm" variant="secondary" onClick={() => runSampling(r.id)} disabled={samplingId === r.id}>
+                                {samplingId === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Run sampling"}
+                              </Button>
+                            )}
+                            {(t === "B" || t === "C" || t === "D") && <Button size="sm" onClick={() => bulk("approve", { ids: [r.id] })} disabled={busy}>Approve</Button>}
                             {t !== "D" && <Button size="sm" variant="destructive" onClick={() => bulk("reject", { ids: [r.id] })} disabled={busy}>Reject</Button>}
-                            {t === "A" && <Button size="sm" variant="destructive" onClick={() => bulk("revert", { ids: [r.id] })} disabled={busy}>Revert</Button>}
+                            {(t === "S" || t === "A") && <Button size="sm" variant="destructive" onClick={() => bulk("revert", { ids: [r.id] })} disabled={busy}>Revert</Button>}
                           </div>
                         </div>
                       );

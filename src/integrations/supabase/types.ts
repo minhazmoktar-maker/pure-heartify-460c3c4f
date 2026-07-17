@@ -446,6 +446,7 @@ export type Database = {
         Row: {
           auto_action: string | null
           category: string | null
+          clean_samples: number
           cluster_id: string | null
           confidence: number | null
           confidence_breakdown: Json
@@ -457,16 +458,21 @@ export type Database = {
           duplicate_risk: string | null
           educational_quality: number | null
           evidence: Json
+          failed_samples: number
           halal_topic_hint: string | null
           handle: string | null
           id: string
           language: string | null
           language_detected: string | null
+          last_sampled_at: string | null
           last_verified_at: string | null
           learned_weight_version: number | null
           moderation_summary: Json | null
           organization_type: string | null
+          pre_approved_at: string | null
           priority_score: number
+          promoted_at: string | null
+          required_samples: number
           risk_score: number | null
           source: string
           source_channel_id: string | null
@@ -474,6 +480,7 @@ export type Database = {
           submitted_by: string | null
           subscriber_count: number | null
           summary_generated_at: string | null
+          suspended_at: string | null
           tier: string | null
           tier_reason: string[] | null
           title: string
@@ -483,6 +490,7 @@ export type Database = {
         Insert: {
           auto_action?: string | null
           category?: string | null
+          clean_samples?: number
           cluster_id?: string | null
           confidence?: number | null
           confidence_breakdown?: Json
@@ -494,16 +502,21 @@ export type Database = {
           duplicate_risk?: string | null
           educational_quality?: number | null
           evidence?: Json
+          failed_samples?: number
           halal_topic_hint?: string | null
           handle?: string | null
           id?: string
           language?: string | null
           language_detected?: string | null
+          last_sampled_at?: string | null
           last_verified_at?: string | null
           learned_weight_version?: number | null
           moderation_summary?: Json | null
           organization_type?: string | null
+          pre_approved_at?: string | null
           priority_score?: number
+          promoted_at?: string | null
+          required_samples?: number
           risk_score?: number | null
           source?: string
           source_channel_id?: string | null
@@ -511,6 +524,7 @@ export type Database = {
           submitted_by?: string | null
           subscriber_count?: number | null
           summary_generated_at?: string | null
+          suspended_at?: string | null
           tier?: string | null
           tier_reason?: string[] | null
           title: string
@@ -520,6 +534,7 @@ export type Database = {
         Update: {
           auto_action?: string | null
           category?: string | null
+          clean_samples?: number
           cluster_id?: string | null
           confidence?: number | null
           confidence_breakdown?: Json
@@ -531,16 +546,21 @@ export type Database = {
           duplicate_risk?: string | null
           educational_quality?: number | null
           evidence?: Json
+          failed_samples?: number
           halal_topic_hint?: string | null
           handle?: string | null
           id?: string
           language?: string | null
           language_detected?: string | null
+          last_sampled_at?: string | null
           last_verified_at?: string | null
           learned_weight_version?: number | null
           moderation_summary?: Json | null
           organization_type?: string | null
+          pre_approved_at?: string | null
           priority_score?: number
+          promoted_at?: string | null
+          required_samples?: number
           risk_score?: number | null
           source?: string
           source_channel_id?: string | null
@@ -548,6 +568,7 @@ export type Database = {
           submitted_by?: string | null
           subscriber_count?: number | null
           summary_generated_at?: string | null
+          suspended_at?: string | null
           tier?: string | null
           tier_reason?: string[] | null
           title?: string
@@ -848,6 +869,50 @@ export type Database = {
           w_user_report?: number
         }
         Relationships: []
+      }
+      channel_video_samples: {
+        Row: {
+          candidate_id: string
+          evidence: Json | null
+          id: string
+          reasons: string[] | null
+          sample_kind: string
+          sampled_at: string
+          verdict: string
+          video_id: string
+          youtube_channel_id: string
+        }
+        Insert: {
+          candidate_id: string
+          evidence?: Json | null
+          id?: string
+          reasons?: string[] | null
+          sample_kind: string
+          sampled_at?: string
+          verdict: string
+          video_id: string
+          youtube_channel_id: string
+        }
+        Update: {
+          candidate_id?: string
+          evidence?: Json | null
+          id?: string
+          reasons?: string[] | null
+          sample_kind?: string
+          sampled_at?: string
+          verdict?: string
+          video_id?: string
+          youtube_channel_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_video_samples_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "channel_candidates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       channels_state: {
         Row: {
@@ -2333,6 +2398,30 @@ export type Database = {
           organization_type?: string | null
           primary_topic?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      moderation_config: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
         }
         Relationships: []
       }
@@ -4961,6 +5050,7 @@ export type Database = {
         }[]
       }
       get_internal_config: { Args: { _key: string }; Returns: string }
+      get_moderation_config: { Args: { _key: string }; Returns: Json }
       get_ops_dashboard: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
       get_public_dhikr_circle: {
@@ -5246,6 +5336,15 @@ export type Database = {
       recompute_channel_trust: {
         Args: { _channel_id: string }
         Returns: number
+      }
+      record_learned_signal: {
+        Args: {
+          _action: string
+          _actor: string
+          _feature_type: string
+          _feature_value: string
+        }
+        Returns: undefined
       }
       record_streak_activity: { Args: never; Returns: Json }
       redeem_gift_code: { Args: { p_code: string }; Returns: Json }
