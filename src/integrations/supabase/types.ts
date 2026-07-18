@@ -32,6 +32,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_review_tokens: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          last_used_at: string | null
+          last_used_ip: string | null
+          purpose: string
+          revoked_at: string | null
+          token_hash: string
+          uses: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at: string
+          id?: string
+          last_used_at?: string | null
+          last_used_ip?: string | null
+          purpose?: string
+          revoked_at?: string | null
+          token_hash: string
+          uses?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          last_used_at?: string | null
+          last_used_ip?: string | null
+          purpose?: string
+          revoked_at?: string | null
+          token_hash?: string
+          uses?: number
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -5293,6 +5332,10 @@ export type Database = {
           name: string
         }[]
       }
+      log_admin_review_use: {
+        Args: { _id: string; _ip: string }
+        Returns: undefined
+      }
       match_curated_videos: {
         Args: {
           category_filter?: string
@@ -5309,6 +5352,14 @@ export type Database = {
           thumbnail_url: string
           title: string
           video_id: string
+        }[]
+      }
+      mint_admin_review_token: {
+        Args: { _purpose?: string; _ttl_hours?: number }
+        Returns: {
+          expires_at: string
+          id: string
+          token: string
         }[]
       }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
@@ -5429,6 +5480,15 @@ export type Database = {
         Returns: string
       }
       user_household_id: { Args: { _user_id: string }; Returns: string }
+      verify_admin_review_token: {
+        Args: { _token: string }
+        Returns: {
+          created_by: string
+          expires_at: string
+          id: string
+          purpose: string
+        }[]
+      }
       video_report_queue_summary: {
         Args: never
         Returns: {
