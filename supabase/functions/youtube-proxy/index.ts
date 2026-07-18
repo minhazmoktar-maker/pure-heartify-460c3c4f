@@ -49,12 +49,12 @@ Deno.serve(async (req) => {
     return json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401);
   }
 
-  // Per-user rate limit: 90 searches / minute. The home feed can fan out to
-  // 6+ curated sections in parallel; 30/min was tripping normal browsing.
+  // Per-user rate limit: 300 searches / minute. The home feed can fan out to
+  // 15+ curated sections in parallel across multiple tabs/refreshes.
   const limited = await enforceRateLimit(admin, {
     identity: getClientIdentity(req, userId),
     action: 'youtube-proxy',
-    limit: 90,
+    limit: 300,
     windowSeconds: 60,
   });
   if (limited) {
