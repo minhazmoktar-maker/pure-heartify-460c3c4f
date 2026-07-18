@@ -9,6 +9,7 @@ import HandleClaimCard from "@/components/HandleClaimCard";
 import LanguageSettings from "@/components/LanguageSettings";
 import AppIconPicker from "@/components/AppIconPicker";
 import ThemeModeSetting from "@/components/ThemeModeSetting";
+import KidsModeSetting from "@/components/KidsModeSetting";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import SoundSetting from "@/components/SoundSetting";
 import MfaStatusCard from "@/components/MfaStatusCard";
@@ -282,6 +283,10 @@ const Profile = () => {
 
             <div className="pt-4">
               <ThemeModeSetting />
+            </div>
+
+            <div className="pt-4">
+              <KidsModeSetting />
             </div>
 
             <div className="pt-4">

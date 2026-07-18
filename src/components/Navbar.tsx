@@ -9,8 +9,6 @@ import NotificationsBell from "@/components/NotificationsBell";
 import SuggestContentDialog from "@/components/SuggestContentDialog";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { useKidsMode } from "@/contexts/KidsModeContext";
-import { Baby } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import { useScrolled } from "@/hooks/useScrolled";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
@@ -26,7 +24,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { isAdmin, isOwner } = useRole();
   const scrolled = useScrolled(8);
-  const { enabled: kidsOn, toggle: toggleKids } = useKidsMode();
+  
 
   useEffect(() => { setUnseenChangelog(hasUnseenChangelog()); }, []);
   useEffect(() => { if (!menuOpen) setMenuFilter(""); }, [menuOpen]);
@@ -201,15 +199,6 @@ const Navbar = () => {
             Channels
           </Link>
           <LanguageSwitcher />
-          <button
-            onClick={toggleKids}
-            aria-pressed={kidsOn}
-            aria-label={kidsOn ? "Turn Kids mode off" : "Turn Kids mode on"}
-            title={kidsOn ? "Kids mode ON — safe content only" : "Kids mode OFF"}
-            className={`tap-target rounded-pill transition-colors ${kidsOn ? "bg-primary/15 text-primary" : "hover:bg-secondary"}`}
-          >
-            <Baby className="h-5 w-5" />
-          </button>
           <button
             onClick={toggleTheme}
             aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
