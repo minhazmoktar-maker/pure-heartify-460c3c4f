@@ -24,7 +24,7 @@ async function ytFetch(path: string): Promise<any> {
   throw new Error(`YT quota/keys exhausted: ${lastErr}`);
 }
 
-async function resolveHandle(rawHandle: string): Promise<any | null> {
+async function resolveHandle(rawHandle: string, allowSearch = true): Promise<any | null> {
   const h = rawHandle.replace(/^@/, "");
   // Try forHandle first (modern), then forUsername (legacy)
   try {
@@ -35,7 +35,8 @@ async function resolveHandle(rawHandle: string): Promise<any | null> {
     const j = await ytFetch(`channels?part=snippet,statistics,brandingSettings&forUsername=${encodeURIComponent(h)}`);
     if (j?.items?.[0]) return j.items[0];
   } catch (_) { /* fall through */ }
-  // Fallback: search
+  if (!allowSearch) return null;
+  // Fallback: search (expensive: 100 quota units)
   try {
     const s = await ytFetch(`search?part=snippet&type=channel&maxResults=1&q=${encodeURIComponent("@" + h)}`);
     const chId = s?.items?.[0]?.snippet?.channelId;
@@ -58,14 +59,17 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // auth
+    // auth: x-cron-secret, service-role bearer, OR admin JWT
     const cronSecret = req.headers.get("x-cron-secret");
     const isCron = cronSecret && cronSecret === Deno.env.get("CRON_SECRET");
-    if (!isCron) {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const bearer = authHeader.replace(/^Bearer\s+/i, "");
+    const isServiceRole = bearer && bearer === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!isCron && !isServiceRole) {
       const sb = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_ANON_KEY")!,
-        { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } },
+        { global: { headers: { Authorization: authHeader } } },
       );
       const { data: u } = await sb.auth.getUser();
       if (!u?.user) return new Response(JSON.stringify({ error: "unauthorized" }), {
@@ -78,8 +82,9 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const limit = Math.min(100, Number(body.limit ?? 50));
+    const limit = Math.min(200, Number(body.limit ?? 50));
     const autoClassify: boolean = body.classify !== false;
+    const allowSearch: boolean = body.allow_search !== false;
 
     const { data: pending, error: fetchErr } = await admin
       .from("channel_candidates")
@@ -93,21 +98,20 @@ Deno.serve(async (req) => {
     const stats = { processed: 0, resolved: 0, duplicates: 0, not_found: 0, errors: 0 };
     const results: any[] = [];
 
-    for (const row of pending ?? []) {
+    const CONCURRENCY = 8;
+    async function processRow(row: any) {
       stats.processed++;
       const handle = (row.handle ?? row.youtube_channel_id.replace(/^handle:/, "")) as string;
       try {
-        const ch = await resolveHandle(handle);
+        const ch = await resolveHandle(handle, allowSearch);
         if (!ch?.id) {
           stats.not_found++;
           await admin.from("channel_candidates")
             .update({ evidence: { ...(row.evidence ?? {}), resolution: "not_found", needs_resolution: false } })
             .eq("id", row.id);
           results.push({ id: row.id, handle, status: "not_found" });
-          continue;
+          return;
         }
-
-        // Dedupe: if the real ID already exists, drop this row.
         const { data: dupe } = await admin
           .from("channel_candidates")
           .select("id")
@@ -125,9 +129,8 @@ Deno.serve(async (req) => {
             .update({ status: "rejected", evidence: { ...(row.evidence ?? {}), resolution: "duplicate", resolved_to: ch.id } })
             .eq("id", row.id);
           results.push({ id: row.id, handle, status: "duplicate", resolved_to: ch.id });
-          continue;
+          return;
         }
-
         const snip = ch.snippet ?? {};
         const stat = ch.statistics ?? {};
         const evidence = {
@@ -140,7 +143,6 @@ Deno.serve(async (req) => {
           video_count: stat.videoCount ? Number(stat.videoCount) : null,
         };
         (evidence as any).needs_resolution = false;
-
         await admin.from("channel_candidates").update({
           youtube_channel_id: ch.id,
           title: snip.title ?? row.title,
@@ -150,16 +152,20 @@ Deno.serve(async (req) => {
           language_detected: snip.defaultLanguage ?? row.language_detected ?? null,
           country: snip.country ?? null,
           evidence,
-          confidence: 55, // baseline; classifier will refine
+          confidence: 55,
           last_verified_at: new Date().toISOString(),
         }).eq("id", row.id);
-
         stats.resolved++;
         results.push({ id: row.id, handle, status: "resolved", channel_id: ch.id, subs: stat.subscriberCount });
       } catch (e) {
         stats.errors++;
         results.push({ id: row.id, handle, status: "error", error: String(e) });
       }
+    }
+
+    const rows = pending ?? [];
+    for (let i = 0; i < rows.length; i += CONCURRENCY) {
+      await Promise.all(rows.slice(i, i + CONCURRENCY).map(processRow));
     }
 
     // Kick off classifier asynchronously so newly-enriched rows get tiered.
