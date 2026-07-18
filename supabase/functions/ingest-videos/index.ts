@@ -814,19 +814,35 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
   let uploadsId = state.uploads_playlist_id;
 
   if (!channelId || !uploadsId) {
-    const resolved = await resolveChannel(state.channel_name);
-    if (!resolved) {
-      await markChannelFailure(state, `resolve_failed:${state.channel_name}`);
-      return { added: 0, quota };
+    // Fast path: we already have the UC id from approved_channels backfill —
+    // just fetch the uploads playlist (1 quota unit). Avoids the 100-unit search.
+    if (channelId && !uploadsId) {
+      const cr = await ytFetch("channels", new URLSearchParams({ part: "contentDetails", id: channelId }));
+      quota += 1;
+      const cd = cr.ok ? (cr.data as { items?: Array<{ contentDetails?: { relatedPlaylists?: { uploads?: string } } }> }) : null;
+      const up = cd?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+      if (up) {
+        uploadsId = up;
+        await updateChannelState(state.id, { uploads_playlist_id: up, resolved_at: new Date().toISOString() });
+      } else {
+        await markChannelFailure(state, `uploads_playlist_missing:${channelId}`);
+        return { added: 0, quota };
+      }
+    } else {
+      const resolved = await resolveChannel(state.channel_name);
+      if (!resolved) {
+        await markChannelFailure(state, `resolve_failed:${state.channel_name}`);
+        return { added: 0, quota };
+      }
+      quota += resolved.quota;
+      channelId = resolved.channelId;
+      uploadsId = resolved.uploadsPlaylistId;
+      await updateChannelState(state.id, {
+        channel_id: channelId,
+        uploads_playlist_id: uploadsId,
+        resolved_at: new Date().toISOString(),
+      });
     }
-    quota += resolved.quota;
-    channelId = resolved.channelId;
-    uploadsId = resolved.uploadsPlaylistId;
-    await updateChannelState(state.id, {
-      channel_id: channelId,
-      uploads_playlist_id: uploadsId,
-      resolved_at: new Date().toISOString(),
-    });
   }
 
   const params = new URLSearchParams({
