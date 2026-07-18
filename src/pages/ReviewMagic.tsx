@@ -96,7 +96,7 @@ export default function ReviewMagic() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Channel review" description="Magic-link channel moderation" path="/review" noIndex />
+      <SEO title="Channel review" description="Magic-link channel moderation" path="/review" />
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur px-4 py-3 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold">Channel Review Queue</h1>
