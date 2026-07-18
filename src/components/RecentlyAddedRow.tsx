@@ -83,6 +83,27 @@ const RecentlyAddedRow = () => {
     return out;
   }, [data, perChannelCap]);
 
+  // Impression tracking: report visible video cards to feed_impressions so
+  // the ranker can decay repeats over the next 48h.
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root || videos.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio >= 0.5) {
+            const id = (e.target as HTMLElement).dataset.videoId;
+            if (id) track(id);
+          }
+        }
+      },
+      { root, threshold: [0.5] },
+    );
+    const nodes = root.querySelectorAll<HTMLElement>("[data-video-id]");
+    nodes.forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, [videos, track]);
+
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
   };
