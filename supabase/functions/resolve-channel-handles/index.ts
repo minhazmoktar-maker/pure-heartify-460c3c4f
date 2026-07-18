@@ -95,7 +95,8 @@ Deno.serve(async (req) => {
     const stats = { processed: 0, resolved: 0, duplicates: 0, not_found: 0, errors: 0 };
     const results: any[] = [];
 
-    for (const row of pending ?? []) {
+    const CONCURRENCY = 8;
+    async function processRow(row: any) {
       stats.processed++;
       const handle = (row.handle ?? row.youtube_channel_id.replace(/^handle:/, "")) as string;
       try {
@@ -106,10 +107,8 @@ Deno.serve(async (req) => {
             .update({ evidence: { ...(row.evidence ?? {}), resolution: "not_found", needs_resolution: false } })
             .eq("id", row.id);
           results.push({ id: row.id, handle, status: "not_found" });
-          continue;
+          return;
         }
-
-        // Dedupe: if the real ID already exists, drop this row.
         const { data: dupe } = await admin
           .from("channel_candidates")
           .select("id")
@@ -127,9 +126,8 @@ Deno.serve(async (req) => {
             .update({ status: "rejected", evidence: { ...(row.evidence ?? {}), resolution: "duplicate", resolved_to: ch.id } })
             .eq("id", row.id);
           results.push({ id: row.id, handle, status: "duplicate", resolved_to: ch.id });
-          continue;
+          return;
         }
-
         const snip = ch.snippet ?? {};
         const stat = ch.statistics ?? {};
         const evidence = {
@@ -142,7 +140,6 @@ Deno.serve(async (req) => {
           video_count: stat.videoCount ? Number(stat.videoCount) : null,
         };
         (evidence as any).needs_resolution = false;
-
         await admin.from("channel_candidates").update({
           youtube_channel_id: ch.id,
           title: snip.title ?? row.title,
@@ -152,16 +149,20 @@ Deno.serve(async (req) => {
           language_detected: snip.defaultLanguage ?? row.language_detected ?? null,
           country: snip.country ?? null,
           evidence,
-          confidence: 55, // baseline; classifier will refine
+          confidence: 55,
           last_verified_at: new Date().toISOString(),
         }).eq("id", row.id);
-
         stats.resolved++;
         results.push({ id: row.id, handle, status: "resolved", channel_id: ch.id, subs: stat.subscriberCount });
       } catch (e) {
         stats.errors++;
         results.push({ id: row.id, handle, status: "error", error: String(e) });
       }
+    }
+
+    const rows = pending ?? [];
+    for (let i = 0; i < rows.length; i += CONCURRENCY) {
+      await Promise.all(rows.slice(i, i + CONCURRENCY).map(processRow));
     }
 
     // Kick off classifier asynchronously so newly-enriched rows get tiered.
