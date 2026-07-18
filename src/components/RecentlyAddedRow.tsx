@@ -36,6 +36,7 @@ const RecentlyAddedRow = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
   const { perChannelCap } = useFeedDiversity();
+  const { track } = useImpressionTracker(true);
 
   const {
     data,
