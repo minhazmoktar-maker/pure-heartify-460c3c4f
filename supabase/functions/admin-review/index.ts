@@ -71,92 +71,127 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (op === "action") {
+    if (op === "action" || op === "bulk") {
       const body = await req.json().catch(() => ({}));
-      const id: string = body.id;
       const action: string = body.action;
-      if (!id || !["approve", "reject", "escalate"].includes(action)) {
+      if (!["approve", "reject", "escalate"].includes(action)) {
         return json({ error: "invalid_input" }, 400);
       }
+      const ids: string[] = op === "bulk"
+        ? (Array.isArray(body.ids) ? body.ids.filter((x: unknown) => typeof x === "string") : [])
+        : (body.id ? [body.id] : []);
+      if (ids.length === 0) return json({ error: "no_ids" }, 400);
+      if (ids.length > 500) return json({ error: "too_many_ids", max: 500 }, 400);
 
       const { data: rows, error: fetchErr } = await admin
         .from("channel_candidates")
         .select("id, youtube_channel_id, title, handle, category, tier, status, confidence, cluster_id")
-        .eq("id", id)
-        .limit(1);
+        .in("id", ids);
       if (fetchErr) return json({ error: fetchErr.message }, 500);
-      const c = rows?.[0];
-      if (!c) return json({ error: "not_found" }, 404);
-
-      // Magic-link reviewer is the human final say — allow approving any tier,
-      // including D. Nothing is auto-rejected on their behalf.
+      const candidates = rows ?? [];
+      if (candidates.length === 0) return json({ error: "not_found" }, 404);
 
       const newStatus =
         action === "approve" ? "approved" : action === "reject" ? "rejected" : "pending";
+      const nowIso = new Date().toISOString();
+      const isBulk = candidates.length > 1;
 
-      await admin.from("channel_candidates").update({
+      const updatePatch: Record<string, unknown> = {
         status: newStatus,
-        promoted_at: action === "approve" ? new Date().toISOString() : null,
-        auto_action: action === "escalate" ? "queued_full" : undefined,
-        updated_at: new Date().toISOString(),
-      }).eq("id", c.id);
+        updated_at: nowIso,
+      };
+      if (action === "approve") updatePatch.promoted_at = nowIso;
+      if (action === "escalate") updatePatch.auto_action = "queued_full";
 
-      if (action === "approve") {
-        const { data: ownerKeyRow } = await admin.rpc("compute_owner_key", {
-          _name: c.handle ?? c.title,
-        });
-        await admin.from("approved_channels").upsert(
-          {
+      await admin
+        .from("channel_candidates")
+        .update(updatePatch)
+        .in("id", candidates.map((c) => c.id));
+
+      const results: Array<{ id: string; ok: boolean; error?: string }> = [];
+      const approvedYouTubeIds: string[] = [];
+
+      for (const c of candidates) {
+        try {
+          if (action === "approve") {
+            const { data: ownerKeyRow } = await admin.rpc("compute_owner_key", {
+              _name: c.handle ?? c.title,
+            });
+            await admin.from("approved_channels").upsert(
+              {
+                youtube_channel_id: c.youtube_channel_id,
+                title: c.title,
+                handle: c.handle,
+                category: c.category,
+                owner_key: ownerKeyRow ?? "",
+                approved_by: session.created_by,
+                last_rechecked_at: nowIso,
+                consistency_score: c.confidence ?? 90,
+              },
+              { onConflict: "youtube_channel_id" },
+            );
+            approvedYouTubeIds.push(c.youtube_channel_id);
+          }
+
+          await admin.from("channel_moderation_decisions").insert({
+            candidate_id: c.id,
             youtube_channel_id: c.youtube_channel_id,
-            title: c.title,
-            handle: c.handle,
-            category: c.category,
-            owner_key: ownerKeyRow ?? "",
-            approved_by: session.created_by,
-            last_rechecked_at: new Date().toISOString(),
-            consistency_score: c.confidence ?? 90,
-          },
-          { onConflict: "youtube_channel_id" },
-        );
+            tier: c.tier,
+            action,
+            actor: session.created_by,
+            is_bulk: isBulk,
+            cluster_id: c.cluster_id,
+            reason: `magic_link:${session.id}${isBulk ? ":bulk" : ""}`,
+            previous_status: c.status,
+            new_status: newStatus,
+            reversible: true,
+          });
 
-        // Auto-ingest videos for the newly approved channel (fire-and-forget).
+          results.push({ id: c.id, ok: true });
+        } catch (e) {
+          results.push({ id: c.id, ok: false, error: (e as Error).message });
+        }
+      }
+
+      // Fire-and-forget auto-ingest for approved channels (batched).
+      if (approvedYouTubeIds.length > 0) {
         try {
           const ingestUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/ingest-videos`;
-          fetch(ingestUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-              "apikey": Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-              "X-Cron-Secret": Deno.env.get("CRON_SECRET") ?? "",
-            },
-            body: JSON.stringify({
-              channel_ids: [c.youtube_channel_id],
-              limit: 25,
-              reason: "magic_link_auto_ingest",
-            }),
-          }).catch((err) => console.error("auto-ingest fetch failed", err));
+          // Chunk to keep individual invocations bounded.
+          const CHUNK = 25;
+          for (let i = 0; i < approvedYouTubeIds.length; i += CHUNK) {
+            const chunk = approvedYouTubeIds.slice(i, i + CHUNK);
+            fetch(ingestUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+                "apikey": Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+                "X-Cron-Secret": Deno.env.get("CRON_SECRET") ?? "",
+              },
+              body: JSON.stringify({
+                channel_ids: chunk,
+                limit: 25,
+                reason: isBulk ? "magic_link_bulk_ingest" : "magic_link_auto_ingest",
+              }),
+            }).catch((err) => console.error("auto-ingest fetch failed", err));
+          }
         } catch (e) {
           console.error("auto-ingest schedule failed", e);
         }
       }
 
-
-      await admin.from("channel_moderation_decisions").insert({
-        candidate_id: c.id,
-        youtube_channel_id: c.youtube_channel_id,
-        tier: c.tier,
-        action,
-        actor: session.created_by,
-        is_bulk: false,
-        cluster_id: c.cluster_id,
-        reason: `magic_link:${session.id}`,
-        previous_status: c.status,
-        new_status: newStatus,
-        reversible: true,
+      const okCount = results.filter((r) => r.ok).length;
+      if (op === "action") {
+        return json({ ok: results[0]?.ok ?? false, id: results[0]?.id, status: newStatus });
+      }
+      return json({
+        ok: true,
+        processed: okCount,
+        failed: results.length - okCount,
+        status: newStatus,
+        results,
       });
-
-      return json({ ok: true, id: c.id, status: newStatus });
     }
 
     return json({ error: "unknown_op" }, 400);
