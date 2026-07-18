@@ -86,6 +86,7 @@ Deno.serve(async (req) => {
       .select("id, youtube_channel_id, handle, title, evidence, category, halal_topic_hint, language_detected")
       .like("youtube_channel_id", "handle:%")
       .eq("status", "pending")
+      .or("evidence->>resolution.is.null,evidence->>resolution.eq.pending")
       .limit(limit);
     if (fetchErr) throw fetchErr;
 
