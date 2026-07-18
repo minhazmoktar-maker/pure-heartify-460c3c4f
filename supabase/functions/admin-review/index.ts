@@ -55,8 +55,8 @@ Deno.serve(async (req) => {
         .select(
           "id, youtube_channel_id, title, handle, description, category, language_detected, subscriber_count, risk_score, tier, confidence, moderation_summary, tier_reason",
         )
-        .in("tier", ["B", "C"])
-        .eq("status", "pending")
+        .in("tier", ["S", "A", "B", "C", "D"])
+        .in("status", ["pending", "sampling", "pre_approved"])
         .order("subscriber_count", { ascending: false, nullsFirst: false })
         .limit(limit);
       if (error) return json({ error: error.message }, 500);
@@ -80,10 +80,8 @@ Deno.serve(async (req) => {
       const c = rows?.[0];
       if (!c) return json({ error: "not_found" }, 404);
 
-      // Safety invariant: never approve a Tier D row via magic link.
-      if (action === "approve" && c.tier === "D") {
-        return json({ error: "tier_d_blocked" }, 403);
-      }
+      // Magic-link reviewer is the human final say — allow approving any tier,
+      // including D. Nothing is auto-rejected on their behalf.
 
       const newStatus =
         action === "approve" ? "approved" : action === "reject" ? "rejected" : "pending";

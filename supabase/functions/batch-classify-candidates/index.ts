@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
       let newStatus = raw.status;
       if (!dryRun) {
         if (tier === "S" || tier === "A") { newStatus = "pre_approved"; stats.auto_approved++; }
-        else if (tier === "D") { newStatus = "rejected"; stats.auto_rejected++; }
+        // Tier D is NOT auto-rejected — leave it pending for human review via magic link.
       }
 
       await admin.from("channel_candidates").update({
