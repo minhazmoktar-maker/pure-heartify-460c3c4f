@@ -816,7 +816,7 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
   if (!channelId || !uploadsId) {
     const resolved = await resolveChannel(state.channel_name);
     if (!resolved) {
-      await updateChannelState(state.id, { last_pulled_at: new Date().toISOString() });
+      await markChannelFailure(state, `resolve_failed:${state.channel_name}`);
       return { added: 0, quota };
     }
     quota += resolved.quota;
@@ -829,7 +829,6 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
     });
   }
 
-  // Page through playlistItems (1 quota unit per page, 50 items per page) — incremental cursor
   const params = new URLSearchParams({
     part: "snippet,contentDetails",
     playlistId: uploadsId,
@@ -840,8 +839,9 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
   const r = await ytFetch("playlistItems", params);
   quota += 1;
   if (!r.ok) {
+    const reason = `playlistItems_${r.status}:${String((r.data as any)?.error ?? "").slice(0, 200)}`;
     console.error(`playlistItems failed for ${state.channel_name}: ${r.status}`);
-    await updateChannelState(state.id, { last_pulled_at: new Date().toISOString() });
+    await markChannelFailure(state, reason);
     return { added: 0, quota };
   }
   const data = r.data as { items?: Array<Record<string, unknown>>; nextPageToken?: string };
@@ -890,13 +890,13 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
       halal_score: verdict.score,
       section_id: inferSectionFromChannel(channel),
       is_trusted_channel: true,
+      moderation_state: "approved",
     });
   }
 
   const added = await upsertVideos(rows);
-  await updateChannelState(state.id, {
+  await markChannelSuccess(state.id, {
     next_page_token: nextToken,
-    last_pulled_at: new Date().toISOString(),
     total_pulled: state.total_pulled + added,
   });
   await logIngestion(`channel:${state.channel_name}`, null, items.length, added, quota);
