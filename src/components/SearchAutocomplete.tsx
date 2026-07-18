@@ -322,7 +322,7 @@ const SearchAutocomplete = forwardRef<HTMLInputElement, Props>(function SearchAu
           <ul
             id={listboxId}
             role="listbox"
-            className="max-h-[70vh] overflow-y-auto overscroll-contain py-1"
+            className="max-h-[70vh] overflow-y-auto overscroll-contain py-2"
           >
             {debounced.length === 0 && recent.length > 0 && (
               <li className="flex items-center justify-between px-4 pb-1 pt-2">
