@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
 
     // auth: x-cron-secret, service-role bearer, OR admin JWT
     const cronSecret = req.headers.get("x-cron-secret");
-    const isCron = cronSecret && (cronSecret === Deno.env.get("CRON_SECRET") || cronSecret === "bulk-resolve-2026-07-18");
+    const isCron = cronSecret && cronSecret === Deno.env.get("CRON_SECRET");
     const authHeader = req.headers.get("Authorization") ?? "";
     const bearer = authHeader.replace(/^Bearer\s+/i, "");
     const isServiceRole = bearer && bearer === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
