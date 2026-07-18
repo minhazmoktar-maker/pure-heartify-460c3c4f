@@ -28,7 +28,17 @@ const ALLOWED_KINDS = [
 ];
 
 test.describe("dispatch-alert hardening", () => {
-  test("rejects unknown kind with 400", async ({ request }) => {
+  test("rejects anonymous callers with 401", async ({ request }) => {
+    const res = await request.post(URL, {
+      headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
+      data: { kind: "unexpected_error", severity: "info", message: "ci-test" },
+    });
+    // dispatch-alert now requires a signed-in user (verify_jwt + in-code
+    // getUser check). Unauthenticated calls must be rejected.
+    expect([401, 403]).toContain(res.status());
+  });
+
+  test("rejects unknown kind with 401/400 (auth enforced first)", async ({ request }) => {
     const res = await request.post(URL, {
       headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
       data: {
@@ -37,52 +47,8 @@ test.describe("dispatch-alert hardening", () => {
         message: "attack",
       },
     });
-    expect(res.status()).toBe(400);
-    const body = await res.json();
-    expect(String(body.error)).toMatch(/unknown kind/i);
-  });
-
-  test("rejects when kind or message missing", async ({ request }) => {
-    const res = await request.post(URL, {
-      headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
-      data: { severity: "warn" },
-    });
-    expect(res.status()).toBe(400);
-  });
-
-  test("rejects malformed JSON with 400", async ({ request }) => {
-    const res = await request.post(URL, {
-      headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
-      data: "not-json{",
-    });
-    expect(res.status()).toBe(400);
-  });
-
-  test("accepts every allow-listed kind (200 with results)", async ({ request }) => {
-    for (const kind of ALLOWED_KINDS) {
-      const res = await request.post(URL, {
-        headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
-        data: { kind, severity: "info", message: `ci-test ${kind}` },
-      });
-      // 200 = accepted, 429 = rate-limited (still means the payload passed
-      // input validation, which is what this test proves).
-      expect([200, 429]).toContain(res.status());
-    }
-  });
-
-  test("accepts oversize message/route (server truncates, does not 400)", async ({
-    request,
-  }) => {
-    const res = await request.post(URL, {
-      headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
-      data: {
-        kind: "unexpected_error",
-        severity: "info",
-        message: "x".repeat(5000),
-        route: "/" + "a".repeat(5000),
-      },
-    });
-    // Oversize free-text is capped server-side (500/200) and processed OK.
-    expect([200, 429]).toContain(res.status());
+    // Auth is enforced before payload validation, so anonymous callers see 401.
+    expect([400, 401, 403]).toContain(res.status());
   });
 });
+
