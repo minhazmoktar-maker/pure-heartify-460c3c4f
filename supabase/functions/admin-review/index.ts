@@ -49,18 +49,26 @@ Deno.serve(async (req) => {
 
   try {
     if (op === "queue") {
-      const limit = Math.min(Number(url.searchParams.get("limit") ?? 50), 100);
-      const { data, error } = await admin
+      const limit = Math.min(Number(url.searchParams.get("limit") ?? 500), 2000);
+      const offset = Math.max(0, Number(url.searchParams.get("offset") ?? 0));
+      let q = admin
         .from("channel_candidates")
         .select(
-          "id, youtube_channel_id, title, handle, description, category, language_detected, subscriber_count, risk_score, tier, confidence, moderation_summary, tier_reason",
+          "id, youtube_channel_id, title, handle, description, category, language_detected, subscriber_count, risk_score, tier, confidence, moderation_summary, tier_reason, status",
+          { count: "exact" },
         )
-        .in("tier", ["S", "A", "B", "C", "D"])
         .in("status", ["pending", "sampling", "pre_approved"])
         .order("subscriber_count", { ascending: false, nullsFirst: false })
-        .limit(limit);
+        .range(offset, offset + limit - 1);
+      const { data, error, count } = await q;
       if (error) return json({ error: error.message }, 500);
-      return json({ session: { expires_at: session.expires_at }, items: data ?? [] });
+      return json({
+        session: { expires_at: session.expires_at },
+        items: data ?? [],
+        total: count ?? (data?.length ?? 0),
+        offset,
+        limit,
+      });
     }
 
     if (op === "action") {

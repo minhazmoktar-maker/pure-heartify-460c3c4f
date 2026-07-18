@@ -36,18 +36,33 @@ export default function ReviewMagic() {
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [total, setTotal] = useState<number>(0);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${FN_URL}?op=queue&token=${encodeURIComponent(token)}&limit=100`, {
-        headers: { apikey: ANON, Authorization: `Bearer ${ANON}` },
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body?.error ?? `HTTP ${res.status}`);
-      setItems(body.items ?? []);
-      setExpiresAt(body.session?.expires_at ?? null);
+      const all: Candidate[] = [];
+      const pageSize = 500;
+      let offset = 0;
+      let totalCount = 0;
+      // Paginate through the entire pending queue so every candidate is visible.
+      while (true) {
+        const res = await fetch(
+          `${FN_URL}?op=queue&token=${encodeURIComponent(token)}&limit=${pageSize}&offset=${offset}`,
+          { headers: { apikey: ANON, Authorization: `Bearer ${ANON}` } },
+        );
+        const body = await res.json();
+        if (!res.ok) throw new Error(body?.error ?? `HTTP ${res.status}`);
+        const batch: Candidate[] = body.items ?? [];
+        all.push(...batch);
+        totalCount = body.total ?? all.length;
+        setExpiresAt(body.session?.expires_at ?? null);
+        setItems([...all]);
+        setTotal(totalCount);
+        if (batch.length < pageSize || all.length >= totalCount) break;
+        offset += pageSize;
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -101,7 +116,7 @@ export default function ReviewMagic() {
         <div>
           <h1 className="text-lg font-semibold">Channel Review Queue</h1>
           <p className="text-xs text-muted-foreground">
-            {items.length} pending · {expiresAt ? `link expires ${new Date(expiresAt).toLocaleString()}` : ""}
+            {items.length}{total > items.length ? ` / ${total}` : ""} pending{loading ? " · loading…" : ""} · {expiresAt ? `link expires ${new Date(expiresAt).toLocaleString()}` : ""}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
