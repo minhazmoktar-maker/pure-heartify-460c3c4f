@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       stats.processed++;
       const handle = (row.handle ?? row.youtube_channel_id.replace(/^handle:/, "")) as string;
       try {
-        const ch = await resolveHandle(handle);
+        const ch = await resolveHandle(handle, allowSearch);
         if (!ch?.id) {
           stats.not_found++;
           await admin.from("channel_candidates")
