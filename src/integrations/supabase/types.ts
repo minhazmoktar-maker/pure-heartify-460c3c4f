@@ -2084,6 +2084,36 @@ export type Database = {
           },
         ]
       }
+      feed_impressions: {
+        Row: {
+          first_seen_at: string
+          last_action: string | null
+          last_action_at: string | null
+          last_seen_at: string
+          seen_count: number
+          user_id: string
+          video_id: string
+        }
+        Insert: {
+          first_seen_at?: string
+          last_action?: string | null
+          last_action_at?: string | null
+          last_seen_at?: string
+          seen_count?: number
+          user_id: string
+          video_id: string
+        }
+        Update: {
+          first_seen_at?: string
+          last_action?: string | null
+          last_action_at?: string | null
+          last_seen_at?: string
+          seen_count?: number
+          user_id?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       gift_codes: {
         Row: {
           code: string
@@ -5337,6 +5367,11 @@ export type Database = {
         Args: { _id: string; _ip: string }
         Returns: undefined
       }
+      log_feed_impressions: { Args: { _video_ids: string[] }; Returns: number }
+      mark_feed_action: {
+        Args: { _action: string; _video_id: string }
+        Returns: undefined
+      }
       match_curated_videos: {
         Args: {
           category_filter?: string
@@ -5364,6 +5399,7 @@ export type Database = {
         }[]
       }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
+      purge_feed_impressions: { Args: never; Returns: number }
       rate_limit_cleanup: {
         Args: { _older_than_minutes?: number }
         Returns: number
