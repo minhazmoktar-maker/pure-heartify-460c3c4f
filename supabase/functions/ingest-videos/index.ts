@@ -1035,7 +1035,7 @@ Deno.serve(async (req) => {
       await runPool(stale, ingestChannel, perRunQuotaCap * 0.75);
     }
 
-    if (mode === "discovery" || mode === "both") {
+    if (explicitChannelIds.length === 0 && (mode === "discovery" || mode === "both")) {
       const allQueries: Array<[string, string]> = [];
       for (const [sec, qs] of Object.entries(SECTION_QUERIES)) {
         for (const q of qs) allQueries.push([sec, q]);
