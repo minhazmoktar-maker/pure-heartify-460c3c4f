@@ -61,6 +61,7 @@ const AdminApprovedChannels = lazy(() => import("./pages/AdminApprovedChannels.t
 const AdminOps = lazy(() => import("./pages/AdminOps.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
+const ReviewMagic = lazy(() => import("./pages/ReviewMagic.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers.tsx"));
 
