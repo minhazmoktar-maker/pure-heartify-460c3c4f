@@ -2,6 +2,12 @@ project_id = "tbgxtwgliumqqtuppztu"
 [functions.send-push]
 verify_jwt = true
 
+# dispatch-alert now requires an authenticated user (JWT) to prevent
+# anonymous callers from flooding admin email/Slack fan-out.
+[functions.dispatch-alert]
+verify_jwt = true
+
+
 [functions.og-image]
 verify_jwt = false
 

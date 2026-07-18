@@ -176,16 +176,36 @@ function renderEmailHtml(p: Payload, title: string, timestamp: string): string {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // 60 alerts/min per identity. Client fire-and-forgets on frontend errors —
-  // a bug loop or malicious page could spam Slack/email/DB otherwise.
+  // Require a real signed-in user. Supabase's verify_jwt=true accepts the
+  // anon role token as a valid JWT, so we additionally reject non-authenticated
+  // callers here to prevent anyone with the publishable key from spamming
+  // admin email/Slack fan-out.
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const bearer = authHeader.toLowerCase().startsWith("bearer ")
+    ? authHeader.slice(7).trim()
+    : "";
+  let authedUserId: string | null = null;
+  if (bearer) {
+    const { data: userData } = await admin.auth.getUser(bearer);
+    if (userData?.user?.id) authedUserId = userData.user.id;
+  }
+  if (!authedUserId) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // 60 alerts/min per identity. Client fire-and-forgets on frontend errors —
+  // a bug loop could spam Slack/email/DB otherwise.
   const limited = await enforceRateLimit(admin, {
-    identity: getClientIdentity(req, null),
+    identity: getClientIdentity(req, authedUserId),
     action: "dispatch-alert", limit: 60, windowSeconds: 60,
   });
   if (limited) return new Response(JSON.stringify({ error: "rate_limited" }), {
     status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+
 
 
   let p: Payload;
