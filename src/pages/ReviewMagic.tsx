@@ -140,7 +140,9 @@ export default function ReviewMagic() {
                   <CardTitle className="text-base truncate">{c.title}</CardTitle>
                   <div className="text-xs text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 mt-1">
                     {c.handle && <span>{c.handle}</span>}
-                    {c.subscriber_count != null && <span>{c.subscriber_count.toLocaleString()} subs</span>}
+                    <span className={c.subscriber_count == null ? "italic opacity-70" : "font-medium"}>
+                      {c.subscriber_count != null ? `${c.subscriber_count.toLocaleString()} subs` : "subs: unresolved"}
+                    </span>
                     {c.language_detected && <span>lang: {c.language_detected}</span>}
                     {c.category && <span>{c.category}</span>}
                   </div>
