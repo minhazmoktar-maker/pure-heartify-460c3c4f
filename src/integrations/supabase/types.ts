@@ -4837,6 +4837,7 @@ export type Database = {
     }
     Functions: {
       _analytics_assert_admin: { Args: never; Returns: undefined }
+      _suggestion_is_blocked: { Args: { _text: string }; Returns: boolean }
       _user_scoped_columns: {
         Args: never
         Returns: {
@@ -5410,6 +5411,7 @@ export type Database = {
         Args: { _limit?: number; _prefix: string }
         Returns: {
           kind: string
+          score: number
           suggestion: string
         }[]
       }
@@ -5426,6 +5428,13 @@ export type Database = {
           popularity_score: number
           primary_riwayah: string
           rank: number
+        }[]
+      }
+      search_trending: {
+        Args: { _limit?: number }
+        Returns: {
+          hits: number
+          suggestion: string
         }[]
       }
       search_videos: {
