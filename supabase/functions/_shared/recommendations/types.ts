@@ -12,6 +12,7 @@ export interface RecommendationCandidate {
   title: string;
   channel_title: string | null;
   category: string | null;
+  section_id: string | null;
   thumbnail_url: string | null;
   halal_score: number | null;
   published_at: string | null;

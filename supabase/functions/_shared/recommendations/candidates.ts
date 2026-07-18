@@ -21,6 +21,7 @@ export async function fetchCandidates(
     title: String(row.title ?? ""),
     channel_title: (row.channel_title as string) ?? null,
     category: (row.category as string) ?? null,
+    section_id: (row.section_id as string) ?? null,
     thumbnail_url: (row.thumbnail_url as string) ?? null,
     halal_score: (row.halal_score as number) ?? null,
     published_at: (row.published_at as string) ?? null,
@@ -32,7 +33,7 @@ export async function fetchCandidates(
   });
 
   const select =
-    "video_id,title,channel_title,category,thumbnail_url,halal_score,published_at,is_trusted_channel,view_count,moderation_confidence,moderation_state,content_language";
+    "video_id,title,channel_title,category,section_id,thumbnail_url,halal_score,published_at,is_trusted_channel,view_count,moderation_confidence,moderation_state,content_language";
 
   const jobs: Array<Promise<unknown>> = [];
 
@@ -42,7 +43,9 @@ export async function fetchCandidates(
       .from("curated_videos")
       .select(select)
       .in("moderation_state", ["approved", "auto_approved"])
-      .eq(categoryFilter ? "category" : "moderation_state", categoryFilter ?? "approved") // noop guard when no filter
+      .eq("is_hidden", false)
+      .eq("is_archived", false)
+      .match(categoryFilter ? { category: categoryFilter } : {})
       .order("published_at", { ascending: false })
       .limit(BASE_LIMIT)
       .then(({ data }) => {
@@ -60,6 +63,8 @@ export async function fetchCandidates(
         .from("curated_videos")
         .select(select)
         .in("moderation_state", ["approved", "auto_approved"])
+        .eq("is_hidden", false)
+        .eq("is_archived", false)
         .in("video_id", Array.from(signals.trendingIds).slice(0, 200))
         .then(({ data }) => {
           for (const row of (data ?? []) as Array<Record<string, unknown>>) {
@@ -77,6 +82,8 @@ export async function fetchCandidates(
         .from("curated_videos")
         .select(select)
         .in("moderation_state", ["approved", "auto_approved"])
+        .eq("is_hidden", false)
+        .eq("is_archived", false)
         .in("video_id", Array.from(signals.heartifyTrendingIds).slice(0, 200))
         .then(({ data }) => {
           for (const row of (data ?? []) as Array<Record<string, unknown>>) {
@@ -94,6 +101,8 @@ export async function fetchCandidates(
         .from("curated_videos")
         .select(select)
         .in("moderation_state", ["approved", "auto_approved"])
+        .eq("is_hidden", false)
+        .eq("is_archived", false)
         .in("video_id", Array.from(signals.hiddenGemIds).slice(0, 120))
         .then(({ data }) => {
           for (const row of (data ?? []) as Array<Record<string, unknown>>) {
@@ -104,7 +113,7 @@ export async function fetchCandidates(
     );
   }
 
-  // 3) Category-affinity pool (top 3 categories, most-recent first).
+  // 3) Category/section-affinity pools (top 3 interests, most-recent first).
   const topCategories = Array.from(signals.categoryAffinity.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
@@ -115,7 +124,26 @@ export async function fetchCandidates(
         .from("curated_videos")
         .select(select)
         .in("moderation_state", ["approved", "auto_approved"])
+        .eq("is_hidden", false)
+        .eq("is_archived", false)
         .eq("category", cat)
+        .order("published_at", { ascending: false })
+        .limit(80)
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+            pool.set(String(row.video_id), project(row));
+          }
+        })
+        .catch(() => {}),
+    );
+    jobs.push(
+      admin
+        .from("curated_videos")
+        .select(select)
+        .in("moderation_state", ["approved", "auto_approved"])
+        .eq("is_hidden", false)
+        .eq("is_archived", false)
+        .eq("section_id", cat)
         .order("published_at", { ascending: false })
         .limit(80)
         .then(({ data }) => {
@@ -138,6 +166,8 @@ export async function fetchCandidates(
         .from("curated_videos")
         .select(select)
         .in("moderation_state", ["approved", "auto_approved"])
+        .eq("is_hidden", false)
+        .eq("is_archived", false)
         .eq("channel_title", ch)
         .order("published_at", { ascending: false })
         .limit(30)

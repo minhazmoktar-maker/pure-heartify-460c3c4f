@@ -2,26 +2,29 @@
  * useImpressionTracker
  *
  * Batches feed video impressions and flushes them to the `log_feed_impressions`
- * RPC. Flushes on: visibility change, beforeunload, or every 15s while active.
+ * RPC. Flushes quickly while active, and again on page hide/unmount.
  * Deduped per-session so the same card can't be counted 10x while scrolling.
  */
 import { useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const FLUSH_INTERVAL_MS = 15_000;
+const FLUSH_INTERVAL_MS = 3_000;
+const FLUSH_DEBOUNCE_MS = 900;
+const FLUSH_ON_QUEUE_SIZE = 8;
 const MAX_BATCH = 100;
 
 export function useImpressionTracker(enabled: boolean = true) {
   const queueRef = useRef<Set<string>>(new Set());
   const seenRef = useRef<Set<string>>(new Set());
   const inFlightRef = useRef(false);
+  const debounceRef = useRef<number | null>(null);
 
   const flush = useCallback(async () => {
     if (!enabled || inFlightRef.current) return;
     const q = queueRef.current;
     if (q.size === 0) return;
     const batch = Array.from(q).slice(0, MAX_BATCH);
-    q.clear();
+    for (const id of batch) q.delete(id);
     inFlightRef.current = true;
     try {
       await supabase.rpc("log_feed_impressions", { _video_ids: batch });
@@ -39,8 +42,18 @@ export function useImpressionTracker(enabled: boolean = true) {
       if (seenRef.current.has(videoId)) return;
       seenRef.current.add(videoId);
       queueRef.current.add(videoId);
+      if (queueRef.current.size >= FLUSH_ON_QUEUE_SIZE) {
+        void flush();
+        return;
+      }
+      if (debounceRef.current === null) {
+        debounceRef.current = window.setTimeout(() => {
+          debounceRef.current = null;
+          void flush();
+        }, FLUSH_DEBOUNCE_MS);
+      }
     },
-    [enabled],
+    [enabled, flush],
   );
 
   const markAction = useCallback(
@@ -67,6 +80,7 @@ export function useImpressionTracker(enabled: boolean = true) {
     window.addEventListener("pagehide", onUnload);
     return () => {
       clearInterval(interval);
+      if (debounceRef.current !== null) window.clearTimeout(debounceRef.current);
       document.removeEventListener("visibilitychange", onHide);
       window.removeEventListener("beforeunload", onUnload);
       window.removeEventListener("pagehide", onUnload);
