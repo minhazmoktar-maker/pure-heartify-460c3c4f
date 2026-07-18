@@ -110,7 +110,29 @@ Deno.serve(async (req) => {
           },
           { onConflict: "youtube_channel_id" },
         );
+
+        // Auto-ingest videos for the newly approved channel (fire-and-forget).
+        try {
+          const ingestUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/ingest-videos`;
+          fetch(ingestUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+              "apikey": Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+              "X-Cron-Secret": Deno.env.get("CRON_SECRET") ?? "",
+            },
+            body: JSON.stringify({
+              channel_ids: [c.youtube_channel_id],
+              limit: 25,
+              reason: "magic_link_auto_ingest",
+            }),
+          }).catch((err) => console.error("auto-ingest fetch failed", err));
+        } catch (e) {
+          console.error("auto-ingest schedule failed", e);
+        }
       }
+
 
       await admin.from("channel_moderation_decisions").insert({
         candidate_id: c.id,
