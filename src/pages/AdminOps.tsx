@@ -170,6 +170,36 @@ export default function AdminOps() {
       </Card>
 
       <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Recommendation pool mix (v3)</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Weights for the multi-source recommender. Values are proportions (0–1). Changes take effect on the next feed request.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {poolMix && Object.entries(poolMix).map(([k, v]) => (
+            <div key={k} className="flex items-center gap-3">
+              <div className="w-48 text-sm font-medium">{k}</div>
+              <Input
+                type="number"
+                step="0.05"
+                min={0}
+                max={1}
+                defaultValue={v}
+                onChange={(e) => setPoolMixEdits((s) => ({ ...s, [k]: e.target.value }))}
+                className="w-28"
+                disabled={!isOwner}
+              />
+            </div>
+          ))}
+          {!poolMix && <p className="text-sm text-muted-foreground">Not configured yet.</p>}
+          {isOwner && poolMix && (
+            <Button size="sm" onClick={savePoolMix} disabled={Object.keys(poolMixEdits).length === 0}>Save pool mix</Button>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader><CardTitle className="text-base">Recent discovery jobs</CardTitle></CardHeader>
         <CardContent>
           <div className="space-y-2">
