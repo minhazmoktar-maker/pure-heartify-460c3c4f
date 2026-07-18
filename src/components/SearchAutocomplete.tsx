@@ -322,7 +322,7 @@ const SearchAutocomplete = forwardRef<HTMLInputElement, Props>(function SearchAu
           <ul
             id={listboxId}
             role="listbox"
-            className="max-h-[70vh] overflow-y-auto overscroll-contain py-1"
+            className="max-h-[70vh] overflow-y-auto overscroll-contain py-2"
           >
             {debounced.length === 0 && recent.length > 0 && (
               <li className="flex items-center justify-between px-4 pb-1 pt-2">
@@ -366,14 +366,14 @@ const SearchAutocomplete = forwardRef<HTMLInputElement, Props>(function SearchAu
                     submit(s.text);
                   }}
                   className={cn(
-                    "flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm transition-colors",
-                    "min-h-[44px]", // touch-friendly
+                    "flex cursor-pointer items-center gap-4 px-5 py-3 text-[15px] transition-colors",
+                    "min-h-[48px]", // YT-style roomy row
                     active ? "bg-accent" : "hover:bg-accent/60",
                   )}
                 >
                   <Icon
                     className={cn(
-                      "h-4 w-4 shrink-0",
+                      "h-5 w-5 shrink-0",
                       s.kind === "trending"
                         ? "text-[hsl(var(--gold))]"
                         : s.kind === "channel"
