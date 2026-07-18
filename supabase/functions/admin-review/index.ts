@@ -55,8 +55,8 @@ Deno.serve(async (req) => {
         .select(
           "id, youtube_channel_id, title, handle, description, category, language_detected, subscriber_count, risk_score, tier, confidence, moderation_summary, tier_reason",
         )
-        .in("tier", ["B", "C"])
-        .eq("status", "pending")
+        .in("tier", ["S", "A", "B", "C", "D"])
+        .in("status", ["pending", "sampling", "pre_approved"])
         .order("subscriber_count", { ascending: false, nullsFirst: false })
         .limit(limit);
       if (error) return json({ error: error.message }, 500);
