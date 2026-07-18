@@ -55,7 +55,7 @@ export default function AdminOps() {
     if (error) toast({ title: "Dashboard failed", description: error.message, variant: "destructive" });
     setData(dash as any);
     setDlq((q as any[]) ?? []);
-    setPoolMix((mix?.value as Record<string, number>) ?? null);
+    setPoolMix(((mix?.value as unknown) as Record<string, number>) ?? null);
     setLoading(false);
   };
 
