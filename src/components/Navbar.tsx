@@ -190,14 +190,6 @@ const Navbar = () => {
           >
             <Search className="h-5 w-5 text-foreground" />
           </Link>
-          <Link
-            to="/channels"
-            className="hidden items-center gap-1.5 rounded-pill px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary md:flex"
-            title="Browse trusted channels"
-          >
-            <ShieldCheck className="h-4 w-4 text-primary" />
-            Channels
-          </Link>
           <LanguageSwitcher />
           <button
             onClick={toggleTheme}
