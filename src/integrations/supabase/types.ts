@@ -955,45 +955,74 @@ export type Database = {
       }
       channels_state: {
         Row: {
+          approved_channel_id: string | null
           category: string | null
           channel_id: string | null
           channel_name: string
+          consecutive_failures: number
           created_at: string
           id: string
+          last_error: string | null
           last_pulled_at: string | null
+          last_success_at: string | null
+          next_attempt_at: string
           next_page_token: string | null
+          priority: number
           resolved_at: string | null
+          status: string
           total_pulled: number
           updated_at: string
           uploads_playlist_id: string | null
         }
         Insert: {
+          approved_channel_id?: string | null
           category?: string | null
           channel_id?: string | null
           channel_name: string
+          consecutive_failures?: number
           created_at?: string
           id?: string
+          last_error?: string | null
           last_pulled_at?: string | null
+          last_success_at?: string | null
+          next_attempt_at?: string
           next_page_token?: string | null
+          priority?: number
           resolved_at?: string | null
+          status?: string
           total_pulled?: number
           updated_at?: string
           uploads_playlist_id?: string | null
         }
         Update: {
+          approved_channel_id?: string | null
           category?: string | null
           channel_id?: string | null
           channel_name?: string
+          consecutive_failures?: number
           created_at?: string
           id?: string
+          last_error?: string | null
           last_pulled_at?: string | null
+          last_success_at?: string | null
+          next_attempt_at?: string
           next_page_token?: string | null
+          priority?: number
           resolved_at?: string | null
+          status?: string
           total_pulled?: number
           updated_at?: string
           uploads_playlist_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "channels_state_approved_channel_id_fkey"
+            columns: ["approved_channel_id"]
+            isOneToOne: false
+            referencedRelation: "approved_channels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       comment_reactions: {
         Row: {
@@ -4861,6 +4890,20 @@ export type Database = {
           period: string | null
           stage: string | null
           state: string | null
+        }
+        Relationships: []
+      }
+      v_ingestion_health: {
+        Row: {
+          approved_active: number | null
+          approved_with_videos: number | null
+          approved_without_videos: number | null
+          dead_letter_count: number | null
+          failing_count: number | null
+          state_rows_linked: number | null
+          successful_last_24h: number | null
+          videos_ingested_last_24h: number | null
+          videos_ingested_last_7d: number | null
         }
         Relationships: []
       }

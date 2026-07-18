@@ -736,13 +736,29 @@ interface ChannelStateRow {
   next_page_token: string | null;
   total_pulled: number;
   last_pulled_at: string | null;
+  consecutive_failures?: number;
 }
 
 async function pickStaleChannels(limit: number): Promise<ChannelStateRow[]> {
-  const url = `channels_state?select=id,channel_name,channel_id,uploads_playlist_id,next_page_token,total_pulled,last_pulled_at&order=last_pulled_at.asc.nullsfirst&limit=${limit}`;
+  // Scheduler: only rows whose backoff has elapsed and that aren't dead-lettered.
+  // Ordering: priority ASC (approved channels have priority=10, catalog seeds=100),
+  // then next_attempt_at ASC so due channels come first, breaking ties by oldest pull.
+  const nowIso = new Date().toISOString();
+  const url =
+    `channels_state?select=id,channel_name,channel_id,uploads_playlist_id,next_page_token,total_pulled,last_pulled_at,consecutive_failures` +
+    `&status=in.(pending,healthy,failing)` +
+    `&next_attempt_at=lte.${encodeURIComponent(nowIso)}` +
+    `&order=priority.asc,next_attempt_at.asc,last_pulled_at.asc.nullsfirst` +
+    `&limit=${limit}`;
   const res = await sbFetch(url);
   if (!res.ok) return [];
   return await res.json();
+}
+
+function backoffMinutes(consecutiveFailures: number): number {
+  // 5,10,20,40,80,160,320 min. 6+ failures → dead-lettered by caller.
+  const step = Math.max(0, Math.min(consecutiveFailures, 8));
+  return 5 * Math.pow(2, step);
 }
 
 async function updateChannelState(id: string, patch: Record<string, unknown>) {
@@ -752,6 +768,45 @@ async function updateChannelState(id: string, patch: Record<string, unknown>) {
   }).catch(() => {});
 }
 
+async function markChannelSuccess(id: string, extra: Record<string, unknown> = {}) {
+  const nextIso = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+  await updateChannelState(id, {
+    status: "healthy",
+    consecutive_failures: 0,
+    last_error: null,
+    last_success_at: new Date().toISOString(),
+    last_pulled_at: new Date().toISOString(),
+    next_attempt_at: nextIso,
+    ...extra,
+  });
+}
+
+async function markChannelFailure(state: ChannelStateRow, reason: string) {
+  const failures = (state.consecutive_failures ?? 0) + 1;
+  const dead = failures >= 6;
+  const nextIso = new Date(Date.now() + backoffMinutes(failures) * 60 * 1000).toISOString();
+  await updateChannelState(state.id, {
+    status: dead ? "dead" : "failing",
+    consecutive_failures: failures,
+    last_error: reason.slice(0, 500),
+    last_pulled_at: new Date().toISOString(),
+    next_attempt_at: nextIso,
+  });
+  if (dead) {
+    // Dead-letter mirror so operators see it in /admin/ops.
+    await sbFetch("dead_letter_queue", {
+      method: "POST",
+      headers: { "Prefer": "return=headers-only" },
+      body: JSON.stringify([{
+        job_type: "channel_ingest",
+        payload: { channel_state_id: state.id, channel_id: state.channel_id, channel_name: state.channel_name },
+        error: reason.slice(0, 1000),
+        failure_count: failures,
+      }]),
+    }).catch(() => {});
+  }
+}
+
 // === CHANNELS TRACK: pull uploads playlist ===
 async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; quota: number }> {
   let quota = 0;
@@ -759,22 +814,37 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
   let uploadsId = state.uploads_playlist_id;
 
   if (!channelId || !uploadsId) {
-    const resolved = await resolveChannel(state.channel_name);
-    if (!resolved) {
-      await updateChannelState(state.id, { last_pulled_at: new Date().toISOString() });
-      return { added: 0, quota };
+    // Fast path: we already have the UC id from approved_channels backfill —
+    // just fetch the uploads playlist (1 quota unit). Avoids the 100-unit search.
+    if (channelId && !uploadsId) {
+      const cr = await ytFetch("channels", new URLSearchParams({ part: "contentDetails", id: channelId }));
+      quota += 1;
+      const cd = cr.ok ? (cr.data as { items?: Array<{ contentDetails?: { relatedPlaylists?: { uploads?: string } } }> }) : null;
+      const up = cd?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+      if (up) {
+        uploadsId = up;
+        await updateChannelState(state.id, { uploads_playlist_id: up, resolved_at: new Date().toISOString() });
+      } else {
+        await markChannelFailure(state, `uploads_playlist_missing:${channelId}`);
+        return { added: 0, quota };
+      }
+    } else {
+      const resolved = await resolveChannel(state.channel_name);
+      if (!resolved) {
+        await markChannelFailure(state, `resolve_failed:${state.channel_name}`);
+        return { added: 0, quota };
+      }
+      quota += resolved.quota;
+      channelId = resolved.channelId;
+      uploadsId = resolved.uploadsPlaylistId;
+      await updateChannelState(state.id, {
+        channel_id: channelId,
+        uploads_playlist_id: uploadsId,
+        resolved_at: new Date().toISOString(),
+      });
     }
-    quota += resolved.quota;
-    channelId = resolved.channelId;
-    uploadsId = resolved.uploadsPlaylistId;
-    await updateChannelState(state.id, {
-      channel_id: channelId,
-      uploads_playlist_id: uploadsId,
-      resolved_at: new Date().toISOString(),
-    });
   }
 
-  // Page through playlistItems (1 quota unit per page, 50 items per page) — incremental cursor
   const params = new URLSearchParams({
     part: "snippet,contentDetails",
     playlistId: uploadsId,
@@ -785,8 +855,9 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
   const r = await ytFetch("playlistItems", params);
   quota += 1;
   if (!r.ok) {
+    const reason = `playlistItems_${r.status}:${String((r.data as any)?.error ?? "").slice(0, 200)}`;
     console.error(`playlistItems failed for ${state.channel_name}: ${r.status}`);
-    await updateChannelState(state.id, { last_pulled_at: new Date().toISOString() });
+    await markChannelFailure(state, reason);
     return { added: 0, quota };
   }
   const data = r.data as { items?: Array<Record<string, unknown>>; nextPageToken?: string };
@@ -835,13 +906,13 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
       halal_score: verdict.score,
       section_id: inferSectionFromChannel(channel),
       is_trusted_channel: true,
+      moderation_state: "approved",
     });
   }
 
   const added = await upsertVideos(rows);
-  await updateChannelState(state.id, {
+  await markChannelSuccess(state.id, {
     next_page_token: nextToken,
-    last_pulled_at: new Date().toISOString(),
     total_pulled: state.total_pulled + added,
   });
   await logIngestion(`channel:${state.channel_name}`, null, items.length, added, quota);
