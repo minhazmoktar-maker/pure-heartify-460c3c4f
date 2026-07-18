@@ -116,7 +116,7 @@ export default function ReviewMagic() {
         <div>
           <h1 className="text-lg font-semibold">Channel Review Queue</h1>
           <p className="text-xs text-muted-foreground">
-            {items.length} pending · {expiresAt ? `link expires ${new Date(expiresAt).toLocaleString()}` : ""}
+            {items.length}{total > items.length ? ` / ${total}` : ""} pending{loading ? " · loading…" : ""} · {expiresAt ? `link expires ${new Date(expiresAt).toLocaleString()}` : ""}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
