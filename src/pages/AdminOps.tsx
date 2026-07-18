@@ -42,16 +42,20 @@ export default function AdminOps() {
   const [loading, setLoading] = useState(true);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [dlq, setDlq] = useState<any[]>([]);
+  const [poolMix, setPoolMix] = useState<Record<string, number> | null>(null);
+  const [poolMixEdits, setPoolMixEdits] = useState<Record<string, string>>({});
 
   const load = async () => {
     setLoading(true);
-    const [{ data: dash, error }, { data: q }] = await Promise.all([
+    const [{ data: dash, error }, { data: q }, { data: mix }] = await Promise.all([
       supabase.rpc("get_ops_dashboard"),
       supabase.from("dead_letter_queue").select("*").is("resolved_at", null).order("created_at", { ascending: false }).limit(25),
+      supabase.from("_internal_config").select("value").eq("key", "reco_pool_mix").maybeSingle(),
     ]);
     if (error) toast({ title: "Dashboard failed", description: error.message, variant: "destructive" });
     setData(dash as any);
     setDlq((q as any[]) ?? []);
+    setPoolMix((mix?.value as Record<string, number>) ?? null);
     setLoading(false);
   };
 
