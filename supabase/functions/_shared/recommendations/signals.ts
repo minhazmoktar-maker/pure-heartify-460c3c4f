@@ -350,6 +350,26 @@ export async function gatherSignals(
         })
         .catch(() => {}),
     );
+
+    // Followed channels — explicit intent, strongest single channel signal.
+    // channel_follows.channel_id → approved_channels.id → channel_title
+    jobs.push(
+      admin
+        .from("channel_follows")
+        .select("approved_channels(channel_title)")
+        .eq("follower_id", userId)
+        .limit(500)
+        .then(({ data }) => {
+          for (const row of (data ?? []) as Array<{ approved_channels: { channel_title: string | null } | null }>) {
+            const title = row.approved_channels?.channel_title;
+            if (!title) continue;
+            signals.channelAffinity.set(title, (signals.channelAffinity.get(title) ?? 0) + 6);
+            signals.longTermChannelAffinity.set(title, (signals.longTermChannelAffinity.get(title) ?? 0) + 6);
+            signals.seenChannelIds.add(title);
+          }
+        })
+        .catch(() => {}),
+    );
   }
 
   await Promise.all(jobs);
