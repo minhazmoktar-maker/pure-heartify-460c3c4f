@@ -158,6 +158,15 @@ export default function ReviewMagic() {
                   >
                     Tier {c.tier ?? "?"}
                   </Badge>
+                  {c.subscriber_count != null && (
+                    <Badge variant="outline" className="tabular-nums">
+                      {c.subscriber_count >= 1_000_000
+                        ? `${(c.subscriber_count / 1_000_000).toFixed(1)}M subs`
+                        : c.subscriber_count >= 1_000
+                        ? `${(c.subscriber_count / 1_000).toFixed(1)}K subs`
+                        : `${c.subscriber_count} subs`}
+                    </Badge>
+                  )}
                   {c.risk_score != null && (
                     <Badge variant={c.risk_score >= 70 ? "destructive" : c.risk_score >= 50 ? "secondary" : "outline"}>
                       risk {c.risk_score}
