@@ -24,7 +24,7 @@ async function ytFetch(path: string): Promise<any> {
   throw new Error(`YT quota/keys exhausted: ${lastErr}`);
 }
 
-async function resolveHandle(rawHandle: string): Promise<any | null> {
+async function resolveHandle(rawHandle: string, allowSearch = true): Promise<any | null> {
   const h = rawHandle.replace(/^@/, "");
   // Try forHandle first (modern), then forUsername (legacy)
   try {
@@ -35,7 +35,8 @@ async function resolveHandle(rawHandle: string): Promise<any | null> {
     const j = await ytFetch(`channels?part=snippet,statistics,brandingSettings&forUsername=${encodeURIComponent(h)}`);
     if (j?.items?.[0]) return j.items[0];
   } catch (_) { /* fall through */ }
-  // Fallback: search
+  if (!allowSearch) return null;
+  // Fallback: search (expensive: 100 quota units)
   try {
     const s = await ytFetch(`search?part=snippet&type=channel&maxResults=1&q=${encodeURIComponent("@" + h)}`);
     const chId = s?.items?.[0]?.snippet?.channelId;
