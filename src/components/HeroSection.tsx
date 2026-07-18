@@ -21,13 +21,13 @@ const HeroSection = () => {
 
       <div className="relative mx-auto max-w-[1800px] px-4 py-14 md:px-6 md:py-20">
         <FadeIn y={30} duration={0.7} className="max-w-2xl">
-          <span className="inline-block rounded-pill bg-gold/20 px-3 py-1 text-micro font-semibold text-gold">
-            ✦ Your attention deserves better
-          </span>
           <h1 className="mt-4 font-heading text-title font-bold leading-tight text-cream md:text-display">
-            Less distraction.{" "}
-            <span className="text-gradient-gold">More benefit.</span>
+            Your attention{" "}
+            <span className="text-gradient-gold">deserves better.</span>
           </h1>
+          <p className="mt-4 font-heading text-lg font-semibold leading-tight text-cream md:text-xl">
+            Less distraction. More benefit.
+          </p>
           <p className="mt-4 text-sm leading-relaxed text-cream md:text-base">
             Heartify is built for people who want their screen time to be meaningful.
           </p>
