@@ -79,8 +79,9 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const limit = Math.min(100, Number(body.limit ?? 50));
+    const limit = Math.min(200, Number(body.limit ?? 50));
     const autoClassify: boolean = body.classify !== false;
+    const allowSearch: boolean = body.allow_search !== false;
 
     const { data: pending, error: fetchErr } = await admin
       .from("channel_candidates")
