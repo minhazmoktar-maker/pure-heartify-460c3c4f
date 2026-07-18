@@ -736,6 +736,7 @@ interface ChannelStateRow {
   next_page_token: string | null;
   total_pulled: number;
   last_pulled_at: string | null;
+  consecutive_failures?: number;
 }
 
 async function pickStaleChannels(limit: number): Promise<ChannelStateRow[]> {
