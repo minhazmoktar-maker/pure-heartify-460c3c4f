@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle, Download } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, Clock, Bookmark, PlayCircle, AlertTriangle, Download, ShieldCheck, ChevronRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import EmptyState from "@/components/EmptyState";
 import PageSkeleton from "@/components/PageSkeleton";
@@ -292,6 +292,24 @@ const Profile = () => {
 
             <div className="pt-4">
               <ChannelDiversitySetting />
+            </div>
+
+            <div className="pt-4">
+              <Link
+                to="/channels"
+                className="flex items-center justify-between gap-3 rounded-card border border-border bg-card p-5 transition-colors hover:border-primary/50 hover:bg-accent"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-pill bg-primary/15 text-primary" aria-hidden>
+                    <ShieldCheck className="h-5 w-5" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-foreground">Trusted channels</span>
+                    <span className="block text-micro text-muted-foreground">Browse the vetted halal channel directory.</span>
+                  </span>
+                </span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden />
+              </Link>
             </div>
 
             <div className="pt-4">
