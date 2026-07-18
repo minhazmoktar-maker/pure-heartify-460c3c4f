@@ -165,6 +165,7 @@ async function computeRecommendations(args: ComputeArgs) {
               title: (n.title as string) ?? "",
               channel_title: (n.channel_title as string) ?? null,
               category: (n.category as string) ?? null,
+              section_id: (n.section_id as string) ?? null,
               thumbnail_url: (n.thumbnail_url as string) ?? null,
               halal_score: (n.halal_score as number) ?? null,
               published_at: (n.published_at as string) ?? null,

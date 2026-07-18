@@ -1,9 +1,11 @@
+import { useEffect, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useInfiniteFeed, type FeedSort } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { HalalCategory } from "@/services/youtube";
+import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 
 interface Props {
   category?: HalalCategory;
@@ -37,6 +39,26 @@ const InfiniteVideoGrid = ({
   );
 
   const allVideos = data?.pages.flatMap((p) => p.items) ?? [];
+  const gridRef = useRef<HTMLDivElement>(null);
+  const { track } = useImpressionTracker(!isLoading && !error);
+
+  useEffect(() => {
+    const root = gridRef.current;
+    if (!root || allVideos.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            const id = (entry.target as HTMLElement).dataset.videoId;
+            if (id) track(id);
+          }
+        }
+      },
+      { threshold: [0.5] },
+    );
+    root.querySelectorAll<HTMLElement>("[data-video-id]").forEach((node) => io.observe(node));
+    return () => io.disconnect();
+  }, [allVideos, track]);
 
   if (isLoading) {
     return (
@@ -76,10 +98,11 @@ const InfiniteVideoGrid = ({
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div ref={gridRef} className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {allVideos.map((video, i) => (
           <div
             key={video.id}
+            data-video-id={video.id}
             // content-visibility virtualizes off-screen cards without breaking the
             // responsive CSS grid; contain-intrinsic-size prevents layout shift.
             style={{ contentVisibility: "auto", containIntrinsicSize: "320px" }}

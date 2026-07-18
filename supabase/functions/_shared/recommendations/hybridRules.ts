@@ -24,9 +24,9 @@ import type {
 // perturbWeights) so different users literally optimize a different linear
 // combination of signals — not merely a different ordering of the same one.
 const W_BASE = {
-  interest:        Number(Deno.env.get("REC_W_INTEREST") ?? 0.18),
-  categoryAff:     Number(Deno.env.get("REC_W_CATEGORY") ?? 0.16),
-  channelAff:      Number(Deno.env.get("REC_W_CHANNEL")  ?? 0.14),
+  interest:        Number(Deno.env.get("REC_W_INTEREST") ?? 0.34),
+  categoryAff:     Number(Deno.env.get("REC_W_CATEGORY") ?? 0.22),
+  channelAff:      Number(Deno.env.get("REC_W_CHANNEL")  ?? 0.20),
   favoriteChannel: Number(Deno.env.get("REC_W_FAV_CHAN") ?? 0.06),
   trending:        Number(Deno.env.get("REC_W_TRENDING") ?? 0.08),
   heartifyTrend:   Number(Deno.env.get("REC_W_HEARTIFY_TREND") ?? 0.12),
@@ -34,7 +34,7 @@ const W_BASE = {
   trusted:         Number(Deno.env.get("REC_W_TRUSTED")  ?? 0.10),
   halal:           Number(Deno.env.get("REC_W_HALAL")    ?? 0.08),
   aiConfidence:    Number(Deno.env.get("REC_W_AI")       ?? 0.06),
-  freshness:       Number(Deno.env.get("REC_W_FRESH")    ?? 0.08),
+  freshness:       Number(Deno.env.get("REC_W_FRESH")    ?? 0.06),
   session:         Number(Deno.env.get("REC_W_SESSION")  ?? 0.04),
   language:        Number(Deno.env.get("REC_W_LANGUAGE") ?? 0.10),
   context:         Number(Deno.env.get("REC_W_CONTEXT")  ?? 0.12),
@@ -128,7 +128,7 @@ function freshnessScore(publishedAt: string | null): number {
 
 function interestMatch(interests: string[], candidate: RecommendationCandidate): number {
   if (!interests.length) return 0;
-  const hay = `${candidate.title ?? ""} ${candidate.channel_title ?? ""} ${candidate.category ?? ""}`.toLowerCase();
+  const hay = `${candidate.title ?? ""} ${candidate.channel_title ?? ""} ${candidate.category ?? ""} ${candidate.section_id ?? ""}`.toLowerCase();
   let matches = 0;
   for (const kw of interests) {
     if (kw && hay.includes(kw)) matches++;
@@ -162,7 +162,10 @@ function scoreCandidate(
   score += push("interest_match", interestMatch(s.interests, candidate), W.interest,
     s.interests.length ? `matched user interests` : undefined);
 
-  const catAff = candidate.category ? (s.categoryAffinity.get(candidate.category) ?? 0) : 0;
+  const catAff = Math.max(
+    candidate.category ? (s.categoryAffinity.get(candidate.category) ?? 0) : 0,
+    candidate.section_id ? (s.categoryAffinity.get(candidate.section_id) ?? 0) : 0,
+  );
   score += push("category_affinity", catAff, W.categoryAff,
     candidate.category ? `category "${candidate.category}"` : undefined);
 
@@ -174,8 +177,10 @@ function scoreCandidate(
   // interest in tafsīr keeps seeing tafsīr weeks after their short-term
   // signal has decayed. Two users with identical last-week behaviour but
   // different multi-year histories will now diverge here.
-  const longCat = candidate.category
-    ? (s.longTermCategoryAffinity.get(candidate.category) ?? 0) : 0;
+  const longCat = Math.max(
+    candidate.category ? (s.longTermCategoryAffinity.get(candidate.category) ?? 0) : 0,
+    candidate.section_id ? (s.longTermCategoryAffinity.get(candidate.section_id) ?? 0) : 0,
+  );
   const longCh = candidate.channel_title
     ? (s.longTermChannelAffinity.get(candidate.channel_title) ?? 0) : 0;
   const longTerm = Math.max(longCat, longCh);

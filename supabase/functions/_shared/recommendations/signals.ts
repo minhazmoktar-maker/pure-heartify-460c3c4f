@@ -138,12 +138,28 @@ export async function gatherSignals(
     jobs.push(
       admin
         .from("user_interests")
-        .select("interest")
+        .select("primary_interest, secondary_interest, exploration_interest")
         .eq("user_id", userId)
         .then(({ data }) => {
-          signals.interests = ((data ?? []) as Array<{ interest: string }>)
-            .map((r) => r.interest?.toLowerCase().trim())
-            .filter(Boolean);
+          const row = ((data ?? []) as Array<{
+            primary_interest: string | null;
+            secondary_interest: string | null;
+            exploration_interest: string | null;
+          }>)[0];
+          const weighted = [
+            [row?.primary_interest, 3],
+            [row?.secondary_interest, 2],
+            [row?.exploration_interest, 1],
+          ] as const;
+          const interests: string[] = [];
+          for (const [raw, weight] of weighted) {
+            const key = raw?.toLowerCase().trim();
+            if (!key) continue;
+            interests.push(key);
+            signals.categoryAffinity.set(key, (signals.categoryAffinity.get(key) ?? 0) + weight);
+            signals.longTermCategoryAffinity.set(key, (signals.longTermCategoryAffinity.get(key) ?? 0) + weight);
+          }
+          signals.interests = interests;
         })
         .catch(() => {}),
     );

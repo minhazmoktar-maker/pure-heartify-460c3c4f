@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
       : sort === "recent"
       ? "ingested_at.desc,published_at.desc.nullslast,halal_score.desc"
       : "published_at.desc.nullslast,halal_score.desc,ingested_at.desc";
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&order=${orderClause}&limit=${fetchLimit}`;
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false&order=${orderClause}&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
@@ -232,24 +232,26 @@ Deno.serve(async (req) => {
                 })
               : ordered;
 
-            const aff = sort === "recent" ? 0.4 : 1.0;
-            const freshAnchor = sort === "recent" ? 1.6 : 1.0;
+            const aff = sort === "recent" ? 0.7 : 1.0;
+            const freshAnchor = sort === "recent" ? 1.15 : 0.35;
             const freshBoost = (poolMix.recently_added ?? 0.2) * 2.5; // 0..~0.6
 
             const N = preFiltered.length;
             const scored = preFiltered.map((v, i) => {
               const ch = (v.channel_title as string | null) ?? "";
               const cat = (v.category as string | null) ?? "";
+              const section = (v.section_id as string | null) ?? "";
               const vid = (v.video_id as string) ?? "";
               const baseFresh = 1 - i / Math.max(1, N);
               const chAff = signals.channelAffinity.get(ch) ?? 0;
-              const catAff = signals.categoryAffinity.get(cat) ?? 0;
+              const catAff = Math.max(signals.categoryAffinity.get(cat) ?? 0, signals.categoryAffinity.get(section) ?? 0);
               const longCh = signals.longTermChannelAffinity.get(ch) ?? 0;
               const longCat = signals.longTermCategoryAffinity.get(cat) ?? 0;
               const interestMatch = signals.interests.some((kw) =>
                 kw && (
                   ((v.title as string) ?? "").toLowerCase().includes(kw) ||
-                  ((v.category as string) ?? "").toLowerCase().includes(kw)
+                  ((v.category as string) ?? "").toLowerCase().includes(kw) ||
+                  ((v.section_id as string) ?? "").toLowerCase().includes(kw)
                 )
               ) ? 1 : 0;
               const seenCh = ch && signals.seenChannelIds.has(ch);
@@ -269,11 +271,11 @@ Deno.serve(async (req) => {
               const score =
                 baseFresh * freshAnchor +
                 fresh * freshBoost +
-                chAff * 0.55 * aff * p("ch") +
-                catAff * 0.45 * aff * p("cat") +
+                chAff * 0.85 * aff * p("ch") +
+                catAff * 0.90 * aff * p("cat") +
                 longCh * 0.25 * aff * p("longCh") +
-                longCat * 0.20 * aff * p("longCat") +
-                interestMatch * 0.30 * aff * p("int") +
+                longCat * 0.55 * aff * p("longCat") +
+                interestMatch * 1.10 * aff * p("int") +
                 novelty * 0.20 * aff * p("nov") -
                 impPen -
                 skipped * 0.25 -
