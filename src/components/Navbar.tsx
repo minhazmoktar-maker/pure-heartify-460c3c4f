@@ -24,7 +24,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { isAdmin, isOwner } = useRole();
   const scrolled = useScrolled(8);
-  const { enabled: kidsOn, toggle: toggleKids } = useKidsMode();
+  
 
   useEffect(() => { setUnseenChangelog(hasUnseenChangelog()); }, []);
   useEffect(() => { if (!menuOpen) setMenuFilter(""); }, [menuOpen]);
