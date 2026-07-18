@@ -32,7 +32,11 @@ function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=60, s-maxage=60",
+      // Personalized responses must not be shared between users. Any CDN in
+      // front must key by Authorization so signed-in users never receive
+      // another user's cached feed.
+      "Cache-Control": "private, max-age=30",
+      "Vary": "Authorization",
       ...extra,
     },
   });
@@ -204,8 +208,10 @@ Deno.serve(async (req) => {
     // across users.
     if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
-      // v3: rotate seed daily instead of weekly so feeds refresh at least 1x/day.
-      const dayBucket = Math.floor(Date.now() / 86400000);
+      // Rotate seed every 4h so returning users don't see the exact same
+      // ranking for a full day. 6 buckets/day → feed feels alive without
+      // trashing cache hit rates or impression memory.
+      const dayBucket = Math.floor(Date.now() / (4 * 3600_000));
       const seedStr = `${identity}:${dayBucket}:${category ?? "all"}:${sort}`;
       const hash01 = (s: string): number => {
         let h = 2166136261 >>> 0;

@@ -991,13 +991,51 @@ Deno.serve(async (req) => {
       await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, next));
     }
 
-    if (mode === "channels" || mode === "both") {
+    // Explicit channel_ids target: honor caller (e.g. admin-review auto-ingest).
+    // Seeds/updates channels_state with resolved YouTube channel IDs, then
+    // processes ONLY those channels this run — no staleness scan, no discovery.
+    const explicitChannelIds: string[] = Array.isArray(body?.channel_ids)
+      ? (body.channel_ids as unknown[])
+          .filter((x): x is string => typeof x === "string" && /^UC[A-Za-z0-9_-]{22}$/.test(x))
+          .slice(0, 200)
+      : [];
+
+    if (explicitChannelIds.length > 0) {
+      // Look up display names from approved_channels (fallback to raw ID).
+      const idList = explicitChannelIds.map(encodeURIComponent).join(",");
+      const acRes = await sbFetch(
+        `approved_channels?select=youtube_channel_id,channel_title,handle&youtube_channel_id=in.(${idList})`,
+      ).catch(() => null);
+      const nameByYtId = new Map<string, string>();
+      if (acRes?.ok) {
+        for (const r of (await acRes.json()) as Array<{ youtube_channel_id: string; channel_title?: string | null; handle?: string | null }>) {
+          nameByYtId.set(r.youtube_channel_id, r.channel_title || r.handle || r.youtube_channel_id);
+        }
+      }
+      // Upsert channels_state so we have a stable row per channel.
+      const seedRows = explicitChannelIds.map((ytId) => ({
+        channel_name: nameByYtId.get(ytId) ?? ytId,
+        channel_id: ytId,
+      }));
+      await sbFetch("channels_state?on_conflict=channel_name", {
+        method: "POST",
+        headers: { "Prefer": "resolution=merge-duplicates,return=headers-only" },
+        body: JSON.stringify(seedRows),
+      }).catch((e) => console.error("seed explicit channels error", e));
+
+      // Fetch the state rows back for the ids we care about.
+      const stateRes = await sbFetch(
+        `channels_state?select=id,channel_name,channel_id,uploads_playlist_id,next_page_token,total_pulled,last_pulled_at&channel_id=in.(${idList})`,
+      );
+      const targetRows: ChannelStateRow[] = stateRes.ok ? await stateRes.json() : [];
+      await runPool(targetRows, ingestChannel, perRunQuotaCap);
+    } else if (mode === "channels" || mode === "both") {
       await ensureChannelsSeeded();
       const stale = await pickStaleChannels(channelsPerRun);
       await runPool(stale, ingestChannel, perRunQuotaCap * 0.75);
     }
 
-    if (mode === "discovery" || mode === "both") {
+    if (explicitChannelIds.length === 0 && (mode === "discovery" || mode === "both")) {
       const allQueries: Array<[string, string]> = [];
       for (const [sec, qs] of Object.entries(SECTION_QUERIES)) {
         for (const q of qs) allQueries.push([sec, q]);
