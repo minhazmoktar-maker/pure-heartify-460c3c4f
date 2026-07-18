@@ -21,35 +21,34 @@ const HeroSection = () => {
 
       <div className="relative mx-auto max-w-[1800px] px-4 py-14 md:px-6 md:py-20">
         <FadeIn y={30} duration={0.7} className="max-w-2xl">
+          <span className="inline-block rounded-pill bg-gold/20 px-3 py-1 text-micro font-semibold text-gold">
+            ✦ Reclaim your attention
+          </span>
           <h1 className="mt-4 font-heading text-title font-bold leading-tight text-cream md:text-display">
-            Your attention{" "}
-            <span className="text-gradient-gold">deserves better.</span>
+            Every recommendation should earn your time.
           </h1>
-          <p className="mt-4 font-heading text-lg font-semibold leading-tight text-cream md:text-xl">
-            Less distraction. More benefit.
+          <p className="mt-4 text-sm leading-relaxed text-cream md:text-base">
+            Heartify is built for people who choose learning over endless scrolling.
           </p>
           <p className="mt-4 text-sm leading-relaxed text-cream md:text-base">
-            Heartify is built for people who want their screen time to be meaningful.
+            Our AI continuously selects educational, ethical, and value-aligned content while reducing distractions, so your feed becomes a place to learn, reflect, and grow.
           </p>
           <p className="mt-4 text-sm leading-relaxed text-cream md:text-base">
-            Using a rigorous AI moderation and recommendation system, we prioritize educational, ethical, and value-aligned content while continuously working to reduce distractions and surface what matters most.
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-cream md:text-base">
-            Whether you&apos;re exploring Islamic knowledge, science, technology, history, or practical skills, Heartify helps you spend more time on content that benefits your life.
+            Whether you&apos;re studying Islam, building new skills, or exploring the world&apos;s knowledge, Heartify helps you spend more time on content that truly matters.
           </p>
 
           <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-micro font-medium text-cream md:text-sm">
             <li className="inline-flex items-center gap-1.5">
-              <span aria-hidden className="text-gold">✓</span> AI-moderated recommendations
+              <span aria-hidden className="text-gold">✓</span> Purposeful recommendations
             </li>
             <li className="inline-flex items-center gap-1.5">
-              <span aria-hidden className="text-gold">✓</span> Educational &amp; value-aligned
+              <span aria-hidden className="text-gold">✓</span> AI-moderated for quality
             </li>
             <li className="inline-flex items-center gap-1.5">
               <span aria-hidden className="text-gold">✓</span> Built to reduce distraction
             </li>
             <li className="inline-flex items-center gap-1.5">
-              <span aria-hidden className="text-gold">✓</span> Privacy-first
+              <span aria-hidden className="text-gold">✓</span> Privacy respected
             </li>
           </ul>
 
