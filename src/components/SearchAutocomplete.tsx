@@ -128,15 +128,18 @@ const SearchAutocomplete = forwardRef<HTMLInputElement, Props>(function SearchAu
   // Autocomplete for the current prefix.
   const suggestQ = useQuery({
     queryKey: ["search-autocomplete", debounced],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("search_autocomplete", {
-        _prefix: debounced,
-        _limit: MAX_SUGGESTIONS,
-      });
+    queryFn: async ({ signal }) => {
+      const { data, error } = await supabase
+        .rpc("search_autocomplete", {
+          _prefix: debounced,
+          _limit: MAX_SUGGESTIONS,
+        })
+        .abortSignal(signal);
       if (error) throw error;
       return (data ?? []) as Array<{ suggestion: string; kind: string; score: number }>;
     },
     enabled: debounced.length >= 1,
+    retry: false,
     staleTime: 60_000,
     gcTime: 5 * 60_000,
     placeholderData: (prev) => prev,
@@ -397,9 +400,19 @@ const SearchAutocomplete = forwardRef<HTMLInputElement, Props>(function SearchAu
 
             {suggestions.length === 0 &&
               !suggestQ.isFetching &&
+              !suggestQ.isError &&
               debounced.length >= 1 && (
                 <li className="px-4 py-4 text-center text-sm text-muted-foreground">
                   No ethical results found.
+                </li>
+              )}
+
+            {suggestions.length === 0 &&
+              !suggestQ.isFetching &&
+              suggestQ.isError &&
+              debounced.length >= 1 && (
+                <li className="px-4 py-4 text-center text-sm text-muted-foreground">
+                  Press Search to continue.
                 </li>
               )}
           </ul>
