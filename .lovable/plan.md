@@ -1,120 +1,137 @@
+# Recommendation Engine v3
 
-# Confidence-Tiered Moderation Pipeline
+Complete redesign of Heartify's recommendation system. Preserves all halal-first moderation, RLS, and existing APIs. Ships in verifiable phases against the current `feed` and `recommendations` edge functions and Home UI.
 
-Goal: scale channel moderation from 1-by-1 review to a 4-tier confidence pipeline with batch actions, AI-generated evidence, cluster review, and active learning — while preserving every existing halal rule and never lowering the approval bar.
+## Goals (measurable)
 
-## 1. Confidence tier model
+- Two users with different interests share <20% of top-50 feed items.
+- Repeat-impression rate over 7 days <15%.
+- Newly approved videos reach eligible users within 5 minutes.
+- p95 personalized feed latency <200ms after warm cache.
+- Zero regression to halal-first filters and RLS.
 
-Extend `channel_candidates` with:
-- `tier CHAR(1)` — A/B/C/D
-- `tier_reason TEXT[]` — human-readable evidence bullets
-- `auto_action TEXT` — `auto_approved` | `queued_fast` | `queued_full` | `auto_rejected` | `quarantined`
-- `moderation_summary JSONB` — AI + rules blob (topics, presenter, music, dup, similar approved)
-- `risk_score INTEGER` (0–100, inverse of confidence + penalties)
-- `cluster_id UUID` — bulk grouping key
-- `learned_weight_version INTEGER` — active-learning generation used at scoring time
+## Architecture
 
-Tier gating (server-computed, immutable client-side):
+### 1. Multi-pool candidate generator (edge: `feed`)
+
+Independent pools scored separately, then merged with configurable weights (read from `_internal_config` key `reco_pool_mix`):
+
 ```text
-A  98–100  auto_approve   (strict allow-list of trusted org signals + zero flags)
-B  90–97   fast_review    (~5-10s: summary card, 1-click approve/reject)
-C  70–89   full_review    (existing manual UI)
-D  <70     auto_reject / quarantine
+recently_added   20%   approved_at within last 30d, freshness decay
+deep_personal    35%   long-term affinity × short-term intent
+trending         15%   watch/save velocity over 24h/7d, per-topic
+hidden_gems      10%   high completion rate, subs < 50k
+continue         10%   next episode/part in a started series/playlist
+rediscovery       5%   items watched >30d ago with high affinity
+exploration       5%   epsilon-greedy on adjacent topics, unseen creators
 ```
 
-Tier A requires ALL of: institution match (universities/gov/known scholar registry), zero exclusion hits, zero female-presenter signal, zero music signal, `duplicate_risk=low`, subs≥10k, channel age≥2y. Any single failure ⇒ demote to B.
+Owner UI (`/admin/ops`) gets a mix slider that writes to `_internal_config`. Default lives in code; DB override wins.
 
-## 2. Trust registries (new tables)
+### 2. Impression memory & decay (new table `feed_impressions`)
 
-- `trusted_institutions` — regex/domain patterns for universities, ministries, waqf orgs (auto-Tier-A eligibility).
-- `verified_scholars` — hand-curated scholar identity list; matches on name/handle/YouTube ID.
-- `moderation_learned_signals` — active-learning weights per feature (topic, org, source, language).
-- `moderation_clusters` — bulk grouping (owner-key prefix, topic, language, org).
+```text
+user_id, video_id, first_seen_at, seen_count, last_action, last_action_at
+```
 
-All admin-only RLS + service_role, standard 4-step grant pattern.
+- Every served video logs an impression (batched via `beforeunload` + on-scroll debounce).
+- Penalty curve: seen 1→−0.05, 2→−0.15, 3→−0.35, 5→−0.65, ≥8→hard hide 48h.
+- Positive interaction (watch ≥30s, save, share, follow, complete) resets `seen_count` to 0 and boosts creator/topic affinity.
 
-## 3. AI moderation summary
+Retention: 30 days rolling; nightly purge job.
 
-New edge function `moderate-channel-summary`:
-- Input: candidate row + YouTube snippet + latest 10 titles + thumbnails.
-- Uses Lovable AI (`google/gemini-3.5-flash` for cost; escalate to `openai/gpt-5.4` for Tier B/C ambiguous cases).
-- Structured output (Zod):
-  ```
-  { topics[], presenter_analysis, music_analysis, halal_flags[],
-    confidence_breakdown{...}, duplicate_notes, similar_approved_ids[],
-    recommend_tier, rationale }
-  ```
-- Writes to `channel_candidates.moderation_summary`.
-- Called automatically after `discover-channels` enqueue and on-demand from admin UI.
+### 3. Interest graph (new tables `user_topic_affinity`, `topic_taxonomy`)
 
-## 4. Batch scoring & clustering
+Micro-topics replace broad categories. Seeded taxonomy (~200 topics across Islamic + secular educational verticals). Affinity update on every event:
 
-New edge function `batch-classify-candidates`:
-- Runs over all `status=pending` in pages of 500.
-- For each: recompute tier from current rules + learned weights, call `moderate-channel-summary` if missing, assign `cluster_id` via:
-  - Same owner-key prefix (org family), OR
-  - Same (language, primary_topic, org_type) triple.
-- Auto-executes Tier A approvals and Tier D rejections; logs every action to `channel_audit_log` with `evidence` (fully reversible via existing pipeline).
+```text
+watch_full   +1.0
+watch_50%    +0.4
+save         +0.8
+share        +0.6
+follow       +1.2
+skip <5s     −0.5
+not_interested −2.0
+hide creator  −3.0
+```
 
-## 5. Admin UI — `/admin/moderation`
+Exponential decay with 21-day half-life. Short-term (session) affinity kept in-memory per request, blended 30/70 with long-term.
 
-New page with 4 tabs (A/B/C/D) plus Clusters view.
+### 4. Diversity & MMR reranker
 
-- **Tier A tab**: audit log of auto-approvals, one-click revert.
-- **Tier B tab**: card list. Each card = channel + AI summary + 4 buttons (Approve / Reject / Escalate / Approve cluster).
-- **Tier C tab**: full existing review UI.
-- **Tier D tab**: quarantine list; requires 2-admin override to promote.
-- **Clusters tab**: grouped list; "Approve all similar" / "Reject all similar" acts on entire `cluster_id`.
-- **Bulk bar** (all tabs): multi-select + Approve 50–500 / Reject / Reassign tier.
+After scoring, apply Maximal Marginal Relevance:
+- No two consecutive items from same creator.
+- Max 2 per topic in any window of 10.
+- Language rotation matches user's declared locales + one exploration slot.
+- Format rotation (short/long, video/audio) every 5 items.
 
-Every action calls new edge function `bulk-moderate-candidates` (batches of ≤500, atomic per candidate, full audit).
+### 5. Freshness signal
 
-## 6. Active learning
+`freshness_score = exp(-hours_since_approval / 72)` added to every candidate. Recently Added pool boosts this to `exp(-hours / 12)`. Newly approved videos are pushed into a Redis-like `hot_pool` via a DB trigger on `approved_channels` → `video_candidates.status='approved'`.
 
-- On every moderator decision (approve/reject/revert), insert into `moderation_learned_signals` deltas:
-  - +weight for features present on approvals, −weight on rejections.
-- Weekly cron `retrain-moderation-weights` recomputes normalized weights (bounded −0.25..+0.25) and bumps `learned_weight_version`.
-- Scorer blends baseline confidence with learned weights (learned weights can only **raise the bar**, never lower halal exclusions — hard-coded floor unchanged).
+### 6. Per-user salt & jitter
 
-## 7. Safeguards (unchanged and reinforced)
+Deterministic hash `(user_id, day_bucket)` mixed into score with amplitude 0.08. Guarantees unique ordering across users and daily rotation without random shuffle.
 
-- Halal exclusion keywords, duplicate check, female-presenter heuristic, music heuristic — all still hard-blocking regardless of tier or learned weights.
-- Learned weights cannot promote a candidate past a hard-block.
-- Every auto-approval reversible from Tier A log; reverting a Tier A also feeds negative signal into active learning.
-- Tier A eligibility list itself is admin-curated (no self-promotion possible from AI or heuristics).
+### 7. Learning continuity
 
-## 8. Technical scope
+Detect series via title regex (`Part \d+`, `Episode \d+`, `Lesson \d+`) + same-creator + upload order. Store in `video_series` view. When user completes item N, promote N+1 into `continue` pool with high priority.
 
-New files:
-- `supabase/migrations/*` — schema + registries + RLS + grants.
-- `supabase/functions/moderate-channel-summary/index.ts`
-- `supabase/functions/batch-classify-candidates/index.ts`
-- `supabase/functions/bulk-moderate-candidates/index.ts`
-- `supabase/functions/retrain-moderation-weights/index.ts` (cron, weekly)
-- `src/pages/admin/Moderation.tsx` + tab components
-- `src/components/admin/ModerationSummaryCard.tsx`
-- `src/components/admin/ClusterList.tsx`
-- `src/hooks/useModerationQueue.ts`
-- `docs/PHASE_P1_2D.md` — pipeline spec + reversal procedure.
+### 8. Explainability
 
-Reuse:
-- Existing `verify-channel` moderation gate (Tier A auto-approve still routes through it for the actual approval write).
-- Existing `channel_audit_log`, `check_channel_duplicate`, `compute_owner_key`.
-- Existing discovery cron — just triggers `batch-classify-candidates` at the end of each run.
+Every ranked item carries `reasons: { pool, freshness, affinity, diversity_bonus, exploration, confidence }` returned in the feed payload (unused by UI initially, consumed by owner analytics).
 
-Estimated review reduction (from your 25% baseline approval rate at ~800–1500 hits/day):
-- Tier A auto-approve ~10–15% of hits → 0 review time
-- Tier D auto-reject ~40–55% → 0 review time
-- Tier B fast (5–10s each) → ~25–35%
-- Tier C full review → ~5–10%
-Total manual time ≈ 10–20% of current, meeting the 80–95% reduction target with no rule weakening.
+### 9. Owner analytics dashboard
 
-## 9. Rollout
+New tab in `/admin/ops`:
+- Feed uniqueness (Jaccard across sampled user pairs)
+- Repeat impression rate
+- Personalization score
+- Diversity (creator/topic/language Gini)
+- New content exposure rate
+- p50/p95 latency
+- Cold-start quality
 
-1. Ship schema + registries (migration).
-2. Ship AI summary function + batch classifier (dry-run mode: writes tier/summary but does not auto-act).
-3. Ship admin UI; run in dry-run for 3–7 days to calibrate.
-4. Enable Tier A auto-approve + Tier D auto-reject.
-5. Enable active learning cron after ≥500 moderator decisions collected.
+Backed by SQL views over `feed_impressions` + `analytics_events`.
 
-Confirm and I'll implement in this order.
+## Files
+
+**New**
+- `supabase/migrations/…_reco_v3.sql` — `feed_impressions`, `user_topic_affinity`, `topic_taxonomy`, `video_series`, `_internal_config` seed for `reco_pool_mix`, RLS + GRANTs, purge function, trigger for hot pool.
+- `supabase/functions/_shared/reco/pools.ts` — pool generators.
+- `supabase/functions/_shared/reco/rerank.ts` — MMR + diversity + jitter.
+- `supabase/functions/_shared/reco/affinity.ts` — event → affinity updater.
+- `supabase/functions/log-impressions/index.ts` — batched impression writes (auth: user JWT).
+- `src/hooks/useImpressionTracker.ts` — IntersectionObserver + beforeunload flush.
+- `src/pages/admin/RecoMetrics.tsx` — owner analytics view.
+
+**Modified**
+- `supabase/functions/feed/index.ts` — swap monolithic ranker for multi-pool merge, add impression penalty join.
+- `supabase/functions/recommendations/index.ts` — align with new pipeline.
+- `src/pages/Index.tsx`, `src/components/FeedGrid.tsx` — wire impression tracker.
+- `src/pages/admin/Ops.tsx` — add pool-mix sliders + link to RecoMetrics.
+
+## Rollout & verification
+
+1. Migration + shared helpers.
+2. Feed edge function switched behind `reco_v3` feature flag (default on for authenticated, sample 10% anon).
+3. Impression tracker + logging.
+4. Owner dashboard + sliders.
+5. Verification pass:
+   - Script two synthetic users with different interests, compare Jaccard on `feed` output.
+   - Simulate 10 refreshes for one user, count unique items.
+   - Approve a new video, poll `feed` until it appears (target <5 min).
+   - Benchmark p95 latency via `curl_edge_functions` × 50.
+
+## Non-goals for this phase
+
+- No new mobile UI sections beyond wiring the impression tracker (existing rails already cover "Recently Added", "Continue", "Trending").
+- No changes to moderation, RLS predicates, or halal filters.
+- No Redis/external cache — Postgres materialized views + short-TTL in-memory cache in edge functions.
+
+## Risk & mitigation
+
+- **Latency**: keep hot candidate set to ≤500 rows per pool via indexed queries; precompute affinity aggregates nightly.
+- **Impression write volume**: batch client-side, upsert with `ON CONFLICT` incrementing `seen_count`.
+- **Cold start**: onboarding interests seed `user_topic_affinity`; unauthenticated users get country/language + trending + recently added only.
+- **Regression**: keep old ranker path behind flag for 1 release; kill after metrics confirm.
