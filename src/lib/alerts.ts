@@ -35,6 +35,10 @@ export async function reportAlert(opts: ReportAlertOptions): Promise<void> {
   try {
     if (!shouldSend(opts.kind)) return;
     const { data: userRes } = await supabase.auth.getUser();
+    // dispatch-alert requires an authenticated session (verify_jwt=true) to
+    // prevent anonymous callers from spamming admin email/Slack. Silently
+    // skip fan-out for signed-out users.
+    if (!userRes?.user?.id) return;
     const route = opts.route ?? (typeof window !== "undefined" ? window.location.pathname : null);
     const severity = opts.severity ?? "warn";
     const message = opts.message.slice(0, 2000);
@@ -49,7 +53,7 @@ export async function reportAlert(opts: ReportAlertOptions): Promise<void> {
         message,
         route,
         context,
-        user_id: userRes?.user?.id ?? null,
+        user_id: userRes.user.id,
         persist: true,
       },
     }).catch((e) => console.warn("[alerts] dispatch failed", e));
