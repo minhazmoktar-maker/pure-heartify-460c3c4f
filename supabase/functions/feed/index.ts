@@ -208,8 +208,10 @@ Deno.serve(async (req) => {
     // across users.
     if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
-      // v3: rotate seed daily instead of weekly so feeds refresh at least 1x/day.
-      const dayBucket = Math.floor(Date.now() / 86400000);
+      // Rotate seed every 4h so returning users don't see the exact same
+      // ranking for a full day. 6 buckets/day → feed feels alive without
+      // trashing cache hit rates or impression memory.
+      const dayBucket = Math.floor(Date.now() / (4 * 3600_000));
       const seedStr = `${identity}:${dayBucket}:${category ?? "all"}:${sort}`;
       const hash01 = (s: string): number => {
         let h = 2166136261 >>> 0;
