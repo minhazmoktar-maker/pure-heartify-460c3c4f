@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
-import { Video, Headphones, Sparkles, Shuffle, TrendingUp, Clock, Zap } from "lucide-react";
+import { Video, Headphones, Sparkles, TrendingUp, Clock, Zap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import HalalCategoryFilter from "@/components/HalalCategoryFilter";
@@ -18,7 +18,7 @@ import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { type HalalCategory } from "@/services/youtube";
 import { CURATED_SECTIONS } from "@/data/curatedSections";
-import { FeedDiversityProvider, useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import { FeedDiversityProvider } from "@/contexts/FeedDiversityContext";
 import type { FeedSort } from "@/hooks/useInfiniteFeed";
 import { cn } from "@/lib/utils";
 
@@ -30,23 +30,9 @@ const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
 const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
 const RecentlyAddedRow = lazy(() => import("@/components/RecentlyAddedRow"));
 
-const DiversityToggle = () => {
-  const { showMoreChannels, toggleShowMoreChannels } = useFeedDiversity();
-  return (
-    <button
-      onClick={toggleShowMoreChannels}
-      className={cn(
-        "mb-2 mt-2 inline-flex items-center gap-2 rounded-pill border px-3 py-1.5 text-micro font-medium transition-colors",
-        showMoreChannels
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-border text-muted-foreground hover:text-foreground",
-      )}
-    >
-      <Shuffle className="h-3.5 w-3.5" />
-      {showMoreChannels ? "Showing more channels" : "Show more channels"}
-    </button>
-  );
-};
+// "Show more channels" toggle has moved to Profile → Preferences.
+// The FeedDiversityProvider still reads the persisted setting so the feed
+// behaviour reacts as soon as the user flips it in settings.
 
 type MainTab = "videos" | "listen" | "curated";
 
@@ -161,7 +147,6 @@ const Index = () => {
       {mainTab === "curated" && (
         <FeedDiversityProvider>
           <main className="mx-auto max-w-[1800px] px-4 py-2 md:px-6">
-            <DiversityToggle />
             <Suspense fallback={null}>
               <RecentlyAddedRow />
             </Suspense>
