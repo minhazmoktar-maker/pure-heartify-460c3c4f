@@ -286,6 +286,10 @@ const Profile = () => {
             </div>
 
             <div className="pt-4">
+              <KidsModeSetting />
+            </div>
+
+            <div className="pt-4">
               <SoundSetting />
             </div>
 
