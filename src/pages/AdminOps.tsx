@@ -42,16 +42,20 @@ export default function AdminOps() {
   const [loading, setLoading] = useState(true);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [dlq, setDlq] = useState<any[]>([]);
+  const [poolMix, setPoolMix] = useState<Record<string, number> | null>(null);
+  const [poolMixEdits, setPoolMixEdits] = useState<Record<string, string>>({});
 
   const load = async () => {
     setLoading(true);
-    const [{ data: dash, error }, { data: q }] = await Promise.all([
+    const [{ data: dash, error }, { data: q }, { data: mix }] = await Promise.all([
       supabase.rpc("get_ops_dashboard"),
       supabase.from("dead_letter_queue").select("*").is("resolved_at", null).order("created_at", { ascending: false }).limit(25),
+      supabase.from("_internal_config").select("value").eq("key", "reco_pool_mix").maybeSingle(),
     ]);
     if (error) toast({ title: "Dashboard failed", description: error.message, variant: "destructive" });
     setData(dash as any);
     setDlq((q as any[]) ?? []);
+    setPoolMix(((mix?.value as unknown) as Record<string, number>) ?? null);
     setLoading(false);
   };
 
@@ -84,6 +88,25 @@ export default function AdminOps() {
       .eq("id", id);
     if (error) toast({ title: "Resolve failed", description: error.message, variant: "destructive" });
     else void load();
+  };
+
+  const savePoolMix = async () => {
+    if (!poolMix) return;
+    const next: Record<string, number> = { ...poolMix };
+    for (const [k, v] of Object.entries(poolMixEdits)) {
+      const num = Number(v);
+      if (!Number.isFinite(num) || num < 0 || num > 1) {
+        toast({ title: "Invalid weight", description: `${k}: enter 0–1`, variant: "destructive" });
+        return;
+      }
+      next[k] = num;
+    }
+    const { error } = await supabase
+      .from("_internal_config")
+      .update({ value: next as unknown as string, updated_at: new Date().toISOString() })
+      .eq("key", "reco_pool_mix");
+    if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    else { toast({ title: "Pool mix saved" }); setPoolMixEdits({}); void load(); }
   };
 
   if (loading && !data) {
@@ -143,6 +166,36 @@ export default function AdminOps() {
             </div>
           ))}
           {!isOwner && <p className="text-xs text-muted-foreground">Owner role required to edit.</p>}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Recommendation pool mix (v3)</CardTitle>
+          <p className="text-xs text-muted-foreground">
+            Weights for the multi-source recommender. Values are proportions (0–1). Changes take effect on the next feed request.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {poolMix && Object.entries(poolMix).map(([k, v]) => (
+            <div key={k} className="flex items-center gap-3">
+              <div className="w-48 text-sm font-medium">{k}</div>
+              <Input
+                type="number"
+                step="0.05"
+                min={0}
+                max={1}
+                defaultValue={v}
+                onChange={(e) => setPoolMixEdits((s) => ({ ...s, [k]: e.target.value }))}
+                className="w-28"
+                disabled={!isOwner}
+              />
+            </div>
+          ))}
+          {!poolMix && <p className="text-sm text-muted-foreground">Not configured yet.</p>}
+          {isOwner && poolMix && (
+            <Button size="sm" onClick={savePoolMix} disabled={Object.keys(poolMixEdits).length === 0}>Save pool mix</Button>
+          )}
         </CardContent>
       </Card>
 

@@ -9,6 +9,13 @@ import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { readThrough } from "../_shared/cache.ts";
 import { gatherSignals } from "../_shared/recommendations/signals.ts";
+import {
+  loadImpressions,
+  impressionPenalty,
+  freshnessScore,
+  loadPoolMix,
+  alternateByCreatorAndCategory,
+} from "../_shared/recommendations/rerankV3.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -197,9 +204,9 @@ Deno.serve(async (req) => {
     // across users.
     if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
-      const weekBucket = Math.floor(Date.now() / (7 * 86400000));
-      const seedStr = `${identity}:${weekBucket}:${category ?? "all"}:${sort}`;
-      // FNV-1a hash → deterministic [0,1)
+      // v3: rotate seed daily instead of weekly so feeds refresh at least 1x/day.
+      const dayBucket = Math.floor(Date.now() / 86400000);
+      const seedStr = `${identity}:${dayBucket}:${category ?? "all"}:${sort}`;
       const hash01 = (s: string): number => {
         let h = 2166136261 >>> 0;
         for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -207,21 +214,16 @@ Deno.serve(async (req) => {
       };
 
       if (callerId) {
-
-        // Signed-in: gather signals (best-effort, timeboxed) and apply a
-        // compact re-ranker on top of the freshness-sorted page.
-        //
-        // Halal-first invariant preserved: this only *reorders* items that
-        // already passed moderation into this fetch page; nothing new is
-        // introduced, nothing is upranked past a trusted+high-halal item
-        // whose base freshness score is meaningfully higher.
         try {
-          const signals = await Promise.race([
-            gatherSignals(admin, callerId),
-            new Promise<null>((resolve) => setTimeout(() => resolve(null), 900)),
+          const [signals, impressions, poolMix] = await Promise.all([
+            Promise.race([
+              gatherSignals(admin, callerId),
+              new Promise<null>((resolve) => setTimeout(() => resolve(null), 900)),
+            ]),
+            loadImpressions(admin, callerId).catch(() => new Map()),
+            loadPoolMix(admin).catch(() => ({} as Record<string, number>)),
           ]);
           if (signals) {
-            // Blocked-creator hard filter (applies globally + per user_blocks).
             const blockedPatterns = signals.blockedChannelPatterns ?? [];
             const preFiltered = blockedPatterns.length
               ? ordered.filter((v) => {
@@ -230,18 +232,16 @@ Deno.serve(async (req) => {
                 })
               : ordered;
 
-            // In "recent" mode, freshness must dominate — dampen affinity
-            // weights to ~40% so the chronological anchor still wins.
             const aff = sort === "recent" ? 0.4 : 1.0;
             const freshAnchor = sort === "recent" ? 1.6 : 1.0;
+            const freshBoost = (poolMix.recently_added ?? 0.2) * 2.5; // 0..~0.6
 
-            // Precompute base freshness index → score so ties break stably.
             const N = preFiltered.length;
             const scored = preFiltered.map((v, i) => {
               const ch = (v.channel_title as string | null) ?? "";
               const cat = (v.category as string | null) ?? "";
               const vid = (v.video_id as string) ?? "";
-              const baseFresh = 1 - i / Math.max(1, N); // 1.0 at top, 0.0 at bottom
+              const baseFresh = 1 - i / Math.max(1, N);
               const chAff = signals.channelAffinity.get(ch) ?? 0;
               const catAff = signals.categoryAffinity.get(cat) ?? 0;
               const longCh = signals.longTermChannelAffinity.get(ch) ?? 0;
@@ -254,38 +254,54 @@ Deno.serve(async (req) => {
               ) ? 1 : 0;
               const seenCh = ch && signals.seenChannelIds.has(ch);
               const novelty = ch && !seenCh && v.is_trusted_channel === true ? 1 : 0;
-              const shownCount = signals.recentImpressionCounts.get(vid) ?? 0;
+
+              // v3: real impression memory (last 48h) from feed_impressions
+              const imp = impressions.get(vid);
+              const [impPen, hardHide] = impressionPenalty(imp);
+
+              // v3: multi-source freshness (published or ingested), independent
+              // of the freshness index anchor.
+              const fresh = freshnessScore((v.published_at as string) ?? (v.ingested_at as string));
+
               const skipped = signals.skippedVideoIds.has(vid) ? 1 : 0;
               const dismissed = signals.dismissedVideoIds.has(vid) ? 1 : 0;
-              // Per-user weight perturbation on affinity signals only.
               const p = (k: string) => 0.75 + hash01(`${identity}:w:${k}`) * 0.5;
               const score =
-                baseFresh * freshAnchor +              // freshness anchor
+                baseFresh * freshAnchor +
+                fresh * freshBoost +
                 chAff * 0.55 * aff * p("ch") +
                 catAff * 0.45 * aff * p("cat") +
                 longCh * 0.25 * aff * p("longCh") +
                 longCat * 0.20 * aff * p("longCat") +
                 interestMatch * 0.30 * aff * p("int") +
                 novelty * 0.20 * aff * p("nov") -
-                Math.min(shownCount, 4) * 0.12 -
+                impPen -
                 skipped * 0.25 -
-                dismissed * 5.0;                       // effectively drops it
-              // Per-user + per-video jitter (±8% max) — deterministic, halal-safe.
-              const j = (hash01(`${identity}:${weekBucket}:${vid}`) - 0.5) * 0.16;
-              return { v, k: -(score * (1 + j)) };
+                dismissed * 5.0;
+              const j = (hash01(`${identity}:${dayBucket}:${vid}`) - 0.5) * 0.16;
+              const finalScore = score * (1 + j);
+              // Build explainability reasons for the top signals actually used.
+              const reasons: string[] = [];
+              if (fresh > 0.4) reasons.push("fresh");
+              if (chAff > 0.3) reasons.push("channel-affinity");
+              if (catAff > 0.3) reasons.push("category-affinity");
+              if (interestMatch) reasons.push("interest-match");
+              if (novelty) reasons.push("new-trusted-creator");
+              if (impPen > 0.3) reasons.push("shown-recently");
+              return { v, k: -finalScore, hardHide: !!hardHide, reasons };
             });
             ordered = scored
-              .filter((x) => x.k < 4.5)                // drop hard-dismissed
+              .filter((x) => !x.hardHide && x.k < 4.5)
               .sort((a, b) => a.k - b.k)
-              .map((x) => x.v);
+              .map((x) => {
+                (x.v as Record<string, unknown>).__reasons = x.reasons;
+                return x.v;
+              });
           }
-
         } catch (e) {
           console.warn("[feed] personalization skipped:", (e as Error).message);
         }
       } else {
-        // Anonymous: keep the deterministic per-device shuffle so distinct
-        // devices don't collide on identical page ordering.
         let seed = 0;
         for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
         const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 0xffffffff; };
@@ -296,8 +312,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Creator diversity: cap items per channel per page so no single creator
-    // dominates. Overflow items are pushed to the tail to keep pagination full.
+    // Creator diversity cap (unchanged): no channel exceeds `maxPerChannel`.
     const perChannel = new Map<string, number>();
     const primary: Array<Record<string, unknown>> = [];
     const overflow: Array<Record<string, unknown>> = [];
@@ -307,7 +322,8 @@ Deno.serve(async (req) => {
       if (n < maxPerChannel) { primary.push(v); perChannel.set(ch, n + 1); }
       else overflow.push(v);
     }
-    const diversified = [...primary, ...overflow];
+    // v3: MMR alternation on the primary block prevents back-to-back creator/category.
+    const diversified = [...alternateByCreatorAndCategory(primary), ...overflow];
 
     const items = diversified.slice(0, limit);
     const nextCursor = items.length === limit
@@ -328,6 +344,7 @@ Deno.serve(async (req) => {
           publishedAt: v.published_at ?? v.ingested_at,
           isTrustedChannel: v.is_trusted_channel,
           isPremiumOnly: v.is_premium_only ?? false,
+          reasons: (v.__reasons as string[] | undefined) ?? undefined,
         })),
         nextCursor,
         total: items.length,

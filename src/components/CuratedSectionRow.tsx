@@ -8,6 +8,7 @@ import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { isTrustedChannel } from "@/data/trustedChannels";
 import { Badge } from "@/components/ui/badge";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 
 interface Props {
   section: CuratedSection;
@@ -109,6 +110,26 @@ const CuratedSectionRow = ({ section }: Props) => {
     observer.observe(node);
     return () => observer.disconnect();
   }, [shouldLoad]);
+
+  // v3 impression tracking on visible cards inside the horizontal scroller.
+  const { track } = useImpressionTracker(shouldLoad);
+  useEffect(() => {
+    const root = scrollRef.current;
+    if (!root || videos.length === 0) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.intersectionRatio >= 0.5) {
+            const id = (e.target as HTMLElement).dataset.videoId;
+            if (id) track(id);
+          }
+        }
+      },
+      { root, threshold: [0.5] },
+    );
+    root.querySelectorAll<HTMLElement>("[data-video-id]").forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, [videos, track]);
 
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
