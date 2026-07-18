@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
         if (!ch?.id) {
           stats.not_found++;
           await admin.from("channel_candidates")
-            .update({ status: "rejected", evidence: { ...(row.evidence ?? {}), resolution: "not_found" } })
+            .update({ evidence: { ...(row.evidence ?? {}), resolution: "not_found", needs_resolution: false } })
             .eq("id", row.id);
           results.push({ id: row.id, handle, status: "not_found" });
           continue;
