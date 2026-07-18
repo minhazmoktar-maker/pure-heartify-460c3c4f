@@ -90,6 +90,25 @@ export default function AdminOps() {
     else void load();
   };
 
+  const savePoolMix = async () => {
+    if (!poolMix) return;
+    const next: Record<string, number> = { ...poolMix };
+    for (const [k, v] of Object.entries(poolMixEdits)) {
+      const num = Number(v);
+      if (!Number.isFinite(num) || num < 0 || num > 1) {
+        toast({ title: "Invalid weight", description: `${k}: enter 0–1`, variant: "destructive" });
+        return;
+      }
+      next[k] = num;
+    }
+    const { error } = await supabase
+      .from("_internal_config")
+      .update({ value: next as unknown as string, updated_at: new Date().toISOString() })
+      .eq("key", "reco_pool_mix");
+    if (error) toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    else { toast({ title: "Pool mix saved" }); setPoolMixEdits({}); void load(); }
+  };
+
   if (loading && !data) {
     return (
       <div className="flex min-h-screen items-center justify-center">
