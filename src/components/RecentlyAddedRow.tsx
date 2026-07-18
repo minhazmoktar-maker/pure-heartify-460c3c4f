@@ -6,6 +6,7 @@ import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import { runDedupedRefresh } from "@/lib/refreshMetrics";
+import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 
 /**
  * Recently Added — newest videos approved into Heartify (moderation-passed).
