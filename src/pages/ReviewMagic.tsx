@@ -131,7 +131,16 @@ export default function ReviewMagic() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  <Badge variant="outline">Tier {c.tier}</Badge>
+                  <Badge
+                    variant={
+                      c.tier === "S" || c.tier === "A" ? "default"
+                      : c.tier === "B" ? "secondary"
+                      : c.tier === "C" ? "outline"
+                      : "destructive"
+                    }
+                  >
+                    Tier {c.tier ?? "?"}
+                  </Badge>
                   {c.risk_score != null && (
                     <Badge variant={c.risk_score >= 70 ? "destructive" : c.risk_score >= 50 ? "secondary" : "outline"}>
                       risk {c.risk_score}
