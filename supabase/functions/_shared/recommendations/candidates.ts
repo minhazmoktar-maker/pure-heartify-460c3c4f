@@ -35,12 +35,6 @@ export async function fetchCandidates(
   const select =
     "video_id,title,channel_title,category,section_id,thumbnail_url,halal_score,published_at,is_trusted_channel,view_count,moderation_confidence,moderation_state,content_language";
 
-  const safe = (query: ReturnType<SupabaseClient["from"]> extends infer T ? T : never) =>
-    query
-      .in("moderation_state", ["approved", "auto_approved"])
-      .eq("is_hidden", false)
-      .eq("is_archived", false);
-
   const jobs: Array<Promise<unknown>> = [];
 
   // 1) Freshness pool.
@@ -119,7 +113,7 @@ export async function fetchCandidates(
     );
   }
 
-  // 3) Category-affinity pool (top 3 categories, most-recent first).
+  // 3) Category/section-affinity pools (top 3 interests, most-recent first).
   const topCategories = Array.from(signals.categoryAffinity.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3)
@@ -142,14 +136,6 @@ export async function fetchCandidates(
         })
         .catch(() => {}),
     );
-  }
-
-  // 4) Channel-affinity pool (top 5 channels).
-  const topChannels = Array.from(signals.channelAffinity.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([c]) => c);
-  for (const ch of topChannels) {
     jobs.push(
       admin
         .from("curated_videos")
