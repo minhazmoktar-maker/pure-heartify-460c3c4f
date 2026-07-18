@@ -32,7 +32,11 @@ function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=60, s-maxage=60",
+      // Personalized responses must not be shared between users. Any CDN in
+      // front must key by Authorization so signed-in users never receive
+      // another user's cached feed.
+      "Cache-Control": "private, max-age=30",
+      "Vary": "Authorization",
       ...extra,
     },
   });
