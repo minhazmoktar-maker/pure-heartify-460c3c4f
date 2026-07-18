@@ -200,32 +200,14 @@ const SearchResults = () => {
 
 
 
-            <input
-              type="search"
-              value={liveInput}
-              onChange={(e) => setLiveInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && liveInput.trim()) {
-                  navigate(`/search?q=${encodeURIComponent(liveInput.trim())}`);
-                }
-              }}
-              placeholder="Try 'quraan', 'hubrman', 'ramadn'…"
-              className="mb-4 w-full rounded-card border border-border bg-card px-4 py-3 text-base outline-none ring-primary/20 focus:ring-2"
-            />
-
-            {liveInput.length >= 2 && smart.autocomplete.length > 0 && (
-              <div className="mb-6 flex flex-wrap gap-2">
-                {smart.autocomplete.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => navigate(`/search?q=${encodeURIComponent(s)}`)}
-                    className="rounded-pill border border-border bg-card px-3 py-1.5 text-sm hover:bg-accent transition-colors"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="mb-6">
+              <SearchAutocomplete
+                autoFocus
+                placeholder="Try 'quran', 'seerah', 'tafsir'…"
+                initialValue={liveInput}
+                onSubmitQuery={(q) => navigate(`/search?q=${encodeURIComponent(q)}`)}
+              />
+            </div>
 
             <SearchSuggestions />
             <div className="mt-8 sm:mt-10">
