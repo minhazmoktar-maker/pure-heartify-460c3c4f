@@ -344,6 +344,7 @@ Deno.serve(async (req) => {
           publishedAt: v.published_at ?? v.ingested_at,
           isTrustedChannel: v.is_trusted_channel,
           isPremiumOnly: v.is_premium_only ?? false,
+          reasons: (v.__reasons as string[] | undefined) ?? undefined,
         })),
         nextCursor,
         total: items.length,
