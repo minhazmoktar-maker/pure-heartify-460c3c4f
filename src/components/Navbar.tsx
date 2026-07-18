@@ -13,6 +13,7 @@ import { useKidsMode } from "@/contexts/KidsModeContext";
 import { Baby } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import { useScrolled } from "@/hooks/useScrolled";
+import SearchAutocomplete from "@/components/SearchAutocomplete";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {
@@ -175,22 +176,7 @@ const Navbar = () => {
 
         {/* Center — Search (desktop/tablet) */}
         <div className="hidden max-w-xl flex-1 items-center md:flex">
-          <form onSubmit={handleSearch} className="relative flex w-full">
-            <input
-              type="search"
-              inputMode="search"
-              enterKeyHint="search"
-              autoComplete="off"
-              placeholder="Search halal content..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search halal content"
-              className="h-10 w-full rounded-l-full border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-            />
-            <button type="submit" aria-label="Search" className="flex h-10 items-center justify-center rounded-r-full border border-l-0 border-border bg-secondary px-5 hover:bg-muted transition-colors">
-              <Search className="h-4 w-4 text-foreground" />
-            </button>
-          </form>
+          <SearchAutocomplete placeholder="Search halal content..." />
         </div>
 
         {/* Spacer on mobile so right cluster hugs the edge */}
