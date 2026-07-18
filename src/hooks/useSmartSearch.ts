@@ -82,32 +82,6 @@ export function useSmartSearch(rawQuery: string) {
       return data as SearchResponse;
     },
   });
-
-
-
-  const autoQ = useQuery({
-    queryKey: ["smart-autocomplete", rawQuery],
-    enabled: rawQuery.trim().length >= 2,
-    staleTime: 15_000,
-    queryFn: async (): Promise<string[]> => {
-      const { data, error } = await supabase.functions.invoke("search", {
-        method: "GET",
-        body: undefined,
-        // functions.invoke does not support query params directly; pass through as body.
-        // Fallback: call the RPC directly which is cheap and identical.
-      } as never);
-      if (error) throw error;
-      const list = (data as { autocomplete: Array<{ suggestion: string }> } | null)?.autocomplete;
-      if (list) return list.map((s) => s.suggestion);
-      // Fallback: direct RPC.
-      const { data: rpc } = await supabase.rpc("search_autocomplete", {
-        _prefix: rawQuery,
-        _limit: 8,
-      });
-      return (rpc ?? []).map((r: { suggestion: string }) => r.suggestion);
-    },
-  });
-
   const enriched: SmartHit[] = useMemo(
     () =>
       (searchQ.data?.hits ?? []).map((h) => ({
@@ -136,6 +110,6 @@ export function useSmartSearch(rawQuery: string) {
         : null,
     trending: searchQ.data?.trending ?? [],
     related: searchQ.data?.related ?? [],
-    autocomplete: autoQ.data ?? [],
+    autocomplete: [],
   };
 }
