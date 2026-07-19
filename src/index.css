@@ -583,3 +583,20 @@
   .group-hover\:opacity-100 { opacity: 1 !important; }
 }
 
+/* P3 craft layer — Apple Music-style shared element transition.
+   The card thumbnail and Watch player share `view-transition-name: video-<id>`
+   so Chrome/Safari morph one into the other. Duration is medium (320ms) with
+   our standard easing; reduced motion is honored by <YouTubeVideoCard>. */
+@supports (view-transition-name: root) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--duration-short);
+    animation-timing-function: var(--ease-standard);
+  }
+  ::view-transition-group(*) {
+    animation-duration: var(--duration-medium);
+    animation-timing-function: var(--ease-standard);
+  }
+}
+
+
