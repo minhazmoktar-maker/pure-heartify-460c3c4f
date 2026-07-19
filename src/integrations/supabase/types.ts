@@ -172,6 +172,7 @@ export type Database = {
       approved_channels: {
         Row: {
           approved_by: string | null
+          auto_approve_uploads: boolean
           category: string | null
           consistency_score: number | null
           created_at: string
@@ -181,11 +182,13 @@ export type Database = {
           owner_key: string
           status: string
           title: string
+          trust_tier: Database["public"]["Enums"]["channel_trust_tier"]
           updated_at: string
           youtube_channel_id: string
         }
         Insert: {
           approved_by?: string | null
+          auto_approve_uploads?: boolean
           category?: string | null
           consistency_score?: number | null
           created_at?: string
@@ -195,11 +198,13 @@ export type Database = {
           owner_key: string
           status?: string
           title: string
+          trust_tier?: Database["public"]["Enums"]["channel_trust_tier"]
           updated_at?: string
           youtube_channel_id: string
         }
         Update: {
           approved_by?: string | null
+          auto_approve_uploads?: boolean
           category?: string | null
           consistency_score?: number | null
           created_at?: string
@@ -209,6 +214,7 @@ export type Database = {
           owner_key?: string
           status?: string
           title?: string
+          trust_tier?: Database["public"]["Enums"]["channel_trust_tier"]
           updated_at?: string
           youtube_channel_id?: string
         }
@@ -5503,6 +5509,10 @@ export type Database = {
       redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
       refresh_leaderboards: { Args: never; Returns: undefined }
+      revoke_auto_approval: {
+        Args: { _reason?: string; _video_id: string }
+        Returns: undefined
+      }
       revoke_entitlement: {
         Args: { _reason?: string; _user_id: string }
         Returns: boolean
@@ -5610,6 +5620,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "moderator" | "user"
       channel_risk_level: "low" | "medium" | "high" | "critical"
+      channel_trust_tier: "S" | "A" | "B" | "C"
       experiment_status:
         | "draft"
         | "running"
@@ -5774,6 +5785,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "moderator", "user"],
       channel_risk_level: ["low", "medium", "high", "critical"],
+      channel_trust_tier: ["S", "A", "B", "C"],
       experiment_status: [
         "draft",
         "running",
