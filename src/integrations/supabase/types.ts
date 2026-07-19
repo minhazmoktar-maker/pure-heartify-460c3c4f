@@ -5177,6 +5177,34 @@ export type Database = {
           source: Database["public"]["Enums"]["trust_event_source"]
         }[]
       }
+      get_feed_candidates_diversified: {
+        Args: {
+          _category?: string
+          _cursor?: string
+          _exclude_premium?: boolean
+          _limit?: number
+          _order?: string
+          _per_channel?: number
+          _section_aliases?: string[]
+          _section_id?: string
+        }
+        Returns: {
+          category: string
+          channel_id: string
+          channel_title: string
+          content_language: string
+          halal_score: number
+          ingested_at: string
+          is_premium_only: boolean
+          is_trusted_channel: boolean
+          published_at: string
+          section_id: string
+          thumbnail_url: string
+          title: string
+          video_id: string
+          view_count: number
+        }[]
+      }
       get_heartify_trending_ids: {
         Args: { _limit?: number; _window_hours?: number }
         Returns: {
