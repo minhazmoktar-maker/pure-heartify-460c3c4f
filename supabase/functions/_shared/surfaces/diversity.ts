@@ -74,7 +74,13 @@ export function computeStats(
     if (v.category) cats.add(v.category);
     const lang = v.content_language ?? "unknown";
     langs.set(lang, (langs.get(lang) ?? 0) + 1);
-    if (v.published_at && now - new Date(v.published_at).getTime() < freshMs) fresh++;
+    // Fresh = whichever of published_at / ingested_at is newer. This lets
+    // surfaces like recently_added honor the intent of "added recently"
+    // even when the underlying YouTube upload is old.
+    const pub = v.published_at ? new Date(v.published_at).getTime() : 0;
+    const ing = v.ingested_at ? new Date(v.ingested_at).getTime() : 0;
+    const t = Math.max(pub, ing);
+    if (t && now - t < freshMs) fresh++;
   }
   const topLang = Math.max(0, ...Array.from(langs.values()));
   return {
