@@ -1043,7 +1043,11 @@ Deno.serve(async (req) => {
     // With 2 keys ⇒ 20k/day budget, target ~2,500/run.
     const keyMultiplier = Math.max(activeKeys().length, 1);
     const channelsPerRun = Math.min(body?.channels_per_run ?? 80 * keyMultiplier, 300);
-    const discoveryQueries = Math.min(body?.discovery_queries ?? 10 * keyMultiplier, 40);
+    // Discovery uses search.list (100 units/call) — the primary cause of
+    // "Quota exceeded" 429s. Default down from 10→4 per key and cap at 20
+    // so a cron run can't drain the daily budget on its own; approved
+    // channels (1 unit each) do the heavy lifting.
+    const discoveryQueries = Math.min(body?.discovery_queries ?? 4 * keyMultiplier, 20);
     // Hard safety cap: leave ~10% headroom of total daily budget per run.
     const perRunQuotaCap = 1200 * keyMultiplier;
 
