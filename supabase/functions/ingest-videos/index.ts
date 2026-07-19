@@ -1008,7 +1008,9 @@ async function ingestDiscoveryQuery(sectionId: string, query: string): Promise<{
 
 async function isAuthorizedCaller(req: Request): Promise<boolean> {
   const cronToken = Deno.env.get("AUDIT_CRON_TOKEN");
-  if (cronToken && req.headers.get("x-cron-token") === cronToken) return true;
+  const ingestToken = Deno.env.get("INGEST_CRON_TOKEN");
+  const provided = req.headers.get("x-cron-token") ?? "";
+  if (provided && ((cronToken && provided === cronToken) || (ingestToken && provided === ingestToken))) return true;
   const authHeader = req.headers.get("Authorization") ?? "";
   if (!authHeader.startsWith("Bearer ") || !SUPABASE_URL) return false;
   try {
