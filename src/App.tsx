@@ -482,6 +482,7 @@ const App = () => (
                 <Route path="/admin/channel-pipeline" element={<AdminRoute><AdminChannelPipeline /></AdminRoute>} />
                 <Route path="/admin/approved-channels" element={<AdminRoute><AdminApprovedChannels /></AdminRoute>} />
                 <Route path="/admin/ops" element={<AdminRoute><AdminOps /></AdminRoute>} />
+                <Route path="/admin/rec-health" element={<AdminRoute><AdminRecHealth /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
                 <Route path="/review/:token" element={<ReviewMagic />} />
 
