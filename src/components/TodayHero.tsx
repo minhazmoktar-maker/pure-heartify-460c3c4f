@@ -3,35 +3,29 @@ import NextSalahWidget from "@/components/NextSalahWidget";
 import { StreakCard } from "@/components/StreakCard";
 import VerseOfDayCard from "@/components/VerseOfDayCard";
 
-// DailyDoseHero is large (interests, fetches, animations) — lazy so the
-// four-up Today shape can paint immediately from the streak + verse cards.
+// DailyDoseHero owns the 3-thumbnail surface. Lazy so the streak + verse
+// cards paint immediately even on cold cache.
 const DailyDoseHero = lazy(() => import("@/components/DailyDoseHero"));
 
 /**
  * The signed-in "Today shape" — one obvious next action per surface:
- *   Next salah · Streak · 3 daily-dose thumbnails · Resume-reading verse.
- * Duolingo-grade: every card is a single, glanceable commitment.
+ *   Next salah countdown · Streak · Resume-reading verse · 3 daily-dose thumbnails.
+ * Kept intentionally sparse so returning users see progress before anything else.
  */
 const TodayHero = () => {
   return (
-    <section className="mx-auto max-w-[1800px] px-4 pt-3 md:px-6" aria-label="Your day at a glance">
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <div className="md:col-span-1">
-          <NextSalahWidget embedded />
-        </div>
-        <div className="md:col-span-1">
+    <>
+      <NextSalahWidget />
+      <section className="mx-auto max-w-[1800px] px-4 pt-3 md:px-6" aria-label="Your day at a glance">
+        <div className="grid gap-3 md:grid-cols-2">
           <StreakCard />
-        </div>
-        <div className="md:col-span-1">
           <VerseOfDayCard />
         </div>
-        <div className="md:col-span-1">
-          <Suspense fallback={<div className="h-full min-h-40 rounded-card border border-border bg-card" />}>
-            <DailyDoseHero compact />
-          </Suspense>
-        </div>
-      </div>
-    </section>
+      </section>
+      <Suspense fallback={null}>
+        <DailyDoseHero />
+      </Suspense>
+    </>
   );
 };
 
