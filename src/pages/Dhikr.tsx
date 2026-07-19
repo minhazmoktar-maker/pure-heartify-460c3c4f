@@ -208,15 +208,21 @@ const Dhikr = () => {
             <button
               onClick={() => bump(1)}
               aria-label={`Tap to count ${active.translit}`}
-              className="group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-pill bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-4 border-primary/30 transition-transform active:scale-95"
+              className="group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-pill bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-4 border-primary/30 transition-transform active:scale-95 min-h-[280px]"
             >
               <div className="absolute inset-4 rounded-pill border border-border/60" />
+              {/* Gentle pulse ring on every count — respects prefers-reduced-motion via CSS. */}
+              <span
+                key={pulseKey}
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-pill border-2 border-primary/60 motion-safe:animate-ping motion-safe:opacity-0"
+              />
               <div className="text-center">
                 <p dir="rtl" className="font-heading text-display text-foreground md:text-display leading-relaxed">
                   {active.arabic}
                 </p>
-                <p className="mt-4 text-display font-bold tabular-nums text-primary md:text-display">{count}</p>
-                <p className="mt-1 text-micro text-muted-foreground">
+                <p className="mt-4 font-bold tabular-nums text-primary text-[64px] leading-none md:text-[88px]">{count}</p>
+                <p className="mt-2 text-micro text-muted-foreground">
                   {count >= state.target ? (
                     <span className="inline-flex items-center gap-1 text-primary"><Check className="h-3 w-3" /> Goal reached — keep going</span>
                   ) : (
@@ -231,17 +237,25 @@ const Dhikr = () => {
               <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
             </div>
 
-            {/* Controls */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <button onClick={() => bump(-1)} className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
-                <Minus className="h-3.5 w-3.5" /> Undo
+            {/* Controls — big, thumb-friendly Count is the primary action. */}
+            <div className="mt-5 grid gap-2">
+              <button
+                onClick={() => bump(1)}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-primary py-4 text-base font-semibold text-primary-foreground shadow-elev-2 hover:opacity-90 active:scale-[0.98]"
+              >
+                <Plus className="h-5 w-5" /> Count
               </button>
-              <button onClick={() => bump(1)} className="inline-flex items-center gap-1 rounded-pill bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
-                <Plus className="h-3.5 w-3.5" /> Count
-              </button>
-              <button onClick={reset} className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
-                <RotateCcw className="h-3.5 w-3.5" /> Reset
-              </button>
+              <div className="grid grid-cols-3 gap-2">
+                <button onClick={() => bump(-1)} className="inline-flex items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
+                  <Minus className="h-3.5 w-3.5" /> Undo
+                </button>
+                <button onClick={finishSession} className="inline-flex items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
+                  <Sparkles className="h-3.5 w-3.5" /> Finish
+                </button>
+                <button onClick={reset} className="inline-flex items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
+                  <RotateCcw className="h-3.5 w-3.5" /> Reset
+                </button>
+              </div>
             </div>
 
             <div className="mt-4 flex items-center justify-center gap-3 text-micro text-muted-foreground">
