@@ -3,6 +3,7 @@ import { Calculator, Coins, Info, RotateCcw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import CurrencyPicker from "@/components/CurrencyPicker";
+import { getCurrencyFormatter } from "@/lib/currencies";
 
 const STORAGE = "heartify:zakat:v1";
 const ZAKAT_RATE = 0.025;
@@ -97,14 +98,10 @@ const Zakat = () => {
   }, [form]);
 
   const fmt = useMemo(
-    () =>
-      new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: form.currency || "USD",
-        maximumFractionDigits: 2,
-      }),
+    () => getCurrencyFormatter(form.currency || "USD"),
     [form.currency],
   );
+
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) =>
     setForm((f) => ({ ...f, [k]: v }));

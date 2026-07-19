@@ -4,6 +4,7 @@ import { HandCoins, Plus, Trash2, Target, TrendingUp, Calendar } from "lucide-re
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import CurrencyPicker from "@/components/CurrencyPicker";
+import { formatCurrency } from "@/lib/currencies";
 import { toast } from "sonner";
 
 type Entry = {
@@ -80,7 +81,7 @@ const Sadaqah = () => {
 
   const remove = (id: string) => setEntries((es) => es.filter((e) => e.id !== id));
 
-  const fmt = (n: number) => `${currency} ${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  const fmt = (n: number) => formatCurrency(n, currency);
 
   const recent = entries.slice(0, 20);
   const maxCat = Math.max(1, ...Object.values(stats.byCat));
