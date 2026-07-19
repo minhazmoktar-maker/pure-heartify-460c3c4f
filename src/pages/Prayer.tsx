@@ -52,7 +52,7 @@ export default function Prayer() {
             if (prev.location) return prev;
             const next: PrayerSettings = {
               ...prev,
-              location: { latitude: lat, longitude: lon, label, approximate: true } as PrayerSettings["location"],
+              location: { latitude: lat, longitude: lon, label, approximate: true },
             };
             saveSettings(next);
             return next;
