@@ -89,6 +89,7 @@ export default function Prayer() {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
             label: "Current location",
+            approximate: false,
           },
         });
         setLoading(false);
