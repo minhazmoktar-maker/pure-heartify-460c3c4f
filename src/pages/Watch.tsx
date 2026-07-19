@@ -207,7 +207,10 @@ const Watch = () => {
           </button>
 
           {isEmbeddableVideo ? (
-            <div className="relative aspect-video w-full overflow-hidden rounded-card bg-black">
+            <div
+              className="relative aspect-video w-full overflow-hidden rounded-card bg-black"
+              style={{ viewTransitionName: `video-${videoId}` } as React.CSSProperties}
+            >
               {playerActivated ? (
                 <iframe
                   ref={iframeRef}

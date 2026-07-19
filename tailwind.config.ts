@@ -14,8 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['"Space Grotesk"', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        // P3 craft layer — Fraunces is our single display face. Warm, editorial,
+        // opsz-variable so display sizes get proper optical scaling.
+        heading: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+        display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
+        body: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -73,6 +76,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // P3 craft layer — layered surfaces so the UI reads as a stack of
+        // planes instead of one flat cream. `surface-1` sits above the page
+        // background, `surface-2` above cards (modals, sheets, floating bars).
+        surface: {
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          sunken: "hsl(var(--surface-sunken))",
+        },
       },
       borderRadius: {
         // Legacy (kept so shadcn ui/* keeps working; do not use in new code)
@@ -90,11 +101,12 @@ export default {
         "ds-md": "16px",
         "ds-lg": "32px",
       },
-      // Locked design system — elevations
+      // Locked design system — elevations (4 tiers as of P3 craft layer)
       boxShadow: {
         e0: "var(--shadow-e0)",
         e1: "var(--shadow-e1)",
         e2: "var(--shadow-e2)",
+        e3: "var(--shadow-e3)",
       },
       // Locked design system — motion
       transitionDuration: {

@@ -36,7 +36,20 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isEmbeddableVideo) return; // non-embeddable videos can't be played
-    navigate(`/watch/${video.id}`, { state: { video } });
+    // P3 craft layer — Apple Music-style shared-element transition from
+    // card → player. Uses the browser View Transitions API when available;
+    // gracefully no-ops elsewhere (Firefox today), so the navigation itself
+    // is never blocked.
+    const go = () => navigate(`/watch/${video.id}`, { state: { video } });
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => unknown;
+    };
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (doc.startViewTransition && !reduceMotion) {
+      doc.startViewTransition(go);
+    } else {
+      go();
+    }
   };
 
   const handleBookmark = (e: React.MouseEvent) => {
@@ -62,7 +75,10 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
       className="group cursor-pointer"
       onClick={handleClick}
     >
-      <div className="relative overflow-hidden rounded-card">
+      <div
+        className="relative overflow-hidden rounded-card"
+        style={{ viewTransitionName: `video-${video.id}` } as React.CSSProperties}
+      >
         <img
           src={hiResThumb}
           onError={handleThumbError}

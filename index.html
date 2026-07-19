@@ -27,18 +27,23 @@
          The app icon is not the LCP element on any route, so we don't preload it (it would compete with the true LCP). -->
     <link rel="modulepreload" href="/src/main.tsx" />
 
-    <!-- Perf: fonts as non-blocking <link> (was @import in CSS, blocks render) -->
+    <!-- Perf: fonts as non-blocking <link> (was @import in CSS, blocks render).
+         P3 craft layer — Fraunces (warm editorial serif) is our single display
+         face for headings; Inter remains the body sans. Space Grotesk retired. -->
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap"
     />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap"
       media="print"
       onload="this.media='all'"
     />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap" />
+    </noscript>
 
     <title>Heartify — Curated Halal Video &amp; Audio App</title>
     <meta name="description" content="Heartify is a clean, Islamic-friendly video and audio app with curated, distraction-free content for focused and mindful viewing." />
