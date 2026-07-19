@@ -20,7 +20,7 @@
  *   coverage.
  */
 
-export type SpineId = "home" | "watch" | "practice" | "learn" | "you";
+export type SpineId = "home" | "quran" | "prayer" | "dhikr" | "you";
 
 export interface SpineDefinition {
   id: SpineId;
