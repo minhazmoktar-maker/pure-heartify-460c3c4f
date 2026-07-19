@@ -78,10 +78,10 @@ Deno.serve(async (req) => {
     if (contract.requiresAuth && !userId) return json({ error: "auth_required" }, 401);
 
     const identity = getClientIdentity(req, userId);
-    const rl = await enforceRateLimit(service, {
-      identity, action: `surface:${surface}`, limit: 60, windowSeconds: 60,
+    const limited = await enforceRateLimit(service, {
+      identity, action: `surface:${surface}`, limit: 120, windowSeconds: 60,
     });
-    if (!rl.allowed) return json({ error: "rate_limited" }, 429);
+    if (limited) return json({ error: "rate_limited" }, 429);
 
     const isPremium = userId ? await hasActivePremium(service, userId).catch(() => false) : false;
     const sessionId = String(body?.session_id ?? "anon");
