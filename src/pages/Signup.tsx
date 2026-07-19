@@ -10,9 +10,10 @@ import SEO from "@/components/SEO";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordStrength, scorePassword } from "@/components/auth/PasswordStrength";
 
-type Errors = { displayName?: string; email?: string; password?: string; policy?: string };
+type Errors = { displayName?: string; email?: string; password?: string; policy?: string; age?: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_AGE = 13; // COPPA / app-store minimum
 
 function safeNext(raw: string | null): string | null {
   if (!raw) return null;
@@ -28,6 +29,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
+  const [confirmedAge, setConfirmedAge] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
@@ -39,6 +41,7 @@ const Signup = () => {
     if (!password) e.password = "Password is required.";
     else if (password.length < 8) e.password = "Use at least 8 characters.";
     else if (scorePassword(password) < 2) e.password = "Try a stronger password (mix case, numbers, symbols).";
+    if (!confirmedAge) e.age = `You must be at least ${MIN_AGE} to create an account.`;
     if (!acceptedPolicy) e.policy = "Please accept the Privacy Policy to continue.";
     return e;
   };
