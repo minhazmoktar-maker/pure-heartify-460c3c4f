@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      _channel_id_backfill_progress: {
+        Row: {
+          processed_at: string
+          rows_updated: number
+          youtube_channel_id: string
+        }
+        Insert: {
+          processed_at?: string
+          rows_updated?: number
+          youtube_channel_id: string
+        }
+        Update: {
+          processed_at?: string
+          rows_updated?: number
+          youtube_channel_id?: string
+        }
+        Relationships: []
+      }
       _internal_config: {
         Row: {
           key: string
@@ -4913,6 +4931,7 @@ export type Database = {
     }
     Functions: {
       _analytics_assert_admin: { Args: never; Returns: undefined }
+      _run_channel_id_backfill: { Args: { _batch?: number }; Returns: number }
       _suggestion_is_blocked: { Args: { _text: string }; Returns: boolean }
       _user_scoped_columns: {
         Args: never
