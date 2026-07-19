@@ -100,7 +100,7 @@ const Signup = () => {
               <span className="text-heading font-bold text-primary-foreground">H</span>
             </div>
             <span className="font-heading text-title font-bold text-foreground">
-              Halal<span className="text-[hsl(var(--gold))]">Tube</span>
+              Heartify
             </span>
           </Link>
           <h1 className="mt-2 text-heading font-semibold text-foreground">Create your Heartify account</h1>
