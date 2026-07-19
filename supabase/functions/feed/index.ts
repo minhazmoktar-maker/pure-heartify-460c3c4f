@@ -194,6 +194,7 @@ Deno.serve(async (req) => {
       : "";
 
     const produce = async () => {
+      const t0 = Date.now();
       const res = await fetch(url, {
         headers: {
           "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
@@ -201,17 +202,22 @@ Deno.serve(async (req) => {
           "Accept": "application/json",
         },
       });
+      const tFetch = Date.now() - t0;
       if (!res.ok) {
         console.error(`DB query failed: ${res.status} ${await res.text()}`);
         return { items: [] as Array<Record<string, unknown>>, ok: false };
       }
       const items = await res.json();
+      const tJson = Date.now() - t0 - tFetch;
+      console.log(`[feed.produce] fetch=${tFetch}ms json=${tJson}ms rows=${(items as unknown[]).length}`);
       return { items, ok: true };
     };
 
+    const tStage = Date.now();
     const { value: payload, hit } = cacheable
       ? await readThrough(cacheKey, 60, produce)
       : { value: await produce(), hit: false };
+    console.log(`[feed] section=${sectionId ?? "-"} cache=${hit ? "HIT" : "MISS"} produce=${Date.now() - tStage}ms`);
 
     if (!payload.ok) return json({ items: [], nextCursor: null, total: 0 });
 
