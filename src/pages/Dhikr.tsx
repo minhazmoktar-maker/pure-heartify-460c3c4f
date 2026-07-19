@@ -317,6 +317,49 @@ const Dhikr = () => {
           </aside>
         </div>
       </main>
+
+      {/* End-of-session summary — celebrates the effort without breaking flow. */}
+      {summary && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm md:items-center" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md rounded-t-card border border-border bg-card p-6 shadow-elev-3 md:rounded-card">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-micro uppercase tracking-wider text-primary">Session complete</p>
+                <h3 className="mt-1 text-heading font-semibold text-foreground">{summary.dhikr}</h3>
+              </div>
+              <button onClick={closeSummary} aria-label="Close summary" className="rounded-pill p-1 text-muted-foreground hover:bg-secondary hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-card border border-border bg-background p-3">
+                <p className="text-display font-bold tabular-nums text-foreground">{summary.counted}</p>
+                <p className="mt-1 text-micro text-muted-foreground">Counted</p>
+              </div>
+              <div className="rounded-card border border-border bg-background p-3">
+                <p className="text-display font-bold tabular-nums text-foreground">
+                  {Math.max(1, Math.round(summary.durationMs / 60000))}
+                  <span className="ml-1 text-sm font-normal text-muted-foreground">min</span>
+                </p>
+                <p className="mt-1 text-micro text-muted-foreground">Focused</p>
+              </div>
+              <div className="rounded-card border border-border bg-background p-3">
+                <p className="text-display font-bold tabular-nums text-foreground">{summary.streak}</p>
+                <p className="mt-1 text-micro text-muted-foreground">Day streak</p>
+              </div>
+            </div>
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Barakallahu feek — may Allah accept your dhikr.
+            </p>
+            <button
+              onClick={closeSummary}
+              className="mt-5 inline-flex w-full items-center justify-center rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
