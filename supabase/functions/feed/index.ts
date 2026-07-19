@@ -79,6 +79,12 @@ Deno.serve(async (req) => {
       ? (body.sort as "fresh" | "trending" | "recent") : "fresh";
     // Max videos per channel per page — creator diversity guard.
     const maxPerChannel = Math.min(Math.max(Number(body?.max_per_channel ?? 3), 1), 10);
+    // Per-tab session id — used as the *primary* rotation seed so every new
+    // tab / cold open / refresh in a new session produces a substantively
+    // different order, not merely re-jittered positions. Sanitized to
+    // alphanumerics to keep it opaque and short.
+    const rawSession = typeof body?.session_id === "string" ? body.session_id : "";
+    const sessionId = rawSession.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64) || "anon";
     // Locale-aware filtering: soft filter to caller's content languages.
     // Sanitized to 2-3 char ISO codes to prevent injection.
     const rawLangs = Array.isArray(body?.content_languages) ? body.content_languages : [];
@@ -97,7 +103,10 @@ Deno.serve(async (req) => {
     // NOTE: we intentionally overfetch a bit so post-fetch JS blocklist filter
     // can drop matches without leaving the page short of `limit`.
     // Overfetch more when locale-boosting so we can re-rank without starving pages.
-    const fetchLimit = Math.min(limit * (contentLanguages.length ? 5 : 4), 400);
+    // Wider candidate pool → more channels compete per response, which is
+    // what allows the session-seeded rotation below to feel genuinely
+    // different across sessions instead of re-sorting the same 400 rows.
+    const fetchLimit = Math.min(limit * (contentLanguages.length ? 12 : 10), 800);
     const orderClause = sort === "trending"
       ? "view_count.desc.nullslast,published_at.desc.nullslast,halal_score.desc"
       : sort === "recent"
@@ -239,10 +248,13 @@ Deno.serve(async (req) => {
     const produce = async () => {
       const t0 = Date.now();
       if (canUseDiversifiedRpc) {
-        // Per-channel cap at pool layer: match the per-page cap (maxPerChannel)
-        // plus 1 slack so the reranker has room to prefer affinity items
-        // without pinning the exact same channels on every request.
-        const perChannelCap = Math.min(Math.max(maxPerChannel + 1, 2), 8);
+        // Tighter per-channel cap at the pool layer so ~250–400 distinct
+        // channels compete inside the candidate slice (vs. 40–80 before).
+        // For anon we go stricter (2/channel) — no personalization can
+        // rescue diversity from a single dominant creator.
+        const perChannelCap = callerId
+          ? Math.min(Math.max(maxPerChannel + 1, 2), 6)
+          : 2;
         const { data, error } = await admin.rpc("get_feed_candidates_diversified", {
           _limit: fetchLimit,
           _per_channel: perChannelCap,
@@ -371,11 +383,13 @@ Deno.serve(async (req) => {
     // across users.
     if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
-      // Rotate seed every 4h so returning users don't see the exact same
-      // ranking for a full day. 6 buckets/day → feed feels alive without
-      // trashing cache hit rates or impression memory.
+      // Rotation seed prioritizes session id so every new tab / cold open
+      // yields a substantively different order. The 4h bucket remains as
+      // a *fallback* only (when no session id is provided) so cached anon
+      // responses still rotate over time.
       const dayBucket = Math.floor(Date.now() / (4 * 3600_000));
-      const seedStr = `${identity}:${dayBucket}:${category ?? "all"}:${sort}`;
+      const rotationKey = sessionId !== "anon" ? sessionId : String(dayBucket);
+      const seedStr = `${identity}:${rotationKey}:${category ?? "all"}:${sort}`;
       const hash01 = (s: string): number => {
         let h = 2166136261 >>> 0;
         for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -426,12 +440,9 @@ Deno.serve(async (req) => {
               const seenCh = ch && signals.seenChannelIds.has(ch);
               const novelty = ch && !seenCh && v.is_trusted_channel === true ? 1 : 0;
 
-              // v3: real impression memory (last 48h) from feed_impressions
               const imp = impressions.get(vid);
               const [impPen, hardHide] = impressionPenalty(imp);
 
-              // v3: multi-source freshness (published or ingested), independent
-              // of the freshness index anchor.
               const fresh = freshnessScore((v.published_at as string) ?? (v.ingested_at as string));
 
               const skipped = signals.skippedVideoIds.has(vid) ? 1 : 0;
@@ -449,9 +460,10 @@ Deno.serve(async (req) => {
                 impPen -
                 skipped * 0.25 -
                 dismissed * 5.0;
-              const j = (hash01(`${identity}:${dayBucket}:${vid}`) - 0.5) * 0.16;
+              // Per-session jitter (wider amplitude) → same signed-in user
+              // sees a genuinely different order across tabs/sessions.
+              const j = (hash01(`${identity}:${rotationKey}:${vid}`) - 0.5) * 0.35;
               const finalScore = score * (1 + j);
-              // Build explainability reasons for the top signals actually used.
               const reasons: string[] = [];
               if (fresh > 0.4) reasons.push("fresh");
               if (chAff > 0.3) reasons.push("channel-affinity");
@@ -473,14 +485,50 @@ Deno.serve(async (req) => {
           console.warn("[feed] personalization skipped:", (e as Error).message);
         }
       } else {
+        // Anon: session-seeded shuffle with wide amplitude so refreshes in
+        // different tabs produce fundamentally different orderings.
         let seed = 0;
         for (let i = 0; i < seedStr.length; i++) seed = (seed * 31 + seedStr.charCodeAt(i)) >>> 0;
         const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 0xffffffff; };
         ordered = ordered
-          .map((v, i) => ({ v, k: i + (rand() - 0.5) * 6 }))
+          .map((v, i) => ({ v, k: i * 0.4 + (rand() - 0.5) * 40 }))
           .sort((a, b) => a.k - b.k)
           .map((x) => x.v);
       }
+
+      // --- Long-tail creator injection ------------------------------------
+      // Compute per-channel counts within the candidate pool; treat channels
+      // with ≤3 items as "long-tail" and guarantee ~3 of them per page. This
+      // is what makes small creators & niche topics actually surface without
+      // waiting for personalization signals to accumulate.
+      const chCount = new Map<string, number>();
+      for (const v of ordered) {
+        const ch = (v.channel_id as string) || (v.channel_title as string) || "__";
+        chCount.set(ch, (chCount.get(ch) ?? 0) + 1);
+      }
+      const longTailQuota = Math.max(2, Math.floor(limit * 0.2));
+      const longTail: Array<Record<string, unknown>> = [];
+      const rest: Array<Record<string, unknown>> = [];
+      for (const v of ordered) {
+        const ch = (v.channel_id as string) || (v.channel_title as string) || "__";
+        if ((chCount.get(ch) ?? 0) <= 3 && longTail.length < longTailQuota * 4) longTail.push(v);
+        else rest.push(v);
+      }
+      // Interleave long-tail every ~5 positions; keeps discovery constant
+      // without shoving unknown creators to the top.
+      const merged: Array<Record<string, unknown>> = [];
+      let li = 0, ri = 0, injected = 0;
+      while (merged.length < ordered.length) {
+        if (li < longTail.length && injected < longTailQuota && merged.length > 0 && merged.length % 5 === 2) {
+          merged.push(longTail[li++]);
+          injected++;
+        } else if (ri < rest.length) {
+          merged.push(rest[ri++]);
+        } else if (li < longTail.length) {
+          merged.push(longTail[li++]);
+        } else break;
+      }
+      ordered = merged;
     }
 
     // Creator diversity cap (unchanged): no channel exceeds `maxPerChannel`.
