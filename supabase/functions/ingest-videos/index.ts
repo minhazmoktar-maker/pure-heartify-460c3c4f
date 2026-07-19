@@ -907,6 +907,7 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
     rows.push({
       video_id: videoId,
       title,
+      channel_id: channelId, // canonical YouTube channel id — never trust title
       channel_title: channel,
       thumbnail_url: thumb,
       published_at: snippet?.publishedAt ?? null,
