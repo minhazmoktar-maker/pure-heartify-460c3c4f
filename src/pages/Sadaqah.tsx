@@ -137,20 +137,16 @@ const Sadaqah = () => {
               <p className="text-micro text-muted-foreground">Set a target to consistently give.</p>
             </div>
             <div className="flex items-center gap-2">
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="h-9 rounded-card border border-border bg-background px-2 text-sm"
-              >
-                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
-              </select>
+              <div className="w-56">
+                <CurrencyPicker value={currency} onChange={setCurrency} />
+              </div>
               <input
                 type="number"
                 min={0}
                 value={goal || ""}
                 onChange={(e) => setGoal(Math.max(0, Number(e.target.value) || 0))}
                 placeholder="Goal"
-                className="h-9 w-32 rounded-card border border-border bg-background px-2 text-sm"
+                className="h-10 w-32 rounded-card border border-border bg-background px-2 text-sm"
               />
             </div>
           </div>
