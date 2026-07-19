@@ -56,6 +56,8 @@ export interface PrayerLocation {
   latitude: number;
   longitude: number;
   label?: string;
+  /** True when derived from IP geolocation; encourages an upgrade to GPS. */
+  approximate?: boolean;
 }
 
 export interface PrayerSlot {

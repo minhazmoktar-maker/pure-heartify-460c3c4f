@@ -1,6 +1,6 @@
 import { localToday } from "@/lib/intl";
-import { useEffect, useMemo, useState } from "react";
-import { RotateCcw, Plus, Minus, Flame, Target, Check } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { RotateCcw, Plus, Minus, Flame, Target, Check, X, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 
@@ -57,6 +57,18 @@ const Dhikr = () => {
   const count = state.counts[active.id] ?? 0;
   const progress = Math.min(100, Math.round((count / state.target) * 100));
 
+  // Gentle haptic-style pulse: a per-tap ripple ring so every count feels
+  // acknowledged even on devices without vibration.
+  const [pulseKey, setPulseKey] = useState(0);
+
+  // Session accounting so we can show an end-of-session summary.
+  const sessionStartRef = useRef<number | null>(null);
+  const sessionStartCountRef = useRef<number>(0);
+  const [summary, setSummary] = useState<
+    | { dhikr: string; counted: number; durationMs: number; streak: number; goalsHitDelta: number }
+    | null
+  >(null);
+
   // Roll over date + reset daily completions each day
   useEffect(() => {
     const today = todayKey();
@@ -80,6 +92,12 @@ const Dhikr = () => {
   }, [state]);
 
   const bump = (delta: number) => {
+    // Trigger a fresh pulse ring on every positive tap.
+    if (delta > 0) setPulseKey((k) => k + 1);
+    // Native haptic when available — layered on top of the sound cue below.
+    if (delta > 0 && typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try { navigator.vibrate?.(12); } catch { /* noop */ }
+    }
     setState((s) => {
       const prev = s.counts[active.id] ?? 0;
       const next = Math.max(0, prev + delta);
@@ -87,6 +105,13 @@ const Dhikr = () => {
       const newTodayCompleted = s.todayCompleted + (justCompleted ? 1 : 0);
       let newStreak = s.streak;
       if (justCompleted && s.todayCompleted === 0) newStreak = s.streak + 1;
+
+      // Start a session on the first positive tap after being at zero.
+      if (delta > 0 && sessionStartRef.current == null) {
+        sessionStartRef.current = Date.now();
+        sessionStartCountRef.current = prev;
+      }
+
       // Sound + haptics — Phase 10. Tap on every increment, chime on goal,
       // warm swell when the streak advances. Lazy import so first paint stays cheap.
       import("@/lib/soundHaptics").then((m) => {
@@ -97,6 +122,19 @@ const Dhikr = () => {
       }).catch(() => {});
       if (justCompleted) {
         import("@/lib/celebrate").then((m) => m.celebrateSmall()).catch(() => {});
+        // Auto-open the end-of-session summary on goal — but only once per
+        // session, so a user pushing past the goal isn't interrupted.
+        const start = sessionStartRef.current ?? Date.now();
+        const counted = next - sessionStartCountRef.current;
+        setTimeout(() => {
+          setSummary({
+            dhikr: active.translit,
+            counted,
+            durationMs: Date.now() - start,
+            streak: newStreak,
+            goalsHitDelta: justCompleted ? 1 : 0,
+          });
+        }, 400);
       }
       return {
         ...s,
@@ -107,7 +145,34 @@ const Dhikr = () => {
     });
   };
 
-  const reset = () => setState((s) => ({ ...s, counts: { ...s.counts, [active.id]: 0 } }));
+  const finishSession = () => {
+    const start = sessionStartRef.current;
+    if (start == null) return;
+    const counted = count - sessionStartCountRef.current;
+    if (counted <= 0) {
+      sessionStartRef.current = null;
+      return;
+    }
+    setSummary({
+      dhikr: active.translit,
+      counted,
+      durationMs: Date.now() - start,
+      streak: state.streak,
+      goalsHitDelta: 0,
+    });
+  };
+
+  const closeSummary = () => {
+    setSummary(null);
+    sessionStartRef.current = null;
+    sessionStartCountRef.current = count;
+  };
+
+  const reset = () => {
+    setState((s) => ({ ...s, counts: { ...s.counts, [active.id]: 0 } }));
+    sessionStartRef.current = null;
+    sessionStartCountRef.current = 0;
+  };
 
   return (
     <div className="min-h-dvh bg-background">
@@ -143,15 +208,21 @@ const Dhikr = () => {
             <button
               onClick={() => bump(1)}
               aria-label={`Tap to count ${active.translit}`}
-              className="group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-pill bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-4 border-primary/30 transition-transform active:scale-95"
+              className="group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-pill bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-4 border-primary/30 transition-transform active:scale-95 min-h-[280px]"
             >
               <div className="absolute inset-4 rounded-pill border border-border/60" />
+              {/* Gentle pulse ring on every count — respects prefers-reduced-motion via CSS. */}
+              <span
+                key={pulseKey}
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-pill border-2 border-primary/60 motion-safe:animate-ping motion-safe:opacity-0"
+              />
               <div className="text-center">
                 <p dir="rtl" className="font-heading text-display text-foreground md:text-display leading-relaxed">
                   {active.arabic}
                 </p>
-                <p className="mt-4 text-display font-bold tabular-nums text-primary md:text-display">{count}</p>
-                <p className="mt-1 text-micro text-muted-foreground">
+                <p className="mt-4 font-bold tabular-nums text-primary text-[64px] leading-none md:text-[88px]">{count}</p>
+                <p className="mt-2 text-micro text-muted-foreground">
                   {count >= state.target ? (
                     <span className="inline-flex items-center gap-1 text-primary"><Check className="h-3 w-3" /> Goal reached — keep going</span>
                   ) : (
@@ -166,17 +237,25 @@ const Dhikr = () => {
               <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
             </div>
 
-            {/* Controls */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <button onClick={() => bump(-1)} className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
-                <Minus className="h-3.5 w-3.5" /> Undo
+            {/* Controls — big, thumb-friendly Count is the primary action. */}
+            <div className="mt-5 grid gap-2">
+              <button
+                onClick={() => bump(1)}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-primary py-4 text-base font-semibold text-primary-foreground shadow-elev-2 hover:opacity-90 active:scale-[0.98]"
+              >
+                <Plus className="h-5 w-5" /> Count
               </button>
-              <button onClick={() => bump(1)} className="inline-flex items-center gap-1 rounded-pill bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
-                <Plus className="h-3.5 w-3.5" /> Count
-              </button>
-              <button onClick={reset} className="inline-flex items-center gap-1 rounded-pill border border-border bg-background px-4 py-2 text-sm hover:bg-secondary">
-                <RotateCcw className="h-3.5 w-3.5" /> Reset
-              </button>
+              <div className="grid grid-cols-3 gap-2">
+                <button onClick={() => bump(-1)} className="inline-flex items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
+                  <Minus className="h-3.5 w-3.5" /> Undo
+                </button>
+                <button onClick={finishSession} className="inline-flex items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
+                  <Sparkles className="h-3.5 w-3.5" /> Finish
+                </button>
+                <button onClick={reset} className="inline-flex items-center justify-center gap-1 rounded-pill border border-border bg-background px-3 py-2 text-sm hover:bg-secondary">
+                  <RotateCcw className="h-3.5 w-3.5" /> Reset
+                </button>
+              </div>
             </div>
 
             <div className="mt-4 flex items-center justify-center gap-3 text-micro text-muted-foreground">
@@ -238,6 +317,49 @@ const Dhikr = () => {
           </aside>
         </div>
       </main>
+
+      {/* End-of-session summary — celebrates the effort without breaking flow. */}
+      {summary && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm md:items-center" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md rounded-t-card border border-border bg-card p-6 shadow-elev-3 md:rounded-card">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-micro uppercase tracking-wider text-primary">Session complete</p>
+                <h3 className="mt-1 text-heading font-semibold text-foreground">{summary.dhikr}</h3>
+              </div>
+              <button onClick={closeSummary} aria-label="Close summary" className="rounded-pill p-1 text-muted-foreground hover:bg-secondary hover:text-foreground">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-card border border-border bg-background p-3">
+                <p className="text-display font-bold tabular-nums text-foreground">{summary.counted}</p>
+                <p className="mt-1 text-micro text-muted-foreground">Counted</p>
+              </div>
+              <div className="rounded-card border border-border bg-background p-3">
+                <p className="text-display font-bold tabular-nums text-foreground">
+                  {Math.max(1, Math.round(summary.durationMs / 60000))}
+                  <span className="ml-1 text-sm font-normal text-muted-foreground">min</span>
+                </p>
+                <p className="mt-1 text-micro text-muted-foreground">Focused</p>
+              </div>
+              <div className="rounded-card border border-border bg-background p-3">
+                <p className="text-display font-bold tabular-nums text-foreground">{summary.streak}</p>
+                <p className="mt-1 text-micro text-muted-foreground">Day streak</p>
+              </div>
+            </div>
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Barakallahu feek — may Allah accept your dhikr.
+            </p>
+            <button
+              onClick={closeSummary}
+              className="mt-5 inline-flex w-full items-center justify-center rounded-pill bg-primary py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BookOpen, Play, Pause, Loader2, ChevronRight, Search } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import QuranContinueBlock from "@/components/QuranContinueBlock";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -154,6 +155,20 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
       audioRef.current = null;
     };
   }, [n]);
+
+  // Persist "last opened" so the Quran index can offer a Continue card. We
+  // update the ayah as playback advances; if no audio has fired yet, at
+  // least the surah + ayah 1 are remembered.
+  useEffect(() => {
+    try {
+      const surahName = arabic.data?.englishName;
+      const ayah = playingAyah ?? 1;
+      localStorage.setItem(
+        "quran:last-ayah",
+        JSON.stringify({ surah: n, ayah, surahName, ts: Date.now() }),
+      );
+    } catch { /* noop */ }
+  }, [n, playingAyah, arabic.data?.englishName]);
 
   const playAyah = (ayah: Ayah) => {
     const url = ayah.audio || ayah.audioSecondary?.[0];
@@ -355,7 +370,10 @@ const Quran = () => {
         {surahNum ? (
           <SurahView n={surahNum} prefs={prefs} setPrefs={setPrefs} />
         ) : (
-          <SurahIndex onPick={(n) => navigate(`/quran/${n}`)} />
+          <>
+            <QuranContinueBlock />
+            <SurahIndex onPick={(n) => navigate(`/quran/${n}`)} />
+          </>
         )}
 
         {!surahNum && (

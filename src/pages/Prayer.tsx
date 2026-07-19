@@ -30,7 +30,37 @@ export default function Prayer() {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    setSettings(loadSettings());
+    const stored = loadSettings();
+    setSettings(stored);
+
+    // Never a blank screen: if the user has no saved location, silently
+    // resolve an approximate one from their IP so times render immediately.
+    // GPS remains an explicit opt-in via "Use precise location".
+    if (!stored.location) {
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+          if (!res.ok) return;
+          const j = await res.json();
+          const lat = Number(j?.latitude);
+          const lon = Number(j?.longitude);
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+          if (cancelled) return;
+          const label = [j?.city, j?.country_name].filter(Boolean).join(", ") || "Approximate location";
+          setSettings((prev) => {
+            if (prev.location) return prev;
+            const next: PrayerSettings = {
+              ...prev,
+              location: { latitude: lat, longitude: lon, label, approximate: true },
+            };
+            saveSettings(next);
+            return next;
+          });
+        } catch { /* offline — the empty-state CTA still shows */ }
+      })();
+      return () => { cancelled = true; };
+    }
   }, []);
 
   useEffect(() => {
@@ -59,6 +89,7 @@ export default function Prayer() {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
             label: "Current location",
+            approximate: false,
           },
         });
         setLoading(false);
@@ -149,12 +180,28 @@ export default function Prayer() {
                   );
                 })}
               </ul>
-              <button
-                onClick={detectLocation}
-                className="mt-4 inline-flex items-center gap-2 text-micro text-muted-foreground hover:text-foreground"
-              >
-                <RefreshCw className="h-3 w-3" /> Update location
-              </button>
+              {settings.location.approximate && (
+                <div className="mt-4 flex flex-wrap items-center gap-2 rounded-card border border-primary/30 bg-primary/5 px-3 py-2 text-micro">
+                  <MapPin className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-foreground">Approximate location from your network</span>
+                  <button
+                    onClick={detectLocation}
+                    disabled={loading}
+                    className="ml-auto inline-flex items-center gap-1 rounded-pill bg-primary px-2.5 py-1 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+                  >
+                    {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <MapPin className="h-3 w-3" />}
+                    Use precise location
+                  </button>
+                </div>
+              )}
+              {!settings.location.approximate && (
+                <button
+                  onClick={detectLocation}
+                  className="mt-4 inline-flex items-center gap-2 text-micro text-muted-foreground hover:text-foreground"
+                >
+                  <RefreshCw className="h-3 w-3" /> Update location
+                </button>
+              )}
               {settings.location.label && (
                 <p className="mt-1 text-micro text-muted-foreground">
                   {settings.location.label} • {settings.location.latitude.toFixed(3)}, {settings.location.longitude.toFixed(3)}
