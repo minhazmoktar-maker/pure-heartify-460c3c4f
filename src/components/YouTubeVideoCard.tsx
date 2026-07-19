@@ -75,7 +75,10 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
       className="group cursor-pointer"
       onClick={handleClick}
     >
-      <div className="relative overflow-hidden rounded-card">
+      <div
+        className="relative overflow-hidden rounded-card"
+        style={{ viewTransitionName: `video-${video.id}` } as React.CSSProperties}
+      >
         <img
           src={hiResThumb}
           onError={handleThumbError}
