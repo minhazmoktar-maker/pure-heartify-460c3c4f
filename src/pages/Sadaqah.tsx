@@ -81,7 +81,7 @@ const Sadaqah = () => {
 
   const remove = (id: string) => setEntries((es) => es.filter((e) => e.id !== id));
 
-  const fmt = (n: number) => `${currency} ${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+  const fmt = (n: number) => formatCurrency(n, currency);
 
   const recent = entries.slice(0, 20);
   const maxCat = Math.max(1, ...Object.values(stats.byCat));
