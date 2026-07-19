@@ -16,17 +16,21 @@ describe("navigation spine map", () => {
     expect(resolveSpine("/")).toBe("home");
     expect(resolveSpine("/today")).toBe("home");
     expect(resolveSpine("/search")).toBe("home");
-    expect(resolveSpine("/channels")).toBe("watch");
-    expect(resolveSpine("/watch/abc123")).toBe("watch");
-    expect(resolveSpine("/shorts")).toBe("watch");
-    expect(resolveSpine("/prayer")).toBe("practice");
-    expect(resolveSpine("/quran/2")).toBe("practice");
-    expect(resolveSpine("/dhikr")).toBe("practice");
-    expect(resolveSpine("/khatm/groups")).toBe("practice");
-    expect(resolveSpine("/learn")).toBe("learn");
-    expect(resolveSpine("/library")).toBe("learn");
-    expect(resolveSpine("/library/ibn-qayyim")).toBe("learn");
-    expect(resolveSpine("/hadith")).toBe("learn");
+    expect(resolveSpine("/channels")).toBe("home");
+    expect(resolveSpine("/watch/abc123")).toBe("home");
+    expect(resolveSpine("/shorts")).toBe("home");
+    expect(resolveSpine("/quran")).toBe("quran");
+    expect(resolveSpine("/quran/2")).toBe("quran");
+    expect(resolveSpine("/mushaf")).toBe("quran");
+    expect(resolveSpine("/khatm/groups")).toBe("quran");
+    expect(resolveSpine("/prayer")).toBe("prayer");
+    expect(resolveSpine("/qibla")).toBe("prayer");
+    expect(resolveSpine("/mosques")).toBe("prayer");
+    expect(resolveSpine("/dhikr")).toBe("dhikr");
+    expect(resolveSpine("/adhkar")).toBe("dhikr");
+    expect(resolveSpine("/library")).toBe("dhikr");
+    expect(resolveSpine("/library/ibn-qayyim")).toBe("dhikr");
+    expect(resolveSpine("/hadith")).toBe("dhikr");
     expect(resolveSpine("/profile")).toBe("you");
     expect(resolveSpine("/bookmarks")).toBe("you");
     expect(resolveSpine("/plus")).toBe("you");
@@ -56,9 +60,9 @@ describe("navigation spine map", () => {
 
   it("returns canonical entry paths for each spine", () => {
     expect(spinePath("home")).toBe("/");
-    expect(spinePath("watch")).toBe("/channels");
-    expect(spinePath("practice")).toBe("/prayer");
-    expect(spinePath("learn")).toBe("/learn");
+    expect(spinePath("quran")).toBe("/quran");
+    expect(spinePath("prayer")).toBe("/prayer");
+    expect(spinePath("dhikr")).toBe("/dhikr");
     expect(spinePath("you")).toBe("/profile");
   });
 });

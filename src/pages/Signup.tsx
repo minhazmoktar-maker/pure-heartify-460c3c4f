@@ -10,9 +10,10 @@ import SEO from "@/components/SEO";
 import { AuthField } from "@/components/auth/AuthField";
 import { PasswordStrength, scorePassword } from "@/components/auth/PasswordStrength";
 
-type Errors = { displayName?: string; email?: string; password?: string; policy?: string };
+type Errors = { displayName?: string; email?: string; password?: string; policy?: string; age?: string };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_AGE = 13; // COPPA / app-store minimum
 
 function safeNext(raw: string | null): string | null {
   if (!raw) return null;
@@ -28,6 +29,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
+  const [confirmedAge, setConfirmedAge] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
@@ -39,6 +41,7 @@ const Signup = () => {
     if (!password) e.password = "Password is required.";
     else if (password.length < 8) e.password = "Use at least 8 characters.";
     else if (scorePassword(password) < 2) e.password = "Try a stronger password (mix case, numbers, symbols).";
+    if (!confirmedAge) e.age = `You must be at least ${MIN_AGE} to create an account.`;
     if (!acceptedPolicy) e.policy = "Please accept the Privacy Policy to continue.";
     return e;
   };
@@ -70,8 +73,11 @@ const Signup = () => {
   };
 
   const handleOAuth = async (provider: "google" | "apple") => {
-    if (!acceptedPolicy) {
-      setErrors((s) => ({ ...s, policy: "Please accept the Privacy Policy to continue." }));
+    const gate: Errors = {};
+    if (!confirmedAge) gate.age = `You must be at least ${MIN_AGE} to create an account.`;
+    if (!acceptedPolicy) gate.policy = "Please accept the Privacy Policy to continue.";
+    if (Object.keys(gate).length) {
+      setErrors((s) => ({ ...s, ...gate }));
       return;
     }
     setLoading(true);
@@ -100,7 +106,7 @@ const Signup = () => {
               <span className="text-heading font-bold text-primary-foreground">H</span>
             </div>
             <span className="font-heading text-title font-bold text-foreground">
-              Halal<span className="text-[hsl(var(--gold))]">Tube</span>
+              Heartify
             </span>
           </Link>
           <h1 className="mt-2 text-heading font-semibold text-foreground">Create your Heartify account</h1>
@@ -174,6 +180,28 @@ const Signup = () => {
               minLength={8}
             />
             <PasswordStrength value={password} />
+          </div>
+
+          <div>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={confirmedAge}
+                onChange={(e) => {
+                  setConfirmedAge(e.target.checked);
+                  if (e.target.checked && errors.age) setErrors((s) => ({ ...s, age: undefined }));
+                }}
+                className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+              />
+              <span className="text-muted-foreground">
+                I confirm I am at least {MIN_AGE} years old.
+              </span>
+            </label>
+            {errors.age && (
+              <p role="alert" className="mt-1 text-micro font-medium text-destructive">
+                {errors.age}
+              </p>
+            )}
           </div>
 
           <div>

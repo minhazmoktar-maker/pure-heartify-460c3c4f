@@ -48,15 +48,15 @@ export default function NextSalahWidget() {
     return (
       <Link
         to="/prayer"
-        className="mx-auto mt-3 flex max-w-[1800px] items-center gap-3 rounded-card border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm transition-colors hover:bg-primary/10 md:mx-6"
+        className="mx-auto mt-3 flex max-w-[1800px] items-center gap-2 rounded-card border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm transition-colors hover:bg-primary/10 md:mx-6"
         aria-label="Set your location to see the next prayer time"
       >
         <MapPin className="h-4 w-4 shrink-0 text-primary" aria-hidden />
-        <span className="font-medium text-foreground">Set location</span>
-        <span className="truncate text-muted-foreground">
+        <span className="whitespace-nowrap font-medium text-foreground">Set location</span>
+        <span className="min-w-0 truncate text-muted-foreground">
           to see the next salah countdown
         </span>
-        <Compass className="ml-auto h-4 w-4 text-muted-foreground" aria-hidden />
+        <Compass className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
       </Link>
     );
   }

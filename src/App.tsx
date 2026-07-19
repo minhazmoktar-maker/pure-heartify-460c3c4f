@@ -23,7 +23,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import AdminRoute from "./components/AdminRoute";
 import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
-import AgeGate from "./components/AgeGate";
+// AgeGate removed — age is verified at signup only
 import CookieConsent from "./components/CookieConsent";
 const CommandPalette = lazy(() => import("./components/CommandPalette"));
 import BottomTabBar from "./components/BottomTabBar";
@@ -285,7 +285,7 @@ const App = () => (
             <GatedPreviewGuard />
             <OfflineSweeper />
             <BackToTop />
-            <AgeGate />
+            {/* AgeGate removed — age is verified at signup only */}
             <CookieConsent />
             <Suspense fallback={null}><CommandPalette /></Suspense>
             <BottomTabBar />
@@ -295,6 +295,11 @@ const App = () => (
               <RouteTransition>
               <Routes>
                 <Route path="/" element={<Index />} />
+                {/* Common aliases that used to 404 */}
+                <Route path="/discover" element={<Navigate to="/search" replace />} />
+                <Route path="/settings" element={<Navigate to="/profile" replace />} />
+                <Route path="/dua" element={<Navigate to="/dua-wall" replace />} />
+                <Route path="/duas" element={<Navigate to="/dua-wall" replace />} />
                 <Route path="/watch/:videoId" element={<Watch />} />
                 <Route path="/shorts" element={<Shorts />} />
                 <Route path="/mushaf" element={<Mushaf />} />

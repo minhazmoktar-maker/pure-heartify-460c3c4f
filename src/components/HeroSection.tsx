@@ -8,7 +8,7 @@ const HeroSection = () => {
       <div className="absolute inset-0">
         <img
           src={heroBanner}
-          alt="HalalTube hero"
+          alt="Heartify hero"
           width={1920}
           height={800}
           loading="eager"

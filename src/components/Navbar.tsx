@@ -60,7 +60,7 @@ const Navbar = () => {
             <SheetTrigger asChild>
               <button
                 aria-label="Open navigation menu"
-                className="tap-target rounded-card hover:bg-secondary transition-colors"
+                className="tap-target rounded-card hover:bg-secondary transition-colors hidden md:inline-flex"
               >
                 <Menu className="h-5 w-5 text-foreground" />
               </button>
@@ -226,10 +226,10 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-2 rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
+              className="inline-flex items-center gap-2 whitespace-nowrap rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
             >
-              <User className="h-4 w-4" />
-              Sign In
+              <User className="h-4 w-4 shrink-0" />
+              <span className="whitespace-nowrap">Sign In</span>
             </Link>
           )}
         </div>

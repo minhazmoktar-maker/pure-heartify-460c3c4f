@@ -1,30 +1,19 @@
 import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, PlayCircle, Compass, BookOpen, User } from "lucide-react";
+import { Home, BookOpen, Sunrise, MoonStar, User } from "lucide-react";
 import { SPINES, shouldShowBottomBar, resolveSpine, type SpineId } from "@/lib/navigation";
 import { soundTap } from "@/lib/soundHaptics";
 import { cn } from "@/lib/utils";
 
 /**
- * Mobile-only bottom tab bar — the product's spine made tangible.
- *
- * Rendering rules:
- *   - Hidden on immersive routes (see shouldShowBottomBar).
- *   - Hidden on md+ breakpoints; the existing Navbar and side surfaces
- *     serve larger viewports.
- *   - Highlights whichever tab owns the current route (resolveSpine).
- *
- * Accessibility:
- *   - role="navigation" + aria-label so screen readers announce it.
- *   - Each tab is a link with min 44px hit area.
- *   - aria-current="page" on the active spine.
+ * Mobile-only bottom tab bar — Home · Quran · Prayer · Dhikr · You.
  */
 
 const ICONS: Record<SpineId, React.ComponentType<{ className?: string }>> = {
   home: Home,
-  watch: PlayCircle,
-  practice: Compass,
-  learn: BookOpen,
+  quran: BookOpen,
+  prayer: Sunrise,
+  dhikr: MoonStar,
   you: User,
 };
 

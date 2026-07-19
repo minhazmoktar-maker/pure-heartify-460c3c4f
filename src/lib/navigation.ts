@@ -20,7 +20,7 @@
  *   coverage.
  */
 
-export type SpineId = "home" | "watch" | "practice" | "learn" | "you";
+export type SpineId = "home" | "quran" | "prayer" | "dhikr" | "you";
 
 export interface SpineDefinition {
   id: SpineId;
@@ -44,60 +44,52 @@ export const SPINES: readonly SpineDefinition[] = [
       "/",
       "/today",
       "/search",
+      "/channels",
+      "/shorts",
+      "/creators",
+      "/creators/dashboard",
+      "/playlists",
       /^\/section\//,
+      /^\/watch\//,
+      /^\/p\//,          // playlist detail share
       /^\/w\//,          // weekly recap shares
       /^\/b\//,          // badge shares
       /^\/s\//,          // streak shares
     ],
   },
   {
-    id: "watch",
-    label: "Watch",
-    path: "/channels",
+    id: "quran",
+    label: "Quran",
+    path: "/quran",
     owns: [
-      "/channels",
-      "/shorts",
-      "/creators",
-      "/creators/dashboard",
-      /^\/watch\//,
-      /^\/p\//,          // playlist detail share
-      "/playlists",
+      "/quran", "/mushaf", "/hifz", "/tajweed", "/khatm", "/khatm/groups",
+      /^\/quran\//, /^\/mushaf\//, /^\/khatm\//,
+      /^\/ayah\//, /^\/surah\//, /^\/juz\//,
+      /^\/k\//,          // khatm-group share
     ],
   },
   {
-    id: "practice",
-    label: "Practice",
+    id: "prayer",
+    label: "Prayer",
     path: "/prayer",
     owns: [
       "/prayer", "/qibla", "/mosques",
-      "/quran", "/mushaf",
-      "/dhikr", "/adhkar", "/wird",
-      "/salah", "/salah-guide", "/adhan-iqamah",
-      "/khatm", "/khatm/groups",
-      "/hifz", "/tajweed", "/hisnul", "/masnoon-duas", "/kids-duas",
+      "/salah", "/salah-guide", "/adhan-iqamah", "/sunnah-prayers",
+      "/wudu", "/ghusl", "/purification", "/janazah", "/ruqya",
       "/fasting", "/ramadan", "/hajj", "/umrah",
       "/zakat", "/sadaqah", "/wasiyyah", "/nikah",
-      "/dua-wall", "/journal", "/reminders", "/challenges",
-      "/dhikr/circles", "/teams", "/leaderboards",
-      "/wudu", "/ghusl", "/purification", "/janazah", "/ruqya",
-      "/sunnah-prayers",
-      /^\/quran\//,
-      /^\/mushaf\//,
-      /^\/khatm\//,
-      /^\/c\//,          // dhikr circle share
-      /^\/d\//,          // dua share
-      /^\/t\//,          // team share
-      /^\/k\//,          // khatm-group share
-      /^\/ayah\//, /^\/surah\//, /^\/juz\//, /^\/hisn\//,
-      /^\/salah\/[^/]+$/, /^\/masjid\//, /^\/adhkar-set\//,
-      /^\/quran-dua\//, /^\/sunnah\//, /^\/durood\//, /^\/kalimah\//,
+      /^\/salah\/[^/]+$/, /^\/masjid\//, /^\/mosque\//,
     ],
   },
   {
-    id: "learn",
-    label: "Learn",
-    path: "/learn",
+    id: "dhikr",
+    label: "Dhikr",
+    path: "/dhikr",
     owns: [
+      "/dhikr", "/adhkar", "/wird", "/hisnul",
+      "/masnoon-duas", "/kids-duas",
+      "/dua-wall", "/journal", "/reminders", "/challenges",
+      "/dhikr/circles", "/teams", "/leaderboards",
       "/learn", "/library", "/hadith", "/seerah",
       "/names", "/quotes", "/glossary", "/quiz", "/stories",
       "/new-muslim", "/alphabet", "/hijri", "/events",
@@ -114,11 +106,16 @@ export const SPINES: readonly SpineDefinition[] = [
       "/fatwa", "/halal-check", "/digital-purification",
       /^\/library\//,
       /^\/hadith\//,
+      /^\/c\//,          // dhikr circle share
+      /^\/d\//,          // dua share
+      /^\/t\//,          // team share
       /^\/name\//, /^\/prophet\//, /^\/sahabi\//, /^\/hijri-month\//,
       /^\/event\//, /^\/pillar\//, /^\/iman\//, /^\/madhhab\//,
       /^\/seerah\//, /^\/scholar\//, /^\/battle\//, /^\/miracle\//,
-      /^\/prophet-name\//, /^\/sign-of-hour\//, /^\/mosque\//,
-      /^\/virtue\//,
+      /^\/prophet-name\//, /^\/sign-of-hour\//,
+      /^\/virtue\//, /^\/hisn\//,
+      /^\/adhkar-set\//, /^\/quran-dua\//, /^\/sunnah\//,
+      /^\/durood\//, /^\/kalimah\//,
     ],
   },
   {
