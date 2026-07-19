@@ -28,7 +28,9 @@ import { useImpressionTracker } from "@/hooks/useImpressionTracker";
  * Infinite scroll on /section/recently-added; the home rail shows the first
  * ~40 with a "Show All" link.
  */
-const RECENT_LIMIT = 40;
+// 24 rather than 40 — the horizontal rail shows ~5 at a time and users
+// go to /section/recently-added for the full list. Cuts feed payload ~40%.
+const RECENT_LIMIT = 24;
 
 const RecentlyAddedRow = () => {
   const navigate = useNavigate();
