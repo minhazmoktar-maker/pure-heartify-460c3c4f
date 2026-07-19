@@ -183,6 +183,28 @@ const Signup = () => {
             <label className="flex items-start gap-2 text-sm">
               <input
                 type="checkbox"
+                checked={confirmedAge}
+                onChange={(e) => {
+                  setConfirmedAge(e.target.checked);
+                  if (e.target.checked && errors.age) setErrors((s) => ({ ...s, age: undefined }));
+                }}
+                className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+              />
+              <span className="text-muted-foreground">
+                I confirm I am at least {MIN_AGE} years old.
+              </span>
+            </label>
+            {errors.age && (
+              <p role="alert" className="mt-1 text-micro font-medium text-destructive">
+                {errors.age}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
                 checked={acceptedPolicy}
                 onChange={(e) => {
                   setAcceptedPolicy(e.target.checked);
