@@ -4,7 +4,6 @@ import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import CuratedSectionRow from "@/components/CuratedSectionRow";
 import SEO from "@/components/SEO";
 import TodayHero from "@/components/TodayHero";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
@@ -12,35 +11,62 @@ import StreakAtRiskBanner from "@/components/StreakAtRiskBanner";
 import RamadanBanner from "@/components/RamadanBanner";
 import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
-import { CURATED_SECTIONS } from "@/data/curatedSections";
-import { FeedDiversityProvider } from "@/contexts/FeedDiversityContext";
+import SurfaceRail from "@/components/SurfaceRail";
 
-// Below-the-fold heavy modules stay lazy so mid-range phones don't parse
-// framer-motion + audio player + infinite feed until they scroll into range.
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
-const RecentlyAddedRow = lazy(() => import("@/components/RecentlyAddedRow"));
 
 const Index = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const onRefresh = async () => {
-    await queryClient.invalidateQueries();
+    await queryClient.invalidateQueries({ queryKey: ["surface"] });
     toast.success("Feed refreshed");
   };
 
-  const rails = (
-    <FeedDiversityProvider>
-      <main className="mx-auto max-w-[1800px] px-4 py-2 md:px-6">
-        <Suspense fallback={null}>
-          <RecentlyAddedRow />
-        </Suspense>
-        {CURATED_SECTIONS.map((section, i) => (
-          <CuratedSectionRow key={section.id} section={section} priority={i < 3} />
-        ))}
-      </main>
-    </FeedDiversityProvider>
+  // Signed-in home: 11 independent surfaces, ordered by expected daily value.
+  const signedInRails = (
+    <main className="mx-auto max-w-[1800px] space-y-1 px-4 py-2 md:px-6">
+      <SurfaceRail surface="continue_watching" title="Continue watching"
+        subtitle="Pick up where you left off" hideIfEmpty priority />
+      <SurfaceRail surface="for_you" title="For you"
+        subtitle="Personalised to what you love" priority />
+      <SurfaceRail surface="recently_added" title="Recently added"
+        subtitle="Freshly approved on Heartify" priority
+        seeAllHref="/section/recently-added" />
+      <SurfaceRail surface="because_you_watched" title="Because you watched"
+        subtitle="More like your recent watches" hideIfEmpty />
+      <SurfaceRail surface="trending" title="Trending"
+        subtitle="Rising this week across Heartify" />
+      <SurfaceRail surface="listen" title="Listen"
+        subtitle="Recitation, adhan, nasheed and lectures" />
+      <SurfaceRail surface="new_videos" title="New uploads"
+        subtitle="Just published by trusted creators" />
+      <SurfaceRail surface="popular_this_week" title="Popular this week" />
+      <SurfaceRail surface="hidden_gems" title="Hidden gems"
+        subtitle="Overlooked, high-trust videos" />
+      <SurfaceRail surface="new_channels" title="New channels"
+        subtitle="Recently welcomed to Heartify" />
+      <SurfaceRail surface="browse" title="Browse"
+        subtitle="A slice across every category" />
+    </main>
   );
+
+  // Signed-out home: public surfaces only, in a discovery-friendly order.
+  const signedOutRails = (
+    <main className="mx-auto max-w-[1800px] space-y-1 px-4 py-2 md:px-6">
+      <SurfaceRail surface="trending" title="Trending" priority />
+      <SurfaceRail surface="recently_added" title="Recently added" priority
+        seeAllHref="/section/recently-added" />
+      <SurfaceRail surface="listen" title="Listen"
+        subtitle="Recitation, adhan, nasheed and lectures" priority />
+      <SurfaceRail surface="new_videos" title="New uploads" />
+      <SurfaceRail surface="popular_this_week" title="Popular this week" />
+      <SurfaceRail surface="hidden_gems" title="Hidden gems" />
+      <SurfaceRail surface="browse" title="Browse" />
+    </main>
+  );
+
 
   return (
     <PullToRefresh
