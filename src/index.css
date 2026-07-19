@@ -106,6 +106,17 @@
     --sidebar-accent-foreground: 40 33% 96%;
     --sidebar-border: 153 25% 15%;
     --sidebar-ring: 43 80% 55%;
+
+    /* P3 craft layer — dark surface tokens. Steps in lightness rather than
+       hue so hierarchy is legible without going gray. */
+    --surface-sunken: 153 40% 4%;
+    --surface-1: 153 36% 9%;
+    --surface-2: 153 32% 13%;
+
+    /* Elevations re-anchored for dark bg so shadows read against dark cards. */
+    --shadow-e1: 0 1px 2px hsl(0 0% 0% / 0.35), 0 4px 12px -6px hsl(0 0% 0% / 0.50);
+    --shadow-e2: 0 4px 12px -2px hsl(0 0% 0% / 0.45), 0 12px 32px -8px hsl(0 0% 0% / 0.55);
+    --shadow-e3: 0 8px 24px -6px hsl(0 0% 0% / 0.55), 0 24px 56px -16px hsl(0 0% 0% / 0.65);
   }
 }
 
