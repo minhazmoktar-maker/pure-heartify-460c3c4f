@@ -5512,6 +5512,103 @@ export type Database = {
         }[]
       }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
+      pool_because_you_watched: {
+        Args: { _exclude_premium?: boolean; _limit?: number; _user_id: string }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      pool_continue_watching: {
+        Args: { _limit?: number; _user_id: string }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      pool_hidden_gems: {
+        Args: {
+          _exclude_premium?: boolean
+          _limit?: number
+          _max_views?: number
+          _min_halal?: number
+        }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      pool_new_channels: {
+        Args: {
+          _exclude_premium?: boolean
+          _limit?: number
+          _window_days?: number
+        }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      pool_new_videos: {
+        Args: {
+          _exclude_premium?: boolean
+          _limit?: number
+          _window_days?: number
+        }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      pool_popular_week: {
+        Args: { _exclude_premium?: boolean; _limit?: number }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      pool_recently_added: {
+        Args: {
+          _exclude_premium?: boolean
+          _limit?: number
+          _window_hours?: number
+        }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      pool_trending_7d: {
+        Args: { _exclude_premium?: boolean; _limit?: number }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       purge_feed_impressions: { Args: never; Returns: number }
       rate_limit_cleanup: {
         Args: { _older_than_minutes?: number }
@@ -5730,7 +5827,22 @@ export type Database = {
         | "note"
     }
     CompositeTypes: {
-      [_ in never]: never
+      surface_video: {
+        video_id: string | null
+        title: string | null
+        channel_id: string | null
+        channel_title: string | null
+        thumbnail_url: string | null
+        category: string | null
+        section_id: string | null
+        published_at: string | null
+        ingested_at: string | null
+        halal_score: number | null
+        view_count: number | null
+        is_trusted_channel: boolean | null
+        is_premium_only: boolean | null
+        content_language: string | null
+      }
     }
   }
 }
