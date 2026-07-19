@@ -20,6 +20,28 @@ interface UseFeedOptions {
   sort?: FeedSort;
 }
 
+/**
+ * Per-tab session id. Kept in sessionStorage so it survives in-tab
+ * navigation (rerender, route change, refresh) but is fresh on every new
+ * tab or cold app open — this is the key that makes each session's feed
+ * fundamentally different rather than merely re-jittered.
+ */
+function getSessionId(): string {
+  if (typeof window === "undefined") return "ssr";
+  try {
+    const KEY = "heartify.session_id";
+    const existing = sessionStorage.getItem(KEY);
+    if (existing) return existing;
+    const s =
+      (crypto as Crypto & { randomUUID?: () => string }).randomUUID?.() ??
+      `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    sessionStorage.setItem(KEY, s);
+    return s;
+  } catch {
+    return `t-${Date.now()}`;
+  }
+}
+
 async function fetchFeedPage(opts: {
   category?: string;
   sectionId?: string;
@@ -28,6 +50,7 @@ async function fetchFeedPage(opts: {
   limit: number;
   contentLanguages: string[];
   sort?: FeedSort;
+  sessionId: string;
 }): Promise<FeedPage> {
   const { data, error } = await supabase.functions.invoke("feed", {
     body: {
@@ -38,6 +61,7 @@ async function fetchFeedPage(opts: {
       limit: opts.limit,
       content_languages: opts.contentLanguages,
       sort: opts.sort,
+      session_id: opts.sessionId,
     },
   });
 
@@ -61,9 +85,10 @@ export function useInfiniteFeed({
   const { preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
   const langKey = contentLanguages.join(",");
+  const sessionId = getSessionId();
 
   return useInfiniteQuery<FeedPage>({
-    queryKey: ["feed", category, sectionId, search, limit, langKey, sort],
+    queryKey: ["feed", category, sectionId, search, limit, langKey, sort, sessionId],
     queryFn: ({ pageParam }) =>
       fetchFeedPage({
         category: category === "All" ? undefined : category,
@@ -73,6 +98,7 @@ export function useInfiniteFeed({
         limit,
         contentLanguages,
         sort,
+        sessionId,
       }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
@@ -81,4 +107,3 @@ export function useInfiniteFeed({
     refetchOnWindowFocus: false,
   });
 }
-
