@@ -1098,6 +1098,7 @@ export type Database = {
       curated_videos: {
         Row: {
           category: string
+          channel_id: string | null
           channel_title: string
           content_language: string | null
           embedding: string | null
@@ -1134,6 +1135,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          channel_id?: string | null
           channel_title: string
           content_language?: string | null
           embedding?: string | null
@@ -1170,6 +1172,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          channel_id?: string | null
           channel_title?: string
           content_language?: string | null
           embedding?: string | null
