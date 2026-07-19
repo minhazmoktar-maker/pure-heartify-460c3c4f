@@ -356,7 +356,10 @@ const Quran = () => {
         {surahNum ? (
           <SurahView n={surahNum} prefs={prefs} setPrefs={setPrefs} />
         ) : (
-          <SurahIndex onPick={(n) => navigate(`/quran/${n}`)} />
+          <>
+            <QuranContinueBlock />
+            <SurahIndex onPick={(n) => navigate(`/quran/${n}`)} />
+          </>
         )}
 
         {!surahNum && (
