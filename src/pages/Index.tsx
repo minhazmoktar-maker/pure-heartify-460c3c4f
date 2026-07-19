@@ -201,7 +201,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border bg-card py-8">
         <div className="mx-auto max-w-[1800px] px-4 text-center md:px-6 space-y-2">
-          <p className="text-sm text-muted-foreground">© 2026 HalalTube — Curated halal content for the Ummah ✦</p>
+          <p className="text-sm text-muted-foreground">© 2026 Heartify — Curated halal content for the Ummah ✦</p>
           <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-micro text-muted-foreground">
             <a href="/privacy" className="hover:text-foreground underline">Privacy</a>
             <a href="/terms" className="hover:text-foreground underline">Terms</a>
