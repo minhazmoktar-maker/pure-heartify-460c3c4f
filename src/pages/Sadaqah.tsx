@@ -4,6 +4,7 @@ import { HandCoins, Plus, Trash2, Target, TrendingUp, Calendar } from "lucide-re
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import CurrencyPicker from "@/components/CurrencyPicker";
+import { formatCurrency } from "@/lib/currencies";
 import { toast } from "sonner";
 
 type Entry = {
