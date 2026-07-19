@@ -210,10 +210,54 @@ Deno.serve(async (req) => {
     if (!payload.ok) return json({ items: [], nextCursor: null, total: 0 });
 
     // Post-fetch blocklist filter (see BLOCKED_TOKENS above).
-    const filtered = (payload.items as Array<Record<string, unknown>>).filter((v) => {
+    let filtered = (payload.items as Array<Record<string, unknown>>).filter((v) => {
       const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
       return !BLOCKED_TOKENS.some((tok) => t.includes(tok));
     });
+
+    // Empty-section fallback cascade: a section should NEVER disappear.
+    // If the primary retrieval returns fewer than half of `limit`, broaden
+    // in stages — recent approved, then trending by view_count, then any
+    // approved — merging by video_id so duplicates from the primary pool
+    // are preserved on their higher-ranked positions.
+    if (sectionId && filtered.length < Math.ceil(limit / 2)) {
+      const seen = new Set(filtered.map((v) => v.video_id as string));
+      const cascade = async (extra: string) => {
+        const u = `${SUPABASE_URL}/rest/v1/curated_videos?select=*` +
+          `&moderation_state=in.(approved,auto_approved)` +
+          `&is_hidden=eq.false&is_archived=eq.false` +
+          (isPremium ? "" : "&is_premium_only=eq.false") +
+          `&${extra}&limit=${fetchLimit}`;
+        const r = await fetch(u, {
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            "Accept": "application/json",
+          },
+        });
+        if (!r.ok) return;
+        const rows = (await r.json()) as Array<Record<string, unknown>>;
+        for (const v of rows) {
+          const id = v.video_id as string;
+          if (seen.has(id)) continue;
+          const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
+          if (BLOCKED_TOKENS.some((tok) => t.includes(tok))) continue;
+          seen.add(id);
+          filtered.push(v);
+          if (filtered.length >= fetchLimit) return;
+        }
+      };
+      // Stage 1: recently-approved
+      await cascade("order=ingested_at.desc.nullslast,halal_score.desc");
+      // Stage 2: trending fallback if still short
+      if (filtered.length < Math.ceil(limit / 2)) {
+        await cascade("order=view_count.desc.nullslast,published_at.desc.nullslast");
+      }
+      // Stage 3: hidden gems (high halal, low exposure) — last-resort filler
+      if (filtered.length < Math.ceil(limit / 2)) {
+        await cascade("halal_score=gte.85&order=published_at.desc.nullslast,halal_score.desc");
+      }
+    }
 
     // Locale-aware soft re-rank: matching content_language items surface first
     // (and un-tagged items are treated as neutral so we never starve pages
