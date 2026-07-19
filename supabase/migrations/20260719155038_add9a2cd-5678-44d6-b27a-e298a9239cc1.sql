@@ -1,0 +1,1 @@
+ALTER TABLE public.curated_videos ADD COLUMN IF NOT EXISTS channel_id TEXT; CREATE INDEX IF NOT EXISTS idx_curated_videos_channel_id ON public.curated_videos (channel_id) WHERE channel_id IS NOT NULL;
