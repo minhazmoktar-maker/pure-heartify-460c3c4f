@@ -73,8 +73,11 @@ const Signup = () => {
   };
 
   const handleOAuth = async (provider: "google" | "apple") => {
-    if (!acceptedPolicy) {
-      setErrors((s) => ({ ...s, policy: "Please accept the Privacy Policy to continue." }));
+    const gate: Errors = {};
+    if (!confirmedAge) gate.age = `You must be at least ${MIN_AGE} to create an account.`;
+    if (!acceptedPolicy) gate.policy = "Please accept the Privacy Policy to continue.";
+    if (Object.keys(gate).length) {
+      setErrors((s) => ({ ...s, ...gate }));
       return;
     }
     setLoading(true);
