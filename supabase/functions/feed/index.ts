@@ -248,10 +248,13 @@ Deno.serve(async (req) => {
     const produce = async () => {
       const t0 = Date.now();
       if (canUseDiversifiedRpc) {
-        // Per-channel cap at pool layer: match the per-page cap (maxPerChannel)
-        // plus 1 slack so the reranker has room to prefer affinity items
-        // without pinning the exact same channels on every request.
-        const perChannelCap = Math.min(Math.max(maxPerChannel + 1, 2), 8);
+        // Tighter per-channel cap at the pool layer so ~250–400 distinct
+        // channels compete inside the candidate slice (vs. 40–80 before).
+        // For anon we go stricter (2/channel) — no personalization can
+        // rescue diversity from a single dominant creator.
+        const perChannelCap = callerId
+          ? Math.min(Math.max(maxPerChannel + 1, 2), 6)
+          : 2;
         const { data, error } = await admin.rpc("get_feed_candidates_diversified", {
           _limit: fetchLimit,
           _per_channel: perChannelCap,
