@@ -60,7 +60,7 @@ const Navbar = () => {
             <SheetTrigger asChild>
               <button
                 aria-label="Open navigation menu"
-                className="tap-target rounded-card hover:bg-secondary transition-colors"
+                className="tap-target rounded-card hover:bg-secondary transition-colors hidden md:inline-flex"
               >
                 <Menu className="h-5 w-5 text-foreground" />
               </button>
