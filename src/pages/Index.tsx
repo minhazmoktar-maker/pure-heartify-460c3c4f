@@ -109,12 +109,12 @@ const Index = () => {
               <WeeklyRecapCard />
             </div>
 
-            {rails}
+            {signedInRails}
           </>
         ) : (
           <>
             {/* Signed-out: content first, marketing below the fold. */}
-            {rails}
+            {signedOutRails}
             <HeroSection />
           </>
         )}
