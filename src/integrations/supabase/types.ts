@@ -5439,6 +5439,20 @@ export type Database = {
         Returns: undefined
       }
       log_feed_impressions: { Args: { _video_ids: string[] }; Returns: number }
+      log_recommendation_event: {
+        Args: {
+          _event_type: string
+          _provider?: string
+          _reasons?: Json
+          _score?: number
+          _session_id?: string
+          _signals?: Json
+          _surface?: string
+          _user_id?: string
+          _video_id: string
+        }
+        Returns: undefined
+      }
       mark_feed_action: {
         Args: { _action: string; _video_id: string }
         Returns: undefined
@@ -5480,6 +5494,36 @@ export type Database = {
         Returns: number
       }
       reap_stuck_discovery_jobs: { Args: never; Returns: number }
+      rec_feed_health: {
+        Args: { _hours?: number }
+        Returns: {
+          channel_entropy_bits: number
+          distinct_categories: number
+          distinct_channels: number
+          distinct_videos: number
+          duplicate_rate_pct: number
+          pct_fresh_7d: number
+          pct_trusted: number
+          personalized_ratio_pct: number
+          top_category_pct: number
+          top_channel_pct: number
+          total_impressions: number
+        }[]
+      }
+      rec_retriever_health: {
+        Args: never
+        Returns: {
+          channel_entropy_bits: number
+          distinct_categories: number
+          distinct_channels: number
+          distinct_languages: number
+          pct_fresh_7d: number
+          pct_trusted: number
+          pool_size: number
+          retriever: string
+          top_channel_pct: number
+        }[]
+      }
       recent_video_report_count: {
         Args: { _user_id: string; _window_minutes?: number }
         Returns: number
