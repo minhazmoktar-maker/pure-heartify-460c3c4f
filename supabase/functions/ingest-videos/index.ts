@@ -585,19 +585,27 @@ async function sbFetch(path: string, init: RequestInit = {}) {
 
 async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
   if (!rows.length) return 0;
-  const res = await sbFetch("curated_videos?on_conflict=video_id", {
-    method: "POST",
-    headers: { "Prefer": "resolution=ignore-duplicates,return=headers-only" },
-    body: JSON.stringify(rows),
-  });
-  if (!res.ok) {
-    console.error(`upsert failed ${res.status}: ${await res.text()}`);
-    return 0;
+  // Chunk to keep each INSERT small enough that Postgres statement_timeout
+  // doesn't cancel it (error 57014). Large single-shot upserts of a few
+  // hundred rows were timing out under load; 50-row chunks are safe.
+  const CHUNK = 50;
+  let inserted = 0;
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const chunk = rows.slice(i, i + CHUNK);
+    const res = await sbFetch("curated_videos?on_conflict=video_id", {
+      method: "POST",
+      headers: { "Prefer": "resolution=ignore-duplicates,return=headers-only" },
+      body: JSON.stringify(chunk),
+    });
+    if (!res.ok) {
+      console.error(`upsert failed ${res.status} (chunk ${i}-${i + chunk.length}): ${await res.text()}`);
+      continue; // skip the bad chunk, keep going with the rest
+    }
+    inserted += chunk.length;
+    // Fire-and-forget embedding for this chunk.
+    embedNewVideos(chunk).catch((e) => console.warn("[embed] batch failed:", e));
   }
-  // Fire-and-forget: embed the newly-inserted videos so semantic recall works.
-  // Errors are logged inside embedNewVideos; never blocks ingest.
-  embedNewVideos(rows).catch((e) => console.warn("[embed] batch failed:", e));
-  return rows.length;
+  return inserted;
 }
 
 // Embed a batch of newly ingested rows and store the vectors on curated_videos.
@@ -1035,7 +1043,11 @@ Deno.serve(async (req) => {
     // With 2 keys ⇒ 20k/day budget, target ~2,500/run.
     const keyMultiplier = Math.max(activeKeys().length, 1);
     const channelsPerRun = Math.min(body?.channels_per_run ?? 80 * keyMultiplier, 300);
-    const discoveryQueries = Math.min(body?.discovery_queries ?? 10 * keyMultiplier, 40);
+    // Discovery uses search.list (100 units/call) — the primary cause of
+    // "Quota exceeded" 429s. Default down from 10→4 per key and cap at 20
+    // so a cron run can't drain the daily budget on its own; approved
+    // channels (1 unit each) do the heavy lifting.
+    const discoveryQueries = Math.min(body?.discovery_queries ?? 4 * keyMultiplier, 20);
     // Hard safety cap: leave ~10% headroom of total daily budget per run.
     const perRunQuotaCap = 1200 * keyMultiplier;
 
