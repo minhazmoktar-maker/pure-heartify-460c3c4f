@@ -61,10 +61,17 @@
     --radius-card: 0.75rem;
     --radius-pill: 9999px;
 
-    /* Elevations — exactly 3 */
+    /* Elevations — 4 tiers as of P3. e3 is for lifted modal/sheet surfaces. */
     --shadow-e0: 0 0 0 0 transparent;
     --shadow-e1: 0 1px 2px hsl(var(--primary) / 0.06), 0 4px 12px -6px hsl(var(--primary) / 0.10);
     --shadow-e2: 0 4px 12px -2px hsl(var(--primary) / 0.10), 0 12px 32px -8px hsl(var(--primary) / 0.18);
+    --shadow-e3: 0 8px 24px -6px hsl(var(--primary) / 0.16), 0 24px 56px -16px hsl(var(--primary) / 0.28);
+
+    /* Surface planes — layered on top of --background so the UI feels stacked
+       instead of a single flat cream. Each step is ~2% lightness lift. */
+    --surface-sunken: 40 28% 93%;
+    --surface-1: 40 32% 97%;
+    --surface-2: 40 34% 99%;
 
     /* Motion — exactly 3 durations + 1 easing */
     --duration-micro: 120ms;
