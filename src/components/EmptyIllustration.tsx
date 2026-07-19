@@ -65,6 +65,41 @@ export default function EmptyIllustration({ variant, className }: Props) {
           <path d="M14 22 l4 4 M78 22 l-4 4 M14 74 l4-4 M78 74 l-4-4" className="stroke-primary/40" strokeWidth="2" strokeLinecap="round" />
         </svg>
       );
+    case "location":
+      // P3 craft layer — location / geolocation empty state, drawn in the
+      // same 96×96 arithmetic + primary-tinted stroke as the rest of the set.
+      return (
+        <svg viewBox="0 0 96 96" fill="none" className={base} aria-hidden="true">
+          <circle cx="48" cy="48" r="44" className="fill-primary/5" />
+          <path
+            d="M48 22 c-10 0-18 8-18 18 0 14 18 32 18 32 s18-18 18-32 c0-10-8-18-18-18z"
+            className="fill-primary/15 stroke-primary/70"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+          <circle cx="48" cy="40" r="6" className="fill-background stroke-primary" strokeWidth="2" />
+          <path d="M18 78 h60" className="stroke-primary/40" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 4" />
+        </svg>
+      );
+    case "not-found":
+      // 404 — echoes the search glyph but hollowed out so it reads as "gone",
+      // not "we're still searching".
+      return (
+        <svg viewBox="0 0 96 96" fill="none" className={base} aria-hidden="true">
+          <circle cx="48" cy="48" r="44" className="fill-primary/5" />
+          <text
+            x="48"
+            y="60"
+            textAnchor="middle"
+            className="fill-primary/70 font-heading"
+            style={{ fontSize: 26, letterSpacing: "-0.03em", fontWeight: 600 }}
+          >
+            404
+          </text>
+          <path d="M20 74 h56" className="stroke-primary/30" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="76" cy="22" r="4" className="fill-[hsl(var(--gold))]" />
+        </svg>
+      );
     case "empty-list":
     default:
       return (
