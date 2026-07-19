@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { HandCoins, Plus, Trash2, Target, TrendingUp, Calendar } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import CurrencyPicker from "@/components/CurrencyPicker";
 import { toast } from "sonner";
 
 type Entry = {
