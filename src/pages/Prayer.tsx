@@ -30,7 +30,37 @@ export default function Prayer() {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    setSettings(loadSettings());
+    const stored = loadSettings();
+    setSettings(stored);
+
+    // Never a blank screen: if the user has no saved location, silently
+    // resolve an approximate one from their IP so times render immediately.
+    // GPS remains an explicit opt-in via "Use precise location".
+    if (!stored.location) {
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+          if (!res.ok) return;
+          const j = await res.json();
+          const lat = Number(j?.latitude);
+          const lon = Number(j?.longitude);
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+          if (cancelled) return;
+          const label = [j?.city, j?.country_name].filter(Boolean).join(", ") || "Approximate location";
+          setSettings((prev) => {
+            if (prev.location) return prev;
+            const next: PrayerSettings = {
+              ...prev,
+              location: { latitude: lat, longitude: lon, label, approximate: true } as PrayerSettings["location"],
+            };
+            saveSettings(next);
+            return next;
+          });
+        } catch { /* offline — the empty-state CTA still shows */ }
+      })();
+      return () => { cancelled = true; };
+    }
   }, []);
 
   useEffect(() => {
