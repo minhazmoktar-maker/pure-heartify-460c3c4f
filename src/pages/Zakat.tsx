@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Calculator, Coins, Info, RotateCcw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import CurrencyPicker from "@/components/CurrencyPicker";
 
 const STORAGE = "heartify:zakat:v1";
 const ZAKAT_RATE = 0.025;
@@ -9,87 +10,6 @@ const ZAKAT_RATE = 0.025;
 // Approximate nisab weights (grams)
 const GOLD_NISAB_GRAMS = 87.48;
 const SILVER_NISAB_GRAMS = 612.36;
-
-// 60+ ISO 4217 currencies supported by Intl.NumberFormat.
-// Users enter gold/silver prices in the chosen currency; totals format accordingly.
-const CURRENCIES: { code: string; name: string }[] = [
-  { code: "USD", name: "US Dollar" },
-  { code: "EUR", name: "Euro" },
-  { code: "GBP", name: "British Pound" },
-  { code: "AED", name: "UAE Dirham" },
-  { code: "SAR", name: "Saudi Riyal" },
-  { code: "QAR", name: "Qatari Riyal" },
-  { code: "KWD", name: "Kuwaiti Dinar" },
-  { code: "BHD", name: "Bahraini Dinar" },
-  { code: "OMR", name: "Omani Rial" },
-  { code: "JOD", name: "Jordanian Dinar" },
-  { code: "EGP", name: "Egyptian Pound" },
-  { code: "TRY", name: "Turkish Lira" },
-  { code: "IRR", name: "Iranian Rial" },
-  { code: "IQD", name: "Iraqi Dinar" },
-  { code: "LBP", name: "Lebanese Pound" },
-  { code: "MAD", name: "Moroccan Dirham" },
-  { code: "DZD", name: "Algerian Dinar" },
-  { code: "TND", name: "Tunisian Dinar" },
-  { code: "LYD", name: "Libyan Dinar" },
-  { code: "SDG", name: "Sudanese Pound" },
-  { code: "SOS", name: "Somali Shilling" },
-  { code: "YER", name: "Yemeni Rial" },
-  { code: "SYP", name: "Syrian Pound" },
-  { code: "AFN", name: "Afghan Afghani" },
-  { code: "PKR", name: "Pakistani Rupee" },
-  { code: "INR", name: "Indian Rupee" },
-  { code: "BDT", name: "Bangladeshi Taka" },
-  { code: "LKR", name: "Sri Lankan Rupee" },
-  { code: "NPR", name: "Nepalese Rupee" },
-  { code: "MVR", name: "Maldivian Rufiyaa" },
-  { code: "IDR", name: "Indonesian Rupiah" },
-  { code: "MYR", name: "Malaysian Ringgit" },
-  { code: "SGD", name: "Singapore Dollar" },
-  { code: "BND", name: "Brunei Dollar" },
-  { code: "THB", name: "Thai Baht" },
-  { code: "PHP", name: "Philippine Peso" },
-  { code: "VND", name: "Vietnamese Dong" },
-  { code: "CNY", name: "Chinese Yuan" },
-  { code: "HKD", name: "Hong Kong Dollar" },
-  { code: "TWD", name: "Taiwan Dollar" },
-  { code: "JPY", name: "Japanese Yen" },
-  { code: "KRW", name: "South Korean Won" },
-  { code: "KZT", name: "Kazakhstani Tenge" },
-  { code: "UZS", name: "Uzbekistani Som" },
-  { code: "AZN", name: "Azerbaijani Manat" },
-  { code: "AUD", name: "Australian Dollar" },
-  { code: "NZD", name: "New Zealand Dollar" },
-  { code: "CAD", name: "Canadian Dollar" },
-  { code: "MXN", name: "Mexican Peso" },
-  { code: "BRL", name: "Brazilian Real" },
-  { code: "ARS", name: "Argentine Peso" },
-  { code: "CLP", name: "Chilean Peso" },
-  { code: "COP", name: "Colombian Peso" },
-  { code: "PEN", name: "Peruvian Sol" },
-  { code: "CHF", name: "Swiss Franc" },
-  { code: "SEK", name: "Swedish Krona" },
-  { code: "NOK", name: "Norwegian Krone" },
-  { code: "DKK", name: "Danish Krone" },
-  { code: "ISK", name: "Icelandic Króna" },
-  { code: "PLN", name: "Polish Zloty" },
-  { code: "CZK", name: "Czech Koruna" },
-  { code: "HUF", name: "Hungarian Forint" },
-  { code: "RON", name: "Romanian Leu" },
-  { code: "BGN", name: "Bulgarian Lev" },
-  { code: "RSD", name: "Serbian Dinar" },
-  { code: "UAH", name: "Ukrainian Hryvnia" },
-  { code: "RUB", name: "Russian Ruble" },
-  { code: "ZAR", name: "South African Rand" },
-  { code: "NGN", name: "Nigerian Naira" },
-  { code: "GHS", name: "Ghanaian Cedi" },
-  { code: "KES", name: "Kenyan Shilling" },
-  { code: "TZS", name: "Tanzanian Shilling" },
-  { code: "UGX", name: "Ugandan Shilling" },
-  { code: "ETB", name: "Ethiopian Birr" },
-  { code: "XOF", name: "West African CFA Franc" },
-  { code: "XAF", name: "Central African CFA Franc" },
-];
 
 interface Form {
   currency: string;
@@ -242,17 +162,10 @@ const Zakat = () => {
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <label className="flex flex-col gap-1">
                   <span className="text-micro font-medium text-foreground">Currency</span>
-                  <select
+                  <CurrencyPicker
                     value={form.currency}
-                    onChange={(e) => set("currency", e.target.value)}
-                    className="rounded-card border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary"
-                  >
-                    {CURRENCIES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.code} — {c.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(code) => set("currency", code)}
+                  />
                 </label>
                 <Row
                   label="Gold price / gram"
