@@ -101,11 +101,12 @@ export default {
         "ds-md": "16px",
         "ds-lg": "32px",
       },
-      // Locked design system — elevations
+      // Locked design system — elevations (4 tiers as of P3 craft layer)
       boxShadow: {
         e0: "var(--shadow-e0)",
         e1: "var(--shadow-e1)",
         e2: "var(--shadow-e2)",
+        e3: "var(--shadow-e3)",
       },
       // Locked design system — motion
       transitionDuration: {
