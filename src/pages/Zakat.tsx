@@ -97,14 +97,10 @@ const Zakat = () => {
   }, [form]);
 
   const fmt = useMemo(
-    () =>
-      new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: form.currency || "USD",
-        maximumFractionDigits: 2,
-      }),
+    () => getCurrencyFormatter(form.currency || "USD"),
     [form.currency],
   );
+
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
