@@ -76,6 +76,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // P3 craft layer — layered surfaces so the UI reads as a stack of
+        // planes instead of one flat cream. `surface-1` sits above the page
+        // background, `surface-2` above cards (modals, sheets, floating bars).
+        surface: {
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          sunken: "hsl(var(--surface-sunken))",
+        },
       },
       borderRadius: {
         // Legacy (kept so shadcn ui/* keeps working; do not use in new code)
