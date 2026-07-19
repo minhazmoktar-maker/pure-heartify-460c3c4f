@@ -1,83 +1,123 @@
-# Recommendation Pipeline Audit — 2026-07
+# Recommendation System Audit — 2026-07
 
-_All numbers below produced by SQL against the live database, not estimated._
+Living audit doc. Measurements taken against production DB; re-runnable via
+`SELECT * FROM rec_retriever_health();` and `SELECT * FROM rec_feed_health(24);`
+or via the owner dashboard at **`/admin/rec-health`**.
 
-## Pipeline stages and where problems actually live
+---
 
-| Stage | Health | Verified problem |
-|---|---|---|
-| **Database** | ✅ | 30,454 approved videos, 149 channels, sufficient corpus. |
-| **Retrieval (`candidates.ts`)** | 🔴 **root cause** | Freshness pool = 50.7% top-4 channels; entropy only 4.15 bits over 41 distinct channels. This starves every downstream step. |
-| **Candidate generation** | 🟡 | Trending pool empty (0 events last 24h — likely because signed-out users don't record). Semantic recall requires embeddings (~0.1% coverage). |
-| **Filtering** | ✅ | Hard-cuts for dismissed / blocked / re-shown 4×+ work as designed. |
-| **Ranking (`hybridRules.ts`)** | ✅ | Per-user weight perturbation, daily salt, ε-greedy exploration all present and correct. But: if input pool is 50% one channel, no ranking trick fixes it. |
-| **MMR diversify** | 🟡 | `MAX_PER_CHANNEL=2`, `MAX_PER_CATEGORY=4` on **output**, but by then the pool has already collapsed. |
-| **Section assembly** | 🔴 | 6 sections have ≤2 videos (`revert-stories`, `study-focus`, `live-streams`, `elite-recitation`, `daily-picks`, `advanced-learning`). They render empty for many users. |
-| **Caching** | ✅ | Anonymous 60s read-through cache in `recommendations/index.ts`. |
-| **API** | ✅ | Latency healthy; rate limits sane. |
-| **Client rendering** | ✅ | React Query with lazy image loading. |
+## Root-cause findings (2026-07-19)
 
-## Root cause: retrieval, not ranking
+### 🔴 P0 — `recommendation_events` table has 0 rows
 
-Two users get similar feeds because **they see the same 300 candidates**, and after MMR they pick similar top-24 from that same shallow pool. The daily user-salt rotates *ordering* but cannot rotate *content that isn't there*.
+Every trending retriever (`get_trending_video_ids`, `get_heartify_trending_ids`)
+reads from this table. It was empty for the entire lifetime of the app.
 
-Measured proof (baseline freshness pool of top 300 published):
+- Cause: `admin.from("recommendation_events").insert(...).then().catch()`
+  in the `/recommendations` edge function silently swallowed writes. No log,
+  no row.
+- Impact: two of four retrievers (`trending_14d`, `heartify_trending_72h`)
+  return **0 candidates**. All popularity signal is dead. The system was
+  effectively running on freshness + hidden_gems only.
+- Fix shipped: new `log_recommendation_event(...)` SECURITY DEFINER RPC.
+  Edge function now calls the RPC for both single-event and batched impression
+  writes. Writes cannot silently drop.
 
-```
-Islamic Waz Bogra               50 videos  16.7%
-Madani Channel Bangla Official  49 videos  16.3%
-Bangla Lecture                  29 videos   9.7%
-DawateIslami                    24 videos   8.0%
-────────────────────────────────────────────────
-Top-4 concentration                        50.7%
-Channel Shannon entropy                    4.154 bits
-Distinct channels in pool                  41
-```
+### 🔴 P0 — `content_language` is 100% NULL
 
-## Fix shipped this turn — retrieval-time per-channel cap
+31,380/31,380 approved videos have `content_language = NULL`. Every
+"language-aware" personalization path (`useLocalePreferences`, MMR language
+diversity boost, regional Daily Dose) is a no-op.
 
-`supabase/functions/_shared/recommendations/candidates.ts`
+- Fix required (not shipped this turn): language-detection backfill from
+  title + channel_title + description. Recommend `franc-min` in an edge
+  function, batched 500/run, target ~2h to complete backfill.
 
-- Widened freshness query window from 300 to 900 rows.
-- Cap admissions at **6 videos per channel** (`REC_RETRIEVAL_MAX_PER_CHANNEL`) before feeding the ranker.
-- Same final pool size (300) — no cost increase; extra 600 rows are already indexed by `published_at`.
+### 🟠 P1 — Hidden Gems retriever concentrated on 8 channels
 
-## Measured impact (identical SQL simulation, same DB snapshot)
+`get_hidden_gem_ids(120, 300)`:
 
-| Metric | Before | After | Δ |
-|---|---:|---:|---:|
-| Max videos from one channel | 50 (16.7%) | **6 (2.0%)** | **−88%** |
-| Top-4 channel share of pool | 50.7% | **8.0%** | **−84%** |
-| Distinct channels in pool | 41 | **73** | **+78%** |
-| Channel Shannon entropy (bits) | 4.154 | **5.428** | **+30.7%** |
-| Category share top-1 (Islamic) | 36.7% | **28.0%** | −8.7pp |
-| Pool size | 300 | 300 | unchanged |
-| Retrieval latency estimate | 1 query, LIMIT 300 | 1 query, LIMIT 900 | +~2ms (same index) |
+| metric | value |
+|---|---:|
+| pool_size | 120 |
+| distinct_channels | **8** |
+| top_channel_pct | **31.67%** |
+| entropy | 2.386 bits |
 
-**Interpretation:** The ranker now has 1.78× more distinct creators to blend, so two users with different weight perturbations diverge on *who* they see, not just *what order*. MMR's `MAX_PER_CHANNEL=2` output cap now bites on a richer input, so no single creator can occupy >2 slots of the top 24.
+Root cause: the "gem" definition (high halal_score, low impressions) matches
+only a handful of channels because impressions are almost entirely absent
+(see P0 above). Once event logging comes back online, re-measure before
+tuning the SQL.
 
-## Not shipped this turn (would need dedicated verification)
+### 🟠 P1 — Freshness pool is 17.6% fresh, universe is 0.3% fresh (7d)
 
-Being honest — the following are visible in the code path but were not touched this turn and remain as-is:
+After ingestion fixes the top-900 window contains ~42 fresh-7d videos.
+The universe itself only has **95/31,380 videos published in the last 7
+days** — ingestion is not keeping pace with upstream uploads.
 
-- **Section suppression when a section has <8 videos.** Would need a client-side change in the Home page section renderer and a re-measurement of empty-render rates. Data shows 6 sections at risk.
-- **Dynamic section ordering.** Currently static.
-- **Cross-session memory beyond 24h impression counts.** `feed_impressions` supports it but scoring only reads last 24h.
-- **Trending pool depth.** `recommendation_events` has 0 rows in last 24h; needs anonymous-session event flushing before it can power the trending signal.
+### 🟠 P2 — Age gate + cookie banner + location prompt stack on first load
 
-## Verification you can run yourself
+Confirmed via Playwright (see `/tmp/browser/rec/shots/s1.png`): a brand-new
+user sees the age-verification modal, cookie banner, and "Get location"
+strip all rendered on the same initial paint. Feed loads behind the modal
+but is unreachable. Recommend sequential presentation (age → consent →
+location) with a single call-to-action per step.
 
-```sql
--- Before/after channel dominance (uses same query the fix implements):
-WITH ranked AS (
-  SELECT channel_title, published_at,
-    row_number() OVER (PARTITION BY channel_title ORDER BY published_at DESC NULLS LAST) rn,
-    row_number() OVER (ORDER BY published_at DESC NULLS LAST) grn
-  FROM curated_videos
-  WHERE moderation_state IN ('approved','auto_approved')
-    AND is_hidden=false AND is_archived=false
-)
-SELECT channel_title, count(*)
-FROM ranked WHERE grn <= 900 AND rn <= 6
-GROUP BY 1 ORDER BY 2 DESC LIMIT 10;
-```
+---
+
+## Per-retriever health snapshot (2026-07-19 18:48 UTC)
+
+Source: `SELECT * FROM rec_retriever_health();`
+
+| retriever | pool | ch | cats | langs | top_ch% | entropy | fresh_7d% | trusted% |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| universe | 31380 | 149 | 15 | **1** | 12.24 | 4.401 | 0.30 | 99.92 |
+| freshness | 239 | 67 | 10 | 1 | **2.51** | **5.772** | 17.57 | 100.00 |
+| trending_14d | — | — | — | — | — | — | — | — |
+| heartify_trending_72h | — | — | — | — | — | — | — | — |
+| hidden_gems | 120 | **8** | 6 | 1 | **31.67** | 2.386 | 0.00 | 100.00 |
+
+Rows for `trending_*` are absent because their underlying RPCs return
+zero rows (dead event pipeline, see P0).
+
+## Assembled-feed snapshot (720h impressions)
+
+Only 2 impressions total in the last 30 days — the entire personalization
+loop was starved. Once the RPC logger backfills real traffic, this table
+becomes meaningful.
+
+---
+
+## Shipped this turn
+
+- `log_recommendation_event(...)` SECURITY DEFINER RPC (guaranteed writes)
+- `/recommendations` edge function switched to the RPC for both event
+  endpoint and impression batch
+- `rec_retriever_health()` + `rec_feed_health(hours)` RPCs
+- `/admin/rec-health` owner dashboard with color-coded thresholds and a
+  rubric explaining each metric
+
+## Not shipped — explicit follow-up backlog
+
+The original ask covered a much larger scope. I was not willing to
+fabricate measurements for items I couldn't credibly execute in one turn.
+These are the real remaining pieces:
+
+1. **`content_language` backfill** — language detection worker + one-shot
+   backfill migration.
+2. **Per-source pool tagging in `candidates.ts`** — attach a `Set<string>`
+   of source retrievers to each candidate, then log per-source contribution
+   + overlap ratios into `rec_feed_health`.
+3. **11 user-simulation harness** — replay against a fixture user
+   (Quran-focused, Programming-focused, Arabic learner, ...) and diff
+   sequential feeds. Requires the RPC logger to have run for ≥24h so
+   personalization has signal to react to.
+4. **Novelty / long-tail / new-channel metrics** on the dashboard — need
+   `seen_channel` history per user to compute.
+5. **Latency + cache-hit-ratio panel** — plumb from existing `readThrough`
+   cache stats + edge function duration histograms.
+6. **UX friction fix**: sequence age gate → cookie consent → location
+   prompt instead of stacking them on first paint.
+
+Every item above is scoped so it can be picked up individually without
+re-doing the diagnostic work.
