@@ -66,16 +66,19 @@ Deno.serve(async (req) => {
       if (!videoId || !["impression", "click", "dismiss", "convert"].includes(eventType)) {
         return json({ error: "invalid event" }, 400);
       }
-      const { error } = await admin.from("recommendation_events").insert({
-        user_id: userId,
-        video_id: videoId,
-        event_type: eventType,
-        score: body.score ?? null,
-        reasons: body.reasons ?? [],
-        signals: body.signals ?? {},
-        surface: body.surface ?? null,
-        session_id: body.sessionId ?? null,
-        provider: body.provider ?? null,
+      // Use SECURITY DEFINER RPC — guaranteed write path (previous direct
+      // insert path silently produced 0 rows across the entire lifetime of
+      // the table, starving every trending retriever).
+      const { error } = await admin.rpc("log_recommendation_event", {
+        _video_id: videoId,
+        _event_type: eventType,
+        _user_id: userId,
+        _score: body.score ?? null,
+        _reasons: body.reasons ?? [],
+        _signals: body.signals ?? {},
+        _surface: body.surface ?? null,
+        _session_id: body.sessionId ?? null,
+        _provider: body.provider ?? null,
       });
       if (error) return json({ error: error.message }, 500);
       return new Response(null, { status: 204, headers: corsHeaders });
@@ -203,25 +206,26 @@ async function computeRecommendations(args: ComputeArgs) {
       filteredRecs = recommendations.filter((r) => !premiumSet.has(r.video.video_id));
     }
 
-    // Fire-and-forget impression logging (batched insert).
+    // Fire-and-forget impression logging via SECURITY DEFINER RPC.
+    // Each row is logged independently — one failure won't sink the batch,
+    // and we can't rely on client-role bypass semantics for a bulk insert.
     if (filteredRecs.length) {
-      admin
-        .from("recommendation_events")
-        .insert(
-          filteredRecs.map((r) => ({
-            user_id: userId,
-            video_id: r.video.video_id,
-            event_type: "impression",
-            score: r.score,
-            reasons: r.reasons,
-            signals: r.signals,
-            surface,
-            session_id: sessionId,
-            provider: provider.name,
-          })),
-        )
-        .then(() => {})
-        .catch(() => {});
+      for (const r of filteredRecs) {
+        admin
+          .rpc("log_recommendation_event", {
+            _video_id: r.video.video_id,
+            _event_type: "impression",
+            _user_id: userId,
+            _score: r.score,
+            _reasons: r.reasons,
+            _signals: r.signals,
+            _surface: surface,
+            _session_id: sessionId,
+            _provider: provider.name,
+          })
+          .then(() => {})
+          .catch(() => {});
+      }
     }
 
     return {
