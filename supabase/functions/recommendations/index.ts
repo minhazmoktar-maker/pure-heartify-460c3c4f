@@ -206,25 +206,26 @@ async function computeRecommendations(args: ComputeArgs) {
       filteredRecs = recommendations.filter((r) => !premiumSet.has(r.video.video_id));
     }
 
-    // Fire-and-forget impression logging (batched insert).
+    // Fire-and-forget impression logging via SECURITY DEFINER RPC.
+    // Each row is logged independently — one failure won't sink the batch,
+    // and we can't rely on client-role bypass semantics for a bulk insert.
     if (filteredRecs.length) {
-      admin
-        .from("recommendation_events")
-        .insert(
-          filteredRecs.map((r) => ({
-            user_id: userId,
-            video_id: r.video.video_id,
-            event_type: "impression",
-            score: r.score,
-            reasons: r.reasons,
-            signals: r.signals,
-            surface,
-            session_id: sessionId,
-            provider: provider.name,
-          })),
-        )
-        .then(() => {})
-        .catch(() => {});
+      for (const r of filteredRecs) {
+        admin
+          .rpc("log_recommendation_event", {
+            _video_id: r.video.video_id,
+            _event_type: "impression",
+            _user_id: userId,
+            _score: r.score,
+            _reasons: r.reasons,
+            _signals: r.signals,
+            _surface: surface,
+            _session_id: sessionId,
+            _provider: provider.name,
+          })
+          .then(() => {})
+          .catch(() => {});
+      }
     }
 
     return {
