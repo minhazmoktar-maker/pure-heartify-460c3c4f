@@ -350,16 +350,16 @@ async function runJob(admin: Admin, jobId: string) {
   await admin
     .from('discovery_jobs')
     .update({
-      status: quotaExhausted ? 'partial' : 'completed',
+      status: 'succeeded',
       finished_at: new Date().toISOString(),
+      quota_used: ctx.used,
+      enqueued_count: inserted,
+      skipped_count: skipped,
+      seeds_processed: processed,
+      api_failures: ctx.failures,
       stats: {
         lane: 'trusted_source',
         seeds_total: seeds.length,
-        seeds_processed: processed,
-        candidates_inserted: inserted,
-        candidates_skipped_existing: skipped,
-        quota_used: ctx.used,
-        api_failures: ctx.failures,
         quota_exhausted: quotaExhausted,
       },
     })
