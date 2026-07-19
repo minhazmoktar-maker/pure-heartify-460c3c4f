@@ -103,7 +103,10 @@ Deno.serve(async (req) => {
     // NOTE: we intentionally overfetch a bit so post-fetch JS blocklist filter
     // can drop matches without leaving the page short of `limit`.
     // Overfetch more when locale-boosting so we can re-rank without starving pages.
-    const fetchLimit = Math.min(limit * (contentLanguages.length ? 5 : 4), 400);
+    // Wider candidate pool → more channels compete per response, which is
+    // what allows the session-seeded rotation below to feel genuinely
+    // different across sessions instead of re-sorting the same 400 rows.
+    const fetchLimit = Math.min(limit * (contentLanguages.length ? 12 : 10), 800);
     const orderClause = sort === "trending"
       ? "view_count.desc.nullslast,published_at.desc.nullslast,halal_score.desc"
       : sort === "recent"
