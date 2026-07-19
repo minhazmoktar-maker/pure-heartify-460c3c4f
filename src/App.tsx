@@ -23,7 +23,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import AdminRoute from "./components/AdminRoute";
 import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
-import AgeGate from "./components/AgeGate";
+// AgeGate removed — age is verified at signup only
 import CookieConsent from "./components/CookieConsent";
 const CommandPalette = lazy(() => import("./components/CommandPalette"));
 import BottomTabBar from "./components/BottomTabBar";
