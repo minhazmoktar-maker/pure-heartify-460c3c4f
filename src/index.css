@@ -127,9 +127,18 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
-    font-feature-settings: "ss01", "cv11";
+    font-feature-settings: "ss01", "cv11", "tnum";
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* P3 craft layer — Fraunces optical sizing + refined tracking on headings.
+     `opsz` scales the design between text and display cuts automatically. */
+  h1, h2, h3, h4, .font-heading, .font-display {
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 96, "SOFT" 50;
+    letter-spacing: -0.015em;
   }
   /* Reserve space for the mobile BottomTabBar (Phase 2 spine) only when
      the bar is actually rendered. BottomTabBar toggles `has-bottom-bar`
