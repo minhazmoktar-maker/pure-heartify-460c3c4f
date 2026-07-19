@@ -4434,6 +4434,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_taste_profiles: {
+        Row: {
+          avg_completion: number
+          avg_session_len: number
+          creator_affinity: Json
+          hour_histogram: Json
+          interest_drift: number
+          language_affinity: Json
+          last_signal_at: string | null
+          signal_count: number
+          topic_affinity: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_completion?: number
+          avg_session_len?: number
+          creator_affinity?: Json
+          hour_histogram?: Json
+          interest_drift?: number
+          language_affinity?: Json
+          last_signal_at?: string | null
+          signal_count?: number
+          topic_affinity?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_completion?: number
+          avg_session_len?: number
+          creator_affinity?: Json
+          hour_histogram?: Json
+          interest_drift?: number
+          language_affinity?: Json
+          last_signal_at?: string | null
+          signal_count?: number
+          topic_affinity?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       variant_assignments: {
         Row: {
           anon_key: string | null
@@ -5532,6 +5574,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      pool_for_you_v2: {
+        Args: { _exclude_premium?: boolean; _limit?: number; _user_id: string }
+        Returns: Database["public"]["CompositeTypes"]["surface_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "surface_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       pool_hidden_gems: {
         Args: {
           _exclude_premium?: boolean
@@ -5678,6 +5730,28 @@ export type Database = {
       redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
       refresh_leaderboards: { Args: never; Returns: undefined }
+      refresh_user_taste_profile: {
+        Args: { _user_id: string }
+        Returns: {
+          avg_completion: number
+          avg_session_len: number
+          creator_affinity: Json
+          hour_histogram: Json
+          interest_drift: number
+          language_affinity: Json
+          last_signal_at: string | null
+          signal_count: number
+          topic_affinity: Json
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "user_taste_profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       revoke_auto_approval: {
         Args: { _reason?: string; _video_id: string }
         Returns: undefined
