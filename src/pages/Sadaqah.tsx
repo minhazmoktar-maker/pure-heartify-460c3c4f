@@ -29,7 +29,34 @@ const CATEGORIES = [
   "Other",
 ] as const;
 
-const CURRENCIES = ["USD", "GBP", "EUR", "SAR", "AED", "PKR", "INR", "BDT", "MYR", "IDR", "TRY", "NGN"];
+const CURRENCIES: { code: string; name: string }[] = [
+  { code: "USD", name: "US Dollar" }, { code: "EUR", name: "Euro" }, { code: "GBP", name: "British Pound" },
+  { code: "AED", name: "UAE Dirham" }, { code: "SAR", name: "Saudi Riyal" }, { code: "QAR", name: "Qatari Riyal" },
+  { code: "KWD", name: "Kuwaiti Dinar" }, { code: "BHD", name: "Bahraini Dinar" }, { code: "OMR", name: "Omani Rial" },
+  { code: "JOD", name: "Jordanian Dinar" }, { code: "EGP", name: "Egyptian Pound" }, { code: "TRY", name: "Turkish Lira" },
+  { code: "IRR", name: "Iranian Rial" }, { code: "IQD", name: "Iraqi Dinar" }, { code: "LBP", name: "Lebanese Pound" },
+  { code: "MAD", name: "Moroccan Dirham" }, { code: "DZD", name: "Algerian Dinar" }, { code: "TND", name: "Tunisian Dinar" },
+  { code: "LYD", name: "Libyan Dinar" }, { code: "SDG", name: "Sudanese Pound" }, { code: "SOS", name: "Somali Shilling" },
+  { code: "YER", name: "Yemeni Rial" }, { code: "SYP", name: "Syrian Pound" }, { code: "AFN", name: "Afghan Afghani" },
+  { code: "PKR", name: "Pakistani Rupee" }, { code: "INR", name: "Indian Rupee" }, { code: "BDT", name: "Bangladeshi Taka" },
+  { code: "LKR", name: "Sri Lankan Rupee" }, { code: "NPR", name: "Nepalese Rupee" }, { code: "MVR", name: "Maldivian Rufiyaa" },
+  { code: "IDR", name: "Indonesian Rupiah" }, { code: "MYR", name: "Malaysian Ringgit" }, { code: "SGD", name: "Singapore Dollar" },
+  { code: "BND", name: "Brunei Dollar" }, { code: "THB", name: "Thai Baht" }, { code: "PHP", name: "Philippine Peso" },
+  { code: "VND", name: "Vietnamese Dong" }, { code: "CNY", name: "Chinese Yuan" }, { code: "HKD", name: "Hong Kong Dollar" },
+  { code: "TWD", name: "Taiwan Dollar" }, { code: "JPY", name: "Japanese Yen" }, { code: "KRW", name: "South Korean Won" },
+  { code: "KZT", name: "Kazakhstani Tenge" }, { code: "UZS", name: "Uzbekistani Som" }, { code: "AZN", name: "Azerbaijani Manat" },
+  { code: "AUD", name: "Australian Dollar" }, { code: "NZD", name: "New Zealand Dollar" }, { code: "CAD", name: "Canadian Dollar" },
+  { code: "MXN", name: "Mexican Peso" }, { code: "BRL", name: "Brazilian Real" }, { code: "ARS", name: "Argentine Peso" },
+  { code: "CLP", name: "Chilean Peso" }, { code: "COP", name: "Colombian Peso" }, { code: "PEN", name: "Peruvian Sol" },
+  { code: "CHF", name: "Swiss Franc" }, { code: "SEK", name: "Swedish Krona" }, { code: "NOK", name: "Norwegian Krone" },
+  { code: "DKK", name: "Danish Krone" }, { code: "ISK", name: "Icelandic Króna" }, { code: "PLN", name: "Polish Zloty" },
+  { code: "CZK", name: "Czech Koruna" }, { code: "HUF", name: "Hungarian Forint" }, { code: "RON", name: "Romanian Leu" },
+  { code: "BGN", name: "Bulgarian Lev" }, { code: "RSD", name: "Serbian Dinar" }, { code: "UAH", name: "Ukrainian Hryvnia" },
+  { code: "RUB", name: "Russian Ruble" }, { code: "ZAR", name: "South African Rand" }, { code: "NGN", name: "Nigerian Naira" },
+  { code: "GHS", name: "Ghanaian Cedi" }, { code: "KES", name: "Kenyan Shilling" }, { code: "TZS", name: "Tanzanian Shilling" },
+  { code: "UGX", name: "Ugandan Shilling" }, { code: "ETB", name: "Ethiopian Birr" },
+  { code: "XOF", name: "West African CFA Franc" }, { code: "XAF", name: "Central African CFA Franc" },
+];
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 const today = () => localToday();
