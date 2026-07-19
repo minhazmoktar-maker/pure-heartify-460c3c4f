@@ -1,6 +1,6 @@
 import { localToday } from "@/lib/intl";
-import { useEffect, useMemo, useState } from "react";
-import { RotateCcw, Plus, Minus, Flame, Target, Check } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { RotateCcw, Plus, Minus, Flame, Target, Check, X, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 
