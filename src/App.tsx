@@ -59,6 +59,7 @@ const AdminDiscovery = lazy(() => import("./pages/AdminDiscovery.tsx"));
 const AdminChannelPipeline = lazy(() => import("./pages/AdminChannelPipeline.tsx"));
 const AdminApprovedChannels = lazy(() => import("./pages/AdminApprovedChannels.tsx"));
 const AdminOps = lazy(() => import("./pages/AdminOps.tsx"));
+const AdminRecHealth = lazy(() => import("./pages/AdminRecHealth.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const ReviewMagic = lazy(() => import("./pages/ReviewMagic.tsx"));
