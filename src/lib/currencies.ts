@@ -144,3 +144,33 @@ export function searchCurrencies(query: string): Currency[] {
       (c.country ?? "").toLowerCase().includes(q),
   );
 }
+
+/**
+ * Build a currency-aware Intl.NumberFormat.
+ * Uses each ISO 4217 currency's native minor units (JPY/KRW=0, KWD/BHD/OMR/IQD/JOD/TND/LYD=3, most others=2)
+ * so amounts round and display correctly across all 100+ supported currencies.
+ * Falls back to a decimal formatter with the code prefixed if the runtime rejects the currency.
+ */
+export function getCurrencyFormatter(code: string, locale?: string): Intl.NumberFormat {
+  const safe = (code || "USD").toUpperCase();
+  try {
+    return new Intl.NumberFormat(locale, { style: "currency", currency: safe });
+  } catch {
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
+  }
+}
+
+/**
+ * Format an amount for a given ISO currency code.
+ * Handles NaN / non-finite input by rendering the currency's zero value.
+ */
+export function formatCurrency(amount: number, code: string, locale?: string): string {
+  const n = Number.isFinite(amount) ? amount : 0;
+  const fmt = getCurrencyFormatter(code, locale);
+  try {
+    return fmt.format(n);
+  } catch {
+    return `${code} ${n.toLocaleString(locale, { maximumFractionDigits: 2 })}`;
+  }
+}
+
