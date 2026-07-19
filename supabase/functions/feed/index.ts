@@ -194,8 +194,75 @@ Deno.serve(async (req) => {
       ? `feed:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}`
       : "";
 
+    // Decide whether we can use the diversified RPC path. It applies a
+    // per-channel window (ROW_NUMBER PARTITION BY channel_id) at the DB
+    // layer so the fetched candidate slice draws from >100 channels
+    // instead of the 40-50 that dominate a raw `published_at DESC` scan.
+    // The RPC covers the two hottest surfaces (fresh, recent). Trending,
+    // search, and category-only browsing keep the raw PostgREST path.
+    const canUseDiversifiedRpc =
+      (sort === "fresh" || sort === "recent") && !search;
+
+    const sectionAliasesForRpc: string[] | null = (() => {
+      if (!sectionId) return null;
+      const SECTION_CATEGORY_ALIASES: Record<string, string[]> = {
+        "quran-recitations": ["Quran", "Adhan"],
+        "elite-recitation": ["Quran", "Adhan"],
+        "recitation-tranquility": ["Quran", "Adhan", "Nasheeds"],
+        "nasheeds": ["Nasheeds"],
+        "business-money": ["Business"],
+        "halal-finance": ["Business"],
+        "study-focus": ["Self-Improvement", "Education", "Lectures"],
+        "advanced-learning": ["Education", "Lectures", "Fiqh"],
+        "academic-fiqh": ["Fiqh", "Lectures"],
+        "lectures-scholars": ["Lectures", "Dawah"],
+        "dawah": ["Dawah", "Islamic"],
+        "family-kids": ["Kids & Family", "Lifestyle"],
+        "health-fitness": ["Health & Fitness", "Lifestyle", "Self-Improvement"],
+        "halal-lifestyle": ["Lifestyle", "Self-Improvement"],
+        "podcasts": ["Podcasts", "Lectures"],
+        "community-podcasts": ["Podcasts", "Dawah"],
+        "intellectual-podcasts": ["Podcasts", "Education"],
+        "intellectual": ["Education", "Lectures"],
+        "science-documentaries": ["Education", "Lectures"],
+        "technology-ai": ["Education", "Business"],
+        "islamic-history": ["Islamic", "Education", "Lectures"],
+        "islamic-knowledge": ["Islamic", "Lectures"],
+        "daily-picks": ["Spirituality", "Islamic", "Quran"],
+        "live-streams": ["Quran", "Adhan", "Lectures"],
+        "revert-stories": ["Dawah", "Islamic", "Spirituality"],
+        "news-current-affairs": ["Islamic", "Podcasts", "Education"],
+      };
+      return SECTION_CATEGORY_ALIASES[sectionId] ?? null;
+    })();
+
     const produce = async () => {
       const t0 = Date.now();
+      if (canUseDiversifiedRpc) {
+        // Per-channel cap at pool layer: match the per-page cap (maxPerChannel)
+        // plus 1 slack so the reranker has room to prefer affinity items
+        // without pinning the exact same channels on every request.
+        const perChannelCap = Math.min(Math.max(maxPerChannel + 1, 2), 8);
+        const { data, error } = await admin.rpc("get_feed_candidates_diversified", {
+          _limit: fetchLimit,
+          _per_channel: perChannelCap,
+          _category: category && category !== "All" ? category : null,
+          _section_id: sectionId ?? null,
+          _section_aliases: sectionAliasesForRpc,
+          _cursor: cursor ?? null,
+          _exclude_premium: !isPremium,
+          _order: sort === "recent" ? "recent" : "fresh",
+        });
+        const tFetch = Date.now() - t0;
+        if (error) {
+          console.error(`[feed.rpc] failed: ${error.message} — falling back to HTTP`);
+        } else {
+          const items = (data ?? []) as Array<Record<string, unknown>>;
+          console.log(`[feed.produce.rpc] fetch=${tFetch}ms rows=${items.length}`);
+          return { items, ok: true };
+        }
+      }
+      // Fallback / non-diversified paths: raw PostgREST.
       const res = await fetch(url, {
         headers: {
           "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
@@ -213,6 +280,7 @@ Deno.serve(async (req) => {
       console.log(`[feed.produce] fetch=${tFetch}ms json=${tJson}ms rows=${(items as unknown[]).length}`);
       return { items, ok: true };
     };
+
 
     const tStage = Date.now();
     const { value: payload, hit } = cacheable
