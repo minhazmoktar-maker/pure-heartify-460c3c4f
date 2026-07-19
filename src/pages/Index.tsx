@@ -150,9 +150,10 @@ const Index = () => {
             <Suspense fallback={null}>
               <RecentlyAddedRow />
             </Suspense>
-            {CURATED_SECTIONS.map((section) => (
-              <CuratedSectionRow key={section.id} section={section} />
+            {CURATED_SECTIONS.map((section, i) => (
+              <CuratedSectionRow key={section.id} section={section} priority={i < 3} />
             ))}
+
           </main>
         </FeedDiversityProvider>
       )}

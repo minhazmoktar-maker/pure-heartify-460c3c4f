@@ -12,6 +12,14 @@ import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 
 interface Props {
   section: CuratedSection;
+  /**
+   * If true, fetch immediately on mount instead of waiting for the row to
+   * scroll near the viewport. Set for the first ~3 above-the-fold rows so
+   * their feed requests fire in the same tick as React hydration — this
+   * removes the ~1s IntersectionObserver delay measured as the dominant
+   * "time-to-first-video" gap on cold Home loads.
+   */
+  priority?: boolean;
 }
 
 // Horizontal row shows ~4-6 cards at a time; 30 gives ~5x screens of scroll
@@ -24,8 +32,9 @@ const TARGET = 30;
 // visible sections.
 const MAX_FEED_PAGES = 2;
 
-const CuratedSectionRow = ({ section }: Props) => {
-  const [shouldLoad, setShouldLoad] = useState(false);
+const CuratedSectionRow = ({ section, priority = false }: Props) => {
+  const [shouldLoad, setShouldLoad] = useState(priority);
+
   const sectionRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
