@@ -297,7 +297,7 @@ Deno.serve(async (req) => {
 
     const tStage = Date.now();
     const { value: payload, hit } = cacheable
-      ? await readThrough(cacheKey, 60, produce)
+      ? await readThrough(cacheKey, 180, produce)
       : { value: await produce(), hit: false };
     console.log(`[feed] section=${sectionId ?? "-"} cache=${hit ? "HIT" : "MISS"} produce=${Date.now() - tStage}ms`);
 
