@@ -3,6 +3,7 @@ import { Calculator, Coins, Info, RotateCcw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import CurrencyPicker from "@/components/CurrencyPicker";
+import { getCurrencyFormatter } from "@/lib/currencies";
 
 const STORAGE = "heartify:zakat:v1";
 const ZAKAT_RATE = 0.025;
