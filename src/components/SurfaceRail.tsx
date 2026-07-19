@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
@@ -17,6 +17,20 @@ interface Props {
   seeAllHref?: string;
 }
 
+function usePriorityGate(ref: React.RefObject<HTMLElement>, priority: boolean) {
+  const [shouldLoad, setShouldLoad] = useState(priority);
+  useEffect(() => {
+    if (shouldLoad || !ref.current) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setShouldLoad(true); io.disconnect(); } },
+      { rootMargin: "200px 0px" },
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [ref, shouldLoad]);
+  return shouldLoad;
+}
+
 /**
  * SurfaceRail — a horizontal rail bound to ONE independent surface.
  * No cross-rail dedup: the server guarantees per-surface diversity, and
@@ -28,11 +42,7 @@ const SurfaceRail = ({
 }: Props) => {
   const sectionRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [shouldLoad, setShouldLoad] = (() => {
-    // priority = load immediately; otherwise lazy-mount on scroll.
-    const state = require ? null : null; void state;
-    return usePriorityGate(sectionRef, priority);
-  })();
+  const shouldLoad = usePriorityGate(sectionRef, priority);
 
   const { items, isLoading, meta } = useSurface(surface, { enabled: shouldLoad });
   const { track } = useImpressionTracker(true);
@@ -57,7 +67,7 @@ const SurfaceRail = ({
         </div>
         <div className="hidden items-center gap-1 md:flex">
           {seeAllHref && (
-            <Link to={seeAllHref} className="mr-2 text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline">
+            <Link to={seeAllHref} className="mr-2 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
               See all
             </Link>
           )}
@@ -104,22 +114,5 @@ const SurfaceRail = ({
     </section>
   );
 };
-
-// -- helpers ---------------------------------------------------------
-
-import { useState } from "react";
-function usePriorityGate(ref: React.RefObject<HTMLElement>, priority: boolean) {
-  const [shouldLoad, setShouldLoad] = useState(priority);
-  useEffect(() => {
-    if (shouldLoad || !ref.current) return;
-    const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setShouldLoad(true); io.disconnect(); } },
-      { rootMargin: "200px 0px" },
-    );
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, [ref, shouldLoad]);
-  return [shouldLoad, setShouldLoad] as const;
-}
 
 export default SurfaceRail;
