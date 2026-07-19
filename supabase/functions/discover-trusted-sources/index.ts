@@ -387,9 +387,10 @@ Deno.serve(async (req) => {
   const { data: job, error } = await admin
     .from('discovery_jobs')
     .insert({
-      job_type: 'trusted_source_lane',
+      mode: 'trusted_source',
       status: 'running',
       started_at: new Date().toISOString(),
+      heartbeat_at: new Date().toISOString(),
       stats: { lane: 'trusted_source' },
     })
     .select('id')
