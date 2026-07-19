@@ -39,7 +39,7 @@ const Privacy = () => {
             Effective date: {effective} · Last updated: {lastUpdated}
           </p>
           <p className="mt-4 text-sm text-foreground/90">
-            This Privacy Policy explains how HalalTube ("HalalTube", "we", "us", or
+            This Privacy Policy explains how Heartify ("Heartify", "we", "us", or
             "our") collects, uses, discloses, and safeguards information when you
             access or use our website, mobile applications, and related services
             (collectively, the "Service"). It also describes the rights and choices
@@ -51,7 +51,7 @@ const Privacy = () => {
         <div className="mt-10 space-y-10 text-sm leading-relaxed">
           <Section id="introduction" title="1. Introduction">
             <p>
-              HalalTube is an AI-assisted content curation platform that helps users
+              Heartify is an AI-assisted content curation platform that helps users
               discover YouTube videos and channels aligned with a family-friendly,
               ethically conscious viewing experience. We take privacy, security, and
               user trust seriously, and we are committed to processing personal data
@@ -79,7 +79,7 @@ const Privacy = () => {
               </li>
               <li>
                 <strong className="text-foreground">"Service"</strong> means the
-                HalalTube website, mobile applications, APIs, and related features.
+                Heartify website, mobile applications, APIs, and related features.
               </li>
               <li>
                 <strong className="text-foreground">"User"</strong> means any
@@ -204,7 +204,7 @@ const Privacy = () => {
             </h2>
             <div className="mt-3 space-y-3 text-muted-foreground">
               <p>
-                HalalTube uses automated systems, including machine learning models
+                Heartify uses automated systems, including machine learning models
                 and rule-based heuristics, to analyze publicly available metadata
                 (such as video titles, descriptions, and channel information) in
                 order to assist with categorization and content moderation. Any
@@ -221,7 +221,7 @@ const Privacy = () => {
               </p>
               <p>
                 <strong className="text-foreground">Not a religious authority.</strong>{" "}
-                HalalTube is a technology platform and is not a mufti, scholar, or
+                Heartify is a technology platform and is not a mufti, scholar, or
                 religious institution. Nothing on the Service constitutes a fatwa, a
                 religious ruling, or an authoritative determination of halal or
                 haram status. Users seeking religious guidance should consult
@@ -252,7 +252,7 @@ const Privacy = () => {
               </li>
               <li>
                 <strong className="text-foreground">Safety and enforcement:</strong>{" "}
-                to protect the rights, property, or safety of HalalTube, our users,
+                to protect the rights, property, or safety of Heartify, our users,
                 or the public, and to enforce our Terms of Service.
               </li>
               <li>
@@ -404,7 +404,7 @@ const Privacy = () => {
 
           <Section id="international" title="12. International Data Transfers">
             <p>
-              HalalTube operates globally, and your information may be processed in
+              Heartify operates globally, and your information may be processed in
               countries other than your own. Where required, we rely on appropriate
               safeguards for international transfers, such as Standard Contractual
               Clauses or equivalent mechanisms.
@@ -522,7 +522,7 @@ const Privacy = () => {
               Policy or your Personal Data, please contact us at:
             </p>
             <p className="text-foreground">
-              <strong>Email:</strong> privacy@halaltube.app
+              <strong>Email:</strong> privacy@heartify.app
             </p>
             <p>
               We will respond to legitimate requests within the timeframes required
@@ -533,7 +533,7 @@ const Privacy = () => {
           <section className="border-t border-border pt-6">
             <p className="text-micro text-muted-foreground">
               This Privacy Policy is provided for informational purposes and does
-              not constitute legal advice. HalalTube may adapt this document to
+              not constitute legal advice. Heartify may adapt this document to
               reflect the specific legal requirements of the jurisdictions in which
               it operates.
             </p>
