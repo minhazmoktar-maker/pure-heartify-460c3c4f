@@ -169,7 +169,7 @@ const Sadaqah = () => {
                 onChange={(e) => setCurrency(e.target.value)}
                 className="h-9 rounded-card border border-border bg-background px-2 text-sm"
               >
-                {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
+                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
               </select>
               <input
                 type="number"
