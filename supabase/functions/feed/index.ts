@@ -103,7 +103,13 @@ Deno.serve(async (req) => {
       : sort === "recent"
       ? "ingested_at.desc,published_at.desc.nullslast,halal_score.desc"
       : "published_at.desc.nullslast,halal_score.desc,ingested_at.desc";
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=*&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false&order=${orderClause}&limit=${fetchLimit}`;
+    // Slim column projection — avoids pulling the 1536-dim `embedding`
+    // vector, `search_tsv`, and moderation blobs (`moderation_reasoning`,
+    // `moderation_signals`) that inflate the row payload 50-200x and are
+    // never read by feed rendering. Cuts internal PostgREST payload from
+    // ~5-15 MB per request to ~50-150 KB.
+    const FEED_COLS = "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language";
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false&order=${orderClause}&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
@@ -223,7 +229,7 @@ Deno.serve(async (req) => {
     if (sectionId && filtered.length < Math.ceil(limit / 2)) {
       const seen = new Set(filtered.map((v) => v.video_id as string));
       const cascade = async (extra: string) => {
-        const u = `${SUPABASE_URL}/rest/v1/curated_videos?select=*` +
+        const u = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}` +
           `&moderation_state=in.(approved,auto_approved)` +
           `&is_hidden=eq.false&is_archived=eq.false` +
           (isPremium ? "" : "&is_premium_only=eq.false") +
