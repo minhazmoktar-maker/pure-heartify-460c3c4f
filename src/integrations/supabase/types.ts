@@ -5729,6 +5729,10 @@ export type Database = {
       record_streak_activity: { Args: never; Returns: Json }
       redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
+      refresh_active_taste_profiles: {
+        Args: { _max_users?: number }
+        Returns: number
+      }
       refresh_leaderboards: { Args: never; Returns: undefined }
       refresh_user_taste_profile: {
         Args: { _user_id: string }
