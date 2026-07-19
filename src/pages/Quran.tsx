@@ -156,6 +156,20 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
     };
   }, [n]);
 
+  // Persist "last opened" so the Quran index can offer a Continue card. We
+  // update the ayah as playback advances; if no audio has fired yet, at
+  // least the surah + ayah 1 are remembered.
+  useEffect(() => {
+    try {
+      const surahName = arabic.data?.englishName;
+      const ayah = playingAyah ?? 1;
+      localStorage.setItem(
+        "quran:last-ayah",
+        JSON.stringify({ surah: n, ayah, surahName, ts: Date.now() }),
+      );
+    } catch { /* noop */ }
+  }, [n, playingAyah, arabic.data?.englishName]);
+
   const playAyah = (ayah: Ayah) => {
     const url = ayah.audio || ayah.audioSecondary?.[0];
     if (!url) return;
