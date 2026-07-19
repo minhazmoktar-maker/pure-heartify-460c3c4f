@@ -109,7 +109,45 @@ Deno.serve(async (req) => {
       url += `&category=eq.${encodeURIComponent(category)}`;
     }
     if (sectionId) {
-      url += `&section_id=eq.${encodeURIComponent(sectionId)}`;
+      // Many curated sections are underpopulated in section_id (which is a
+      // single-value column). To keep every For You row full without
+      // reassigning existing rows, we broaden the query to include
+      // category aliases per section. Falls back to the plain section_id
+      // filter when no aliases are defined.
+      const SECTION_CATEGORY_ALIASES: Record<string, string[]> = {
+        "quran-recitations": ["Quran", "Adhan"],
+        "elite-recitation": ["Quran", "Adhan"],
+        "recitation-tranquility": ["Quran", "Adhan", "Nasheeds"],
+        "nasheeds": ["Nasheeds"],
+        "business-money": ["Business"],
+        "halal-finance": ["Business"],
+        "study-focus": ["Self-Improvement", "Education"],
+        "advanced-learning": ["Education", "Lectures"],
+        "academic-fiqh": ["Fiqh", "Lectures"],
+        "lectures-scholars": ["Lectures", "Dawah"],
+        "dawah": ["Dawah"],
+        "family-kids": ["Kids & Family"],
+        "health-fitness": ["Health & Fitness"],
+        "halal-lifestyle": ["Lifestyle"],
+        "podcasts": ["Podcasts"],
+        "community-podcasts": ["Podcasts"],
+        "intellectual-podcasts": ["Podcasts"],
+        "intellectual": ["Education"],
+        "science-documentaries": ["Education"],
+        "technology-ai": ["Education"],
+        "islamic-history": ["Islamic", "Education"],
+        "islamic-knowledge": ["Islamic"],
+        "daily-picks": ["Spirituality", "Islamic"],
+        "live-streams": ["Quran", "Adhan"],
+        "revert-stories": ["Dawah", "Islamic"],
+      };
+      const aliases = SECTION_CATEGORY_ALIASES[sectionId] ?? [];
+      if (aliases.length) {
+        const catList = aliases.map((c) => `"${c.replace(/"/g, "")}"`).join(",");
+        url += `&or=(section_id.eq.${encodeURIComponent(sectionId)},category.in.(${encodeURIComponent(catList)}))`;
+      } else {
+        url += `&section_id=eq.${encodeURIComponent(sectionId)}`;
+      }
     }
     if (cursor) {
       url += `&ingested_at=lt.${encodeURIComponent(cursor)}`;

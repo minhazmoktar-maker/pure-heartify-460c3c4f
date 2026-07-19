@@ -52,28 +52,36 @@ const CuratedSectionRow = ({ section }: Props) => {
 
   const rawVideos = dbVideos.length > 0 ? dbVideos : (ytVideos ?? []);
 
-  // Diversity context still supplies the per-channel cap. The global
-  // seenVideoIds set is intentionally NOT applied here so each section can
-  // independently reach 100 items even if adjacent sections share videos.
-  const { perChannelCap } = useFeedDiversity();
+  // Diversity context: per-channel cap AND cross-section dedup. Sections
+  // now share overlapping category pools (see feed edge function's
+  // SECTION_CATEGORY_ALIASES), so without a cross-row seen set the same
+  // Quran recitation could appear in 4 different rows. Row order = claim
+  // order: earlier sections claim first, later sections filter them out.
+  const { perChannelCap, seenVideoIds, resetKey } = useFeedDiversity();
 
-  // In-section dedup + per-channel cap.
+  // In-section dedup + per-channel cap + cross-section dedup.
   const videos = useMemo(() => {
-    const seen = new Set<string>();
+    const seenLocal = new Set<string>();
     const perChannel = new Map<string, number>();
     const out: typeof rawVideos = [];
+    const globalSeen = seenVideoIds.current;
     for (const v of rawVideos) {
-      if (seen.has(v.id)) continue;
+      if (seenLocal.has(v.id)) continue;
+      if (globalSeen.has(v.id)) continue;
       const key = (v.channelTitle || "unknown").toLowerCase().trim();
       const count = perChannel.get(key) ?? 0;
       if (count >= perChannelCap) continue;
-      seen.add(v.id);
+      seenLocal.add(v.id);
       perChannel.set(key, count + 1);
       out.push(v);
       if (out.length >= TARGET) break;
     }
+    // Publish claims so later rows skip these ids. Idempotent on re-render.
+    for (const v of out) globalSeen.add(v.id);
     return out;
-  }, [rawVideos, perChannelCap]);
+    // resetKey lets the diversity toggle wipe claims and re-materialize.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawVideos, perChannelCap, resetKey, seenVideoIds]);
 
   // Auto-paginate the DB feed until we hit TARGET or run out of pages.
   useEffect(() => {
