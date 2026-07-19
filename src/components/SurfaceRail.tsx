@@ -49,8 +49,8 @@ const SurfaceRail = ({
 
   useEffect(() => {
     if (!items.length) return;
-    for (const v of items.slice(0, 6)) track(v.id, surface);
-  }, [items, surface, track]);
+    for (const v of items.slice(0, 6)) track(v.id);
+  }, [items, track]);
 
   if (hideIfEmpty && !isLoading && shouldLoad && items.length === 0) return null;
 
