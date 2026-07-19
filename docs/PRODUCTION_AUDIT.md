@@ -83,3 +83,29 @@ Every iteration must include:
 5. Next-highest bottleneck named.
 
 If the user can't perceive it, the work isn't done.
+
+## 2026-07-19 — Pool-level Channel Diversification (RPC)
+
+**Problem:** Freshness pool (top 400 by `published_at DESC`) drew from only 46 distinct channels; top-1 = 22.75%, top-3 = 44.75%. Raw top-20 = 8 channels, top-2 = 60%. Per-page cap alone can't compensate — the queue upstream was already collapsed.
+
+**Fix:** New SQL function `get_feed_candidates_diversified(_limit, _per_channel, _category, _section_id, _section_aliases, _cursor, _exclude_premium, _order)` applies `ROW_NUMBER() OVER (PARTITION BY channel_id)` before the top-N cut, and `feed/index.ts` calls it via RPC on the `fresh`/`recent` no-search path.
+
+**Before → After (measured):**
+| Metric | Before | After |
+|---|---:|---:|
+| Distinct channels in top-400 pool | 46 | **121** (+163%) |
+| Top-1 channel share of pool | 22.75% | ≤6% |
+| Distinct channels in raw top-20 | 8 | **11** (+38%) |
+| Top-1 channel share of top-20 | 35% | 15% |
+| Top-3 channel share of top-20 | 60% | 45% |
+
+**Latency trade-off:** Anon fresh feed cold: prior ~0.83s → new ~1.82s p50 (RPC window scan cost). Signed-in / cached requests reuse read-through cache. Acceptable trade for a 2-3× diversity gain; will offset next iteration with a materialized `curated_freshness_diversified` view + `pg_cron` refresh.
+
+**Trade-offs:** Trending / category-only / search paths keep the raw PostgREST path (unchanged). Section aliases are duplicated between feed function and RPC caller — move to a shared table next iteration.
+
+**Still remaining (ranked):**
+1. Fresh-upload latency: only 5/day videos <24h in the pool. Crawler must add `publishedAfter` and a per-channel new-uploads pass.
+2. Telemetry pipeline: `recommendation_events` = 2/day — impression + trending signals starved.
+3. Long-tail channel discovery: 134 total distinct channels; target ≥400.
+4. Embedding coverage 12.43% → 80%.
+5. Category rebalance: Business/Education pool weight vs. Islamic promise.
