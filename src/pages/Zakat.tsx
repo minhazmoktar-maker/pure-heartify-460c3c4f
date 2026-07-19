@@ -162,17 +162,10 @@ const Zakat = () => {
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 <label className="flex flex-col gap-1">
                   <span className="text-micro font-medium text-foreground">Currency</span>
-                  <select
+                  <CurrencyPicker
                     value={form.currency}
-                    onChange={(e) => set("currency", e.target.value)}
-                    className="rounded-card border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary"
-                  >
-                    {CURRENCIES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.code} — {c.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(code) => set("currency", code)}
+                  />
                 </label>
                 <Row
                   label="Gold price / gram"
