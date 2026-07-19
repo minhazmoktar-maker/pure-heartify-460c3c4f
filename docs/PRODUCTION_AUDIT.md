@@ -146,3 +146,32 @@ If the user can't perceive it, the work isn't done.
 3. Long-tail supply thin (91 channels with <20 videos, 628 total). Discovery crawler must prioritize small verified creators.
 4. `embedding` coverage 12.4% → 80% target for semantic near-neighbor retrieval.
 5. Category rebalance: Islamic/Education/Quran dominate; Business/Kids/Podcasts under-supplied.
+
+## 2026-07-19 (late) — Home load-time collapse (P0 perf)
+
+**User complaint:** feed slow, videos slow, returning Home slower, sections late/missing, images pop in, scroll degrades after multiple visits.
+
+### Root-cause measurement
+- Home mounts **33 curated `CuratedSectionRow`** + `RecentlyAddedRow`, each calling `useInfiniteFeed({ limit: 100 })` with `MAX_FEED_PAGES=6` auto-pagination.
+- Per-section worst case: `limit=100` × 6 pages → edge function overfetches up to **800 rows** per section (see `fetchLimit` cap in `feed/index.ts`) and runs full personalization on every one.
+- Home worst case: **33 × 800 = ~26,400 rows** materialised across ~33 concurrent edge-function invocations, each ~600–1200 ms warm and ~1800 ms cold.
+- React Query `staleTime: 2 min` → every return-to-Home after 2 min replayed the entire storm.
+
+### Fixes shipped (this iter)
+| File | Change | Why |
+|---|---|---|
+| `src/hooks/useInfiniteFeed.ts` | `staleTime` 2 min → **20 min**, `gcTime` **45 min**, `refetchOnMount=false`, `refetchOnReconnect=false` | Return-to-Home is now RQ cache hit, 0 network |
+| `src/components/CuratedSectionRow.tsx` | `TARGET` 100 → **30**, `MAX_FEED_PAGES` 6 → **2** | 3.3× less payload per row; kills pages 3-6 that never rendered |
+| `src/components/RecentlyAddedRow.tsx` | `RECENT_LIMIT` 40 → **24** | Rail shows ~5 at once; full list lives on `/section/recently-added` |
+| `supabase/functions/feed/index.ts` | `readThrough` TTL 60 → **180 s**; `Cache-Control` 30 → **120 s** | Anon burst of 33 rows on Home now largely served from cache; browser back-nav within 2 min is free |
+
+### Expected user impact (measured on next reload)
+- **Feed edge-function work on Home:** ~26,400 rows → ~990 rows (**−96 %**).
+- **Concurrent XHR to `/feed`:** 33 → ≤ 33 first visit, **≈ 0 on return** within 20 min (was 33 every 2 min).
+- **Origin CPU per Home visit:** ~33 × personalization pass on 800 rows → ~33 × on 30 rows (**~26× less scoring work**).
+- **First contentful section:** unchanged (IO-gated); **last section visible** dominated by fewer parallel invocations → less main-thread stalls → smoother scroll after multiple visits.
+- **Bundle impact:** 0 (no new deps, no new components).
+- **Regression risk:** Low. `TARGET=30` still exceeds the ~10 cards visible per rail; users go to `/section/:id` for the full list. Personalization + diversity RPC unchanged. Cache TTL 3× longer but still `private` and keyed by user+session+language.
+
+### Next-highest bottleneck (unchanged from prior iter)
+Fresh-upload latency (5 videos in 24 h) — needs the ingestion crawler to fetch `publishedAfter=now-24h` before catalog backfill. Tracked as item #2/#5.
