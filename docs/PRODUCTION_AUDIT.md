@@ -109,3 +109,40 @@ If the user can't perceive it, the work isn't done.
 3. Long-tail channel discovery: 134 total distinct channels; target ≥400.
 4. Embedding coverage 12.43% → 80%.
 5. Category rebalance: Business/Education pool weight vs. Islamic promise.
+
+---
+
+## Iteration — Session-Diverse Discovery Engine (2026-07-19)
+
+**Highest-impact issue identified via SQL audit:** rotation was time-bucketed (`floor(now/4h)`), so every anon viewer in the same 4h window saw the same top-20. Combined with a 400-row candidate window where the top-8 channels owned 63.75% of the fresh slice, refreshes and repeat sessions felt identical.
+
+**Coordinated fix (one feature, shipped together):**
+1. Per-tab `session_id` (sessionStorage UUID) sent by `useInfiniteFeed`.
+2. Feed edge fn now uses `session_id` as the primary rotation seed (4h bucket is fallback only).
+3. Widened anon candidate pool: `fetchLimit` 400 → 800.
+4. Tightened per-channel cap at the DB (RPC `get_feed_candidates_diversified`): anon = 2/channel (was 4).
+5. Anon shuffle amplitude widened; jitter for signed-in users now keyed on session.
+6. Long-tail creator injection at page assembly: channels with ≤3 items in the candidate pool are guaranteed ~20% of page slots (interleaved every 5 positions).
+
+**Before vs after (live measurement, 5 anon sessions, top-20 fresh):**
+
+| Metric | Before | After |
+|---|---|---|
+| Distinct channels in top-20 | ~8 | **16–18** |
+| Pairwise Jaccard between sessions | ~1.0 | **avg 0.19** (0.08–0.33) |
+| Any channel ≥ 3 slots | frequent | **0 cases** |
+| Long-tail creators surfaced (Halal Chef, DeepMind, British Library, Al Jazeera, Plus1htx, Mesquita Brasil…) | never in top-20 | present every session |
+| Same-session refresh stability | — | Jaccard 1.0 (cache preserved) |
+
+**Why this beat every other candidate fix:**
+- Personalization tuning is bounded by data (2 rec events/24h, 3 users with interests) — cannot deliver perceptible change today.
+- Ingest throughput expansion is quota-bound and yields at most a handful more videos/day short-term.
+- Pool-cap migrations would reduce inventory permanently and require moderator re-review.
+- Session-rotation + widened candidate pool converts *existing* inventory into a fundamentally different visible feed on every session — measurably ~5× the diversity across sessions — with no moderation impact and cache hit rate preserved (session shuffle runs post-cache).
+
+**Remaining bottlenecks (ranked):**
+1. Fresh uploads still starved (5 in 24h, 100 in 7d) — needs `publishedAfter` crawler pass in `ingest-videos-15min`.
+2. Behavioral telemetry pipeline still returning ~2 events/24h — starves personalization; needs client-side impression flush audit.
+3. Long-tail supply thin (91 channels with <20 videos, 628 total). Discovery crawler must prioritize small verified creators.
+4. `embedding` coverage 12.4% → 80% target for semantic near-neighbor retrieval.
+5. Category rebalance: Islamic/Education/Quran dominate; Business/Kids/Podcasts under-supplied.
