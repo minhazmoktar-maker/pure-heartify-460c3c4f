@@ -8,6 +8,12 @@ import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 import type { RecommendationCandidate, UserSignals } from "./types.ts";
 
 const BASE_LIMIT = 300;
+// Retrieval-time per-channel cap. Without this a single high-frequency
+// uploader (Yufid, Madani Channel, ...) can consume 15-20% of the freshness
+// pool before scoring even starts — starving every downstream diversity
+// mechanism. Measured baseline (2026-07): top-4 channels = 50.7% of pool.
+const RETRIEVAL_MAX_PER_CHANNEL = Number(Deno.env.get("REC_RETRIEVAL_MAX_PER_CHANNEL") ?? 6);
+const FRESHNESS_WINDOW = 900; // fetch a wide window, then cap per channel
 
 export async function fetchCandidates(
   admin: SupabaseClient,
@@ -37,7 +43,10 @@ export async function fetchCandidates(
 
   const jobs: Array<Promise<unknown>> = [];
 
-  // 1) Freshness pool.
+  // 1) Freshness pool — fetch a wider window (900), then apply a per-channel
+  //    cap in memory. Guarantees no single uploader can dominate retrieval,
+  //    which was the root cause of "different users see the same feed":
+  //    when the pool is 50% one channel, MMR has nothing else to pick from.
   jobs.push(
     admin
       .from("curated_videos")
@@ -47,10 +56,17 @@ export async function fetchCandidates(
       .eq("is_archived", false)
       .match(categoryFilter ? { category: categoryFilter } : {})
       .order("published_at", { ascending: false })
-      .limit(BASE_LIMIT)
+      .limit(FRESHNESS_WINDOW)
       .then(({ data }) => {
+        const perChannel = new Map<string, number>();
+        let admitted = 0;
         for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+          const ch = (row.channel_title as string) ?? "__unknown__";
+          const n = perChannel.get(ch) ?? 0;
+          if (n >= RETRIEVAL_MAX_PER_CHANNEL) continue;
+          perChannel.set(ch, n + 1);
           pool.set(String(row.video_id), project(row));
+          if (++admitted >= BASE_LIMIT) break;
         }
       })
       .catch(() => {}),
