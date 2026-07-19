@@ -14,8 +14,15 @@ interface Props {
   section: CuratedSection;
 }
 
-const TARGET = 100;
-const MAX_FEED_PAGES = 6;
+// Horizontal row shows ~4-6 cards at a time; 30 gives ~5x screens of scroll
+// depth. Was 100 — that forced the feed edge function to overfetch 800 rows
+// per section and run full personalization on 3.3x more data than any user
+// would ever scroll to, multiplied by 33 sections on Home.
+const TARGET = 30;
+// Auto-paginate at most twice. Was 6 — the row rarely exhausts one page,
+// so pages 3-6 were wasted round-trips that stole main-thread time from
+// visible sections.
+const MAX_FEED_PAGES = 2;
 
 const CuratedSectionRow = ({ section }: Props) => {
   const [shouldLoad, setShouldLoad] = useState(false);
