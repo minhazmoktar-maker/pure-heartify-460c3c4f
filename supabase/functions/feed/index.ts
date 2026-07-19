@@ -34,8 +34,9 @@ function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
       "Content-Type": "application/json",
       // Personalized responses must not be shared between users. Any CDN in
       // front must key by Authorization so signed-in users never receive
-      // another user's cached feed.
-      "Cache-Control": "private, max-age=30",
+      // another user's cached feed. 120s browser cache absorbs the burst of
+      // 30+ curated rows firing on a single Home visit.
+      "Cache-Control": "private, max-age=120",
       "Vary": "Authorization",
       ...extra,
     },
@@ -296,7 +297,7 @@ Deno.serve(async (req) => {
 
     const tStage = Date.now();
     const { value: payload, hit } = cacheable
-      ? await readThrough(cacheKey, 60, produce)
+      ? await readThrough(cacheKey, 180, produce)
       : { value: await produce(), hit: false };
     console.log(`[feed] section=${sectionId ?? "-"} cache=${hit ? "HIT" : "MISS"} produce=${Date.now() - tStage}ms`);
 
