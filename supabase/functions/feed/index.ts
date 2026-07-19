@@ -79,6 +79,12 @@ Deno.serve(async (req) => {
       ? (body.sort as "fresh" | "trending" | "recent") : "fresh";
     // Max videos per channel per page — creator diversity guard.
     const maxPerChannel = Math.min(Math.max(Number(body?.max_per_channel ?? 3), 1), 10);
+    // Per-tab session id — used as the *primary* rotation seed so every new
+    // tab / cold open / refresh in a new session produces a substantively
+    // different order, not merely re-jittered positions. Sanitized to
+    // alphanumerics to keep it opaque and short.
+    const rawSession = typeof body?.session_id === "string" ? body.session_id : "";
+    const sessionId = rawSession.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64) || "anon";
     // Locale-aware filtering: soft filter to caller's content languages.
     // Sanitized to 2-3 char ISO codes to prevent injection.
     const rawLangs = Array.isArray(body?.content_languages) ? body.content_languages : [];
