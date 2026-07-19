@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils";
 
 interface TrustBadgesProps {
   channelTitle: string;
-  halalScore: number;
+  /** Kept for backwards compatibility with callers; no longer displayed. */
+  halalScore?: number;
   category?: string;
   size?: "sm" | "md";
   className?: string;
