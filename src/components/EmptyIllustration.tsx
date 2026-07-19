@@ -11,7 +11,9 @@ export type EmptyIllustrationVariant =
   | "no-search-results"
   | "no-favorites"
   | "no-notifications"
-  | "all-caught-up";
+  | "all-caught-up"
+  | "location"
+  | "not-found";
 
 interface Props {
   variant: EmptyIllustrationVariant;
