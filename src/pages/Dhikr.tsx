@@ -57,6 +57,18 @@ const Dhikr = () => {
   const count = state.counts[active.id] ?? 0;
   const progress = Math.min(100, Math.round((count / state.target) * 100));
 
+  // Gentle haptic-style pulse: a per-tap ripple ring so every count feels
+  // acknowledged even on devices without vibration.
+  const [pulseKey, setPulseKey] = useState(0);
+
+  // Session accounting so we can show an end-of-session summary.
+  const sessionStartRef = useRef<number | null>(null);
+  const sessionStartCountRef = useRef<number>(0);
+  const [summary, setSummary] = useState<
+    | { dhikr: string; counted: number; durationMs: number; streak: number; goalsHitDelta: number }
+    | null
+  >(null);
+
   // Roll over date + reset daily completions each day
   useEffect(() => {
     const today = todayKey();
@@ -80,6 +92,12 @@ const Dhikr = () => {
   }, [state]);
 
   const bump = (delta: number) => {
+    // Trigger a fresh pulse ring on every positive tap.
+    if (delta > 0) setPulseKey((k) => k + 1);
+    // Native haptic when available — layered on top of the sound cue below.
+    if (delta > 0 && typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try { navigator.vibrate?.(12); } catch { /* noop */ }
+    }
     setState((s) => {
       const prev = s.counts[active.id] ?? 0;
       const next = Math.max(0, prev + delta);
@@ -87,6 +105,13 @@ const Dhikr = () => {
       const newTodayCompleted = s.todayCompleted + (justCompleted ? 1 : 0);
       let newStreak = s.streak;
       if (justCompleted && s.todayCompleted === 0) newStreak = s.streak + 1;
+
+      // Start a session on the first positive tap after being at zero.
+      if (delta > 0 && sessionStartRef.current == null) {
+        sessionStartRef.current = Date.now();
+        sessionStartCountRef.current = prev;
+      }
+
       // Sound + haptics — Phase 10. Tap on every increment, chime on goal,
       // warm swell when the streak advances. Lazy import so first paint stays cheap.
       import("@/lib/soundHaptics").then((m) => {
@@ -97,6 +122,19 @@ const Dhikr = () => {
       }).catch(() => {});
       if (justCompleted) {
         import("@/lib/celebrate").then((m) => m.celebrateSmall()).catch(() => {});
+        // Auto-open the end-of-session summary on goal — but only once per
+        // session, so a user pushing past the goal isn't interrupted.
+        const start = sessionStartRef.current ?? Date.now();
+        const counted = next - sessionStartCountRef.current;
+        setTimeout(() => {
+          setSummary({
+            dhikr: active.translit,
+            counted,
+            durationMs: Date.now() - start,
+            streak: newStreak,
+            goalsHitDelta: justCompleted ? 1 : 0,
+          });
+        }, 400);
       }
       return {
         ...s,
@@ -107,7 +145,34 @@ const Dhikr = () => {
     });
   };
 
-  const reset = () => setState((s) => ({ ...s, counts: { ...s.counts, [active.id]: 0 } }));
+  const finishSession = () => {
+    const start = sessionStartRef.current;
+    if (start == null) return;
+    const counted = count - sessionStartCountRef.current;
+    if (counted <= 0) {
+      sessionStartRef.current = null;
+      return;
+    }
+    setSummary({
+      dhikr: active.translit,
+      counted,
+      durationMs: Date.now() - start,
+      streak: state.streak,
+      goalsHitDelta: 0,
+    });
+  };
+
+  const closeSummary = () => {
+    setSummary(null);
+    sessionStartRef.current = null;
+    sessionStartCountRef.current = count;
+  };
+
+  const reset = () => {
+    setState((s) => ({ ...s, counts: { ...s.counts, [active.id]: 0 } }));
+    sessionStartRef.current = null;
+    sessionStartCountRef.current = 0;
+  };
 
   return (
     <div className="min-h-dvh bg-background">
