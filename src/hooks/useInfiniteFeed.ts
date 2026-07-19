@@ -103,7 +103,13 @@ export function useInfiniteFeed({
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
     enabled,
-    staleTime: 2 * 60 * 1000,
+    // 20 min stale + 45 min gc: returning to Home hydrates instantly from
+    // the RQ cache instead of re-invoking the (~600-800ms) feed function
+    // for every one of the 33 curated rows.
+    staleTime: 20 * 60 * 1000,
+    gcTime: 45 * 60 * 1000,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 }
