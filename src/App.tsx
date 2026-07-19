@@ -285,7 +285,7 @@ const App = () => (
             <GatedPreviewGuard />
             <OfflineSweeper />
             <BackToTop />
-            <AgeGate />
+            {/* AgeGate removed — age is verified at signup only */}
             <CookieConsent />
             <Suspense fallback={null}><CommandPalette /></Suspense>
             <BottomTabBar />
