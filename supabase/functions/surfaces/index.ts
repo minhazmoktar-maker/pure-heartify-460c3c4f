@@ -159,7 +159,9 @@ Deno.serve(async (req) => {
       }).then(() => {}, () => {});
     }
 
-    return json(resp, 200, Boolean(userId));
+    // Force private cache when the caller sent an exclude list — that
+    // response is session-specific and must never be shared.
+    return json(resp, 200, Boolean(userId) || excludeIds.size > 0);
   } catch (e) {
     console.error("[surfaces] error", e);
     return json({ error: "internal", message: (e as Error).message }, 500);
