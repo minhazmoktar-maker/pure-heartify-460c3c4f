@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Loader2, Plus, Lock, Globe2, Link as LinkIcon, Trash2 } from "lucide-react";
+import { Loader2, Plus, Lock, Globe2, Link as LinkIcon, Trash2, ListMusic } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
