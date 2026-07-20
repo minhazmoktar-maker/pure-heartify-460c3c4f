@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo } from "react";
 import NextSalahWidget from "@/components/NextSalahWidget";
 import { StreakCard } from "@/components/StreakCard";
 import VerseOfDayCard from "@/components/VerseOfDayCard";
