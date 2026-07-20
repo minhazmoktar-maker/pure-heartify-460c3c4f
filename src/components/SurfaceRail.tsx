@@ -153,11 +153,8 @@ const SurfaceRail = ({
           </div>
         )}
       </div>
-      {meta && import.meta.env.DEV && typeof window !== "undefined" && window.localStorage?.getItem("heartify.debug") === "1" && (
-        <div className="px-1 text-[10px] text-muted-foreground/60">
-          {surface} · pool={meta.pool_size} · took={meta.took_ms}ms · ch={meta.stats.distinctChannels} · cats={meta.stats.distinctCategories} · fresh={(meta.stats.freshShare * 100).toFixed(0)}%
-        </div>
-      )}
+      {/* Rec-health telemetry is admin-only and lives at /admin/rec-health.
+          Never rendered on user-facing surfaces — no engineering artifacts, ever. */}
     </section>
   );
 };
