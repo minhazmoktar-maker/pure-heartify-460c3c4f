@@ -56,7 +56,8 @@ const Privacy = () => {
           <CookiePreferencesPanel />
         </div>
 
-        </header>
+
+
 
         <div className="mt-10 space-y-10 text-sm leading-relaxed">
           <Section id="introduction" title="1. Introduction">
