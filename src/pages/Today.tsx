@@ -162,6 +162,12 @@ export default function Today() {
         <header className="mb-6">
           <p className="text-sm text-muted-foreground">{greeting}</p>
           <h1 className="mt-1 flex items-center gap-2 text-title font-bold"><Sunrise className="h-7 w-7 text-primary" />Today</h1>
+          {(daily?.fallback || (typeof navigator !== "undefined" && !navigator.onLine)) && (
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-pill border border-border bg-muted/50 px-2.5 py-1 text-micro text-muted-foreground">
+              <WifiOff className="h-3 w-3" aria-hidden />
+              Offline — showing your saved Today
+            </p>
+          )}
         </header>
 
         {/* Streak strip */}
