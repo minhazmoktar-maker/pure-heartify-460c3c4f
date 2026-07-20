@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Loader2, AlertTriangle, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from "@/components/EmptyState";
@@ -7,6 +7,7 @@ import { useInfiniteFeed, type FeedSort } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { HalalCategory } from "@/services/youtube";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
+import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 
 interface Props {
   category?: HalalCategory;
