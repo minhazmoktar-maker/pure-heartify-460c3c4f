@@ -1,105 +1,59 @@
-## Redesign — Independent Surface Assembly Pipeline
+# Heartify — Ranked Backlog (from first-time-user critique)
 
-### The problem (evidence)
+Ordered by *return-visit impact ÷ effort*. Each item has the measurable user benefit it moves.
 
-Today all 34 curated rails, Recently Added, and Hidden-Gems/Trending signals read from **one function (`feed`) → one RPC (`get_feed_candidates_diversified`) → one table (`curated_videos`)**. Section aliasing collapses many rails onto identical category sets (`feed/index.ts:133-160`); cross-section dedup is a client-side first-come-first-served hack (`CuratedSectionRow.tsx:71-100`). Of the 11 target surfaces, only Recently Added exists; For You, Listen, Trending, Continue Watching, Hidden Gems, New Channels, Because You Watched, Popular This Week are absent or backend-only.
+| # | Item | Impact | Effort | Metric it moves |
+|---|------|--------|--------|-----------------|
+| 1 | **Kill debug telemetry on all public rails** (`pool=80 · took=793ms · ch=17…`) | H | XS | Trust, perceived polish |
+| 2 | **"Today" hero density pass** — collapse 4 stacked cards into one calm above-the-fold "Right now" block (next salah + streak inline, verse as quiet secondary, daily-dose as row 2) | H | S | D1/D7 return, LCP hierarchy |
+| 3 | **Rail count on Home: 11 → 5** (Continue · For you · Recently added · Trending · Listen) — the rest live behind "Browse all" | H | S | Session depth, scroll fatigue ↓ |
+| 4 | Empty-state rails must never render as skeletons that resolve to nothing — hide or replace with 1 real editorial card | H | S | "Feels alive" |
+| 5 | Signed-out home: replace bottom `HeroSection` marketing with a **single sample video + one-sentence promise**; move the rest to `/about` | M | S | Signup lift |
+| 6 | **First-run ≤ 60s**: 3 taps (language · one interest chip · Dhikr or Quran) → straight to content. No DOB, no permissions, no notification asks | H | M | Activation |
+| 7 | Push permission: never on cold start; ask after first completed dhikr OR first video finish (already have `PushPermissionPrompt` — enforce trigger) | M | XS | Permission grant % |
+| 8 | Bottom tab bar: label typography down to `text-micro`, active state = gold underline (1 accent rule), remove tab shadow | M | XS | Craft |
+| 9 | Cookie toast: hide entirely after first scroll on all routes (currently only >120px) — make it "self-dismissing on any intent" | L | XS | Fold cleanliness |
+| 10 | Verse of Day: add "Continue where you left off in Al-Baqarah" if user has Quran history — otherwise stays as-is | M | S | Quran DAU |
+| 11 | Video card: drop channel initial avatar chip when a real channel thumbnail exists; tighten metadata to one line | M | S | Scan speed |
+| 12 | Search: elevate "Recently searched" + "Try: [3 chips]" instead of blank state | M | S | Search usage |
+| 13 | Dhikr: haptic on 33/66/99, quiet celebrate on 100; keep silent between | L | XS | Delight |
+| 14 | Prayer: show "You've prayed 3/5 today" chip above next-salah countdown | M | S | Return frequency |
+| 15 | Settings: consolidate 3 notification screens into one matrix | M | M | Clarity |
+| 16 | Offline banner: swap to a 1-line inline strip under Navbar instead of floating pill | L | XS | Craft |
+| 17 | Home footer: shorten to `Privacy · Terms · Trust` — trim 5 links to 3 | L | XS | Density |
+| 18 | Trust page: pin "Moderation at a glance" numbers to the top with a last-updated timestamp | M | XS | Trust |
+| 19 | Preload the first video thumbnail on Home (fetchpriority already set — add `<link rel=preload as=image>` for card-0 URL when known) | M | M | LCP |
+| 20 | Replace generic "Nothing to show yet" copy globally with domain-specific empty states via existing `EmptyState` component | M | S | Warmth |
 
-### What we're building
+---
 
-One dedicated **retriever** per surface. Each retriever owns its candidate query, its ranker, and its diversity contract. No shared candidate pool. Shared components are only utility (impression penalty, blocklist, MMR helper).
+## Focused execution — Top 3
 
-### Surface contracts
+### 1. Kill debug telemetry on public rails
+- `SurfaceRail` / `CuratedSectionRow` render diagnostic strings (`pool=… took=…ms · ch=… · cats=… · fresh=…%`) as a subtitle when data returns. Gate that entire line behind `import.meta.env.DEV || localStorage.getItem('heartify.debug') === '1'`.
+- Grep for the format tokens (`took=`, `pool=`, `fresh=`) and remove from anything shipped to end users.
+- Keep them visible on `/admin/rec-health` and behind the debug flag.
 
-| Surface | Pool source | Ranker | Freshness window | Guarantees |
-|---|---|---|---|---|
-| For You | Personalization pool: user interests × affinity channels × language | Impression-penalized affinity + semantic KNN | 90d, mixed with all-time | ≥12 videos, ≤2/channel, ≤35% top language, ≥4 categories, ≥30% <14d |
-| Browse | Category-diverse spread across all approved categories | Round-robin categories × trust weight | any | ≥16 videos, ≤1/channel, ≥8 categories, ≥3 languages |
-| Listen | Audio-first: `category ∈ {Quran, Adhan, Nasheed, Lectures}` + audio_sources join | Reciter/lecturer diversity | any | ≥12 videos, ≤1/reciter, ≥4 reciters, ≥3 languages |
-| Recently Added | `ingested_at ≥ now()-24h`, then rolling 7d fallback | Time DESC + trust weight | 24h → 7d | ≥8 videos, ≤1/channel, ≥5 channels |
-| Trending | 7-day window ranked by view velocity × recommendation clicks | z-scored velocity | 7d | ≥12 videos, ≤2/channel, ≥6 channels, ≥3 categories |
-| Continue Watching | `watch_history` where `progress ∈ (0.05, 0.9)` in last 30d | Recency DESC | 30d | Signed-in only; ≥1 to render, cap 12 |
-| Hidden Gems | `view_count < P25 AND halal_score ≥ 90 AND published_at ≥ 180d` | Trust × freshness | 180d | ≥8 videos, ≤1/channel, ≥6 channels, ≥4 categories |
-| New Channels | Channels with first approved video in last 30d | Channel novelty × video trust | 30d | ≥6 channels, 1 video per channel |
-| New Videos | `published_at ≥ 7d` (distinct from ingested_at) | Publish-date DESC | 7d | ≥10 videos, ≤2/channel, ≥5 channels |
-| Because You Watched | Semantic KNN off last 3 completed videos, filter out already-seen | Cosine similarity × trust | any | Signed-in only; ≥8, ≤1/channel, exclude source channels |
-| Popular This Week | Top view-count deltas in 7d, min view floor | View-delta rank | 7d | ≥12 videos, ≤2/channel, ≥6 channels |
+### 2. "Today" hero density pass
+- `src/components/TodayHero.tsx`: merge the 4-card stack into one card:
+  - Row 1: next salah countdown (left, primary) + streak flame (right, compact).
+  - Row 2: verse of day as a quiet text block, no card chrome.
+  - Row 3: 3 daily-dose thumbnails as a compact carousel (already lazy).
+- One elevation (`shadow-e1`), one radius (`rounded-card`), 32px vertical rhythm, gold used only on the streak flame.
+- Removes the "wall of cards" first impression; keeps every action.
 
-Every retriever runs its own SQL. No retriever calls another. `feed_impressions` penalty and blocklist apply universally as a post-filter.
+### 3. Home rail count 11 → 5
+- `src/pages/Index.tsx`:
+  - Signed-in visible: `continue_watching`, `for_you`, `recently_added`, `trending`, `listen`.
+  - Move `because_you_watched`, `new_videos`, `popular_this_week`, `hidden_gems`, `new_channels`, `browse` behind a single **"Browse all"** section that renders on demand (button expands, or link to `/browse`).
+  - Signed-out visible: `trending`, `recently_added`, `listen` — the rest collapse the same way.
+- `InfiniteVideoGrid` at the bottom stays — it's the endless-explore surface.
 
-### Architecture
+## Technical notes
 
-```text
-Client rail ──► useSurface("<name>")
-                    │
-                    ▼
-   supabase.functions.invoke("surface-<name>")
-                    │
-                    ▼
-  ┌─────────────────────────────────────────┐
-  │  supabase/functions/surface-<name>/     │
-  │  1. Fetch candidates (own SQL/RPC)      │
-  │  2. Apply universal filters             │
-  │     (blocklist, impressions, blocks)    │
-  │  3. Rank (own scorer)                   │
-  │  4. Diversify (MMR + caps per contract) │
-  │  5. Validate guarantees, fallback tier  │
-  │  6. Log impressions + return            │
-  └─────────────────────────────────────────┘
-```
+- No schema changes. No new edge functions. All three fixes are frontend-only.
+- Design tokens already exist; no `index.css` / `tailwind.config.ts` edits needed.
+- Debug flag: `localStorage.heartify.debug = '1'` reveals telemetry — document in `docs/APP_GUIDE.md`.
+- Rail-collapse should preserve deep links: `/section/:surface` routes remain, so "Browse all" is discovery-safe.
 
-`supabase/functions/_shared/surfaces/` holds:
-- `filters.ts` — blocklist, impression penalty, block-list, kids-mode
-- `diversity.ts` — creator/language/topic/institution cap helpers + MMR
-- `guarantees.ts` — validator that returns `{ok, missing[]}` per contract
-- `logging.ts` — impression + retrieval telemetry
-
-### Database work
-
-New RPCs (independent pools):
-- `pool_trending_7d(_limit, _lang, _exclude_ids)` — velocity ranking
-- `pool_hidden_gems(_limit, _min_score, _exclude_ids)` — low-view + high-trust
-- `pool_new_channels(_limit, _window_days)` — channels first-approved in window
-- `pool_new_videos(_limit, _window_days)` — published_at not ingested_at
-- `pool_because_you_watched(_user_id, _limit)` — pgvector KNN off completed embeddings
-- `pool_popular_week(_limit, _lang)` — view-count delta ranking
-- `pool_continue_watching(_user_id, _limit)` — from `watch_history`
-- `pool_recently_added(_limit, _window_hours)` — dedicated, no aliasing
-
-`get_feed_candidates_diversified` stays for Browse-style category rails. Add `institution_id` join through `approved_channels` where available for institution-diversity guarantee.
-
-### Client work
-
-- New hook `useSurface(name, opts)` per surface with React Query keys namespaced `["surface", name, session]`.
-- Replace `Index.tsx` home rails with the 11 surface components: `<ForYouRail/>`, `<BrowseRail/>`, `<ListenRail/>`, `<RecentlyAddedRow/>` (refactor), `<TrendingRail/>`, `<ContinueWatchingRail/>`, `<HiddenGemsRail/>`, `<NewChannelsRail/>`, `<NewVideosRail/>`, `<BecauseYouWatchedRail/>`, `<PopularThisWeekRail/>`.
-- Remove `FeedDiversityContext` cross-section seen set — diversity now guaranteed server-side per surface.
-- Order on signed-in home: Continue Watching → For You → Recently Added → Because You Watched → Trending → Listen → New Videos → Popular This Week → Hidden Gems → New Channels → Browse.
-- Signed-out home: Trending → Recently Added → Listen → New Videos → Hidden Gems → Popular This Week → Browse.
-
-### Validation (evidence, not vibes)
-
-Add `docs/SURFACE_VALIDATION_2026-07.md` and a `/admin/surface-health` panel. For every surface, run and record:
-
-1. **Minimum videos** — `SELECT surface, min(item_count) FROM last_100_responses GROUP BY surface;` — must equal contract minimum.
-2. **Creator diversity** — `SELECT surface, avg(distinct_channels::float/items::float) FROM ...` — must be ≥ target per contract.
-3. **Topic diversity** — distinct-category ratio per response.
-4. **Language diversity** — distinct-language ratio; top-language share ≤ cap.
-5. **Institution diversity** — distinct `approved_channels.institution_id` per response.
-6. **Freshness** — % rows with `published_at ≥ contract_window` and % <14d for time-sensitive surfaces.
-7. **Novelty vs prior session** — pairwise Jaccard between consecutive responses for same user; target < 0.35 for For You / Trending / Because You Watched.
-8. **Pool independence** — pairwise Jaccard *between surfaces* in a single home load; target < 0.15 (proves independent pools, not just re-sliced overlap).
-
-Every metric is queried live from `recommendation_events` + response snapshots; results committed with before/after numbers. Surface fails to ship if any guarantee misses.
-
-### Rollout
-
-- Phase A: build `_shared/surfaces/*`, `pool_*` RPCs, and 4 highest-value surfaces (For You, Trending, Continue Watching, Because You Watched). Ship behind `feature_flags.surfaces_v2`.
-- Phase B: remaining 7 surfaces + client refactor of `Index.tsx`; retire the 34-rail curated grid on home (keep as `/browse` explorer).
-- Phase C: enable flag for 10% → 100%; delete legacy `SECTION_CATEGORY_ALIASES` and `refresh-sections` pruning once traffic is off.
-
-### Technical details
-
-- Retriever contract: `type Retriever = (ctx: SurfaceCtx) => Promise<{items: Video[], meta: {source, took_ms, guarantees}}>`.
-- Universal filters run *after* candidate fetch, *before* rank: `applyBlocklist → applyImpressionPenalty → applyUserBlocks → applyKidsMode`.
-- Diversity contract enforced via `enforceContract(items, contract)`: greedy MMR that drops items violating channel/language/topic/institution caps until guarantee met or pool exhausted; then triggers tier-2 fallback (broaden window) then tier-3 (drop language filter). Never returns fewer than `minimum` unless pool is truly empty — in which case the surface is hidden, not shown empty.
-- Cache keys per surface include `user_id` (or `session_id` for anon) so novelty differs per user; anon TTL 60s, signed-in 30s.
-- All new RPCs `SECURITY DEFINER` with `search_path=public`, granted to `authenticated, anon` where surface allows anon.
+Approve to build, or tell me to reorder / swap items in / out.

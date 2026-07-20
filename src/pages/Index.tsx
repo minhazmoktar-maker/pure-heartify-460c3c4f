@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
 const Index = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [showMoreRails, setShowMoreRails] = useState(false);
 
   const onRefresh = async () => {
     // Clear cross-rail dedup so the refreshed pages can re-claim ids.
@@ -34,8 +35,10 @@ const Index = () => {
     toast.success("Feed refreshed");
   };
 
-  // Signed-in home: 11 independent surfaces, ordered by expected daily value.
-  const signedInRails = (
+  // Home is intentionally sparse: 5 top rails above the fold.
+  // Secondary rails collapse behind one "Show more" affordance so the
+  // first impression isn't an 11-rail wall of scaffolding.
+  const signedInPrimary = (
     <main className="mx-auto max-w-[1800px] space-y-1 px-4 py-2 md:px-6">
       <SurfaceRail surface="continue_watching" title="Continue watching"
         subtitle="Pick up where you left off" hideIfEmpty priority />
@@ -44,12 +47,17 @@ const Index = () => {
       <SurfaceRail surface="recently_added" title="Recently added"
         subtitle="Freshly approved on Heartify" priority
         seeAllHref="/section/recently-added" />
-      <SurfaceRail surface="because_you_watched" title="Because you watched"
-        subtitle="More like your recent watches" hideIfEmpty />
       <SurfaceRail surface="trending" title="Trending"
         subtitle="Rising this week across Heartify" />
       <SurfaceRail surface="listen" title="Listen"
         subtitle="Recitation, adhan, nasheed and lectures" />
+    </main>
+  );
+
+  const signedInSecondary = (
+    <main className="mx-auto max-w-[1800px] space-y-1 px-4 pb-2 md:px-6">
+      <SurfaceRail surface="because_you_watched" title="Because you watched"
+        subtitle="More like your recent watches" hideIfEmpty />
       <SurfaceRail surface="new_videos" title="New uploads"
         subtitle="Just published by trusted creators" />
       <SurfaceRail surface="popular_this_week" title="Popular this week" />
@@ -62,19 +70,34 @@ const Index = () => {
     </main>
   );
 
-  // Signed-out home: public surfaces only, in a discovery-friendly order.
-  const signedOutRails = (
+  const signedOutPrimary = (
     <main className="mx-auto max-w-[1800px] space-y-1 px-4 py-2 md:px-6">
       <SurfaceRail surface="trending" title="Trending" priority />
       <SurfaceRail surface="recently_added" title="Recently added" priority
         seeAllHref="/section/recently-added" />
       <SurfaceRail surface="listen" title="Listen"
         subtitle="Recitation, adhan, nasheed and lectures" priority />
+    </main>
+  );
+
+  const signedOutSecondary = (
+    <main className="mx-auto max-w-[1800px] space-y-1 px-4 pb-2 md:px-6">
       <SurfaceRail surface="new_videos" title="New uploads" />
       <SurfaceRail surface="popular_this_week" title="Popular this week" />
       <SurfaceRail surface="hidden_gems" title="Hidden gems" />
       <SurfaceRail surface="browse" title="Browse" />
     </main>
+  );
+
+  const showMoreButton = (
+    <div className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6">
+      <button
+        onClick={() => setShowMoreRails(true)}
+        className="w-full rounded-card border border-border bg-card px-4 py-3 text-caption font-semibold text-foreground shadow-e1 transition-colors hover:bg-secondary"
+      >
+        Show more rails
+      </button>
+    </div>
   );
 
 
@@ -119,7 +142,8 @@ const Index = () => {
               <WeeklyRecapCard />
             </div>
 
-            {signedInRails}
+            {signedInPrimary}
+            {showMoreRails ? signedInSecondary : showMoreButton}
 
             <section aria-label="Keep exploring" className="mx-auto max-w-[1800px] px-4 pt-6 md:px-6">
               <h2 className="text-title font-semibold mb-3">Keep exploring</h2>
@@ -131,7 +155,8 @@ const Index = () => {
         ) : (
           <>
             {/* Signed-out: content first, marketing below the fold. */}
-            {signedOutRails}
+            {signedOutPrimary}
+            {showMoreRails ? signedOutSecondary : showMoreButton}
 
             <section aria-label="Keep exploring" className="mx-auto max-w-[1800px] px-4 pt-6 md:px-6">
               <h2 className="text-title font-semibold mb-3">Keep exploring</h2>
