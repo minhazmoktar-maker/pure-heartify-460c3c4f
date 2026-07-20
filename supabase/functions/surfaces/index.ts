@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
     });
     if (limited) return json({ error: "rate_limited" }, 429);
 
-    const isPremium = userId ? await hasActivePremium(service, userId).catch(() => false) : false;
+    const isPremium = userId ? await hasActivePremium(userId).catch(() => false) : false;
     const sessionId = String(body?.session_id ?? "anon");
     const contentLanguages: string[] = Array.isArray(body?.content_languages)
       ? body.content_languages.filter((s: unknown) => typeof s === "string")
