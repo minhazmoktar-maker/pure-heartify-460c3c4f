@@ -51,18 +51,18 @@ export default function AsmaUlHusna() {
         {filtered.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-12">No names match "{q}".</p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div dir="rtl" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((n) => (
-              <Card key={n.n} className="transition hover:border-primary/60">
+              <Card key={n.n} className="transition hover:border-primary/60" dir="ltr">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-micro font-mono text-muted-foreground">#{n.n}</span>
                     <span dir="rtl" lang="ar" className="text-title font-semibold leading-tight">
                       {n.ar}
                     </span>
+                    <span className="text-micro font-mono text-muted-foreground">#{n.n}</span>
                   </div>
-                  <div className="mt-2 font-semibold text-primary">{n.translit}</div>
-                  <div className="text-sm text-muted-foreground">{n.meaning}</div>
+                  <div dir="rtl" lang="ar" className="mt-2 font-semibold text-primary text-right">{n.translit}</div>
+                  <div dir="rtl" className="text-sm text-muted-foreground text-right">{n.meaning}</div>
                 </CardContent>
               </Card>
             ))}
