@@ -77,12 +77,6 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
 
   const rawVideos = dbVideos.length > 0 ? dbVideos : (ytVideos ?? []);
 
-  // Diversity context: per-channel cap AND cross-section dedup. Sections
-  // now share overlapping category pools (see feed edge function's
-  // SECTION_CATEGORY_ALIASES), so without a cross-row seen set the same
-  // Quran recitation could appear in 4 different rows. Row order = claim
-  // order: earlier sections claim first, later sections filter them out.
-  const { perChannelCap, seenVideoIds, resetKey } = useFeedDiversity();
 
   // In-section dedup + per-channel cap + cross-section dedup via claim().
   const videos = useMemo(() => {
