@@ -6,6 +6,7 @@
 // spamming/harassing arbitrary users with fake push notifications.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { canSendPush, recordPushSend } from "../_shared/pushCap.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
