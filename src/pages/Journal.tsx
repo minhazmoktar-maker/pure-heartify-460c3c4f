@@ -178,7 +178,7 @@ const Journal = () => {
             onChange={(e) => setText(e.target.value)}
             rows={4}
             maxLength={600}
-            placeholder="Write from the heart…"
+            placeholder="Write From Your Heart…"
             className="w-full resize-none rounded-card border border-border bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
           />
           <div className="mt-2 flex items-center justify-between">
