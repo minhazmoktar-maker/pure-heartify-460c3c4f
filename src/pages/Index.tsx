@@ -167,6 +167,15 @@ const Index = () => {
             <NextSalahWidget />
             <section className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6" aria-label="Verse of the day">
               <VerseOfDayCard />
+              {/* Quiet first-session hook — never pushy, one line, dismissible
+                  by simply signing in. Converts anon Verse-of-day readers into
+                  streak-tracked returning users. */}
+              <p className="mt-2 text-center text-caption text-muted-foreground">
+                <a href="/login" className="underline underline-offset-2 hover:text-foreground">
+                  Sign in
+                </a>{" "}
+                to save your streak and pick up where you left off.
+              </p>
             </section>
 
             {signedOutPrimary}
