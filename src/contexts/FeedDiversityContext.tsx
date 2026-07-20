@@ -217,9 +217,10 @@ export const FeedDiversityProvider = ({ children }: { children: ReactNode }) => 
       }
       set.add(videoId);
       ownersRef.current.set(videoId, source);
+      flush();
       return true;
     },
-    [],
+    [flush],
   );
 
   const claimMany = useCallback(
