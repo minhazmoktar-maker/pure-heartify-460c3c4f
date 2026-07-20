@@ -33,6 +33,7 @@ import ScrollRestoration from "./components/ScrollRestoration";
 import SkipLink from "./components/SkipLink";
 import OfflineBanner from "./components/OfflineBanner";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
+const PushPermissionPrompt = lazy(() => import("./components/PushPermissionPrompt"));
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
 const Mushaf = lazy(() => import("./pages/Mushaf.tsx"));
