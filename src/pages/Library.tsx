@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
+import EmptyState from "@/components/EmptyState";
 import libraryData from "@/data/library.json";
 
 type Entry = {
