@@ -33,6 +33,7 @@ import ScrollRestoration from "./components/ScrollRestoration";
 import SkipLink from "./components/SkipLink";
 import OfflineBanner from "./components/OfflineBanner";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
+import { FeedDiversityProvider } from "./contexts/FeedDiversityContext";
 const PushPermissionPrompt = lazy(() => import("./components/PushPermissionPrompt"));
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
@@ -294,6 +295,7 @@ const App = () => (
             <BottomTabBar />
             <EdgeSwipeBack />
             <KeyboardFocusScroller />
+            <FeedDiversityProvider>
             <Suspense fallback={<RouteFallback />}>
               <RouteTransition>
               <Routes>
@@ -811,6 +813,7 @@ const App = () => (
               </Routes>
               </RouteTransition>
             </Suspense>
+            </FeedDiversityProvider>
           </BrowserRouter>
         </PlayerProvider>
           </KidsModeProvider>
