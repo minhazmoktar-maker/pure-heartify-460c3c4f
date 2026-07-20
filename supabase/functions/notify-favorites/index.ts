@@ -89,6 +89,14 @@ Deno.serve(async (req) => {
       continue;
     }
 
+    // Server-side 3-per-7d cap.
+    const cap = await canSendPush(supabase, userId);
+    if (!cap.ok) {
+      queued += tokens.length;
+      continue;
+    }
+
+    let deliveredForUser = 0;
     for (const t of tokens) {
       const res = await fetch("https://fcm.googleapis.com/fcm/send", {
         method: "POST",
@@ -99,10 +107,22 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           to: t.token,
           notification: { title, body },
-          data: { sections: sectionIds.join(",") },
+          data: { kind: "favorites_digest", sections: sectionIds.join(",") },
         }),
       });
-      if (res.ok) sent++;
+      if (res.ok) {
+        sent++;
+        deliveredForUser++;
+      }
+    }
+    if (deliveredForUser > 0) {
+      await recordPushSend(supabase, {
+        user_id: userId,
+        kind: "favorites_digest",
+        title,
+        body,
+        data: { sections: sectionIds.join(",") },
+      });
     }
   }
 
