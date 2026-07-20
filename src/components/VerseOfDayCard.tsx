@@ -102,8 +102,13 @@ const VerseOfDayCard = () => {
           <motion.p
             dir="rtl"
             lang="ar"
-            className="line-clamp-2 text-right font-arabic text-xl leading-loose text-foreground"
-            style={{ fontFeatureSettings: '"liga", "calt", "kern", "rlig", "mset"' }}
+            className="font-quran text-right text-[1.4rem] leading-[2.25] text-foreground"
+            style={{
+              fontFeatureSettings: '"liga", "calt", "kern", "rlig", "mset", "ss01"',
+              unicodeBidi: "isolate",
+              textWrap: "balance",
+              wordSpacing: "0.05em",
+            }}
             initial={shouldReveal ? { opacity: 0, y: 6 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: shouldReveal ? 0.15 : 0 }}
