@@ -6,6 +6,7 @@ import VideoCardSkeleton from "@/components/VideoCardSkeleton";
 import { useSurface, type SurfaceName } from "@/hooks/useSurface";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import { isClickbaitTitle } from "@/lib/clickbait";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -57,7 +58,10 @@ const SurfaceRail = ({
 
   const items = useMemo(() => {
     const out: typeof rawItems = [];
-    for (const v of rawItems) if (claim(v.id, `surface:${surface}`)) out.push(v);
+    for (const v of rawItems) {
+      if (isClickbaitTitle(v.title)) continue;
+      if (claim(v.id, `surface:${surface}`)) out.push(v);
+    }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawItems, resetKey, claim, surface]);
