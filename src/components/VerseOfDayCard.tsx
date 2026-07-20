@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { BookOpen, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -11,15 +12,26 @@ function dailySeed() {
   return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
 }
 
+const REVEAL_KEY = "verse:last-revealed-seed";
+
 /**
  * Compact "resume-reading verse" surface for the signed-in Today shape.
  * Prefers the user's last-read ayah (persisted by the Quran reader in
  * localStorage under `quran:last-ayah`) and falls back to a rotating
  * daily ayah so the card always has content.
+ *
+ * T5 — Once-per-day reveal: the first time this card mounts on a given
+ * UTC day, a signature Arabic-glyph fade/slide plays. Subsequent mounts
+ * that day skip the animation entirely (respecting attention + reduced
+ * motion). Gated by localStorage so it survives route changes but resets
+ * daily with the seed.
  */
 const VerseOfDayCard = () => {
   const [ayah, setAyah] = useState<Ayah | null>(null);
   const [resume, setResume] = useState<{ surah: number; ayah: number } | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const seed = useMemo(() => dailySeed(), []);
+  const [shouldReveal, setShouldReveal] = useState(false);
 
   useEffect(() => {
     try {
@@ -30,8 +42,17 @@ const VerseOfDayCard = () => {
       }
     } catch { /* ignore */ }
 
+    // Decide reveal state exactly once per day, per device.
+    try {
+      const last = Number(localStorage.getItem(REVEAL_KEY) ?? 0);
+      if (last !== seed && !prefersReducedMotion) {
+        setShouldReveal(true);
+        localStorage.setItem(REVEAL_KEY, String(seed));
+      }
+    } catch { /* private mode — silently skip reveal */ }
+
     let cancelled = false;
-    const n = (dailySeed() % 6236) + 1;
+    const n = (seed % 6236) + 1;
     (async () => {
       try {
         const [ar, en] = await Promise.all([
@@ -51,7 +72,8 @@ const VerseOfDayCard = () => {
       } catch { /* offline */ }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [seed, prefersReducedMotion]);
+
 
   const target = resume
     ? `/surah/${resume.surah}#ayah-${resume.ayah}`
@@ -71,13 +93,33 @@ const VerseOfDayCard = () => {
         {resume ? "Resume reading" : "Verse of the day"}
       </div>
       {ayah ? (
-        <div className="mt-2 space-y-2">
-          <p dir="rtl" lang="ar" className="line-clamp-2 text-right font-arabic text-xl leading-loose text-foreground" style={{ fontFeatureSettings: '"liga", "calt", "kern", "rlig", "mset"' }}>
+        <motion.div
+          className="mt-2 space-y-2"
+          initial={shouldReveal ? { opacity: 0, y: 8, filter: "blur(6px)" } : false}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: shouldReveal ? 0.05 : 0 }}
+        >
+          <motion.p
+            dir="rtl"
+            lang="ar"
+            className="line-clamp-2 text-right font-arabic text-xl leading-loose text-foreground"
+            style={{ fontFeatureSettings: '"liga", "calt", "kern", "rlig", "mset"' }}
+            initial={shouldReveal ? { opacity: 0, y: 6 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: shouldReveal ? 0.15 : 0 }}
+          >
             {ayah.arabic}
-          </p>
+          </motion.p>
 
-          <p className="line-clamp-2 text-sm text-muted-foreground">{ayah.english}</p>
-        </div>
+          <motion.p
+            className="line-clamp-2 text-sm text-muted-foreground"
+            initial={shouldReveal ? { opacity: 0 } : false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: shouldReveal ? 0.5 : 0 }}
+          >
+            {ayah.english}
+          </motion.p>
+        </motion.div>
       ) : (
         <div className="mt-2 space-y-2">
           <Skeleton className="h-5 w-full" />
