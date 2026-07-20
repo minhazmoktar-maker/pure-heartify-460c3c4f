@@ -100,6 +100,16 @@ Deno.serve(async (req) => {
     // to prevent filter injection into the or=(...) clause.
     const rawSearch = typeof body?.search === "string" ? body.search.trim() : "";
     const search = rawSearch.replace(/[,()*.:&=%]/g, " ").replace(/\s+/g, " ").trim().slice(0, 100);
+    // Server-side cross-rail dedup: client sends the set of video ids
+    // already claimed by other rails / earlier pages so we can guarantee
+    // no duplicate ever leaves the wire. Capped for memory + URL sanity.
+    const rawExclude = Array.isArray(body?.exclude_ids) ? body.exclude_ids : [];
+    const excludeIds: Set<string> = new Set(
+      rawExclude
+        .filter((s: unknown): s is string => typeof s === "string")
+        .map((s: string) => s.slice(0, 24))
+        .slice(0, 1500),
+    );
 
     // Build PostgREST query
     // Order: freshest content first (published_at), then halal_score, then ingested_at as tiebreaker.
@@ -200,7 +210,7 @@ Deno.serve(async (req) => {
 
     // Read-through cache — anonymous, non-search requests only. Signed-in
     // callers have per-user premium gating and cannot share bytes safely.
-    const cacheable = !callerId && !search;
+    const cacheable = !callerId && !search && excludeIds.size === 0;
     const langKey = contentLanguages.length ? contentLanguages.join(",") : "-";
     const cacheKey = cacheable
       ? `feed:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}`
@@ -305,8 +315,12 @@ Deno.serve(async (req) => {
 
     if (!payload.ok) return json({ items: [], nextCursor: null, total: 0 });
 
-    // Post-fetch blocklist filter (see BLOCKED_TOKENS above).
+    // Post-fetch blocklist filter (see BLOCKED_TOKENS above) + cross-rail
+    // exclude filter — guarantees no duplicate video id ever reaches the
+    // client across rails, surfaces, and infinite-grid pagination.
     let filtered = (payload.items as Array<Record<string, unknown>>).filter((v) => {
+      const id = (v.video_id as string) ?? "";
+      if (excludeIds.has(id)) return false;
       const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
       return !BLOCKED_TOKENS.some((tok) => t.includes(tok));
     });
