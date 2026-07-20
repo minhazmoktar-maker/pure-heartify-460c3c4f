@@ -50,9 +50,18 @@ export default function PlaylistDetail() {
           {playlist.visibility} · {items.length} videos
         </p>
         {items.length === 0 ? (
-          <div className="rounded-card border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
-            {isOwner ? "Add videos to this playlist from any watch page." : "This playlist is empty."}
-          </div>
+          <EmptyState
+            illustration="empty-list"
+            icon={ListMusic}
+            title={isOwner ? "This playlist is empty" : "Nothing here yet"}
+            description={
+              isOwner
+                ? "Add videos to this playlist from any watch page — tap the save icon under a video."
+                : "The owner hasn't added any videos yet. Check back soon."
+            }
+            actionLabel={isOwner ? "Browse videos" : undefined}
+            actionHref={isOwner ? "/" : undefined}
+          />
         ) : (
           <ol className="space-y-2">
             {items.map((it, idx) => (
