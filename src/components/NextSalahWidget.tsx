@@ -125,8 +125,11 @@ export default function NextSalahWidget() {
       ) : null}
       <Link
         to="/prayer"
-        className="flex items-center gap-3 rounded-card border border-border bg-card px-4 py-2.5 text-sm shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40"
-        aria-label={`Next prayer: ${label} in ${countdown}${approx ? " (approximate location)" : ""}`}
+        className={
+          "flex items-center gap-3 rounded-card border border-border bg-card px-4 py-2.5 text-sm shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40 " +
+          (approx ? "opacity-60" : "")
+        }
+        aria-label={`Next prayer: ${label} in ${countdown}${approx ? " (approximate location — confirm your city)" : ""}`}
       >
         <Compass className="h-4 w-4 shrink-0 text-primary" aria-hidden />
         <span className="font-semibold text-foreground">Next: {label}</span>

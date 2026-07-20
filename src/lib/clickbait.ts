@@ -52,14 +52,31 @@ export function isClickbaitTitle(raw: string | undefined | null): boolean {
     "will blow your mind",
     "insane reaction",
     "*emotional*",
+    "wait until you see",
+    "wait till you see",
+    "you have to see",
+    "look what happened",
+    "watch this before",
+    "the truth about",
+    "exposed!",
+    "reaction!!!",
     "😱",
     "🤯",
+    "😳",
+    "‼️",
   ];
   if (tabloid.some((p) => lower.includes(p))) return true;
 
-  // Rule 4: 3+ exclamation marks or 3+ trailing question marks.
+  // Rule 4: 3+ exclamation marks, 3+ trailing question marks, or "?!" combos —
+  // these usually pair with shouty face thumbnails, which is our closest
+  // client-side proxy for a "thumbnail-shout" vision moderation pass.
   if ((title.match(/!/g) ?? []).length >= 3) return true;
   if (/\?{3,}/.test(title)) return true;
+  if (/\?!|!\?/.test(title)) return true;
+
+  // Rule 5: emoji-density abuse (>=3 emoji is a strong clickbait signal).
+  const emoji = title.match(/\p{Extended_Pictographic}/gu);
+  if (emoji && emoji.length >= 3) return true;
 
   return false;
 }

@@ -159,41 +159,50 @@ export default function Prayer() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Next prayer + list */}
             <section className="rounded-card border border-border bg-card p-6">
-              {next && (
-                <div className="mb-4 rounded-card bg-primary/10 p-4">
-                  <div className="text-micro uppercase tracking-wide text-muted-foreground">Next prayer</div>
-                  <div className="mt-1 flex items-baseline justify-between">
-                    <div className="text-title font-bold text-foreground">{next.label}</div>
-                    <div className="text-heading font-medium text-primary">{formatTime(next.time)}</div>
-                  </div>
-                  <div className="mt-1 text-sm text-muted-foreground">in {formatCountdown(next.time.getTime() - now.getTime())}</div>
-                </div>
-              )}
-              <ul className="divide-y divide-border">
-                {slots.map((slot) => {
-                  const isNext = next?.name === slot.name;
-                  return (
-                    <li key={slot.name} className={cn("flex items-center justify-between py-3", isNext && "font-semibold text-primary")}>
-                      <span>{slot.label}</span>
-                      <span className="tabular-nums">{formatTime(slot.time)}</span>
-                    </li>
-                  );
-                })}
-              </ul>
+              {/* Location-first: when the location is only IP-approximate,
+                  everything below is greyed until the user confirms. Prayer
+                  times displayed as authoritative when they might be wrong
+                  is a trust-shattering event for a Muslim audience. */}
               {settings.location.approximate && (
-                <div className="mt-4 flex flex-wrap items-center gap-2 rounded-card border border-primary/30 bg-primary/5 px-3 py-2 text-micro">
-                  <MapPin className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-foreground">Approximate location from your network</span>
+                <div className="mb-4 flex flex-wrap items-center gap-2 rounded-card border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span className="text-foreground">
+                    Approximate location{settings.location.label ? <> · <span className="font-medium">{settings.location.label}</span></> : null}
+                  </span>
                   <button
                     onClick={detectLocation}
                     disabled={loading}
-                    className="ml-auto inline-flex items-center gap-1 rounded-pill bg-primary px-2.5 py-1 font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+                    className="ml-auto inline-flex items-center gap-1 rounded-pill bg-primary px-3 py-1.5 text-micro font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
                   >
                     {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <MapPin className="h-3 w-3" />}
-                    Use precise location
+                    Confirm your city
                   </button>
                 </div>
               )}
+              <div className={cn(settings.location.approximate && "opacity-50 pointer-events-none select-none")}
+                   aria-disabled={settings.location.approximate || undefined}>
+                {next && (
+                  <div className="mb-4 rounded-card bg-primary/10 p-4">
+                    <div className="text-micro uppercase tracking-wide text-muted-foreground">Next prayer</div>
+                    <div className="mt-1 flex items-baseline justify-between">
+                      <div className="text-title font-bold text-foreground">{next.label}</div>
+                      <div className="text-heading font-medium text-primary">{formatTime(next.time)}</div>
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">in {formatCountdown(next.time.getTime() - now.getTime())}</div>
+                  </div>
+                )}
+                <ul className="divide-y divide-border">
+                  {slots.map((slot) => {
+                    const isNext = next?.name === slot.name;
+                    return (
+                      <li key={slot.name} className={cn("flex items-center justify-between py-3", isNext && "font-semibold text-primary")}>
+                        <span>{slot.label}</span>
+                        <span className="tabular-nums">{formatTime(slot.time)}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
               {!settings.location.approximate && (
                 <button
                   onClick={detectLocation}
@@ -202,7 +211,7 @@ export default function Prayer() {
                   <RefreshCw className="h-3 w-3" /> Update location
                 </button>
               )}
-              {settings.location.label && (
+              {settings.location.label && !settings.location.approximate && (
                 <p className="mt-1 text-micro text-muted-foreground">
                   {settings.location.label} • {settings.location.latitude.toFixed(3)}, {settings.location.longitude.toFixed(3)}
                 </p>
