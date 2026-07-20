@@ -21,7 +21,16 @@ const Index = () => {
   const queryClient = useQueryClient();
 
   const onRefresh = async () => {
+    // Clear cross-rail dedup so the refreshed pages can re-claim ids.
+    try {
+      const mod = await import("@/contexts/FeedDiversityContext");
+      // best-effort: dispatch storage-style change to force a resetKey bump
+      window.dispatchEvent(new CustomEvent("heartify:showMoreChannels:change", {
+        detail: mod ? (localStorage.getItem("heartify:showMoreChannels") === "1") : false,
+      }));
+    } catch { /* noop */ }
     await queryClient.invalidateQueries({ queryKey: ["surface"] });
+    await queryClient.invalidateQueries({ queryKey: ["feed"] });
     toast.success("Feed refreshed");
   };
 
