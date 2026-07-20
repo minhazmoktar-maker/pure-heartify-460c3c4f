@@ -1,7 +1,47 @@
+import { useQuery } from "@tanstack/react-query";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
-import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server, ShieldCheck } from "lucide-react";
+
+type TrustStats = {
+  approved_channels: number;
+  reviewed_videos: number;
+  removed_videos: number;
+  languages_covered: number;
+  generated_at: string;
+};
+
+function useTrustStats() {
+  return useQuery({
+    queryKey: ["trust-stats"],
+    queryFn: async (): Promise<TrustStats | null> => {
+      const { data, error } = await supabase.rpc("get_trust_stats");
+      if (error) throw error;
+      return (data as unknown as TrustStats) ?? null;
+    },
+    staleTime: 60 * 60 * 1000, // 1h — aggregate counts move slowly
+    gcTime: 6 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+function StatTile({ label, value, loading }: { label: string; value?: number; loading: boolean }) {
+  return (
+    <div className="rounded-card border border-border bg-card p-4 text-center">
+      {loading || value === undefined ? (
+        <Skeleton className="mx-auto h-7 w-16" />
+      ) : (
+        <div className="text-heading font-semibold tabular-nums text-foreground">
+          {value.toLocaleString()}
+        </div>
+      )}
+      <div className="mt-1 text-micro uppercase tracking-wider text-muted-foreground">{label}</div>
+    </div>
+  );
+}
 
 /**
  * Public Trust page. App-owned editable content maintained by the Heartify team.
