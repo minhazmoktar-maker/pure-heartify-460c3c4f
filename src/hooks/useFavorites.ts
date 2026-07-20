@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { growth } from "@/lib/growthEvents";
+import { requestContextualPush } from "@/components/PushPermissionPrompt";
 
 export interface FavoriteVideo {
   id: string;
