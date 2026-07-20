@@ -47,7 +47,6 @@ export default function AdminDedup() {
       <SEO
         title="Dedup Audit — Heartify Admin"
         description="Cross-rail deduplication audit log"
-        canonical="/admin/dedup"
       />
       <header className="flex items-center justify-between">
         <div>
