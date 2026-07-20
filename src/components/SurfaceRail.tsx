@@ -117,7 +117,7 @@ const SurfaceRail = ({
           "scrollbar-none scroll-smooth [scroll-padding-inline:1rem]",
         )}
       >
-        {isLoading || !shouldLoad
+        {isLoading
           ? Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="w-[240px] shrink-0 snap-start md:w-[280px]">
                 <VideoCardSkeleton />
