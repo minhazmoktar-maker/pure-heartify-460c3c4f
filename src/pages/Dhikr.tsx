@@ -19,6 +19,22 @@ const PRESETS: Preset[] = [
   { id: "lailahaillallah", arabic: "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ", translit: "La ilaha illallah", meaning: "There is no god but Allah", target: 100 },
   { id: "astaghfirullah", arabic: "أَسْتَغْفِرُ ٱللَّٰهَ", translit: "Astaghfirullah", meaning: "I seek Allah's forgiveness", target: 100 },
   { id: "salawat", arabic: "ﷺ", translit: "Salawat on the Prophet", meaning: "Peace and blessings upon him", target: 100 },
+  { id: "hasbiyallah", arabic: "حَسْبِيَ ٱللَّٰهُ لَا إِلَٰهَ إِلَّا هُوَ", translit: "Hasbiyallahu la ilaha illa Huwa", meaning: "Allah is sufficient for me; there is no god but Him", target: 7 },
+  { id: "la-hawla", arabic: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّٰهِ", translit: "La hawla wa la quwwata illa billah", meaning: "There is no power nor might except with Allah", target: 100 },
+  { id: "subhanallah-bihamdih", arabic: "سُبْحَانَ ٱللَّٰهِ وَبِحَمْدِهِ", translit: "SubhanAllahi wa bihamdih", meaning: "Glory to Allah and praise to Him", target: 100 },
+  { id: "subhanallah-azim", arabic: "سُبْحَانَ ٱللَّٰهِ ٱلْعَظِيمِ", translit: "SubhanAllahil-'Azim", meaning: "Glory to Allah the Magnificent", target: 100 },
+  { id: "tahlil-full", arabic: "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ ٱلْمُلْكُ وَلَهُ ٱلْحَمْدُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ", translit: "La ilaha illallahu wahdahu la sharika lah…", meaning: "None worthy of worship but Allah, alone, without partner; His is the dominion and praise, and He is over all things capable", target: 10 },
+  { id: "astaghfirullah-atubu", arabic: "أَسْتَغْفِرُ ٱللَّٰهَ وَأَتُوبُ إِلَيْهِ", translit: "Astaghfirullaha wa atubu ilayh", meaning: "I seek Allah's forgiveness and repent to Him", target: 100 },
+  { id: "sayyid-istighfar", arabic: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ…", translit: "Sayyid al-Istighfar", meaning: "The chief supplication for forgiveness", target: 1 },
+  { id: "rabbi-ghfirli", arabic: "رَبِّ ٱغْفِرْ لِي وَتُبْ عَلَيَّ", translit: "Rabbighfir li wa tub 'alayya", meaning: "My Lord, forgive me and accept my repentance", target: 100 },
+  { id: "hasbunallah", arabic: "حَسْبُنَا ٱللَّٰهُ وَنِعْمَ ٱلْوَكِيلُ", translit: "Hasbunallahu wa ni'mal-Wakil", meaning: "Allah is sufficient for us, and He is the best Disposer of affairs", target: 7 },
+  { id: "ya-hayyu-ya-qayyum", arabic: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ", translit: "Ya Hayyu ya Qayyum, bi rahmatika astaghith", meaning: "O Ever-Living, O Sustainer, by Your mercy I seek help", target: 33 },
+  { id: "allahumma-salli", arabic: "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ وَعَلَىٰ آلِ مُحَمَّدٍ", translit: "Allahumma salli 'ala Muhammad wa 'ala Ali Muhammad", meaning: "O Allah, send blessings upon Muhammad and the family of Muhammad", target: 100 },
+  { id: "subhan-rabbi-azim", arabic: "سُبْحَانَ رَبِّيَ ٱلْعَظِيمِ", translit: "Subhana Rabbiyal-'Azim", meaning: "Glory to my Lord, the Magnificent", target: 33 },
+  { id: "subhan-rabbi-ala", arabic: "سُبْحَانَ رَبِّيَ ٱلْأَعْلَىٰ", translit: "Subhana Rabbiyal-A'la", meaning: "Glory to my Lord, the Most High", target: 33 },
+  { id: "bismillah", arabic: "بِسْمِ ٱللَّٰهِ", translit: "Bismillah", meaning: "In the name of Allah", target: 21 },
+  { id: "allahumma-inni-asaluka-jannah", arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ ٱلْجَنَّةَ وَأَعُوذُ بِكَ مِنَ ٱلنَّارِ", translit: "Allahumma inni as'alukal-Jannah wa a'udhu bika minan-Nar", meaning: "O Allah, I ask You for Paradise and seek refuge from the Fire", target: 7 },
+  { id: "rabbana-atina", arabic: "رَبَّنَا آتِنَا فِي ٱلدُّنْيَا حَسَنَةً وَفِي ٱلْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ ٱلنَّارِ", translit: "Rabbana atina fid-dunya hasanah…", meaning: "Our Lord, give us good in this world and the next, and save us from the punishment of the Fire", target: 7 },
 ];
 
 const STORAGE = "heartify:dhikr:v1";
