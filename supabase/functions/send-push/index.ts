@@ -6,6 +6,7 @@
 // spamming/harassing arbitrary users with fake push notifications.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { canSendPush, recordPushSend } from "../_shared/pushCap.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -68,6 +69,19 @@ Deno.serve(async (req) => {
       if (!isAdmin) return json({ error: "forbidden" }, 403);
     }
 
+    // Server-side push cap: max 3 push notifications per user / rolling 7d.
+    // Admin-originated pushes still count — the cap protects the user, not
+    // the sender. Callers should surface remaining-quota UI when relevant.
+    const cap = await canSendPush(admin, user_id);
+    if (!cap.ok) {
+      return json({
+        ok: false,
+        skipped: "push_cap_exceeded",
+        sent_last_7d: cap.sent,
+        limit: cap.limit,
+      }, 429);
+    }
+
     const { data: tokens, error } = await admin
       .from("device_tokens")
       .select("token, platform")
@@ -75,6 +89,7 @@ Deno.serve(async (req) => {
     if (error) throw error;
 
     const results: unknown[] = [];
+    let delivered = 0;
     if (FCM_SERVER_KEY && tokens?.length) {
       for (const t of tokens) {
         const res = await fetch("https://fcm.googleapis.com/fcm/send", {
@@ -89,15 +104,31 @@ Deno.serve(async (req) => {
             data: data ?? {},
           }),
         });
+        if (res.ok) delivered++;
         results.push({ token: t.token.slice(0, 8), status: res.status });
       }
+    }
+
+    // Record the send so it counts toward the 7-day cap.
+    if (delivered > 0) {
+      await recordPushSend(admin, {
+        user_id,
+        kind: (data && typeof data === "object" && "kind" in (data as object)
+          ? String((data as Record<string, unknown>).kind)
+          : "generic"),
+        title,
+        body: body ?? null,
+        data: (data ?? {}) as Record<string, unknown>,
+      });
     }
 
     return json({
       ok: true,
       recipients: tokens?.length ?? 0,
-      delivered: !!FCM_SERVER_KEY,
+      delivered: delivered,
+      fcm_configured: !!FCM_SERVER_KEY,
       results,
+      quota: { sent_last_7d: cap.sent + (delivered > 0 ? 1 : 0), limit: cap.limit },
     });
   } catch (e) {
     return json({ error: String(e) }, 500);

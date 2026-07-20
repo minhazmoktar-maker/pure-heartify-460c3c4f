@@ -10,6 +10,7 @@
  */
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.103.0/cors";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.103.0";
+import { canSendPush } from "../_shared/pushCap.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -96,7 +97,20 @@ Deno.serve(async (req) => {
     const ctaLabel = "Complete today's dose";
     const ctaUrl = "/?focus=daily-dose";
 
-    // In-app notification (always).
+    // Decide push eligibility (server-side 3-per-7d cap) before we insert
+    // the record so `data.channel` reflects the actual delivery surface.
+    const { data: tokens } = await supabase
+      .from("device_tokens")
+      .select("token")
+      .eq("user_id", row.user_id);
+
+    const hasPushSurface = !!tokens?.length && !!FCM_SERVER_KEY;
+    const cap = hasPushSurface
+      ? await canSendPush(supabase, row.user_id)
+      : { ok: false, sent: 0, limit: 0 };
+    const willPush = hasPushSurface && cap.ok;
+
+    // In-app notification (always). Marks channel so the cap counts push sends.
     await supabase.from("user_notifications").insert({
       user_id: row.user_id,
       kind: "streak_risk",
@@ -107,21 +121,16 @@ Deno.serve(async (req) => {
         cta_label: ctaLabel,
         cta_url: ctaUrl,
         url: ctaUrl,
+        channel: willPush ? "push" : "in_app",
       },
     });
 
-    // Push (if we have tokens + FCM configured).
-    const { data: tokens } = await supabase
-      .from("device_tokens")
-      .select("token")
-      .eq("user_id", row.user_id);
-
-    if (!tokens?.length || !FCM_SERVER_KEY) {
+    if (!willPush) {
       inAppOnly++;
       continue;
     }
 
-    for (const t of tokens) {
+    for (const t of tokens!) {
       const res = await fetch("https://fcm.googleapis.com/fcm/send", {
         method: "POST",
         headers: {
@@ -152,7 +161,6 @@ Deno.serve(async (req) => {
       });
       if (res.ok) sent++;
     }
-
   }
 
   return new Response(
