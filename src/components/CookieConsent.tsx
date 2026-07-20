@@ -30,12 +30,17 @@ export default function CookieConsent() {
     setVisible(false);
   };
 
-  // Auto-dismiss as "essential only" on first scroll / navigation intent.
+  // Auto-dismiss as "essential only" on first scroll / navigation intent
+  // OR after 6s so the toast never persistently covers the bottom tab bar.
   useEffect(() => {
     if (!visible) return;
     const onScroll = () => { if (window.scrollY > 120) decide("essential"); };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const t = window.setTimeout(() => decide("essential"), 6000);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(t);
+    };
   }, [visible]);
 
   if (!visible) return null;
@@ -45,7 +50,7 @@ export default function CookieConsent() {
       role="region"
       aria-live="polite"
       aria-label="Cookie preferences"
-      className="fixed inset-x-2 bottom-[calc(env(safe-area-inset-bottom)+72px)] z-[70] md:inset-x-auto md:right-4 md:bottom-4 md:max-w-md"
+      className="fixed inset-x-2 bottom-[calc(env(safe-area-inset-bottom)+96px)] z-[70] md:inset-x-auto md:right-4 md:bottom-4 md:max-w-md"
     >
       <div className="flex items-center gap-3 rounded-pill border border-border bg-card/95 py-2 pl-4 pr-2 shadow-e2 backdrop-blur supports-[backdrop-filter]:bg-card/85">
         <p className="min-w-0 flex-1 truncate text-caption text-muted-foreground">
