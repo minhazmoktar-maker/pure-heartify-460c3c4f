@@ -161,18 +161,18 @@ export const clearDedupAudit = () => {
 };
 
 export const FeedDiversityProvider = ({ children }: { children: ReactNode }) => {
-  // Hydrate from sessionStorage so cross-navigation dedup survives.
-  const seenVideoIds = useRef<Set<string>>(new Set());
-  const ownersRef = useRef<Map<string, string>>(new Map());
-  const [showMoreChannels, setShowMoreChannelsState] = useState<boolean>(readShowMoreInitial);
-  const [resetKey, setResetKey] = useState(0);
-
-  // One-time hydration on mount.
-  useEffect(() => {
+  // Hydrate from sessionStorage synchronously on first render so the seen-set
+  // is available before the very first claim() call (route navigations must
+  // not have a race window where duplicates could slip through).
+  const seenVideoIds = useRef<Set<string>>(null as unknown as Set<string>);
+  const ownersRef = useRef<Map<string, string>>(null as unknown as Map<string, string>);
+  if (seenVideoIds.current === null) {
     const persisted = readPersistedSeen();
     seenVideoIds.current = new Set(persisted.ids);
     ownersRef.current = new Map(Object.entries(persisted.owners));
-  }, []);
+  }
+  const [showMoreChannels, setShowMoreChannelsState] = useState<boolean>(readShowMoreInitial);
+  const [resetKey, setResetKey] = useState(0);
 
   const flush = useCallback(() => {
     writePersistedSeen(seenVideoIds.current, ownersRef.current);
