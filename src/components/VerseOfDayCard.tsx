@@ -93,13 +93,33 @@ const VerseOfDayCard = () => {
         {resume ? "Resume reading" : "Verse of the day"}
       </div>
       {ayah ? (
-        <div className="mt-2 space-y-2">
-          <p dir="rtl" lang="ar" className="line-clamp-2 text-right font-arabic text-xl leading-loose text-foreground" style={{ fontFeatureSettings: '"liga", "calt", "kern", "rlig", "mset"' }}>
+        <motion.div
+          className="mt-2 space-y-2"
+          initial={shouldReveal ? { opacity: 0, y: 8, filter: "blur(6px)" } : false}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: shouldReveal ? 0.05 : 0 }}
+        >
+          <motion.p
+            dir="rtl"
+            lang="ar"
+            className="line-clamp-2 text-right font-arabic text-xl leading-loose text-foreground"
+            style={{ fontFeatureSettings: '"liga", "calt", "kern", "rlig", "mset"' }}
+            initial={shouldReveal ? { opacity: 0, y: 6 } : false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: shouldReveal ? 0.15 : 0 }}
+          >
             {ayah.arabic}
-          </p>
+          </motion.p>
 
-          <p className="line-clamp-2 text-sm text-muted-foreground">{ayah.english}</p>
-        </div>
+          <motion.p
+            className="line-clamp-2 text-sm text-muted-foreground"
+            initial={shouldReveal ? { opacity: 0 } : false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: shouldReveal ? 0.5 : 0 }}
+          >
+            {ayah.english}
+          </motion.p>
+        </motion.div>
       ) : (
         <div className="mt-2 space-y-2">
           <Skeleton className="h-5 w-full" />
