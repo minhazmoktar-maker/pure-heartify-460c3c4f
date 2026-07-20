@@ -45,8 +45,19 @@ const SurfaceRail = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const shouldLoad = usePriorityGate(sectionRef, priority);
 
-  const { items, isLoading, meta } = useSurface(surface, { enabled: shouldLoad });
+  const { items: rawItems, isLoading, meta } = useSurface(surface, { enabled: shouldLoad });
   const { track } = useImpressionTracker(true);
+
+  // Cross-rail dedup: claim video ids first-come-first-served so the same
+  // video never appears in multiple rails (or in the infinite grid below).
+  const { seenVideoIds, resetKey } = useFeedDiversity();
+  const items = useMemo(() => {
+    const seen = seenVideoIds.current;
+    const filtered = rawItems.filter((v) => !seen.has(v.id));
+    for (const v of filtered) seen.add(v.id);
+    return filtered;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawItems, resetKey, seenVideoIds]);
 
   useEffect(() => {
     if (!items.length) return;
