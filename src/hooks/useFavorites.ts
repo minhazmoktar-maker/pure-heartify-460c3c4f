@@ -139,6 +139,10 @@ export function useFavorites() {
           : "Removed from bookmarks",
         duration: 2500,
       });
+      // Contextual push ask — only after signed-in user adds a bookmark.
+      if (result.action === "added" && user) {
+        requestContextualPush("favorite");
+      }
     },
     onError: () => {
       toast({ title: "Failed to update bookmark", variant: "destructive", duration: 2000 });
