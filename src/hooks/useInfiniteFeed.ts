@@ -18,6 +18,14 @@ interface UseFeedOptions {
   limit?: number;
   enabled?: boolean;
   sort?: FeedSort;
+  /**
+   * Optional accessor for the current cross-rail seen-set. Called at
+   * request time (NOT part of the query key) so the server can drop
+   * already-claimed ids before they ever reach the wire. This makes
+   * server-side dedup work across pagination — every fetchNextPage()
+   * excludes everything the rails and previous pages have shown.
+   */
+  getExcludeIds?: () => string[];
 }
 
 /**
@@ -51,6 +59,7 @@ async function fetchFeedPage(opts: {
   contentLanguages: string[];
   sort?: FeedSort;
   sessionId: string;
+  excludeIds: string[];
 }): Promise<FeedPage> {
   const { data, error } = await supabase.functions.invoke("feed", {
     body: {
@@ -62,6 +71,7 @@ async function fetchFeedPage(opts: {
       content_languages: opts.contentLanguages,
       sort: opts.sort,
       session_id: opts.sessionId,
+      exclude_ids: opts.excludeIds,
     },
   });
 
