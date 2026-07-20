@@ -27,6 +27,13 @@ const TodayHero = () => {
     () => (user?.user_metadata?.full_name as string | undefined) ?? firstName(user?.email),
     [user],
   );
+  // Prewarm the /today offline cache so returning users have a fully
+  // populated Today screen even if they lose connectivity mid-session.
+  useEffect(() => {
+    const idle = (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
+    const run = () => { void import("@/pages/Today").then((m) => m.loadDaily?.()).catch(() => {}); };
+    if (idle) idle(run); else window.setTimeout(run, 1200);
+  }, []);
   return (
     <>
       <h1 className="sr-only">Heartify — your day: prayer, streak, verse, and daily dose</h1>
