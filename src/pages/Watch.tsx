@@ -199,11 +199,14 @@ const Watch = () => {
       <div className="mx-auto max-w-[1800px] px-4 py-4 md:px-6 lg:flex lg:gap-6">
         <div className="min-w-0 flex-1">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => {
+              if (window.history.length > 1) navigate(-1);
+              else navigate("/");
+            }}
             className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to browse
+            Back
           </button>
 
           {isEmbeddableVideo ? (
