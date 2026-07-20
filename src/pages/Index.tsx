@@ -142,7 +142,8 @@ const Index = () => {
               <WeeklyRecapCard />
             </div>
 
-            {signedInRails}
+            {signedInPrimary}
+            {showMoreRails ? signedInSecondary : showMoreButton}
 
             <section aria-label="Keep exploring" className="mx-auto max-w-[1800px] px-4 pt-6 md:px-6">
               <h2 className="text-title font-semibold mb-3">Keep exploring</h2>
@@ -154,7 +155,8 @@ const Index = () => {
         ) : (
           <>
             {/* Signed-out: content first, marketing below the fold. */}
-            {signedOutRails}
+            {signedOutPrimary}
+            {showMoreRails ? signedOutSecondary : showMoreButton}
 
             <section aria-label="Keep exploring" className="mx-auto max-w-[1800px] px-4 pt-6 md:px-6">
               <h2 className="text-title font-semibold mb-3">Keep exploring</h2>
