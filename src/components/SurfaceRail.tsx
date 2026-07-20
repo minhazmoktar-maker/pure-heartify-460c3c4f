@@ -45,19 +45,22 @@ const SurfaceRail = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const shouldLoad = usePriorityGate(sectionRef, priority);
 
-  const { items: rawItems, isLoading, meta } = useSurface(surface, { enabled: shouldLoad });
+  const { claim, getSeenSnapshot, resetKey } = useFeedDiversity();
+  const { items: rawItems, isLoading, meta } = useSurface(surface, {
+    enabled: shouldLoad,
+    // Server-side dedup: exclude ids already claimed by earlier rails so
+    // the response can't contain them in the first place. Client-side
+    // claim() below is the second line of defense.
+    getExcludeIds: getSeenSnapshot,
+  });
   const { track } = useImpressionTracker(true);
 
-  // Cross-rail dedup: claim video ids first-come-first-served so the same
-  // video never appears in multiple rails (or in the infinite grid below).
-  const { seenVideoIds, resetKey } = useFeedDiversity();
   const items = useMemo(() => {
-    const seen = seenVideoIds.current;
-    const filtered = rawItems.filter((v) => !seen.has(v.id));
-    for (const v of filtered) seen.add(v.id);
-    return filtered;
+    const out: typeof rawItems = [];
+    for (const v of rawItems) if (claim(v.id, `surface:${surface}`)) out.push(v);
+    return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawItems, resetKey, seenVideoIds]);
+  }, [rawItems, resetKey, claim, surface]);
 
   useEffect(() => {
     if (!items.length) return;
