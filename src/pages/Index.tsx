@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
 
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
+const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
 
 const Index = () => {
   const { user } = useAuth();
