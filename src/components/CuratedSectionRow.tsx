@@ -39,6 +39,13 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  // Diversity context: per-channel cap AND cross-section dedup. Sections
+  // now share overlapping category pools (see feed edge function's
+  // SECTION_CATEGORY_ALIASES), so without a cross-row seen set the same
+  // Quran recitation could appear in 4 different rows. Row order = claim
+  // order: earlier sections claim first, later sections filter them out.
+  const { perChannelCap, claim, getSeenSnapshot, resetKey } = useFeedDiversity();
+
   // DB-backed feed (paginated). We fetch pages until we reach TARGET or run out.
   const {
     data: feedData,
@@ -50,6 +57,8 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
     sectionId: section.id,
     limit: TARGET,
     enabled: shouldLoad,
+    // Server-side dedup — never receive an id already claimed by an earlier rail.
+    getExcludeIds: getSeenSnapshot,
   });
 
   const dbVideos = useMemo(
@@ -68,36 +77,28 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
 
   const rawVideos = dbVideos.length > 0 ? dbVideos : (ytVideos ?? []);
 
-  // Diversity context: per-channel cap AND cross-section dedup. Sections
-  // now share overlapping category pools (see feed edge function's
-  // SECTION_CATEGORY_ALIASES), so without a cross-row seen set the same
-  // Quran recitation could appear in 4 different rows. Row order = claim
-  // order: earlier sections claim first, later sections filter them out.
-  const { perChannelCap, seenVideoIds, resetKey } = useFeedDiversity();
 
-  // In-section dedup + per-channel cap + cross-section dedup.
+  // In-section dedup + per-channel cap + cross-section dedup via claim().
   const videos = useMemo(() => {
     const seenLocal = new Set<string>();
     const perChannel = new Map<string, number>();
     const out: typeof rawVideos = [];
-    const globalSeen = seenVideoIds.current;
     for (const v of rawVideos) {
       if (seenLocal.has(v.id)) continue;
-      if (globalSeen.has(v.id)) continue;
       const key = (v.channelTitle || "unknown").toLowerCase().trim();
       const count = perChannel.get(key) ?? 0;
       if (count >= perChannelCap) continue;
+      // claim() atomically checks & inserts into the session-persisted
+      // seen-set and logs a dedup event if another rail already had it.
+      if (!claim(v.id, `curated:${section.id}`)) continue;
       seenLocal.add(v.id);
       perChannel.set(key, count + 1);
       out.push(v);
       if (out.length >= TARGET) break;
     }
-    // Publish claims so later rows skip these ids. Idempotent on re-render.
-    for (const v of out) globalSeen.add(v.id);
     return out;
-    // resetKey lets the diversity toggle wipe claims and re-materialize.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawVideos, perChannelCap, resetKey, seenVideoIds]);
+  }, [rawVideos, perChannelCap, resetKey, claim, section.id]);
 
   // Auto-paginate the DB feed until we hit TARGET or run out of pages.
   useEffect(() => {

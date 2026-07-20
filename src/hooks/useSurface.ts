@@ -81,7 +81,20 @@ export interface UseSurfaceResult {
  * pool with any other rail: the edge function routes to a dedicated
  * retriever with its own SQL and contract.
  */
-export function useSurface(surface: SurfaceName, opts: { enabled?: boolean; kidsMode?: boolean } = {}): UseSurfaceResult {
+export function useSurface(
+  surface: SurfaceName,
+  opts: {
+    enabled?: boolean;
+    kidsMode?: boolean;
+    /**
+     * Optional accessor for the current cross-rail seen-set. Called at
+     * request time (NOT part of the query key) so the server can drop
+     * already-claimed ids before they ever reach the wire. Client-side
+     * dedup remains as belt-and-suspenders.
+     */
+    getExcludeIds?: () => string[];
+  } = {},
+): UseSurfaceResult {
   const { preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
   const sessionId = getSessionId();
@@ -96,12 +109,15 @@ export function useSurface(surface: SurfaceName, opts: { enabled?: boolean; kids
     gcTime: 15 * 60_000,
     retry: 1,
     queryFn: async () => {
+      // Cap exclude payload to keep request body small (~64 KB max).
+      const excludeIds = (opts.getExcludeIds?.() ?? []).slice(-1500);
       const { data, error } = await supabase.functions.invoke("surfaces", {
         body: {
           surface,
           session_id: sessionId,
           content_languages: contentLanguages,
           kids_mode: opts.kidsMode ?? false,
+          exclude_ids: excludeIds,
         },
       });
       if (error) throw new Error(error.message || `surface:${surface} failed`);

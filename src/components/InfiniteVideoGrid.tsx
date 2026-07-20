@@ -26,6 +26,7 @@ const InfiniteVideoGrid = ({
   sort = "fresh",
   fallbackMessage = "No halal-compliant content found.",
 }: Props) => {
+  const { claim, getSeenSnapshot, resetKey } = useFeedDiversity();
   const {
     data,
     isLoading,
@@ -33,7 +34,17 @@ const InfiniteVideoGrid = ({
     hasNextPage,
     fetchNextPage,
     error,
-  } = useInfiniteFeed({ category, sectionId, search, limit, sort });
+  } = useInfiniteFeed({
+    category,
+    sectionId,
+    search,
+    limit,
+    sort,
+    // Server-side dedup: freshly-claimed ids from the rails above are
+    // sent as exclude_ids on every page fetch so pagination can never
+    // pull them back in.
+    getExcludeIds: getSeenSnapshot,
+  });
 
   const sentinelRef = useInfiniteScroll(
     () => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); },
@@ -41,20 +52,12 @@ const InfiniteVideoGrid = ({
   );
 
   const rawVideos = data?.pages.flatMap((p) => p.items) ?? [];
-  const { seenVideoIds, resetKey } = useFeedDiversity();
   const allVideos = useMemo(() => {
-    const seen = seenVideoIds.current;
-    const localSeen = new Set<string>();
     const out: typeof rawVideos = [];
-    for (const v of rawVideos) {
-      if (localSeen.has(v.id) || seen.has(v.id)) continue;
-      localSeen.add(v.id);
-      out.push(v);
-    }
-    for (const v of out) seen.add(v.id);
+    for (const v of rawVideos) if (claim(v.id, "infinite_grid")) out.push(v);
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawVideos, resetKey, seenVideoIds]);
+  }, [rawVideos, resetKey, claim]);
   const gridRef = useRef<HTMLDivElement>(null);
   const { track } = useImpressionTracker(!isLoading && !error);
 
