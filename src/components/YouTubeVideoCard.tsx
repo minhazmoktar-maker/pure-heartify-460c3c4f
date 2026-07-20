@@ -119,7 +119,10 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           {video.channelTitle[0]}
         </div>
         <div className="min-w-0">
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
+          <h3
+            className="line-clamp-2 font-sans text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-primary"
+            style={{ textWrap: "balance" } as React.CSSProperties}
+          >
             {video.title}
           </h3>
           <div className="mt-1 flex items-center gap-1 text-micro text-muted-foreground">
