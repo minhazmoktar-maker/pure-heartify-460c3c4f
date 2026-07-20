@@ -154,7 +154,19 @@ const Index = () => {
           </>
         ) : (
           <>
-            {/* Signed-out: content first, marketing below the fold. */}
+            {/* Signed-out personal frame — salaam + next salah + verse of the day.
+                Answers "why open this app?" in one glance before any video rail. */}
+            <section className="mx-auto mt-2 max-w-[1800px] px-4 md:px-6" aria-label="Greeting">
+              <p className="text-sm text-muted-foreground">
+                <span lang="ar" dir="rtl" className="font-quran text-foreground">السلام عليكم</span>
+                {" · welcome to Heartify"}
+              </p>
+            </section>
+            <NextSalahWidget />
+            <section className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6" aria-label="Verse of the day">
+              <VerseOfDayCard />
+            </section>
+
             {signedOutPrimary}
             {showMoreRails ? signedOutSecondary : showMoreButton}
 
