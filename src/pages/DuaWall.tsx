@@ -14,6 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { shareContent } from "@/lib/share";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
+import ShareImageButton from "@/components/ShareImageButton";
 import EmptyState from "@/components/EmptyState";
 import PageSkeleton from "@/components/PageSkeleton";
 
@@ -186,6 +188,26 @@ export default function DuaWall() {
                             </Button>
                           )}
                         </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        <WhatsAppShareButton
+                          message={`Please make du'a: ${d.body.slice(0, 200)}`}
+                          url={`${window.location.origin}/d/${d.id}`}
+                        />
+                        <ShareImageButton
+                          input={{
+                            variant: "dua",
+                            kicker: "A du'a on Heartify",
+                            translation: d.body,
+                            attribution: d.is_anonymous ? "— Anonymous" : "— Shared with the ummah",
+                          }}
+                          meta={{
+                            title: "A du'a on Heartify",
+                            text: d.body.slice(0, 140),
+                            url: `${window.location.origin}/d/${d.id}`,
+                          }}
+                          label="Share as image"
+                        />
                       </div>
                     </CardContent>
                   </Card>
