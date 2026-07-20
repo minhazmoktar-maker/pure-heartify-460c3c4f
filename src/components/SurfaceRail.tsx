@@ -73,6 +73,8 @@ const SurfaceRail = ({
 
   if (hideIfEmpty && !isLoading && shouldLoad && items.length === 0) return null;
 
+  const isEmpty = !isLoading && shouldLoad && items.length === 0;
+
   // Lazy placeholder: for rails past the fold that haven't been gated in yet,
   // reserve vertical space with a lightweight stub instead of mounting a full
   // skeleton row (6 skeleton cards × 11 rails is ~66 nodes at hydration).
@@ -148,7 +150,19 @@ const SurfaceRail = ({
                 <VideoCardSkeleton />
               </div>
             ))
-          : items.map((v, i) => (
+          : isEmpty ? (
+              <div className="mx-1 flex w-full items-center gap-4 rounded-card border border-dashed border-border bg-card/40 px-5 py-6">
+                <div className="shrink-0 rounded-pill bg-primary/10 p-3">
+                  <span aria-hidden className="block h-6 w-6 rounded-pill bg-primary/40" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground">Nothing here yet</p>
+                  <p className="text-micro text-muted-foreground">
+                    New content lands here as our moderators approve it. Pull to refresh or check back soon.
+                  </p>
+                </div>
+              </div>
+            ) : items.map((v, i) => (
               <div key={v.id} className="w-[240px] shrink-0 snap-start md:w-[280px]">
                 <YouTubeVideoCard video={v} index={i} />
               </div>

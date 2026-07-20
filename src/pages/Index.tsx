@@ -13,6 +13,7 @@ import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
 import HomeHero from "@/components/HomeHero";
+import ScholarsRail from "@/components/ScholarsRail";
 
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
 const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
@@ -61,6 +62,7 @@ const Index = () => {
         subtitle="More like your recent watches" hideIfEmpty />
       <SurfaceRail surface="new_videos" title="New uploads"
         subtitle="Just published by trusted creators" />
+      <ScholarsRail />
       <SurfaceRail surface="popular_this_week" title="Popular this week" />
       <SurfaceRail surface="hidden_gems" title="Hidden gems"
         subtitle="Overlooked, high-trust videos" />
@@ -84,6 +86,7 @@ const Index = () => {
   const signedOutSecondary = (
     <main className="mx-auto max-w-[1800px] space-y-1 px-4 pb-2 md:px-6">
       <SurfaceRail surface="new_videos" title="New uploads" />
+      <ScholarsRail />
       <SurfaceRail surface="popular_this_week" title="Popular this week" />
       <SurfaceRail surface="hidden_gems" title="Hidden gems" />
       <SurfaceRail surface="browse" title="Browse" />

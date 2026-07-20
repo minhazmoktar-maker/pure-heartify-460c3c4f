@@ -202,6 +202,7 @@ const Sahaba = lazy(() => import("./pages/Sahaba.tsx"));
 const SalahGuide = lazy(() => import("./pages/SalahGuide.tsx"));
 const SalahTracker = lazy(() => import("./pages/SalahTracker.tsx"));
 const Scholars = lazy(() => import("./pages/Scholars.tsx"));
+const ClaimChannel = lazy(() => import("./pages/ClaimChannel.tsx"));
 const SearchResults = lazy(() => import("./pages/SearchResults.tsx"));
 const SectionAll = lazy(() => import("./pages/SectionAll.tsx"));
 const SeekingKnowledge = lazy(() => import("./pages/SeekingKnowledge.tsx"));
@@ -462,6 +463,8 @@ const App = () => (
                 <Route path="/aqeedah" element={<Aqeedah />} />
                 <Route path="/history" element={<IslamicHistory />} />
                 <Route path="/scholars" element={<Scholars />} />
+                <Route path="/claim-channel" element={<ClaimChannel />} />
+                <Route path="/creators/claim" element={<Navigate to="/claim-channel" replace />} />
                 <Route path="/akhlaq" element={<Akhlaq />} />
                 <Route path="/signs-of-hour" element={<SignsOfHour />} />
                 <Route path="/sunnah-prayers" element={<SunnahPrayers />} />
