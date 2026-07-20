@@ -15,6 +15,7 @@ const DailyDoseHero = lazy(() => import("@/components/DailyDoseHero"));
 const TodayHero = () => {
   return (
     <>
+      <h1 className="sr-only">Heartify — your day: prayer, streak, verse, and daily dose</h1>
       <NextSalahWidget />
       <section className="mx-auto max-w-[1800px] px-4 pt-3 md:px-6" aria-label="Your day at a glance">
         <div className="grid gap-3 md:grid-cols-2">

@@ -8,7 +8,7 @@ const HeroSection = () => {
       <div className="absolute inset-0">
         <img
           src={heroBanner}
-          alt="Heartify hero"
+          alt="Muslim family enjoying curated halal video content on Heartify"
           width={1920}
           height={800}
           loading="eager"
