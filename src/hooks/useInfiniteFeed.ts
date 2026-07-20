@@ -91,6 +91,7 @@ export function useInfiniteFeed({
   limit = 20,
   enabled = true,
   sort = "fresh",
+  getExcludeIds,
 }: UseFeedOptions = {}) {
   const { preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
@@ -109,6 +110,9 @@ export function useInfiniteFeed({
         contentLanguages,
         sort,
         sessionId,
+        // Snapshot at fetch time — deliberately NOT in queryKey so cache
+        // stays warm; server dedup is a defense-in-depth layer.
+        excludeIds: (getExcludeIds?.() ?? []).slice(-1500),
       }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
