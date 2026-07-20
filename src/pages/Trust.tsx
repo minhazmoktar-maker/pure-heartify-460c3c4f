@@ -1,7 +1,47 @@
+import { useQuery } from "@tanstack/react-query";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
-import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server, ShieldCheck } from "lucide-react";
+
+type TrustStats = {
+  approved_channels: number;
+  reviewed_videos: number;
+  removed_videos: number;
+  languages_covered: number;
+  generated_at: string;
+};
+
+function useTrustStats() {
+  return useQuery({
+    queryKey: ["trust-stats"],
+    queryFn: async (): Promise<TrustStats | null> => {
+      const { data, error } = await supabase.rpc("get_trust_stats");
+      if (error) throw error;
+      return (data as unknown as TrustStats) ?? null;
+    },
+    staleTime: 60 * 60 * 1000, // 1h — aggregate counts move slowly
+    gcTime: 6 * 60 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+function StatTile({ label, value, loading }: { label: string; value?: number; loading: boolean }) {
+  return (
+    <div className="rounded-card border border-border bg-card p-4 text-center">
+      {loading || value === undefined ? (
+        <Skeleton className="mx-auto h-7 w-16" />
+      ) : (
+        <div className="text-heading font-semibold tabular-nums text-foreground">
+          {value.toLocaleString()}
+        </div>
+      )}
+      <div className="mt-1 text-micro uppercase tracking-wider text-muted-foreground">{label}</div>
+    </div>
+  );
+}
 
 /**
  * Public Trust page. App-owned editable content maintained by the Heartify team.
@@ -9,6 +49,8 @@ import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Serv
  * independent certification.
  */
 export default function Trust() {
+  const { data: stats, isLoading } = useTrustStats();
+
   return (
     <>
       <SEO
@@ -22,7 +64,26 @@ export default function Trust() {
           subtitle="This page is maintained by the Heartify team to answer common security, privacy, and content questions. It reflects controls currently enabled in the app, not an independent certification."
         />
 
-        <div className="grid gap-4 mt-8">
+        {/* Aggregate moderation stats — anonymised counts only. No moderator
+            identities or per-item data are exposed. Backed by the
+            SECURITY DEFINER RPC public.get_trust_stats(). */}
+        <section aria-label="Moderation at a glance" className="mt-8">
+          <div className="mb-3 flex items-center gap-2 text-micro font-semibold uppercase tracking-wider text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            Moderation at a glance
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatTile label="Approved channels" value={stats?.approved_channels} loading={isLoading} />
+            <StatTile label="Reviewed videos" value={stats?.reviewed_videos} loading={isLoading} />
+            <StatTile label="Videos removed" value={stats?.removed_videos} loading={isLoading} />
+            <StatTile label="Languages covered" value={stats?.languages_covered} loading={isLoading} />
+          </div>
+          <p className="mt-2 text-micro text-muted-foreground">
+            Counts are aggregated from the live moderation ledger and refresh hourly. We never publish individual moderator names or per-decision details.
+          </p>
+        </section>
+
+        <div className="mt-8 grid gap-4">
           <Card className="p-6">
             <div className="flex gap-3 items-start">
               <Shield className="w-5 h-5 text-primary mt-1 shrink-0" />

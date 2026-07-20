@@ -5369,6 +5369,7 @@ export type Database = {
           video_id: string
         }[]
       }
+      get_trust_stats: { Args: never; Returns: Json }
       get_user_dismissed_video_ids: {
         Args: { _limit?: number; _user_id: string }
         Returns: {
