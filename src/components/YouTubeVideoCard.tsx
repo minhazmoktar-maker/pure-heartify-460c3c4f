@@ -125,11 +125,22 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           >
             {video.title}
           </h3>
-          <div className="mt-1 flex items-center gap-1 text-micro text-muted-foreground">
-            <span>{video.channelTitle}</span>
-            <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--gold))]" />
+          <div className="mt-1 flex flex-wrap items-center gap-1.5 text-micro text-muted-foreground">
+            <span className="truncate">{video.channelTitle}</span>
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--gold))]" />
+            {/* Reviewed pill — Heartify's single biggest differentiator vs
+                YouTube. Every card in the pool has passed moderation, so
+                the pill is a subtle trust signal, not a badge of honour. */}
+            <span
+              className="inline-flex items-center gap-0.5 rounded-pill bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary"
+              title="Reviewed by Heartify moderation"
+            >
+              <CheckCircle2 className="h-2.5 w-2.5" aria-hidden />
+              Reviewed
+            </span>
           </div>
           <p className="text-micro text-muted-foreground">{timeAgo}</p>
+
         </div>
       </div>
     </FadeIn>
