@@ -111,11 +111,26 @@ const Index = () => {
             </div>
 
             {signedInRails}
+
+            <section aria-label="Keep exploring" className="mx-auto max-w-[1800px] px-4 pt-6 md:px-6">
+              <h2 className="text-title font-semibold mb-3">Keep exploring</h2>
+              <Suspense fallback={null}>
+                <InfiniteVideoGrid sort="recent" limit={24} />
+              </Suspense>
+            </section>
           </>
         ) : (
           <>
             {/* Signed-out: content first, marketing below the fold. */}
             {signedOutRails}
+
+            <section aria-label="Keep exploring" className="mx-auto max-w-[1800px] px-4 pt-6 md:px-6">
+              <h2 className="text-title font-semibold mb-3">Keep exploring</h2>
+              <Suspense fallback={null}>
+                <InfiniteVideoGrid sort="recent" limit={24} />
+              </Suspense>
+            </section>
+
             <HeroSection />
           </>
         )}
