@@ -1,42 +1,28 @@
-import { Search, Menu, User, LogOut, Moon, Sun, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll, Download } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Search, Menu, User, Moon, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { hasUnseenChangelog } from "@/data/changelog";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import NotificationsBell from "@/components/NotificationsBell";
-import SuggestContentDialog from "@/components/SuggestContentDialog";
-import UpgradeCTA from "@/components/UpgradeCTA";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useRole } from "@/hooks/useRole";
 import { useScrolled } from "@/hooks/useScrolled";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuFilter, setMenuFilter] = useState("");
   const [unseenChangelog, setUnseenChangelog] = useState(false);
-  const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const { isAdmin, isOwner } = useRole();
   const scrolled = useScrolled(8);
-  
+
 
   useEffect(() => { setUnseenChangelog(hasUnseenChangelog()); }, []);
   useEffect(() => { if (!menuOpen) setMenuFilter(""); }, [menuOpen]);
 
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = searchQuery.trim();
-    if (q) {
-      navigate(`/search?q=${encodeURIComponent(q)}`);
-    }
-  };
 
   return (
     <nav
