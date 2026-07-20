@@ -101,6 +101,14 @@ Deno.serve(async (req) => {
       ? body.content_languages.filter((s: unknown) => typeof s === "string")
       : [];
     const kidsMode = Boolean(body?.kids_mode);
+    // Cross-rail dedup: ids already claimed by other rails / pages.
+    const rawExclude = Array.isArray(body?.exclude_ids) ? body.exclude_ids : [];
+    const excludeIds = new Set<string>(
+      rawExclude
+        .filter((s: unknown): s is string => typeof s === "string")
+        .map((s: string) => s.slice(0, 24))
+        .slice(0, 1500),
+    );
 
     // Kick off parallel context loads.
     const [blockedChannels, hiddenVideos, impressions] = await Promise.all([
@@ -120,7 +128,12 @@ Deno.serve(async (req) => {
     const retriever = RETRIEVERS[surface];
     const raw = await retriever(ctx);
     const poolSize = raw.length;
-    const filtered = runUniversalFilters(raw as SurfaceVideo[], ctx, impressions);
+    const universal = runUniversalFilters(raw as SurfaceVideo[], ctx, impressions);
+    // Server-side cross-rail exclude — nothing already shown elsewhere
+    // reaches the wire from this surface.
+    const filtered = excludeIds.size
+      ? universal.filter((v) => !excludeIds.has(v.id))
+      : universal;
     const picked = enforceContract(filtered, contract);
     const stats = computeStats(picked, contract);
     const guarantees = checkGuarantees(picked, contract, stats);
