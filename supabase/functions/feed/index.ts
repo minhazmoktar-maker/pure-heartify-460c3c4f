@@ -32,11 +32,13 @@ function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json",
-      // Personalized responses must not be shared between users. Any CDN in
-      // front must key by Authorization so signed-in users never receive
-      // another user's cached feed. 120s browser cache absorbs the burst of
-      // 30+ curated rows firing on a single Home visit.
-      "Cache-Control": "private, max-age=120",
+      // T4 — Feed is always personalized (impressions, blocklists, kids
+      // mode, premium gating, session shuffle). Never publicly cache.
+      // `private` scopes the entry to the browser; `stale-while-revalidate`
+      // lets the browser paint the last response instantly on repeat visits
+      // while it refreshes in the background. `Vary: Authorization` keeps
+      // any accidental intermediary from mixing user entries.
+      "Cache-Control": "private, max-age=120, stale-while-revalidate=300",
       "Vary": "Authorization",
       ...extra,
     },
