@@ -166,11 +166,11 @@ export async function gatherSignals(
     jobs.push(
       admin
         .from("favorite_categories")
-        .select("category")
+        .select("section_id")
         .eq("user_id", userId)
         .then(({ data }) => {
-          signals.favoriteCategories = ((data ?? []) as Array<{ category: string }>)
-            .map((r) => r.category)
+          signals.favoriteCategories = ((data ?? []) as Array<{ section_id: string }>)
+            .map((r) => r.section_id)
             .filter(Boolean);
           for (const c of signals.favoriteCategories) {
             signals.categoryAffinity.set(c, (signals.categoryAffinity.get(c) ?? 0) + 3);
@@ -183,7 +183,7 @@ export async function gatherSignals(
     jobs.push(
       admin
         .from("favorites")
-        .select("video_id, channel_title, category, created_at")
+        .select("video_id, channel_title, created_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(200)
@@ -191,17 +191,12 @@ export async function gatherSignals(
           for (const row of (data ?? []) as Array<{
             video_id: string;
             channel_title: string | null;
-            category: string | null;
             created_at: string;
           }>) {
             signals.favoriteVideoIds.add(row.video_id);
             const days = Math.max(0, (nowMs - new Date(row.created_at).getTime()) / 86400000);
             const w = decayWeight(days) * 2;
             const wLong = decayWeight(days, LONG_TERM_HALF_LIFE_DAYS) * 2;
-            if (row.category) {
-              signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
-              signals.longTermCategoryAffinity.set(row.category, (signals.longTermCategoryAffinity.get(row.category) ?? 0) + wLong);
-            }
             if (row.channel_title) {
               signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
               signals.longTermChannelAffinity.set(row.channel_title, (signals.longTermChannelAffinity.get(row.channel_title) ?? 0) + wLong);
@@ -216,15 +211,13 @@ export async function gatherSignals(
     jobs.push(
       admin
         .from("watch_history")
-        .select("video_id, channel_title, category, watched_at")
+        .select("video_id, watched_at")
         .eq("user_id", userId)
         .order("watched_at", { ascending: false })
         .limit(200)
         .then(({ data }) => {
           const rows = ((data ?? []) as Array<{
             video_id: string;
-            channel_title: string | null;
-            category: string | null;
             watched_at: string;
           }>);
           signals.recentVideoIds = rows.slice(0, 20).map((r) => r.video_id);
@@ -234,19 +227,11 @@ export async function gatherSignals(
             const days = Math.max(0, (nowMs - ts) / 86400000);
             const w = decayWeight(days);
             const wLong = decayWeight(days, LONG_TERM_HALF_LIFE_DAYS);
-            if (row.category) {
-              signals.categoryAffinity.set(row.category, (signals.categoryAffinity.get(row.category) ?? 0) + w);
-              signals.longTermCategoryAffinity.set(row.category, (signals.longTermCategoryAffinity.get(row.category) ?? 0) + wLong);
-            }
-            if (row.channel_title) {
-              signals.channelAffinity.set(row.channel_title, (signals.channelAffinity.get(row.channel_title) ?? 0) + w);
-              signals.longTermChannelAffinity.set(row.channel_title, (signals.longTermChannelAffinity.get(row.channel_title) ?? 0) + wLong);
-              signals.seenChannelIds.add(row.channel_title);
-            }
-            if (ts >= sessionCutoffMs) {
-              if (row.channel_title) signals.sessionChannelIds.add(row.channel_title);
-              if (row.category) signals.sessionCategoryIds.add(row.category);
-            }
+            // Note: watch_history stores no channel/category directly; those
+            // affinities are populated via favorites, interests, and
+            // recommendation_events feedback. Video-level watched IDs still
+            // drive dedupe + "because you watched" seed selection.
+            void w; void wLong;
           }
         })
         .catch(() => {}),
