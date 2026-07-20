@@ -8,6 +8,7 @@ import NotificationsBell from "@/components/NotificationsBell";
 import { useRole } from "@/hooks/useRole";
 import { useScrolled } from "@/hooks/useScrolled";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
+import Logomark from "@/components/Logomark";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {

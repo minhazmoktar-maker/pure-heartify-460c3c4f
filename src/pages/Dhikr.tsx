@@ -208,9 +208,11 @@ const Dhikr = () => {
             <button
               onClick={() => bump(1)}
               aria-label={`Tap to count ${active.translit}`}
-              className="group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-pill bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-4 border-primary/30 transition-transform active:scale-95 min-h-[280px]"
+              className="btn-physical group relative flex aspect-square w-full max-w-md mx-auto items-center justify-center rounded-pill bg-gradient-to-br from-primary/25 via-primary/10 to-transparent border-4 border-primary/30 min-h-[280px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/60"
             >
               <div className="absolute inset-4 rounded-pill border border-border/60" />
+              {/* Subtle inner ring adds physical depth to the primary CTA */}
+              <div className="pointer-events-none absolute inset-0 rounded-pill shadow-[inset_0_2px_6px_hsl(var(--primary)/0.18)]" aria-hidden />
               {/* Gentle pulse ring on every count — respects prefers-reduced-motion via CSS. */}
               <span
                 key={pulseKey}
@@ -218,7 +220,7 @@ const Dhikr = () => {
                 className="pointer-events-none absolute inset-0 rounded-pill border-2 border-primary/60 motion-safe:animate-ping motion-safe:opacity-0"
               />
               <div className="text-center">
-                <p dir="rtl" className="font-heading text-display text-foreground md:text-display leading-relaxed">
+                <p dir="rtl" lang="ar" className="font-arabic text-display text-foreground md:text-display leading-relaxed" style={{ fontFeatureSettings: '"liga","calt","kern","rlig"' }}>
                   {active.arabic}
                 </p>
                 <p className="mt-4 font-bold tabular-nums text-primary text-[64px] leading-none md:text-[88px]">{count}</p>
