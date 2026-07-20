@@ -129,9 +129,22 @@ export default function Library() {
         )}
 
         {filtered.length === 0 && (
-          <Card className="p-8 text-center text-muted-foreground">
-            No entries match your search.
-          </Card>
+          <EmptyState
+            illustration="no-search-results"
+            icon={Search}
+            title="No entries match"
+            description={
+              q
+                ? `Nothing in the library matches "${q}". Try a different keyword or clear the category filter.`
+                : "No entries match this category yet."
+            }
+            actionLabel="Clear filters"
+            onAction={() => {
+              setQ("");
+              setCat("All");
+              setPage(1);
+            }}
+          />
         )}
       </div>
     </div>
