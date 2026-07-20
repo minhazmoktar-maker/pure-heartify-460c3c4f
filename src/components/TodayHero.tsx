@@ -1,27 +1,46 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import NextSalahWidget from "@/components/NextSalahWidget";
 import { StreakCard } from "@/components/StreakCard";
 import VerseOfDayCard from "@/components/VerseOfDayCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 // DailyDoseHero owns the 3-thumbnail surface. Lazy so the streak + verse
 // cards paint immediately even on cold cache.
 const DailyDoseHero = lazy(() => import("@/components/DailyDoseHero"));
 
+function firstName(email?: string | null): string | null {
+  if (!email) return null;
+  const raw = email.split("@")[0] ?? "";
+  const clean = raw.replace(/[._-]+/g, " ").trim();
+  if (!clean) return null;
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
+}
+
 /**
  * The signed-in "Today shape" — one obvious next action per surface:
- *   Next salah countdown · Streak · Resume-reading verse · 3 daily-dose thumbnails.
- * Kept intentionally sparse so returning users see progress before anything else.
- */
-/**
- * Compact "Right now" hero — one calm surface instead of four stacked cards.
- *   Row 1: Next salah countdown (primary above-the-fold action).
- *   Row 2: Streak + Verse of the day, side by side, quieter chrome.
- *   Row 3: 3 daily-dose thumbnails (lazy).
+ *   Salaam · Next salah countdown · Streak · Verse · Daily dose.
+ * Personal frame answers "why open this app?" in one glance.
  */
 const TodayHero = () => {
+  const { user } = useAuth();
+  const name = useMemo(
+    () => (user?.user_metadata?.full_name as string | undefined) ?? firstName(user?.email),
+    [user],
+  );
   return (
     <>
       <h1 className="sr-only">Heartify — your day: prayer, streak, verse, and daily dose</h1>
+      {user && (
+        <section
+          className="mx-auto mt-2 max-w-[1800px] px-4 md:px-6"
+          aria-label="Greeting"
+        >
+          <p className="text-sm text-muted-foreground">
+            <span lang="ar" dir="rtl" className="font-quran text-foreground">السلام عليكم</span>
+            {name ? <> · <span className="text-foreground">{name}</span></> : null}
+          </p>
+        </section>
+      )}
       <NextSalahWidget />
       <section
         className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6"

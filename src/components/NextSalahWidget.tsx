@@ -109,24 +109,38 @@ export default function NextSalahWidget() {
   const approx = settings.location.approximate;
 
   return (
-    <Link
-      to="/prayer"
-      className="mx-auto mt-3 flex max-w-[1800px] items-center gap-3 rounded-card border border-border bg-card px-4 py-2.5 text-sm shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40 md:mx-6"
-      aria-label={`Next prayer: ${label} in ${countdown}${approx ? " (approximate location)" : ""}`}
-    >
-      <Compass className="h-4 w-4 shrink-0 text-primary" aria-hidden />
-      <span className="font-semibold text-foreground">Next: {label}</span>
-      <span className="text-muted-foreground">
-        {formatTime(next.time)} · in{" "}
-        <span className="tabular-nums font-medium text-foreground">{countdown}</span>
-      </span>
-      {settings.location.label ? (
-        <span className="ml-auto flex items-center gap-1 truncate text-micro text-muted-foreground">
-          <MapPin className="h-3 w-3" aria-hidden />
-          {approx ? <span className="italic">Approx —</span> : null}
-          {settings.location.label}
-        </span>
+    <div className="mx-auto mt-3 max-w-[1800px] space-y-1.5 md:mx-6">
+      {approx && settings.location.label ? (
+        <Link
+          to="/prayer"
+          className="flex items-center gap-2 rounded-card border border-primary/25 bg-primary/5 px-3 py-1.5 text-micro text-muted-foreground transition-colors hover:bg-primary/10"
+          aria-label={`Confirm your location: ${settings.location.label}`}
+        >
+          <MapPin className="h-3 w-3 shrink-0 text-primary" aria-hidden />
+          <span className="min-w-0 truncate">
+            Showing prayer times for <span className="font-medium text-foreground">{settings.location.label}</span>
+          </span>
+          <span className="ml-auto shrink-0 font-semibold text-primary">Confirm</span>
+        </Link>
       ) : null}
-    </Link>
+      <Link
+        to="/prayer"
+        className="flex items-center gap-3 rounded-card border border-border bg-card px-4 py-2.5 text-sm shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40"
+        aria-label={`Next prayer: ${label} in ${countdown}${approx ? " (approximate location)" : ""}`}
+      >
+        <Compass className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+        <span className="font-semibold text-foreground">Next: {label}</span>
+        <span className="text-muted-foreground">
+          {formatTime(next.time)} · in{" "}
+          <span className="tabular-nums font-medium text-foreground">{countdown}</span>
+        </span>
+        {settings.location.label && !approx ? (
+          <span className="ml-auto flex items-center gap-1 truncate text-micro text-muted-foreground">
+            <MapPin className="h-3 w-3" aria-hidden />
+            {settings.location.label}
+          </span>
+        ) : null}
+      </Link>
+    </div>
   );
 }

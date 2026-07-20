@@ -1,4 +1,4 @@
-import { Search, Menu, User, Moon, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll, Download } from "lucide-react";
+import { Search, Menu, Moon, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { hasUnseenChangelog } from "@/data/changelog";
 import { Link } from "react-router-dom";
@@ -192,10 +192,9 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 whitespace-nowrap rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
+              className="inline-flex items-center whitespace-nowrap rounded-pill px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
             >
-              <User className="h-4 w-4 shrink-0" />
-              <span className="whitespace-nowrap">Sign in</span>
+              Sign in
             </Link>
           )}
         </div>
