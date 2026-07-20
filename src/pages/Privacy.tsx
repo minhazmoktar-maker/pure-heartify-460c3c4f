@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import CookiePreferencesPanel from "@/components/CookiePreferencesPanel";
+
 
 const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
   <section id={id} className="scroll-mt-24">
@@ -47,6 +49,15 @@ const Privacy = () => {
             Service, you acknowledge that you have read and understood this Policy.
           </p>
         </header>
+
+        {/* Discoverable Manage-cookies panel sits at the top of the policy
+            so users looking to change their mind never have to hunt for it. */}
+        <div className="mt-8">
+          <CookiePreferencesPanel />
+        </div>
+
+
+
 
         <div className="mt-10 space-y-10 text-sm leading-relaxed">
           <Section id="introduction" title="1. Introduction">

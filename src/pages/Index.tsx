@@ -12,8 +12,7 @@ import RamadanBanner from "@/components/RamadanBanner";
 import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
-import NextSalahWidget from "@/components/NextSalahWidget";
-import VerseOfDayCard from "@/components/VerseOfDayCard";
+import HomeHero from "@/components/HomeHero";
 
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
 const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
@@ -134,7 +133,10 @@ const Index = () => {
 
         {user ? (
           <>
-            {/* Signed-in Today shape: next salah · streak · verse · daily dose */}
+            {/* One collapsed hero — greeting + next salah + today's ayah
+                stacked in a single card; resume-in-1-tap overrides it when
+                a continue-watching item exists. Search pill lives on top. */}
+            <HomeHero />
             <TodayHero />
 
             <div className="mx-auto max-w-[1800px] space-y-3 px-4 pt-3 md:px-6">
@@ -156,27 +158,16 @@ const Index = () => {
           </>
         ) : (
           <>
-            {/* Signed-out personal frame — salaam + next salah + verse of the day.
-                Answers "why open this app?" in one glance before any video rail. */}
-            <section className="mx-auto mt-2 max-w-[1800px] px-4 md:px-6" aria-label="Greeting">
-              <p className="text-sm text-muted-foreground">
-                <span lang="ar" dir="rtl" className="font-quran text-foreground">السلام عليكم</span>
-                {" · welcome to Heartify"}
-              </p>
-            </section>
-            <NextSalahWidget />
-            <section className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6" aria-label="Verse of the day">
-              <VerseOfDayCard />
-              {/* Quiet first-session hook — never pushy, one line, dismissible
-                  by simply signing in. Converts anon Verse-of-day readers into
-                  streak-tracked returning users. */}
-              <p className="mt-2 text-center text-caption text-muted-foreground">
-                <a href="/login" className="underline underline-offset-2 hover:text-foreground">
-                  Sign in
-                </a>{" "}
-                to save your streak and pick up where you left off.
-              </p>
-            </section>
+            {/* Signed-out collapsed hero — same one-card shape, no resume.
+                Sign-in nudge lives inside the primary rails block below. */}
+            <HomeHero />
+            <p className="mx-auto mt-2 max-w-[1800px] px-4 text-center text-caption text-muted-foreground md:px-6">
+              <a href="/login" className="underline underline-offset-2 hover:text-foreground">
+                Sign in
+              </a>{" "}
+              to save your streak and pick up where you left off.
+            </p>
+
 
             {signedOutPrimary}
             {showMoreRails ? signedOutSecondary : showMoreButton}

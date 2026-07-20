@@ -103,15 +103,21 @@ const SurfaceRail = ({
 
   const scrollBy = (dx: number) => scrollRef.current?.scrollBy({ left: dx, behavior: "smooth" });
 
+  // Editorial hierarchy — "For you" and "Continue watching" are hero rails
+  // (larger, bolder). Everything else uses a quieter secondary size so the
+  // page reads like an edited magazine, not a wall of same-weight titles.
+  const isHero = surface === "for_you" || surface === "continue_watching";
+  const titleCls = isHero
+    ? "font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl"
+    : "font-sans text-lg font-semibold tracking-tight text-foreground md:text-xl";
   return (
     <section ref={sectionRef} className="pt-6" aria-label={title}>
       <div className="mb-2 flex items-baseline justify-between px-1">
         <div>
-          <h2 className="font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-            {title}
-          </h2>
+          <h2 className={titleCls}>{title}</h2>
           {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
         </div>
+
         <div className="hidden items-center gap-1 md:flex">
           {seeAllHref && (
             <Link to={seeAllHref} className="mr-2 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
