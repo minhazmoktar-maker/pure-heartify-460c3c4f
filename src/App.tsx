@@ -327,6 +327,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
+                <Route path="/guides/best-islamic-cartoons" element={<BestIslamicCartoons />} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/account/export-data" element={<ExportData />} />
