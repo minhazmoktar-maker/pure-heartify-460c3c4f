@@ -8,6 +8,7 @@ import NotificationsBell from "@/components/NotificationsBell";
 import { useRole } from "@/hooks/useRole";
 import { useScrolled } from "@/hooks/useScrolled";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
+import Logomark from "@/components/Logomark";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {
@@ -148,10 +149,8 @@ const Navbar = () => {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-card bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">H</span>
-            </div>
+          <Link to="/" className="flex items-center gap-2" aria-label="Heartify — home">
+            <Logomark size={32} />
             <span className="hidden font-heading text-heading font-bold text-foreground sm:block">
               Heartify
             </span>
