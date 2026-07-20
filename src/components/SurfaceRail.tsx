@@ -6,6 +6,7 @@ import VideoCardSkeleton from "@/components/VideoCardSkeleton";
 import { useSurface, type SurfaceName } from "@/hooks/useSurface";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import { isClickbaitTitle } from "@/lib/clickbait";
 import { cn } from "@/lib/utils";
 
 interface Props {
