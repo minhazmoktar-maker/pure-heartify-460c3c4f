@@ -192,10 +192,9 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 whitespace-nowrap rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
+              className="inline-flex items-center whitespace-nowrap rounded-pill px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
             >
-              <User className="h-4 w-4 shrink-0" />
-              <span className="whitespace-nowrap">Sign in</span>
+              Sign in
             </Link>
           )}
         </div>
