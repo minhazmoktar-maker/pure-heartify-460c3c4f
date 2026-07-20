@@ -54,6 +54,34 @@ const SurfaceRail = ({
 
   if (hideIfEmpty && !isLoading && shouldLoad && items.length === 0) return null;
 
+  // Lazy placeholder: for rails past the fold that haven't been gated in yet,
+  // reserve vertical space with a lightweight stub instead of mounting a full
+  // skeleton row (6 skeleton cards × 11 rails is ~66 nodes at hydration).
+  // The IntersectionObserver in usePriorityGate promotes this to the full rail
+  // as it approaches the viewport.
+  if (!shouldLoad) {
+    return (
+      <section
+        ref={sectionRef}
+        aria-label={title}
+        className="pt-6"
+        data-surface={surface}
+        data-lazy="pending"
+      >
+        <div className="mb-2 px-1">
+          <h2 className="font-display text-xl font-semibold tracking-tight text-foreground md:text-2xl">
+            {title}
+          </h2>
+          {subtitle && <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>}
+        </div>
+        <div
+          aria-hidden
+          className="h-[180px] rounded-lg bg-surface-1/40 md:h-[210px]"
+        />
+      </section>
+    );
+  }
+
   const scrollBy = (dx: number) => scrollRef.current?.scrollBy({ left: dx, behavior: "smooth" });
 
   return (
