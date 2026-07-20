@@ -207,9 +207,34 @@
     @apply transition-all duration-short ease-standard hover:-translate-y-0.5 hover:shadow-e2 focus-visible:-translate-y-0.5 focus-visible:shadow-e2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:translate-y-0 active:scale-[0.99] motion-reduce:transform-none motion-reduce:transition-none;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Card elevation tiers. Three levels, always applied via these utils. */
+  /* card-flat  → default surfaces (rails, list rows, empty cards)      */
+  /* card-raised → mid-priority surfaces (Today rails, resume cards)    */
+  /* card-hero  → the ONE hero surface per screen (Next salah, streak)  */
+  /* ------------------------------------------------------------------ */
+  .card-flat {
+    @apply rounded-card border border-border bg-card;
+  }
+  .card-raised {
+    @apply rounded-card border border-border bg-card shadow-e1;
+  }
+  .card-hero {
+    @apply rounded-card border border-primary/25 bg-card shadow-e2;
+  }
+
   /* Canonical tactile pressable (buttons, chips, list rows). */
   .pressable {
     @apply transition-transform duration-micro ease-standard active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none;
+  }
+
+  /* Physical primary CTA — press-in inner shadow + released elevation.
+     Used for the Dhikr counter and any other "primary interaction of the
+     screen" button that needs to feel tactile under the thumb. */
+  .btn-physical {
+    @apply shadow-e2 transition-[transform,box-shadow] duration-micro ease-standard
+           active:scale-[0.97] active:shadow-[inset_0_4px_10px_hsl(var(--primary)/0.35),0_1px_2px_hsl(var(--primary)/0.15)]
+           motion-reduce:transform-none motion-reduce:transition-none;
   }
 
   /* iOS safe-area helpers. Use on any fixed bottom bar so the notch/home indicator
