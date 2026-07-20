@@ -50,10 +50,22 @@ export default function PublicMosque() {
   return (
     <div className="min-h-dvh bg-background">
       <SEO
-        type="article"
         title={`${m.translit} — ${m.en} · Sacred Mosques · Heartify`}
         description={`${m.translit} (${m.ar}) in ${m.city}, ${m.country}. ${m.summary.slice(0, 140)}`}
         path={`/mosque/${m.slug}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Mosque",
+          name: `${m.translit} (${m.en})`,
+          alternateName: [m.ar, m.en, m.translit],
+          description: m.summary,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: m.city,
+            addressCountry: m.country,
+          },
+          ...(m.founded ? { foundingDate: String(m.founded) } : {}),
+        }}
       />
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">

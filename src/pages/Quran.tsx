@@ -209,12 +209,12 @@ const SurahView = ({ n, prefs, setPrefs }: { n: number; prefs: Prefs; setPrefs: 
       {arabic.data && (
         <header className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-3">
           <div>
-            <h1 className="text-title font-bold text-foreground">
+            <h2 className="text-title font-bold text-foreground">
               {arabic.data.englishName}{" "}
               <span className="text-muted-foreground text-base font-normal">
                 — {arabic.data.englishNameTranslation}
               </span>
-            </h1>
+            </h2>
             <p className="text-sm text-muted-foreground">
               Surah {arabic.data.number} · {arabic.data.numberOfAyahs} verses · {arabic.data.revelationType}
             </p>

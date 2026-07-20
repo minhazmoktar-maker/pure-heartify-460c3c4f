@@ -254,6 +254,15 @@ export default function HeartifyPlus() {
         title="Heartify+ — Halal streaming without limits"
         description="Unlimited offline Qur'an audio, exclusive reciters, guided Khatm programs, family seats & Kids Mode. We try our best to keep every feature halal — no music, no women on camera."
         path="/plus"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQS.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }}
       />
       <Navbar />
 
