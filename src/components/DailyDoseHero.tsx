@@ -28,7 +28,8 @@ const DailyDoseHero = () => {
 
   if (!user) {
     return (
-      <section className="mx-auto mt-6 max-w-[1800px] px-4 md:px-6">
+      <section id="daily-dose" className="mx-auto mt-6 max-w-[1800px] px-4 md:px-6 scroll-mt-20">
+
         <div className="rounded-card border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 md:p-8">
           <div className="flex items-center gap-2 text-micro font-semibold uppercase tracking-wider text-primary">
             <Sparkles className="h-4 w-4" />
