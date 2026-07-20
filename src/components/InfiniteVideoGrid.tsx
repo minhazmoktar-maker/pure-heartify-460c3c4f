@@ -40,7 +40,21 @@ const InfiniteVideoGrid = ({
     !!hasNextPage && !isFetchingNextPage,
   );
 
-  const allVideos = data?.pages.flatMap((p) => p.items) ?? [];
+  const rawVideos = data?.pages.flatMap((p) => p.items) ?? [];
+  const { seenVideoIds, resetKey } = useFeedDiversity();
+  const allVideos = useMemo(() => {
+    const seen = seenVideoIds.current;
+    const localSeen = new Set<string>();
+    const out: typeof rawVideos = [];
+    for (const v of rawVideos) {
+      if (localSeen.has(v.id) || seen.has(v.id)) continue;
+      localSeen.add(v.id);
+      out.push(v);
+    }
+    for (const v of out) seen.add(v.id);
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawVideos, resetKey, seenVideoIds]);
   const gridRef = useRef<HTMLDivElement>(null);
   const { track } = useImpressionTracker(!isLoading && !error);
 
