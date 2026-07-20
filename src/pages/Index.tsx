@@ -12,8 +12,7 @@ import RamadanBanner from "@/components/RamadanBanner";
 import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
-import NextSalahWidget from "@/components/NextSalahWidget";
-import VerseOfDayCard from "@/components/VerseOfDayCard";
+import HomeHero from "@/components/HomeHero";
 
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
 const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
