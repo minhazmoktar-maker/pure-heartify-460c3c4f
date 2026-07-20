@@ -49,6 +49,8 @@ function StatTile({ label, value, loading }: { label: string; value?: number; lo
  * independent certification.
  */
 export default function Trust() {
+  const { data: stats, isLoading } = useTrustStats();
+
   return (
     <>
       <SEO
@@ -62,7 +64,26 @@ export default function Trust() {
           subtitle="This page is maintained by the Heartify team to answer common security, privacy, and content questions. It reflects controls currently enabled in the app, not an independent certification."
         />
 
-        <div className="grid gap-4 mt-8">
+        {/* Aggregate moderation stats — anonymised counts only. No moderator
+            identities or per-item data are exposed. Backed by the
+            SECURITY DEFINER RPC public.get_trust_stats(). */}
+        <section aria-label="Moderation at a glance" className="mt-8">
+          <div className="mb-3 flex items-center gap-2 text-micro font-semibold uppercase tracking-wider text-muted-foreground">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+            Moderation at a glance
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatTile label="Approved channels" value={stats?.approved_channels} loading={isLoading} />
+            <StatTile label="Reviewed videos" value={stats?.reviewed_videos} loading={isLoading} />
+            <StatTile label="Videos removed" value={stats?.removed_videos} loading={isLoading} />
+            <StatTile label="Languages covered" value={stats?.languages_covered} loading={isLoading} />
+          </div>
+          <p className="mt-2 text-micro text-muted-foreground">
+            Counts are aggregated from the live moderation ledger and refresh hourly. We never publish individual moderator names or per-decision details.
+          </p>
+        </section>
+
+        <div className="mt-8 grid gap-4">
           <Card className="p-6">
             <div className="flex gap-3 items-start">
               <Shield className="w-5 h-5 text-primary mt-1 shrink-0" />
