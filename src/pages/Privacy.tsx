@@ -50,6 +50,14 @@ const Privacy = () => {
           </p>
         </header>
 
+        {/* Discoverable Manage-cookies panel sits at the top of the policy
+            so users looking to change their mind never have to hunt for it. */}
+        <div className="mt-8">
+          <CookiePreferencesPanel />
+        </div>
+
+        </header>
+
         <div className="mt-10 space-y-10 text-sm leading-relaxed">
           <Section id="introduction" title="1. Introduction">
             <p>
