@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import VideoCardSkeleton from "@/components/VideoCardSkeleton";
 import { useSurface, type SurfaceName } from "@/hooks/useSurface";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
+import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import { cn } from "@/lib/utils";
 
 interface Props {
