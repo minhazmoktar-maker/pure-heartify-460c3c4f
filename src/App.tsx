@@ -24,7 +24,7 @@ import AdminRoute from "./components/AdminRoute";
 import RouteTransition from "./components/RouteTransition";
 import BackToTop from "./components/BackToTop";
 // AgeGate removed — age is verified at signup only
-import CookieConsent from "./components/CookieConsent";
+// CookieConsent import removed — consent lives on /privacy only.
 const CommandPalette = lazy(() => import("./components/CommandPalette"));
 import BottomTabBar from "./components/BottomTabBar";
 import EdgeSwipeBack from "./components/EdgeSwipeBack";
@@ -290,7 +290,10 @@ const App = () => (
             <OfflineSweeper />
             <BackToTop />
             {/* AgeGate removed — age is verified at signup only */}
-            <CookieConsent />
+            {/* CookieConsent removed from app root — the persistent toast
+                obstructed the bottom tab bar and violated the "one primary
+                action per surface" rule. Consent controls live at /privacy
+                (footer + Profile → Preferences). Essential cookies only. */}
             <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
             <Suspense fallback={null}><CommandPalette /></Suspense>
             <BottomTabBar />
