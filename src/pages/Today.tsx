@@ -6,7 +6,7 @@ import SEO from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sunrise, BookOpen, BookText, Target, Flame, Compass, ArrowRight, Sparkles, Loader2 } from "lucide-react";
+import { Sunrise, BookOpen, BookText, Target, Flame, Compass, ArrowRight, Sparkles, Loader2, WifiOff } from "lucide-react";
 import { ASMA_UL_HUSNA } from "@/data/asmaUlHusna";
 
 // Cached daily payloads to avoid re-fetching
@@ -15,6 +15,8 @@ type DailyCache = {
   date: string;
   ayah?: { arabic: string; english: string; ref: string };
   hadith?: { text: string; ref: string };
+  /** True when both ayah/hadith are the bundled offline fallback. */
+  fallback?: boolean;
 };
 
 function todayISO() { return localToday(); }
@@ -25,16 +27,47 @@ function dayIndex() {
   return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
 }
 
-async function loadDaily(): Promise<DailyCache> {
+// Bundled offline fallback so /today is never a dead screen on a cold cache
+// with no network — the one screen the user can return to 10× a day guilt-free.
+const FALLBACK_AYAT: NonNullable<DailyCache["ayah"]>[] = [
+  {
+    arabic: "إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",
+    english: "Indeed, with hardship comes ease.",
+    ref: "Surah Ash-Sharh 94:6",
+  },
+  {
+    arabic: "وَٱذْكُر رَّبَّكَ إِذَا نَسِيتَ",
+    english: "And remember your Lord when you forget.",
+    ref: "Surah Al-Kahf 18:24",
+  },
+  {
+    arabic: "حَسْبُنَا ٱللَّهُ وَنِعْمَ ٱلْوَكِيلُ",
+    english: "Sufficient for us is Allah, and He is the best Disposer of affairs.",
+    ref: "Surah Aal-Imran 3:173",
+  },
+];
+const FALLBACK_HADITH: NonNullable<DailyCache["hadith"]>[] = [
+  {
+    text: "Actions are but by intention, and every person will have only what they intended.",
+    ref: "40 Hadith Nawawi #1",
+  },
+  {
+    text: "None of you truly believes until he loves for his brother what he loves for himself.",
+    ref: "40 Hadith Nawawi #13",
+  },
+];
+
+/** Loads today's daily payload from cache; fetches when online; falls back
+ *  to a bundled ayah/hadith when both cache and network are unavailable. */
+export async function loadDaily(): Promise<DailyCache> {
   try {
     const cached = JSON.parse(localStorage.getItem(DAILY_CACHE_KEY) || "null");
     if (cached && cached.date === todayISO()) return cached;
-  } catch {}
+  } catch { /* ignore */ }
 
   const idx = dayIndex();
-  const ayahNum = (idx % 6236) + 1; // Total ayat in the Quran
-  const hadithNum = (idx % 40) + 1; // Rotate through Nawawi 40
-
+  const ayahNum = (idx % 6236) + 1;
+  const hadithNum = (idx % 40) + 1;
   const cache: DailyCache = { date: todayISO() };
 
   try {
@@ -51,7 +84,7 @@ async function loadDaily(): Promise<DailyCache> {
         ref: `Surah ${en.data.surah.englishName} ${en.data.surah.number}:${en.data.numberInSurah}`,
       };
     }
-  } catch {}
+  } catch { /* offline */ }
 
   try {
     const r = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-nawawi/${hadithNum}.min.json`);
@@ -60,9 +93,19 @@ async function loadDaily(): Promise<DailyCache> {
       const h = d.hadiths?.[0];
       if (h) cache.hadith = { text: h.text, ref: `40 Hadith Nawawi #${h.hadithnumber}` };
     }
-  } catch {}
+  } catch { /* offline */ }
 
-  try { localStorage.setItem(DAILY_CACHE_KEY, JSON.stringify(cache)); } catch {}
+  // Bundled fallback when both sources failed and no prior cache exists.
+  if (!cache.ayah) {
+    cache.ayah = FALLBACK_AYAT[idx % FALLBACK_AYAT.length];
+    cache.fallback = true;
+  }
+  if (!cache.hadith) {
+    cache.hadith = FALLBACK_HADITH[idx % FALLBACK_HADITH.length];
+    cache.fallback = true;
+  }
+
+  try { localStorage.setItem(DAILY_CACHE_KEY, JSON.stringify(cache)); } catch { /* ignore */ }
   return cache;
 }
 
