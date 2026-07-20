@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import EmptyState from "@/components/EmptyState";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useInfiniteFeed, type FeedSort } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
