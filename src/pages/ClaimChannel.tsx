@@ -52,13 +52,16 @@ export default function ClaimChannel() {
     setStats(null);
     try {
       const isChannelId = normalized.startsWith("UC");
-      const q = supabase.from("approved_channels").select("channel_id,trust_score").limit(1);
+      const base = supabase
+        .from("approved_channels")
+        .select("youtube_channel_id,consistency_score")
+        .limit(1);
       const { data: ac } = isChannelId
-        ? await q.eq("channel_id", normalized)
-        : await q.or(`handle.eq.${normalized},handle.eq.${normalized.replace(/^@/, "")}`);
+        ? await base.eq("youtube_channel_id", normalized)
+        : await base.or(`handle.eq.${normalized},handle.eq.${normalized.replace(/^@/, "")}`);
       const approved = !!(ac && ac.length);
-      const channelId = ac?.[0]?.channel_id;
-      const trust = ac?.[0]?.trust_score ?? null;
+      const channelId = ac?.[0]?.youtube_channel_id;
+      const trust = ac?.[0]?.consistency_score ?? null;
       let videos = 0;
       if (channelId) {
         const { count } = await supabase
@@ -87,10 +90,9 @@ export default function ClaimChannel() {
         user_id: user?.id ?? null,
         name: name.trim(),
         email: email.trim(),
-        subject: `Channel claim: ${normalized}`,
-        message: `Handle: ${normalized}\nProof / verification: ${proof || "(none provided)"}`,
-        kind: "channel_claim" as never,
-      } as never);
+        topic: "channel_claim",
+        message: `Channel: ${normalized}\nProof / verification: ${proof || "(none provided)"}`,
+      });
       if (error) throw error;
       setSubmitted(true);
       toast.success("Claim submitted — we'll email you within 3 business days");
