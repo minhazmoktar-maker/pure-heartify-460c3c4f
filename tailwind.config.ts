@@ -19,7 +19,11 @@ export default {
         heading: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
         display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
         body: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        arabic: ['"Amiri Quran"', '"Amiri"', '"Scheherazade New"', '"Traditional Arabic"', 'serif'],
+        // Amiri first — full Arabic ligature/glyph coverage. Amiri Quran only
+        // ships Uthmani Quranic glyphs; using it as primary causes disjointed
+        // shapes for non-Quranic text and unsupported ligatures.
+        arabic: ['"Amiri"', '"Amiri Quran"', '"Scheherazade New"', '"Traditional Arabic"', 'serif'],
+        quran: ['"Amiri Quran"', '"Amiri"', '"Scheherazade New"', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",

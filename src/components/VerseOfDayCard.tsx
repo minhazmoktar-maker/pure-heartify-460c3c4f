@@ -72,7 +72,7 @@ const VerseOfDayCard = () => {
       </div>
       {ayah ? (
         <div className="mt-2 space-y-2">
-          <p dir="rtl" lang="ar" className="line-clamp-2 text-right font-arabic text-xl leading-loose text-foreground" style={{ fontFeatureSettings: '"liga", "calt", "kern"' }}>
+          <p dir="rtl" lang="ar" className="line-clamp-2 text-right font-arabic text-xl leading-loose text-foreground" style={{ fontFeatureSettings: '"liga", "calt", "kern", "rlig", "mset"' }}>
             {ayah.arabic}
           </p>
 
