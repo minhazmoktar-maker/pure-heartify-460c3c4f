@@ -71,7 +71,7 @@ export default function HomeHero() {
   // Resume hero — only for signed-in with an active continue-watching item
   const { items: continueItems } = useSurface("continue_watching", {
     enabled: !!user,
-    getExcludeIds: () => new Set<string>(),
+    getExcludeIds: () => [],
   });
   const resume = continueItems?.[0];
 
