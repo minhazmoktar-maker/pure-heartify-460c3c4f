@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FEATURE_FLAGS } from "@/lib/featureFlags";
 import SectionHeader from "@/components/SectionHeader";
+import EmptyState from "@/components/EmptyState";
 
 const PREMIUM_BENEFITS = [
   { icon: Radio, title: "Ad-free listening", desc: "Uninterrupted Qur'an, nasheeds and lectures." },
@@ -358,19 +359,21 @@ const AudioSection = () => {
 
       {/* Track list */}
       {filteredTracks.length === 0 ? (
-        <div className="mx-auto flex max-w-md flex-col items-center gap-2 rounded-card border border-dashed border-border bg-card/60 p-10 text-center">
-          <Search className="h-6 w-6 text-muted-foreground" />
-          <p className="text-sm font-semibold text-foreground">Nothing matched your filters.</p>
-          <p className="text-micro text-muted-foreground">
-            Try clearing the search, switching category, or widening the language filter.
-          </p>
-          <button
-            onClick={() => { setRawQuery(""); setAudioCat("All"); setLanguage("Any"); setDurationBand("Any"); setSpeaker("Any"); }}
-            className="mt-2 rounded-pill bg-primary px-4 py-1.5 text-micro font-semibold text-primary-foreground"
-          >
-            Reset filters
-          </button>
-        </div>
+        <EmptyState
+          illustration="no-search-results"
+          icon={Search}
+          title="Nothing matched your filters"
+          description="Try clearing the search, switching category, or widening the language filter."
+          actionLabel="Reset filters"
+          onAction={() => {
+            setRawQuery("");
+            setAudioCat("All");
+            setLanguage("Any");
+            setDurationBand("Any");
+            setSpeaker("Any");
+          }}
+          className="mx-auto max-w-md"
+        />
       ) : (
         <div className="space-y-0.5" role="list" aria-label="Track list">
           {filteredTracks.map((track, i) => (

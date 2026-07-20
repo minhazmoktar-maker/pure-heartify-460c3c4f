@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Loader2, Plus, Lock, Globe2, Link as LinkIcon, Trash2 } from "lucide-react";
+import { Loader2, Plus, Lock, Globe2, Link as LinkIcon, Trash2, ListMusic } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,9 +90,14 @@ export default function Playlists() {
         {isLoading ? (
           <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
         ) : playlists.length === 0 ? (
-          <div className="rounded-card border border-dashed border-border py-16 text-center">
-            <p className="text-sm text-muted-foreground">No playlists yet — start by creating one.</p>
-          </div>
+          <EmptyState
+            illustration="empty-list"
+            icon={ListMusic}
+            title="No playlists yet"
+            description="Save halal videos into collections you can revisit and share."
+            actionLabel="Create your first playlist"
+            onAction={() => setOpen(true)}
+          />
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2">
             {playlists.map((p) => {

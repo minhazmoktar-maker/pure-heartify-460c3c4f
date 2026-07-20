@@ -1,7 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { Loader2, Lock, Globe2, Link as LinkIcon, Play, Trash2 } from "lucide-react";
+import { Loader2, Lock, Globe2, Link as LinkIcon, Play, Trash2, ListMusic } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 import { usePlaylist, usePlaylists } from "@/hooks/usePlaylists";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -18,9 +19,14 @@ export default function PlaylistDetail() {
   }
   if (!data?.playlist) {
     return (
-      <div className="container mx-auto max-w-2xl px-4 py-16 text-center">
-        <p className="text-heading font-semibold text-foreground">Playlist not found</p>
-        <p className="text-sm text-muted-foreground">It may have been deleted or is private.</p>
+      <div className="container mx-auto max-w-2xl px-4 py-16">
+        <EmptyState
+          illustration="not-found"
+          title="Playlist not found"
+          description="It may have been deleted or is private."
+          actionLabel="Back to playlists"
+          actionHref="/playlists"
+        />
       </div>
     );
   }
@@ -44,9 +50,18 @@ export default function PlaylistDetail() {
           {playlist.visibility} · {items.length} videos
         </p>
         {items.length === 0 ? (
-          <div className="rounded-card border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
-            {isOwner ? "Add videos to this playlist from any watch page." : "This playlist is empty."}
-          </div>
+          <EmptyState
+            illustration="empty-list"
+            icon={ListMusic}
+            title={isOwner ? "This playlist is empty" : "Nothing here yet"}
+            description={
+              isOwner
+                ? "Add videos to this playlist from any watch page — tap the save icon under a video."
+                : "The owner hasn't added any videos yet. Check back soon."
+            }
+            actionLabel={isOwner ? "Browse videos" : undefined}
+            actionHref={isOwner ? "/" : undefined}
+          />
         ) : (
           <ol className="space-y-2">
             {items.map((it, idx) => (
