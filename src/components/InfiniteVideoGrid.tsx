@@ -82,18 +82,25 @@ const InfiniteVideoGrid = ({
 
   if (error) {
     return (
-      <div className="py-20 text-center">
-        <p className="text-heading font-medium text-destructive">Failed to load videos.</p>
-        <p className="mt-1 text-sm text-muted-foreground">{(error as Error).message}</p>
-      </div>
+      <EmptyState
+        icon={AlertTriangle}
+        tone="muted"
+        title="Couldn't load videos"
+        description={(error as Error).message || "Please check your connection and try again."}
+        actionLabel="Retry"
+        onAction={() => window.location.reload()}
+      />
     );
   }
 
   if (allVideos.length === 0) {
     return (
-      <div className="py-20 text-center">
-        <p className="text-heading font-medium text-muted-foreground">{fallbackMessage}</p>
-      </div>
+      <EmptyState
+        illustration="no-search-results"
+        icon={Search}
+        title="Nothing to show yet"
+        description={fallbackMessage}
+      />
     );
   }
 
