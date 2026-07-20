@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, RotateCcw, GraduationCap } from "lucide-react";
+import { ArrowLeft, Search, RotateCcw, GraduationCap, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import SEO from "@/components/SEO";
+import { useVerifiedScholars } from "@/hooks/useVerifiedScholars";
 
 type Scholar = { id: string; name: string; era: string; field: string; summary: string; works: string };
 
@@ -33,37 +34,77 @@ const STORAGE_KEY = "scholars.read";
 
 const Scholars = () => {
   const [q, setQ] = useState("");
+  const [tab, setTab] = useState<"classical" | "contemporary">("contemporary");
   const [read, setRead] = useState<Record<string, boolean>>(() => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; } });
   const persist = (n: Record<string, boolean>) => { setRead(n); localStorage.setItem(STORAGE_KEY, JSON.stringify(n)); };
-  const filtered = useMemo(() => SCHOLARS.filter(s => !q.trim() || s.name.toLowerCase().includes(q.toLowerCase()) || s.field.toLowerCase().includes(q.toLowerCase()) || s.summary.toLowerCase().includes(q.toLowerCase())), [q]);
+  const { data: verified = [], isLoading: verifiedLoading } = useVerifiedScholars();
+  const filteredClassical = useMemo(() => SCHOLARS.filter(s => !q.trim() || s.name.toLowerCase().includes(q.toLowerCase()) || s.field.toLowerCase().includes(q.toLowerCase()) || s.summary.toLowerCase().includes(q.toLowerCase())), [q]);
+  const filteredVerified = useMemo(() => verified.filter(s => !q.trim() || s.display_name.toLowerCase().includes(q.toLowerCase()) || (s.affiliation ?? "").toLowerCase().includes(q.toLowerCase()) || (s.notes ?? "").toLowerCase().includes(q.toLowerCase())), [verified, q]);
   const readCount = Object.values(read).filter(Boolean).length;
   const pct = Math.round((readCount / SCHOLARS.length) * 100);
   return (
     <div className="min-h-dvh bg-background">
-      <SEO title="Great Scholars of Islam — Heartify" description="The lives and legacies of 16 defining scholars: the four imams, hadith masters, mufassirin, and reformers." path="/scholars" />
+      <SEO title="Verified Scholars — Heartify" description="Contemporary and classical Islamic scholars, each vetted by Heartify's moderation team." path="/scholars" />
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Back</Link>
         <header className="mt-4 mb-6">
-          <div className="flex items-center gap-3"><GraduationCap className="h-7 w-7 text-primary" /><h1 className="text-title font-bold">Great Scholars of Islam</h1></div>
+          <div className="flex items-center gap-3"><GraduationCap className="h-7 w-7 text-primary" /><h1 className="text-title font-bold">Scholars of Islam</h1></div>
           <p className="mt-2 text-muted-foreground">"The scholars are the inheritors of the prophets." — Abu Dawud 3641</p>
         </header>
         <Card className="p-4 mb-6">
-          <div className="flex items-center justify-between gap-3 mb-3"><span className="text-sm font-medium">Read</span><span className="text-sm text-muted-foreground">{readCount} / {SCHOLARS.length}</span></div>
-          <Progress value={pct} />
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="inline-flex rounded-pill border bg-secondary/40 p-1">
+              <button onClick={() => setTab("contemporary")} className={`rounded-pill px-3 py-1 text-sm ${tab === "contemporary" ? "bg-background font-semibold shadow-e1" : "text-muted-foreground"}`}>Contemporary · {verified.length}</button>
+              <button onClick={() => setTab("classical")} className={`rounded-pill px-3 py-1 text-sm ${tab === "classical" ? "bg-background font-semibold shadow-e1" : "text-muted-foreground"}`}>Classical · {SCHOLARS.length}</button>
+            </div>
+            {tab === "classical" && <span className="text-sm text-muted-foreground">Read {readCount}/{SCHOLARS.length}</span>}
+          </div>
+          {tab === "classical" && <Progress value={pct} />}
           <div className="mt-3 flex gap-3">
-            <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search scholars or fields…" className="pl-9" /></div>
-            <Button variant="outline" onClick={() => persist({})}><RotateCcw className="h-4 w-4 mr-2" />Reset</Button>
+            <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search scholars, fields, affiliations…" className="pl-9" /></div>
+            {tab === "classical" && <Button variant="outline" onClick={() => persist({})}><RotateCcw className="h-4 w-4 mr-2" />Reset</Button>}
           </div>
         </Card>
-        <div className="grid gap-4">
-          {filtered.map(s => (
-            <Card key={s.id} className={`p-5 cursor-pointer transition ${read[s.id] ? "bg-primary/5 border-primary/40" : "hover:bg-muted/40"}`} onClick={() => persist({ ...read, [s.id]: !read[s.id] })}>
-              <div className="flex items-start justify-between gap-4"><div><h2 className="text-heading font-semibold">{s.name}</h2><div className="mt-1 flex flex-wrap gap-2"><Badge variant="secondary">{s.era}</Badge><Badge variant="outline">{s.field}</Badge></div></div>{read[s.id] && <Badge>Read</Badge>}</div>
-              <p className="mt-3 text-sm text-muted-foreground">{s.summary}</p>
-              <p className="mt-2 text-micro"><span className="font-medium">Major works: </span><span className="text-muted-foreground">{s.works}</span></p>
-            </Card>
-          ))}
-        </div>
+
+        {tab === "contemporary" ? (
+          <div className="grid gap-3">
+            {verifiedLoading && <p className="text-sm text-muted-foreground">Loading verified scholars…</p>}
+            {filteredVerified.map(s => (
+              <Card key={s.id} id={s.id} className="p-5 hover:bg-muted/30">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-heading font-semibold truncate">{s.display_name}</h2>
+                      <ShieldCheck className="h-4 w-4 text-primary shrink-0" aria-label="Verified" />
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {s.language && <Badge variant="secondary" className="uppercase">{s.language}</Badge>}
+                      {s.country && <Badge variant="outline">{s.country}</Badge>}
+                      {s.affiliation && <Badge variant="outline" className="max-w-[220px] truncate">{s.affiliation}</Badge>}
+                    </div>
+                    {s.notes && <p className="mt-2 text-sm text-muted-foreground">{s.notes}</p>}
+                    {s.aliases && s.aliases.length > 0 && (
+                      <p className="mt-2 text-micro text-muted-foreground">Also known as: {s.aliases.join(" · ")}</p>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            ))}
+            {!verifiedLoading && filteredVerified.length === 0 && (
+              <p className="text-sm text-muted-foreground">No scholars matched your search.</p>
+            )}
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {filteredClassical.map(s => (
+              <Card key={s.id} className={`p-5 cursor-pointer transition ${read[s.id] ? "bg-primary/5 border-primary/40" : "hover:bg-muted/40"}`} onClick={() => persist({ ...read, [s.id]: !read[s.id] })}>
+                <div className="flex items-start justify-between gap-4"><div><h2 className="text-heading font-semibold">{s.name}</h2><div className="mt-1 flex flex-wrap gap-2"><Badge variant="secondary">{s.era}</Badge><Badge variant="outline">{s.field}</Badge></div></div>{read[s.id] && <Badge>Read</Badge>}</div>
+                <p className="mt-3 text-sm text-muted-foreground">{s.summary}</p>
+                <p className="mt-2 text-micro"><span className="font-medium">Major works: </span><span className="text-muted-foreground">{s.works}</span></p>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
