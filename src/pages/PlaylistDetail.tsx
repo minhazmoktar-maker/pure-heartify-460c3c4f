@@ -1,7 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { Loader2, Lock, Globe2, Link as LinkIcon, Play, Trash2 } from "lucide-react";
+import { Loader2, Lock, Globe2, Link as LinkIcon, Play, Trash2, ListMusic } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import SEO from "@/components/SEO";
+import EmptyState from "@/components/EmptyState";
 import { usePlaylist, usePlaylists } from "@/hooks/usePlaylists";
 import { useAuth } from "@/contexts/AuthContext";
 
