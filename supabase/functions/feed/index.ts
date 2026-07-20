@@ -349,7 +349,7 @@ Deno.serve(async (req) => {
         const rows = (await r.json()) as Array<Record<string, unknown>>;
         for (const v of rows) {
           const id = v.video_id as string;
-          if (seen.has(id)) continue;
+          if (seen.has(id) || excludeIds.has(id)) continue;
           const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
           if (BLOCKED_TOKENS.some((tok) => t.includes(tok))) continue;
           seen.add(id);
