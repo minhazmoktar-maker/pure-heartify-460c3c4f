@@ -73,8 +73,7 @@ Deno.serve(async (req) => {
     const service = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
 
     // Auth + rate-limit
-    const authHeader = req.headers.get("Authorization") ?? "";
-    const userId = await getCallerUserId(authHeader).catch(() => null);
+    const userId = await getCallerUserId(req).catch(() => null);
     if (contract.requiresAuth && !userId) return json({ error: "auth_required" }, 401);
 
     const identity = getClientIdentity(req, userId);
