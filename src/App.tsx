@@ -288,6 +288,7 @@ const App = () => (
             <BackToTop />
             {/* AgeGate removed — age is verified at signup only */}
             <CookieConsent />
+            <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
             <Suspense fallback={null}><CommandPalette /></Suspense>
             <BottomTabBar />
             <EdgeSwipeBack />
