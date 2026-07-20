@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FEATURE_FLAGS } from "@/lib/featureFlags";
 import SectionHeader from "@/components/SectionHeader";
+import EmptyState from "@/components/EmptyState";
 
 const PREMIUM_BENEFITS = [
   { icon: Radio, title: "Ad-free listening", desc: "Uninterrupted Qur'an, nasheeds and lectures." },
