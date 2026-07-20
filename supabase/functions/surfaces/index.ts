@@ -24,12 +24,25 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 function json(body: unknown, status = 200, cachePrivate = true) {
+  // T4 — Anon-only edge cache + SWR hydration.
+  //   Signed-in (cachePrivate=true): `private` so no shared cache can ever
+  //     serve one user's personalized surface to another. SWR lets the
+  //     browser paint instantly on repeat visits while it refreshes in the
+  //     background.
+  //   Anonymous (cachePrivate=false): `public` with `s-maxage` allows any
+  //     intermediate CDN to serve identical anon responses. Surfaces marked
+  //     `requiresAuth` never take this branch, so personalized data is never
+  //     cached publicly. `Vary: Authorization` guarantees signed-in requests
+  //     are never answered from the anon cache entry.
+  const cacheControl = cachePrivate
+    ? "private, max-age=30, stale-while-revalidate=120"
+    : "public, max-age=60, s-maxage=120, stale-while-revalidate=300";
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       ...corsHeaders,
       "Content-Type": "application/json",
-      "Cache-Control": cachePrivate ? "private, max-age=30" : "public, max-age=60",
+      "Cache-Control": cacheControl,
       "Vary": "Authorization",
     },
   });
