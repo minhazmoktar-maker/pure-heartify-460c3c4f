@@ -19,9 +19,14 @@ export default function PlaylistDetail() {
   }
   if (!data?.playlist) {
     return (
-      <div className="container mx-auto max-w-2xl px-4 py-16 text-center">
-        <p className="text-heading font-semibold text-foreground">Playlist not found</p>
-        <p className="text-sm text-muted-foreground">It may have been deleted or is private.</p>
+      <div className="container mx-auto max-w-2xl px-4 py-16">
+        <EmptyState
+          illustration="not-found"
+          title="Playlist not found"
+          description="It may have been deleted or is private."
+          actionLabel="Back to playlists"
+          actionHref="/playlists"
+        />
       </div>
     );
   }
