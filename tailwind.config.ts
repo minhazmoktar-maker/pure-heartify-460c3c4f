@@ -19,7 +19,8 @@ export default {
         heading: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
         display: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
         body: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-      },
+        arabic: ['"Amiri Quran"', '"Amiri"', '"Scheherazade New"', '"Traditional Arabic"', 'serif'],
+
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

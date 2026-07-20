@@ -167,7 +167,7 @@ const Navbar = () => {
               <span className="text-sm font-bold text-primary-foreground">H</span>
             </div>
             <span className="hidden font-heading text-heading font-bold text-foreground sm:block">
-              Halal<span className="text-[hsl(var(--gold))]">Tube</span>
+              Heartify
             </span>
           </Link>
         </div>
@@ -180,7 +180,7 @@ const Navbar = () => {
         {/* Spacer on mobile so right cluster hugs the edge */}
         <div className="flex-1 md:hidden" aria-hidden />
 
-        {/* Right */}
+        {/* Right — logo · search · avatar (3-target rule). Locale/theme live in Profile → Preferences. */}
         <div className="flex items-center gap-1">
           <Link
             to="/search"
@@ -190,28 +190,9 @@ const Navbar = () => {
           >
             <Search className="h-5 w-5 text-foreground" />
           </Link>
-          <LanguageSwitcher />
-          <button
-            onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="tap-target rounded-pill hover:bg-secondary transition-colors hidden sm:inline-flex"
-            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
-          </button>
-          <UpgradeCTA compact className="hidden sm:inline-flex" />
           {user ? (
             <>
-              <SuggestContentDialog />
               <NotificationsBell isAdmin={isAdmin} />
-              <button
-                onClick={signOut}
-                aria-label="Sign out"
-                className="tap-target rounded-pill hover:bg-secondary transition-colors hidden sm:inline-flex"
-                title="Sign out"
-              >
-                <LogOut className="h-5 w-5 text-foreground" />
-              </button>
               <Link
                 to="/profile"
                 aria-label="Open profile"
@@ -229,10 +210,11 @@ const Navbar = () => {
               className="inline-flex items-center gap-2 whitespace-nowrap rounded-pill bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90"
             >
               <User className="h-4 w-4 shrink-0" />
-              <span className="whitespace-nowrap">Sign In</span>
+              <span className="whitespace-nowrap">Sign in</span>
             </Link>
           )}
         </div>
+
       </div>
     </nav>
   );
