@@ -59,6 +59,28 @@ export function StreakCard() {
       url: handle ? `${window.location.origin}/s/${handle}/${s.current}` : undefined,
     });
 
+  // Zero-state: warm invitation, not a scoreboard of zeros. Duolingo pattern —
+  // numbers only appear once the streak is real (current ≥ 1).
+  if (s.current <= 0) {
+    return (
+      <Card className="p-5 space-y-4" aria-label="Start your streak">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-orange-500/10">
+            <Flame className="h-5 w-5 text-orange-500" aria-hidden />
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-foreground">Start your streak today</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Complete one Daily Dose to begin — small, consistent steps count most.
+            </p>
+          </div>
+        </div>
+        <Button asChild size="sm" className="w-full sm:w-auto">
+          <a href="#daily-dose">Begin today's dose</a>
+        </Button>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-5 space-y-4" aria-label="Current streak">
