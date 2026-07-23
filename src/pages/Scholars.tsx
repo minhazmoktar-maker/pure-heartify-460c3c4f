@@ -74,7 +74,7 @@ const Scholars = () => {
             {filteredVerified.map(s => (
               <Card key={s.id} id={s.id} className="p-5 hover:bg-muted/30">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h2 className="text-heading font-semibold truncate">{s.display_name}</h2>
                       <ShieldCheck className="h-4 w-4 text-primary shrink-0" aria-label="Verified" />
@@ -88,6 +88,28 @@ const Scholars = () => {
                     {s.aliases && s.aliases.length > 0 && (
                       <p className="mt-2 text-micro text-muted-foreground">Also known as: {s.aliases.join(" · ")}</p>
                     )}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        asChild
+                        onClick={() => track("scholar.lectures_opened", { id: s.id, source: "halaltube_speaker" })}
+                      >
+                        <a href={halaltubeSpeakerUrl(s.display_name)} target="_blank" rel="noopener noreferrer">
+                          <PlayCircle className="h-4 w-4 mr-1.5" /> Lectures
+                        </a>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        asChild
+                        onClick={() => track("scholar.lectures_opened", { id: s.id, source: "halaltube_search" })}
+                      >
+                        <a href={halaltubeSearchUrl(s.display_name)} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4 mr-1.5" /> Search HalalTube
+                        </a>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>
