@@ -38,8 +38,16 @@ export function useDailyDose() {
     queryKey: ["daily-dose", user?.id],
     enabled: !!user,
     staleTime: 5 * 60 * 1000,
+    retry: false,
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("generate-daily-dose", { body: {} });
+      // Ensure we have a live session token before hitting the auth-gated function.
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) throw new Error("Not signed in");
+      const { data, error } = await supabase.functions.invoke("generate-daily-dose", {
+        body: {},
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (error) throw new Error(error.message);
       return data as DailyDoseData;
     },
