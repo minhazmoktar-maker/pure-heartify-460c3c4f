@@ -12,12 +12,18 @@ import {
   persistPositionRemote, useCrossDevicePlayback,
 } from "@/hooks/useCrossDevicePlayback";
 
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+
 export type RepeatMode = "off" | "all" | "one";
 
 const RECENT_KEY = "heartify.audio.recent.v1";
 const RESUME_KEY = "heartify.audio.resume.v1";
 const PLAY_COUNT_KEY = "heartify.audio.plays.v1";
+const LISTEN_MINUTES_KEY = "heartify.audio.listen.minutes.v1";
+const STREAK_MARK_KEY = "heartify.audio.streak.mark.v1";
 const MAX_RECENT = 20;
+const STREAK_MIN_LISTEN_SECONDS = 60;
 
 interface RecentEntry { id: string; at: number; progress: number; }
 type PlayCounts = Record<string, number>;
@@ -104,7 +110,15 @@ const mediaErrorCode = (a: HTMLAudioElement | null): string => {
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const { isPremium: isPremiumUser, loading: isPremiumLoading } = useEntitlement();
+  const qc = useQueryClient();
   useCrossDevicePlayback();
+
+  // Cumulative listening seconds for the *current UTC day*. Persisted so the
+  // streak isn't reset by a page refresh mid-listen.
+  const listenSecondsRef = useRef<number>(0);
+  const streakRecordedTodayRef = useRef<boolean>(false);
+
+  const utcToday = () => new Date().toISOString().slice(0, 10);
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
@@ -136,6 +150,48 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const mobile = useMemo(() => isIOS() || isAndroid(), []);
 
   const PREVIEW_SECONDS = 30;
+
+  // Hydrate listening minutes + streak-recorded marker from localStorage so a
+  // refresh doesn't cost the user credit for the seconds they already spent.
+  useEffect(() => {
+    if (!user) return;
+    const today = utcToday();
+    const mins = readJson<Record<string, { day: string; seconds: number }>>(LISTEN_MINUTES_KEY, {});
+    const rec = mins[user.id];
+    listenSecondsRef.current = rec && rec.day === today ? rec.seconds : 0;
+    const mark = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
+    streakRecordedTodayRef.current = mark[user.id] === today;
+  }, [user]);
+
+  const bumpListenSeconds = useCallback((delta: number) => {
+    if (!user || !isFinite(delta) || delta <= 0) return;
+    const today = utcToday();
+    listenSecondsRef.current += delta;
+    const mins = readJson<Record<string, { day: string; seconds: number }>>(LISTEN_MINUTES_KEY, {});
+    mins[user.id] = { day: today, seconds: listenSecondsRef.current };
+    writeJson(LISTEN_MINUTES_KEY, mins);
+    if (
+      !streakRecordedTodayRef.current &&
+      listenSecondsRef.current >= STREAK_MIN_LISTEN_SECONDS
+    ) {
+      streakRecordedTodayRef.current = true;
+      const mark = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
+      mark[user.id] = today;
+      writeJson(STREAK_MARK_KEY, mark);
+      supabase.rpc("record_streak_activity").then(({ error }) => {
+        if (error) {
+          if (import.meta.env.DEV) console.warn("[streak] listen record failed", error);
+          streakRecordedTodayRef.current = false;
+          const m = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
+          delete m[user.id];
+          writeJson(STREAK_MARK_KEY, m);
+          return;
+        }
+        qc.invalidateQueries({ queryKey: ["streak", user.id] });
+        qc.invalidateQueries({ queryKey: ["dailyDose"] });
+      });
+    }
+  }, [user, qc]);
 
   // Lazily construct audio element. iOS Safari REQUIRES construction inside
   // a user-gesture path AND `preload="none"` to avoid the "delay until user
@@ -294,6 +350,14 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       // On some Android WebViews `currentTime` momentarily drops to 0 when the
       // buffer wraps. Ignore that spurious zero to keep the seek bar smooth.
       if (a.currentTime === 0 && lastPos > 1 && !a.seeking) return;
+      // Accumulate listening seconds only while actually playing (not seeking
+      // and not while paused). We use the delta of currentTime rather than
+      // wall-clock so scrubs, buffering pauses, and background tab throttling
+      // don't inflate the counter.
+      const delta = a.currentTime - lastPos;
+      if (!a.paused && !a.seeking && delta > 0 && delta < 2) {
+        bumpListenSeconds(delta);
+      }
       lastPos = a.currentTime;
       setProgress(a.currentTime);
       saveLocal(a.currentTime);
@@ -389,7 +453,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       document.removeEventListener("visibilitychange", onVisibility);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queue, currentTrack, repeat, shuffle, isPremiumUser, mobile, user]);
+  }, [queue, currentTrack, repeat, shuffle, isPremiumUser, mobile, user, bumpListenSeconds]);
 
   const playableFrom = useCallback(
     (list: Track[]) => list.filter((t) => !t.comingSoon && t.url && (!t.isPremium || isPremiumUser)),
