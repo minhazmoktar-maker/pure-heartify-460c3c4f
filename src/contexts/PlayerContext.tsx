@@ -316,7 +316,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     const onPause = () => maybeSaveRemote(a.currentTime, true);
     const onStalled = () => {
       // On mobile, stalled often self-recovers within a couple seconds. Nudge
-      // the pipeline instead of failing hard.
+      // the pipeline instead of failing hard — but ONLY if the user still
+      // intends to play. Without this guard, `suspend` (which fires right
+      // after a user-initiated pause on mobile Safari/Chrome) would call
+      // `a.play()` again and make the audio impossible to stop.
+      if (a.paused) return;
       if (mobile && retryRef.current < 2) {
         retryRef.current += 1;
         try { a.load(); a.play().catch(() => { /* handled by onError */ }); } catch { /* noop */ }
