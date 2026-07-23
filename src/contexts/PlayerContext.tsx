@@ -110,7 +110,15 @@ const mediaErrorCode = (a: HTMLAudioElement | null): string => {
 export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const { isPremium: isPremiumUser, loading: isPremiumLoading } = useEntitlement();
+  const qc = useQueryClient();
   useCrossDevicePlayback();
+
+  // Cumulative listening seconds for the *current UTC day*. Persisted so the
+  // streak isn't reset by a page refresh mid-listen.
+  const listenSecondsRef = useRef<number>(0);
+  const streakRecordedTodayRef = useRef<boolean>(false);
+
+  const utcToday = () => new Date().toISOString().slice(0, 10);
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
