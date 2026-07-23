@@ -36,7 +36,7 @@ const TodayHero = () => {
   }, []);
   return (
     <>
-      <h1 className="sr-only">Heartify — your day: prayer, streak, verse, and daily dose</h1>
+      
       {user && (
         <section
           className="mx-auto mt-2 max-w-[1800px] px-4 md:px-6"
