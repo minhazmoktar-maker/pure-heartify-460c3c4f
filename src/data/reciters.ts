@@ -32,7 +32,7 @@ export const RECITERS: ReciterRecord[] = [
   { id: "nummer",        name: "Suhayb Nummer",                 location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
   { id: "nour",          name: "Muhammad Nour",                 location: "Ottawa",        mp3quranSlug: "nour",         server: 13 },
   { id: "abuquds",       name: "Sheikh Abu Quds",               location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
-  { id: "turki",         name: "Badr Al-Turki",                 location: "Makkah",        mp3quranSlug: null, comingSoon: true },
+  { id: "turki",         name: "Bader Al-Turki",                location: "Makkah",        mp3quranSlug: "bader/Rewayat-Hafs-A-n-Assem", server: 10 },
   { id: "ottawa",        name: "Recitations of Ottawa",         location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
   { id: "nufais",        name: "Ahmad Al-Nufais",               location: "Kuwait City",   mp3quranSlug: "nufais",       server: 7  },
   { id: "maher",         name: "Maher Al-Muaiqly",              location: "Makkah",        mp3quranSlug: "maher",        server: 12 },
