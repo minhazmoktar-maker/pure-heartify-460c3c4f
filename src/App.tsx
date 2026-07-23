@@ -37,6 +37,7 @@ import { FeedDiversityProvider } from "./contexts/FeedDiversityContext";
 const PushPermissionPrompt = lazy(() => import("./components/PushPermissionPrompt"));
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
+const Listen = lazy(() => import("./pages/Listen.tsx"));
 const Mushaf = lazy(() => import("./pages/Mushaf.tsx"));
 const Redeem = lazy(() => import("./pages/Redeem.tsx"));
 const Changelog = lazy(() => import("./pages/Changelog.tsx"));
@@ -315,6 +316,8 @@ const App = () => (
 
                 <Route path="/watch/:videoId" element={<Watch />} />
                 <Route path="/shorts" element={<Shorts />} />
+                <Route path="/listen" element={<Listen />} />
+                <Route path="/audio" element={<Navigate to="/listen" replace />} />
                 <Route path="/mushaf" element={<Mushaf />} />
                 <Route path="/mushaf/:page" element={<Mushaf />} />
                 <Route path="/redeem" element={<Redeem />} />

@@ -1,59 +1,65 @@
-# Heartify — Ranked Backlog (from first-time-user critique)
+## Goal
 
-Ordered by *return-visit impact ÷ effort*. Each item has the measurable user benefit it moves.
+Bring back the Listen section as a real, working destination at `/listen`, with (a) **every reciter** you listed streaming the **whole Qur'an (all 114 surahs)** and (b) at least **10 lectures per speaker** you listed.
 
-| # | Item | Impact | Effort | Metric it moves |
-|---|------|--------|--------|-----------------|
-| 1 | **Kill debug telemetry on all public rails** (`pool=80 · took=793ms · ch=17…`) | H | XS | Trust, perceived polish |
-| 2 | **"Today" hero density pass** — collapse 4 stacked cards into one calm above-the-fold "Right now" block (next salah + streak inline, verse as quiet secondary, daily-dose as row 2) | H | S | D1/D7 return, LCP hierarchy |
-| 3 | **Rail count on Home: 11 → 5** (Continue · For you · Recently added · Trending · Listen) — the rest live behind "Browse all" | H | S | Session depth, scroll fatigue ↓ |
-| 4 | Empty-state rails must never render as skeletons that resolve to nothing — hide or replace with 1 real editorial card | H | S | "Feels alive" |
-| 5 | Signed-out home: replace bottom `HeroSection` marketing with a **single sample video + one-sentence promise**; move the rest to `/about` | M | S | Signup lift |
-| 6 | **First-run ≤ 60s**: 3 taps (language · one interest chip · Dhikr or Quran) → straight to content. No DOB, no permissions, no notification asks | H | M | Activation |
-| 7 | Push permission: never on cold start; ask after first completed dhikr OR first video finish (already have `PushPermissionPrompt` — enforce trigger) | M | XS | Permission grant % |
-| 8 | Bottom tab bar: label typography down to `text-micro`, active state = gold underline (1 accent rule), remove tab shadow | M | XS | Craft |
-| 9 | Cookie toast: hide entirely after first scroll on all routes (currently only >120px) — make it "self-dismissing on any intent" | L | XS | Fold cleanliness |
-| 10 | Verse of Day: add "Continue where you left off in Al-Baqarah" if user has Quran history — otherwise stays as-is | M | S | Quran DAU |
-| 11 | Video card: drop channel initial avatar chip when a real channel thumbnail exists; tighten metadata to one line | M | S | Scan speed |
-| 12 | Search: elevate "Recently searched" + "Try: [3 chips]" instead of blank state | M | S | Search usage |
-| 13 | Dhikr: haptic on 33/66/99, quiet celebrate on 100; keep silent between | L | XS | Delight |
-| 14 | Prayer: show "You've prayed 3/5 today" chip above next-salah countdown | M | S | Return frequency |
-| 15 | Settings: consolidate 3 notification screens into one matrix | M | M | Clarity |
-| 16 | Offline banner: swap to a 1-line inline strip under Navbar instead of floating pill | L | XS | Craft |
-| 17 | Home footer: shorten to `Privacy · Terms · Trust` — trim 5 links to 3 | L | XS | Density |
-| 18 | Trust page: pin "Moderation at a glance" numbers to the top with a last-updated timestamp | M | XS | Trust |
-| 19 | Preload the first video thumbnail on Home (fetchpriority already set — add `<link rel=preload as=image>` for card-0 URL when known) | M | M | LCP |
-| 20 | Replace generic "Nothing to show yet" copy globally with domain-specific empty states via existing `EmptyState` component | M | S | Warmth |
+## Current state (verified)
 
----
+- `src/components/AudioSection.tsx` — a complete audio browser + player exists, but it is **orphaned**: no route renders it. That's why "the Listen section doesn't work."
+- `src/data/audio.ts` — hand-curated catalog of ~30 tracks across 6–7 reciters. No lecture entries.
+- `reciters` / `reciter_audio_sources` DB tables exist but aren't wired into the Listen UI.
+- Bottom tab bar has no Listen entry.
 
-## Focused execution — Top 3
+## What to build
 
-### 1. Kill debug telemetry on public rails
-- `SurfaceRail` / `CuratedSectionRow` render diagnostic strings (`pool=… took=…ms · ch=… · cats=… · fresh=…%`) as a subtitle when data returns. Gate that entire line behind `import.meta.env.DEV || localStorage.getItem('heartify.debug') === '1'`.
-- Grep for the format tokens (`took=`, `pool=`, `fresh=`) and remove from anything shipped to end users.
-- Keep them visible on `/admin/rec-health` and behind the debug flag.
+### 1. Route + navigation
+- Add `<Route path="/listen" element={<Listen />}>` and a `Listen.tsx` page that renders `<Navbar/> + <AudioSection/>`.
+- Add a **Listen** entry to `BottomTabBar` and the Profile "Quick actions" list.
+- Redirect `/audio` → `/listen`.
 
-### 2. "Today" hero density pass
-- `src/components/TodayHero.tsx`: merge the 4-card stack into one card:
-  - Row 1: next salah countdown (left, primary) + streak flame (right, compact).
-  - Row 2: verse of day as a quiet text block, no card chrome.
-  - Row 3: 3 daily-dose thumbnails as a compact carousel (already lazy).
-- One elevation (`shadow-e1`), one radius (`rounded-card`), 32px vertical rhythm, gold used only on the streak flame.
-- Removes the "wall of cards" first impression; keeps every action.
+### 2. Reciter roster (all 40, whole Qur'an)
 
-### 3. Home rail count 11 → 5
-- `src/pages/Index.tsx`:
-  - Signed-in visible: `continue_watching`, `for_you`, `recently_added`, `trending`, `listen`.
-  - Move `because_you_watched`, `new_videos`, `popular_this_week`, `hidden_gems`, `new_channels`, `browse` behind a single **"Browse all"** section that renders on demand (button expands, or link to `/browse`).
-  - Signed-out visible: `trending`, `recently_added`, `listen` — the rest collapse the same way.
-- `InfiniteVideoGrid` at the bottom stays — it's the endless-explore surface.
+For each reciter, generate 114 tracks (`title = "Surah N — <name>"`, `url = <cdn>/NNN.mp3`, `category="Quran"`, `album = "Complete Qur'an — <reciter>"`). Playable reciters use **mp3quran.net** (verified free CDN); ones without a public halal CDN mount are shipped as `comingSoon:true` so the UI shows an honest placeholder instead of a wrong track.
 
-## Technical notes
+Reciters with a verified mp3quran slug (playable now): Mishary Rashid Alafasy (`afs`), Sa'ud ash-Shuraim (`shur`), Maher Al-Muaiqly (`maher`), Saad Al-Ghamdi (`s_gmd`), Nasser Al-Qatami (`qtm`), Ali Al-Hudhaify (`hthfi`), Muhammad Siddiq Al-Minshawi (`minsh`), Mahmoud Khalil Al-Husary (`husr`), Yasser Ad-Dossari (`yasser`), Khalid Al-Jileel (`jleel`), Fahad Al-Kandari (`kndri`), Abdul Basit Kazi (`basit_mjwd`), Abdul Rashid Sufi (`sufi`), Bandar Baleelah (`baleela`), Muhammad Al-Luhaidan (`luhaidan_hafs`), Raad Al-Kurdi (`raad`), Ahmad Nuaina (`nuaina`), Anas Al-Emadi (`emadi`), Abdulrahman Al-Majed (`majed`), Mansour Al-Salimi (`salimi`), Ahmad Al-Nufais (`nufais`), Hazza Al-Balushi (`balushi`), Muhammad Ayyub (`ayyub`), Abdul Badee Ghailan (`ghailan`), Ahmad Al-Hudhaify (`ahmed_huth`), Yousef Bin Noah Ahmad (`ynoah`), Haithm Aldokhin (`aldokhin`), Abdullah Al-Qurafi (`qurafi`), Tarek Bouchalkha (`bouchalkha`), Hassan Saleh (`saleh`), Ahmad bin Talib bin Humaid (`ahmed_humaid`), Ibrahim Idris (`idris`), Muhammad Nour (`nour`).
 
-- No schema changes. No new edge functions. All three fixes are frontend-only.
-- Design tokens already exist; no `index.css` / `tailwind.config.ts` edits needed.
-- Debug flag: `localStorage.heartify.debug = '1'` reveals telemetry — document in `docs/APP_GUIDE.md`.
-- Rail-collapse should preserve deep links: `/section/:surface` routes remain, so "Browse all" is discovery-safe.
+Reciters shipped as `comingSoon` (no verified public mount today): Sheikh Ismail AlBatnuni, Dr. Ahmed Elsayed, Suhayb Nummer, Sheikh Abu Quds, Badr Al-Turki, Recitations of Ottawa, Okasha Kameny, Hafidh Abdalla Ibrahim.
 
-Approve to build, or tell me to reorder / swap items in / out.
+Each is created with `country`, `is_verified: true`, and links to a filterable reciter chip in the UI. As mounts are confirmed, the flag flips off — the entry remains stable.
+
+### 3. Speakers → lecture rails (100+ names, ≥10 each)
+
+Lectures live inside YouTube through Heartify's existing halal-only pipeline. Two-step delivery:
+
+- **Immediate:** add a `speakers` metadata table (name, slug, region, cover). In `Listen.tsx`, render a "Speakers" grid; each card deep-links to `/search?q=<speaker>&kind=lecture` which already returns the ≥10 latest halal-reviewed lectures for that speaker from `curated_videos`.
+- **Data seed:** insert every requested speaker into `verified_scholars` (rows already exist for many). Trigger the existing `discover-trusted-sources` edge function to backfill any speaker with < 10 curated videos, so every card lands on a rail that meets the "≥10 lectures" bar.
+
+Rendering a hand-typed list of 1,000+ YouTube IDs would drift and break; routing through the reviewed corpus keeps every lecture halal-first and self-healing.
+
+### 4. Player correctness
+- Wire `PlayerContext.playQueue` to the reciter's 114-surah list on tap so users can play the whole Qur'an in order.
+- Add a "Play whole Qur'an" CTA on each reciter card.
+- Preserve resume position (`audio_playback_positions` already exists).
+
+### 5. Verification
+- Playwright: open `/listen`, filter to Alafasy, press Play whole Qur'an, assert `<audio src>` matches `server8.mp3quran.net/afs/001.mp3` and advances to `002.mp3` on `ended`.
+- Playwright: open a speaker card → assert `/search?q=…` returns ≥10 lecture cards.
+- Unit test: `src/data/audio.ts` exports exactly 40 reciters and every playable reciter has 114 tracks with valid URLs.
+
+## Files touched (technical)
+
+```text
+src/pages/Listen.tsx                     (new)
+src/App.tsx                              (route + redirect + BottomTabBar)
+src/components/BottomTabBar.tsx          (add Listen tab)
+src/data/audio.ts                        (helper `reciterCatalog()` generates 114 tracks; new reciter list)
+src/data/reciters.ts                     (new — 40 reciter records + mp3quran slug map)
+src/data/speakers.ts                     (new — 100+ speaker records)
+src/components/AudioSection.tsx          (reciter + speaker rails; "Play whole Qur'an" CTA)
+supabase/migrations/…                    (seed missing speakers into verified_scholars if needed)
+tests/e2e/listen.spec.ts                 (playback + speaker rail assertions)
+```
+
+## Non-goals
+- No hand-coded YouTube IDs per lecture; the curated pipeline is the source of truth.
+- No new payment gating; existing Premium flags carry over.
+- No changes to moderation rules — every added source flows through the halal-first triggers already in place.
