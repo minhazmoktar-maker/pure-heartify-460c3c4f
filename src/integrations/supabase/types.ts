@@ -316,6 +316,27 @@ export type Database = {
         }
         Relationships: []
       }
+      audio_listen_daily: {
+        Row: {
+          day: string
+          seconds: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          day: string
+          seconds?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          day?: string
+          seconds?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audio_playback_positions: {
         Row: {
           created_at: string
@@ -5728,6 +5749,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_listen_seconds: { Args: { _seconds: number }; Returns: number }
       record_streak_activity: { Args: never; Returns: Json }
       redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
