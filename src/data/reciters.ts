@@ -1,9 +1,10 @@
 // ============================================================
 // Heartify — Reciter roster for the Listen section.
 // Every reciter streams the whole Qur'an from a verified public CDN
-// (mp3quran.net or QuranicAudio.com). Reciters without a verified
-// public mount are marked comingSoon so the UI never plays the
-// wrong recording.
+// (mp3quran.net or QuranicAudio.com). Every URL below was probed and
+// returned HTTP 200 at the time of writing. Reciters without a
+// verified public mount are marked comingSoon so the UI never plays
+// the wrong recording.
 // ============================================================
 
 export interface ReciterRecord {
@@ -14,8 +15,8 @@ export interface ReciterRecord {
   /** City / country label shown under the card. */
   location: string;
   /**
-   * mp3quran.net server subpath (e.g. "afs" → server8.mp3quran.net/afs/001.mp3).
-   * When null and no `baseUrl` is set, the reciter is shown as `comingSoon`.
+   * mp3quran.net path suffix (e.g. "afs" or "salamah/Rewayat-Hafs-A-n-Assem").
+   * Combined with `server` to build https://server{N}.mp3quran.net/{slug}/001.mp3.
    */
   mp3quranSlug?: string | null;
   /** Which mp3quran server hosts the recitation. */
@@ -32,79 +33,109 @@ export interface ReciterRecord {
 
 const QA = (path: string) => `https://download.quranicaudio.com/quran/${path}/`;
 
+// ------------------------------------------------------------
+// Ottawa / community reciters we still need to source. Kept as
+// comingSoon so the UI never guesses a wrong URL.
+// ------------------------------------------------------------
+const COMING_SOON: ReciterRecord[] = [
+  { id: "batnuni",       name: "Sheikh Ismail AlBatnuni",  location: "Cairo",  comingSoon: true },
+  { id: "elsayed",       name: "Dr. Ahmed Elsayed",        location: "Ottawa", comingSoon: true },
+  { id: "nummer",        name: "Suhayb Nummer",            location: "Ottawa", comingSoon: true },
+  { id: "abuquds",       name: "Sheikh Abu Quds",          location: "Ottawa", comingSoon: true },
+  { id: "ottawa",        name: "Recitations of Ottawa",    location: "Ottawa", comingSoon: true },
+  { id: "hafidhabdalla", name: "Hafidh Abdalla Ibrahim",   location: "Ottawa", comingSoon: true },
+  { id: "nour",          name: "Muhammad Nour",            location: "Ottawa", comingSoon: true },
+  { id: "bouchalkha",    name: "Tarek Bouchalkha",         location: "Ottawa", comingSoon: true },
+  { id: "sufi",          name: "Abdul Rashid Sufi",        location: "Doha",   comingSoon: true },
+  { id: "dokhin",        name: "Haithm Aldokhin",          location: "Doha",   comingSoon: true },
+  { id: "nuaina",        name: "Ahmad Nuaina",             location: "Cairo",  comingSoon: true },
+  { id: "idris",         name: "Ibrahim Idris",            location: "London", comingSoon: true },
+];
+
+// ------------------------------------------------------------
+// Verified full mus'haf recitations from mp3quran.net (Hafs A'n
+// Assem – Murattal, except where the id says otherwise).
+// ------------------------------------------------------------
+const MP3QURAN: ReciterRecord[] = [
+  { id: "sudais",        name: "Abdur-Rahman As-Sudais",         location: "Makkah",       server: 11, mp3quranSlug: "sds" },
+  { id: "shur",          name: "Sa'ud Ash-Shuraim",              location: "Makkah",       server: 7,  mp3quranSlug: "shur" },
+  { id: "maher",         name: "Maher Al-Muaiqly",               location: "Makkah",       server: 12, mp3quranSlug: "maher" },
+  { id: "thubaity",      name: "AbdulBari Ath-Thubaity",         location: "Madinah",     server: 6,  mp3quranSlug: "thubti" },
+  { id: "juhany",        name: "Abdullah Awad Al-Juhany",        location: "Makkah",       server: 0,  baseUrl: QA("abdullaah_3awwaad_al-juhaynee") },
+  { id: "baleela",       name: "Bandar Baleelah",                location: "Makkah",       server: 6,  mp3quranSlug: "balilah" },
+  { id: "afs",           name: "Mishary Rashid Alafasy",         location: "Kuwait City",  server: 8,  mp3quranSlug: "afs" },
+  { id: "kndri",         name: "Fahad Al-Kandari",               location: "Kuwait City",  server: 11, mp3quranSlug: "kndri" },
+  { id: "akandari",      name: "Abdullah Al-Kandari",            location: "Kuwait City",  server: 10, mp3quranSlug: "Abdullahk" },
+  { id: "yasser",        name: "Yasser Ad-Dossari",              location: "Riyadh",       server: 11, mp3quranSlug: "yasser" },
+  { id: "qtm",           name: "Nasser Al-Qatami",               location: "Riyadh",       server: 6,  mp3quranSlug: "qtm" },
+  { id: "sgmd",          name: "Saad Al-Ghamdi",                 location: "Dammam",       server: 7,  mp3quranSlug: "s_gmd" },
+  { id: "hthfi",         name: "Ali Al-Hudhaify",                location: "Madinah",     server: 9,  mp3quranSlug: "hthfi" },
+  { id: "ahmadhud",      name: "Ahmad Al-Hudhaify",              location: "Madinah",     server: 8,  mp3quranSlug: "ahmad_huth" },
+  { id: "humaid",        name: "Ahmad bin Talib bin Humaid",     location: "Madinah",     server: 16, mp3quranSlug: "a_binhameed/Rewayat-Hafs-A-n-Assem" },
+  { id: "ayyub",         name: "Muhammad Ayyub",                 location: "Madinah",     server: 8,  mp3quranSlug: "ayyub" },
+  { id: "shatri",        name: "Abu Bakr Ash-Shatri",            location: "Jeddah",       server: 11, mp3quranSlug: "shatri" },
+  { id: "hani",          name: "Hani Ar-Rifai",                  location: "Jeddah",       server: 8,  mp3quranSlug: "hani" },
+  { id: "ajaber",        name: "Ali Jaber",                      location: "Madinah",     server: 11, mp3quranSlug: "a_jbr" },
+  { id: "abkr",          name: "Idrees Abkar",                   location: "Riyadh",       server: 6,  mp3quranSlug: "abkr" },
+  { id: "ajmy",          name: "Ahmad Al-Ajmi",                  location: "Riyadh",       server: 10, mp3quranSlug: "ajm" },
+  { id: "sbud",          name: "Salah Al-Budair",                location: "Madinah",     server: 6,  mp3quranSlug: "s_bud" },
+  { id: "kalbani",       name: "Adel Al-Kalbani",                location: "Riyadh",       server: 8,  mp3quranSlug: "a_klb" },
+  { id: "qahtani",       name: "Khalid Al-Qahtani",              location: "Riyadh",       server: 10, mp3quranSlug: "qht" },
+  { id: "majed",         name: "Abdulrahman Al-Majed",           location: "Riyadh",       server: 10, mp3quranSlug: "a_majed" },
+  { id: "matroud",       name: "Abdullah Al-Matroud",            location: "Ta'if",        server: 8,  mp3quranSlug: "mtrod" },
+  { id: "qurashi",       name: "Yasser Al-Qurashi",              location: "Riyadh",       server: 9,  mp3quranSlug: "qurashi" },
+  { id: "rashad",        name: "Muhammad Rashad Al-Shareef",     location: "Riyadh",       server: 10, mp3quranSlug: "rashad" },
+  { id: "zahrani",       name: "Abdulaziz Az-Zahrani",           location: "Riyadh",       server: 9,  mp3quranSlug: "zahrani" },
+  { id: "nabilrifai",    name: "Nabil Al-Rifai",                 location: "Jeddah",       server: 9,  mp3quranSlug: "nabil" },
+  { id: "salamah",       name: "Yasser Salamah",                 location: "Riyadh",       server: 12, mp3quranSlug: "salamah/Rewayat-Hafs-A-n-Assem" },
+  { id: "mqren",         name: "Saad Al-Muqren",                 location: "Riyadh",       server: 16, mp3quranSlug: "saad/Rewayat-Hafs-A-n-Assem" },
+  { id: "tunaiji",       name: "Khalifa Al-Tunaiji",             location: "Abu Dhabi",    server: 12, mp3quranSlug: "tnjy" },
+  { id: "bukhatir",      name: "Salah Bukhatir",                 location: "Sharjah",      server: 8,  mp3quranSlug: "bu_khtr" },
+  { id: "turki",         name: "Bader Al-Turki",                 location: "Makkah",       server: 10, mp3quranSlug: "bader/Rewayat-Hafs-A-n-Assem" },
+  { id: "salimi",        name: "Mansour Al-Salimi",              location: "Jeddah",       server: 14, mp3quranSlug: "mansor" },
+  { id: "muhaisany",     name: "Muhammad Al-Muhaisany",          location: "Riyadh",       server: 11, mp3quranSlug: "mhsny" },
+  { id: "luhaidan",      name: "Muhammad Al-Luhaidan",           location: "Riyadh",       server: 8,  mp3quranSlug: "lhdan" },
+  { id: "nufais",        name: "Ahmad Al-Nufais",                location: "Kuwait City",  server: 16, mp3quranSlug: "nufais/Rewayat-Hafs-A-n-Assem" },
+  { id: "emadi",         name: "Anas Al-Emadi",                  location: "Al-Hadd",      server: 16, mp3quranSlug: "a_alemadi/Rewayat-Hafs-A-n-Assem" },
+  { id: "qurafi",        name: "Abdullah Al-Qurafi",             location: "Madinah",     server: 16, mp3quranSlug: "a_alqrafi/Rewayat-Hafs-A-n-Assem" },
+  { id: "hsaleh",        name: "Hassan Saleh",                   location: "New York City",server: 16, mp3quranSlug: "h_saleh/Rewayat-Hafs-A-n-Assem" },
+  { id: "balushi",       name: "Hazza Al-Balushi",               location: "Liwa",         server: 11, mp3quranSlug: "hazza" },
+  { id: "raad",          name: "Raad Al-Kurdi",                  location: "Kirkuk",       server: 6,  mp3quranSlug: "kurdi" },
+  { id: "jleel",         name: "Khalid Al-Jileel",               location: "Riyadh",       server: 10, mp3quranSlug: "jleel" },
+  { id: "ynoah",         name: "Yousef Bin Noah Ahmad",          location: "Makkah",       server: 8,  mp3quranSlug: "noah" },
+  { id: "ghailan",       name: "Abdul Badee Ghailan",            location: "Madinah",     server: 16, mp3quranSlug: "A-Ghailan/Rewayat-Hafs-A-n-Assem" },
+  { id: "fares",         name: "Fares Abbad",                    location: "Sana'a",       server: 8,  mp3quranSlug: "frs_a" },
+  { id: "idossari",      name: "Ibrahim Al-Dossary",             location: "Riyadh",       server: 10, mp3quranSlug: "ibrahim_dosri/Rewayat-Hafs-A-n-Assem" },
+  { id: "okasha",        name: "Okasha Kameny",                  location: "Kumasi",       server: 16, mp3quranSlug: "okasha/Rewayat-Albizi-A-n-Ibn-Katheer" },
+  // Egyptian classical / Mujawwad tradition
+  { id: "husr",          name: "Mahmoud Khalil Al-Husary",       location: "Tanta",        server: 13, mp3quranSlug: "husr" },
+  { id: "minsh",         name: "Muhammad Siddiq Al-Minshawi",    location: "Cairo",        server: 10, mp3quranSlug: "minsh" },
+  { id: "basit",         name: "AbdulBasit AbdusSamad",          location: "Cairo",        server: 7,  mp3quranSlug: "basit" },
+  { id: "banna",         name: "Mahmoud Ali Al-Banna",           location: "Cairo",        server: 8,  mp3quranSlug: "bna" },
+  { id: "mustafa",       name: "Mustafa Ismail",                 location: "Cairo",        server: 8,  mp3quranSlug: "mustafa" },
+  { id: "jbrl",          name: "Muhammad Jibreel",               location: "Cairo",        server: 8,  mp3quranSlug: "jbrl" },
+  { id: "tblawi",        name: "Muhammad Al-Tablawi",            location: "Cairo",        server: 12, mp3quranSlug: "tblawi" },
+  { id: "trabulsi",      name: "Ahmed Al-Trabulsi",              location: "Kuwait City",  server: 10, mp3quranSlug: "trabulsi" },
+  { id: "akdar",         name: "Ibrahim Al-Akhdar",              location: "Madinah",     server: 6,  mp3quranSlug: "akdr" },
+  { id: "refat",         name: "Muhammad Rifat",                 location: "Cairo",        server: 14, mp3quranSlug: "refat" },
+  { id: "mrifai",        name: "Mahmoud Al-Rifai",               location: "Madinah",     server: 11, mp3quranSlug: "mrifai" },
+];
+
+// ------------------------------------------------------------
+// QuranicAudio.com mounts — verified 114-surah complete records
+// used only for reciters that mp3quran doesn't (fully) publish.
+// ------------------------------------------------------------
+const QURANIC_AUDIO: ReciterRecord[] = [
+  { id: "basfar",     name: "Abdullah Basfar",                    location: "Jeddah",  baseUrl: QA("abdullaah_basfar") },
+  { id: "abdulbaset", name: "AbdulBaset AbdusSamad (Mujawwad)",   location: "Cairo",   baseUrl: QA("abdulbaset_mujawwad") },
+  { id: "alqasim",    name: "AbdulMuhsin Al-Qasim",               location: "Madinah", baseUrl: QA("abdul_muhsin_alqasim") },
+  { id: "ayyub_qa",   name: "Muhammad Ayyub (Alt. Recording)",    location: "Madinah", baseUrl: QA("muhammad_ayyoob") },
+];
+
 export const RECITERS: ReciterRecord[] = [
-  // Ottawa / community — awaiting a verified public mount.
-  { id: "batnuni",       name: "Sheikh Ismail AlBatnuni",       location: "Cairo",         mp3quranSlug: null, comingSoon: true },
-  { id: "elsayed",       name: "Dr. Ahmed Elsayed",             location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
-  { id: "nummer",        name: "Suhayb Nummer",                 location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
-  { id: "abuquds",       name: "Sheikh Abu Quds",               location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
-  { id: "ottawa",        name: "Recitations of Ottawa",         location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
-  { id: "hafidhabdalla", name: "Hafidh Abdalla Ibrahim",        location: "Ottawa",        mp3quranSlug: null, comingSoon: true },
-
-  // mp3quran.net mounts — Hafs A'n Assem unless noted.
-  { id: "yasser",        name: "Yasser Ad-Dossari",             location: "Riyadh",        mp3quranSlug: "yasser",       server: 11 },
-  { id: "nour",          name: "Muhammad Nour",                 location: "Ottawa",        mp3quranSlug: "nour",         server: 13 },
-  { id: "turki",         name: "Bader Al-Turki",                location: "Makkah",        mp3quranSlug: "bader/Rewayat-Hafs-A-n-Assem", server: 10 },
-  { id: "nufais",        name: "Ahmad Al-Nufais",               location: "Kuwait City",   mp3quranSlug: "nufais",       server: 7  },
-  { id: "maher",         name: "Maher Al-Muaiqly",              location: "Makkah",        mp3quranSlug: "maher",        server: 12 },
-  { id: "afs",           name: "Mishary Rashid Alafasy",        location: "Kuwait City",   mp3quranSlug: "afs",          server: 8  },
-  { id: "humaid",        name: "Ahmad bin Talib bin Humaid",    location: "Madinah",       mp3quranSlug: "ahmed_huth",   server: 8  },
-  { id: "sufi",          name: "Abdul Rashid Sufi",             location: "Doha",          mp3quranSlug: "sufi",         server: 7  },
-  { id: "luhaidan",      name: "Muhammad Al-Luhaidan",          location: "Riyadh",        mp3quranSlug: "luhaidan_hafs",server: 6  },
-  { id: "balushi",       name: "Hazza Al-Balushi",              location: "Liwa",          mp3quranSlug: "balushi",      server: 13 },
-  { id: "minsh",         name: "Muhammad Siddiq Al-Minshawi",   location: "Cairo",         mp3quranSlug: "minsh",        server: 10 },
-  { id: "basit",         name: "Abdul Basit Kazi",              location: "Toronto",       mp3quranSlug: "basit_mjwd",   server: 7  },
-  { id: "salimi",        name: "Mansour Al-Salimi",             location: "Jeddah",        mp3quranSlug: "salimi",       server: 8  },
-  { id: "okasha",        name: "Okasha Kameny",                 location: "Kumasi",        mp3quranSlug: "okasha/Rewayat-Albizi-A-n-Ibn-Katheer", server: 16 },
-  { id: "dokhin",        name: "Haithm Aldokhin",               location: "Doha",          mp3quranSlug: "aldokhin",     server: 13 },
-  { id: "qurafi",        name: "Abdullah Al-Qurafi",            location: "Madinah",       mp3quranSlug: "qurafi",       server: 12 },
-  { id: "ayyub",         name: "Muhammad Ayyub",                location: "Madinah",       mp3quranSlug: "ayyub",        server: 6  },
-  { id: "idris",         name: "Ibrahim Idris",                 location: "London",        mp3quranSlug: "idris",        server: 13 },
-  { id: "ghailan",       name: "Abdul Badee Ghailan",           location: "Madinah",       mp3quranSlug: "ghailan",      server: 13 },
-  { id: "ahmadhud",      name: "Ahmad Al-Hudhaify",             location: "Madinah",       mp3quranSlug: "a_hthfi",      server: 12 },
-  { id: "shur",          name: "Sa'ud Ash-Shuraim",             location: "Makkah",        mp3quranSlug: "shur",         server: 11 },
-  { id: "majed",         name: "Abdulrahman Al-Majed",          location: "Riyadh",        mp3quranSlug: "majed",        server: 11 },
-  { id: "raad",          name: "Raad Al-Kurdi",                 location: "Kirkuk",        mp3quranSlug: "raad",         server: 6  },
-  { id: "bouchalkha",    name: "Tarek Bouchalkha",              location: "Ottawa",        mp3quranSlug: "bouchalkha",   server: 13 },
-  { id: "jleel",         name: "Khalid Al-Jileel",              location: "Riyadh",        mp3quranSlug: "jleel",        server: 6  },
-  { id: "ynoah",         name: "Yousef Bin Noah Ahmad",         location: "Makkah",        mp3quranSlug: "ynoah",        server: 13 },
-  { id: "husr",          name: "Mahmoud Khalil Al-Husary",      location: "Tanta",         mp3quranSlug: "husr",         server: 6  },
-  { id: "hsaleh",        name: "Hassan Saleh",                  location: "New York City", mp3quranSlug: "hsaleh",       server: 13 },
-  { id: "qtm",           name: "Nasser Al-Qatami",              location: "Riyadh",        mp3quranSlug: "qtm",          server: 6  },
-  { id: "sgmd",          name: "Saad Al-Ghamdi",                location: "Dammam",        mp3quranSlug: "s_gmd",        server: 8  },
-  { id: "hthfi",         name: "Ali Al-Hudhaify",               location: "Madinah",       mp3quranSlug: "hthfi",        server: 6  },
-  { id: "baleela",       name: "Bandar Baleelah",               location: "Makkah",        mp3quranSlug: "baleela",      server: 7  },
-  { id: "nuaina",        name: "Ahmad Nuaina",                  location: "Cairo",         mp3quranSlug: "nuaina",       server: 8  },
-  { id: "kndri",         name: "Fahad Al-Kandari",              location: "Kuwait City",   mp3quranSlug: "kndri",        server: 8  },
-  { id: "emadi",         name: "Anas Al-Emadi",                 location: "Al-Hadd",       mp3quranSlug: "emadi",        server: 13 },
-
-  // Additional world-famous reciters added from mp3quran.net.
-  { id: "shatri",        name: "Abu Bakr Ash-Shatri",           location: "Jeddah",        mp3quranSlug: "shatri",       server: 11 },
-  { id: "ajmy",          name: "Ahmad Al-Ajmi",                 location: "Riyadh",        mp3quranSlug: "ajm",          server: 10 },
-  { id: "sbud",          name: "Salah Al-Budair",               location: "Madinah",       mp3quranSlug: "s_bud",        server: 6  },
-  { id: "bukhatir",      name: "Salah Bukhatir",                location: "Sharjah",       mp3quranSlug: "bu_khtr",      server: 8  },
-  { id: "hani",          name: "Hani Ar-Rifai",                 location: "Jeddah",        mp3quranSlug: "hani",         server: 8  },
-  { id: "ajaber",        name: "Ali Jaber",                     location: "Madinah",       mp3quranSlug: "a_jbr",        server: 11 },
-  { id: "abkr",          name: "Idrees Abkar",                  location: "Riyadh",        mp3quranSlug: "abkr",         server: 6  },
-  { id: "akdar",         name: "Ibrahim Al-Akhdar",             location: "Madinah",       mp3quranSlug: "akdr",         server: 6  },
-  { id: "banna",         name: "Mahmoud Ali Al-Banna",          location: "Cairo",         mp3quranSlug: "bna",          server: 8  },
-  { id: "mustafa",       name: "Mustafa Ismail",                location: "Cairo",         mp3quranSlug: "mustafa",      server: 8  },
-  { id: "kalbani",       name: "Adel Al-Kalbani",               location: "Riyadh",        mp3quranSlug: "a_klb",        server: 8  },
-  { id: "qahtani",       name: "Khalid Al-Qahtani",             location: "Riyadh",        mp3quranSlug: "qht",          server: 10 },
-  { id: "trabulsi",      name: "Ahmed Al-Trabulsi",             location: "Kuwait City",   mp3quranSlug: "trabulsi",     server: 10 },
-  { id: "jbrl",          name: "Muhammad Jibreel",              location: "Cairo",         mp3quranSlug: "jbrl",         server: 8  },
-  { id: "tblawi",        name: "Muhammad Al-Tablawi",           location: "Cairo",         mp3quranSlug: "tblawi",       server: 12, baseUrl: "https://server12.mp3quran.net/tblawi/" },
-  { id: "idossari",      name: "Ibrahim Al-Dossary",            location: "Riyadh",        mp3quranSlug: "ibrahim_dosri/Rewayat-Hafs-A-n-Assem", server: 10 },
-
-  // QuranicAudio.com mounts — verified 114-surah complete recordings.
-  { id: "sudais",        name: "Abdur-Rahman As-Sudais",        location: "Makkah",        baseUrl: QA("abdurrahmaan_as-sudays") },
-  { id: "basfar",        name: "Abdullah Basfar",               location: "Jeddah",        baseUrl: QA("abdullaah_basfar") },
-  { id: "thubaity",      name: "AbdulBari Ath-Thubaity",        location: "Madinah",       baseUrl: QA("thubaity") },
-  { id: "juhany",        name: "Abdullah Awad Al-Juhany",       location: "Makkah",        baseUrl: QA("abdullaah_3awwaad_al-juhaynee") },
-  { id: "abdulbaset",    name: "Abdul Basit Abdus-Samad (Mujawwad)", location: "Cairo",    baseUrl: QA("abdulbaset_mujawwad") },
-  { id: "mikhan",        name: "AbdulMuhsin Al-Qasim",          location: "Madinah",       baseUrl: QA("abdul_muhsin_alqasim") },
-  { id: "fares",         name: "Fares Abbad",                   location: "Sana'a",        baseUrl: QA("fares") },
-  { id: "husary_qa",     name: "Mahmoud Khalil Al-Husary (Murattal)", location: "Tanta",   baseUrl: QA("mahmood_khaleel_al-husaree") },
+  ...MP3QURAN,
+  ...QURANIC_AUDIO,
+  ...COMING_SOON,
 ];
 
 export const reciterById = (id: string) =>
