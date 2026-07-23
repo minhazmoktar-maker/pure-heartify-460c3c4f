@@ -25,8 +25,10 @@ import { toast } from "sonner";
 export default function Listen() {
   const { playQueue, currentTrack } = usePlayer();
   const [selectedReciterId, setSelectedReciterId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"reciters" | "scholars">("reciters");
   const [reciterQuery, setReciterQuery] = useState("");
   const [speakerQuery, setSpeakerQuery] = useState("");
+
 
   const selectedReciter = selectedReciterId ? reciterById(selectedReciterId) : null;
   const surahTracks = useMemo(
