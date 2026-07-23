@@ -117,6 +117,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   // streak isn't reset by a page refresh mid-listen.
   const listenSecondsRef = useRef<number>(0);
   const streakRecordedTodayRef = useRef<boolean>(false);
+  // Unflushed seconds waiting to be posted to record_listen_seconds. Batching
+  // (~30s) keeps this off the hot path while still crediting the weekly recap
+  // long before the tab is closed.
+  const pendingListenSecondsRef = useRef<number>(0);
+  const flushingListenRef = useRef<boolean>(false);
 
   const utcToday = () => new Date().toISOString().slice(0, 10);
 
@@ -163,10 +168,33 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     streakRecordedTodayRef.current = mark[user.id] === today;
   }, [user]);
 
+  const flushListenSeconds = useCallback(async (opts?: { force?: boolean }) => {
+    if (!user) return;
+    if (flushingListenRef.current) return;
+    const pending = Math.floor(pendingListenSecondsRef.current);
+    if (pending <= 0) return;
+    if (!opts?.force && pending < 30) return;
+    flushingListenRef.current = true;
+    // Optimistically clear so concurrent ticks don't double-post; restore on error.
+    pendingListenSecondsRef.current -= pending;
+    try {
+      const { error } = await supabase.rpc("record_listen_seconds", { _seconds: pending });
+      if (error) {
+        pendingListenSecondsRef.current += pending;
+        if (import.meta.env.DEV) console.warn("[listen] record failed", error);
+        return;
+      }
+      qc.invalidateQueries({ queryKey: ["weekly-recap", user.id] });
+    } finally {
+      flushingListenRef.current = false;
+    }
+  }, [user, qc]);
+
   const bumpListenSeconds = useCallback((delta: number) => {
     if (!user || !isFinite(delta) || delta <= 0) return;
     const today = utcToday();
     listenSecondsRef.current += delta;
+    pendingListenSecondsRef.current += delta;
     const mins = readJson<Record<string, { day: string; seconds: number }>>(LISTEN_MINUTES_KEY, {});
     mins[user.id] = { day: today, seconds: listenSecondsRef.current };
     writeJson(LISTEN_MINUTES_KEY, mins);
@@ -191,7 +219,27 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
         qc.invalidateQueries({ queryKey: ["dailyDose"] });
       });
     }
-  }, [user, qc]);
+    // Flush every ~30 accumulated seconds so the weekly Minutes counter
+    // updates while the user is still listening.
+    if (pendingListenSecondsRef.current >= 30) {
+      void flushListenSeconds();
+    }
+  }, [user, qc, flushListenSeconds]);
+
+  // Periodic + unload flush so we don't lose the trailing < 30s.
+  useEffect(() => {
+    if (!user) return;
+    const id = window.setInterval(() => { void flushListenSeconds(); }, 30_000);
+    const onHide = () => { void flushListenSeconds({ force: true }); };
+    window.addEventListener("pagehide", onHide);
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("pagehide", onHide);
+      document.removeEventListener("visibilitychange", onHide);
+      void flushListenSeconds({ force: true });
+    };
+  }, [user, flushListenSeconds]);
 
   // Lazily construct audio element. iOS Safari REQUIRES construction inside
   // a user-gesture path AND `preload="none"` to avoid the "delay until user
