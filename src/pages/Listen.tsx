@@ -162,7 +162,163 @@ export default function Listen() {
   );
 }
 
+// ------------------ Category sections ------------------
+
+interface RecitersSectionProps {
+  reciters: (typeof RECITERS)[number][];
+  onSelect: (id: string) => void;
+  query: string;
+  onQueryChange: (value: string) => void;
+}
+
+function RecitersSection({
+  reciters,
+  onSelect,
+  query,
+  onQueryChange,
+}: RecitersSectionProps) {
+  return (
+    <section aria-labelledby="reciters-heading">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2
+            id="reciters-heading"
+            className="font-heading text-2xl font-bold"
+          >
+            Qur'an Reciters
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {RECITERS.length} reciters • full mus'haf • streaming from
+            mp3quran.net
+          </p>
+        </div>
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          placeholder="Search reciters or cities"
+          className="min-h-[44px] w-full max-w-xs rounded-pill border border-border bg-card px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        />
+      </div>
+
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {reciters.map((r) => {
+          const playable = reciterHasAudio(r);
+          return (
+            <li key={r.id}>
+              <button
+                type="button"
+                onClick={() => onSelect(r.id)}
+                className={cn(
+                  "group flex h-full w-full flex-col rounded-card border bg-card p-4 text-left transition-colors",
+                  "min-h-[128px] pressable",
+                  "hover:border-primary/50 hover:bg-card/80",
+                )}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Mic2 className="h-5 w-5" />
+                  </div>
+                  {playable ? (
+                    <span className="rounded-pill bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
+                      ✓ Full Qur'an
+                    </span>
+                  ) : (
+                    <span className="rounded-pill bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      Coming soon
+                    </span>
+                  )}
+                </div>
+                <div className="mt-3 flex-1">
+                  <p className="line-clamp-2 font-semibold leading-tight">
+                    {r.name}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3 w-3" aria-hidden />
+                    {r.location}
+                  </p>
+                </div>
+                <span
+                  className={cn(
+                    "mt-3 inline-flex items-center gap-1 text-xs font-medium",
+                    playable ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  <Play className="h-3 w-3" aria-hidden />
+                  {playable ? "Open & listen" : "View details"}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+interface SpeakersSectionProps {
+  speakers: (typeof SPEAKERS)[number][];
+  query: string;
+  onQueryChange: (value: string) => void;
+}
+
+function SpeakersSection({
+  speakers,
+  query,
+  onQueryChange,
+}: SpeakersSectionProps) {
+  return (
+    <section aria-labelledby="speakers-heading">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2
+            id="speakers-heading"
+            className="font-heading text-2xl font-bold"
+          >
+            Lectures by Speaker
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {SPEAKERS.length} scholars • reviewed lectures only • halal-first
+          </p>
+        </div>
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          placeholder="Search speakers"
+          className="min-h-[44px] w-full max-w-xs rounded-pill border border-border bg-card px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        />
+      </div>
+
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {speakers.map((s) => (
+          <li key={s.id}>
+            <Link
+              to={speakerSearchPath(s.name)}
+              className={cn(
+                "group flex h-full min-h-[80px] items-center gap-3 rounded-card border bg-card p-3 transition-colors",
+                "hover:border-primary/50 hover:bg-card/80 pressable",
+              )}
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <BookOpen className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium leading-tight">{s.name}</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  Reviewed lectures →
+                </p>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 // ------------------ Reciter detail (114 surahs) ------------------
+
 
 interface ReciterDetailProps {
   reciter: ReturnType<typeof reciterById> & {};
