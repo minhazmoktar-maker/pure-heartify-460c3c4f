@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import FadeIn from "@/components/FadeIn";
 import { CheckCircle2, Play, Heart } from "lucide-react";
 import type { YouTubeVideo } from "@/services/youtube";
