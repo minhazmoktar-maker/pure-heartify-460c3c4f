@@ -4979,6 +4979,7 @@ export type Database = {
     }
     Functions: {
       _analytics_assert_admin: { Args: never; Returns: undefined }
+      _inappropriate_pattern: { Args: never; Returns: string }
       _run_channel_id_backfill: { Args: { _batch?: number }; Returns: number }
       _suggestion_is_blocked: { Args: { _text: string }; Returns: boolean }
       _user_scoped_columns: {
@@ -5827,6 +5828,7 @@ export type Database = {
       }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
+      sweep_inappropriate_content: { Args: never; Returns: Json }
       unaccent: { Args: { "": string }; Returns: string }
       unread_notification_count: { Args: never; Returns: number }
       upsert_reciter: {
