@@ -110,8 +110,9 @@ describe("App.tsx contains every deep-link pattern", () => {
 
   beforeAll(async () => {
     const fs = await import("node:fs/promises");
+    const path = await import("node:path");
     appSource = await fs.readFile(
-      new URL("../App.tsx", import.meta.url),
+      path.resolve(process.cwd(), "src/App.tsx"),
       "utf8",
     );
   });
