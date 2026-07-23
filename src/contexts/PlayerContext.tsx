@@ -12,12 +12,18 @@ import {
   persistPositionRemote, useCrossDevicePlayback,
 } from "@/hooks/useCrossDevicePlayback";
 
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+
 export type RepeatMode = "off" | "all" | "one";
 
 const RECENT_KEY = "heartify.audio.recent.v1";
 const RESUME_KEY = "heartify.audio.resume.v1";
 const PLAY_COUNT_KEY = "heartify.audio.plays.v1";
+const LISTEN_MINUTES_KEY = "heartify.audio.listen.minutes.v1";
+const STREAK_MARK_KEY = "heartify.audio.streak.mark.v1";
 const MAX_RECENT = 20;
+const STREAK_MIN_LISTEN_SECONDS = 60;
 
 interface RecentEntry { id: string; at: number; progress: number; }
 type PlayCounts = Record<string, number>;
