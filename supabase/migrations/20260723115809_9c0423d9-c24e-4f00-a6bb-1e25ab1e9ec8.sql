@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Invitee can redeem" ON public.referrals;
