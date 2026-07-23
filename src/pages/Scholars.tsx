@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Search, RotateCcw, GraduationCap, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Search, RotateCcw, GraduationCap, ShieldCheck, PlayCircle, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import SEO from "@/components/SEO";
 import { useVerifiedScholars } from "@/hooks/useVerifiedScholars";
+import { halaltubeSpeakerUrl, halaltubeSearchUrl } from "@/lib/halaltube";
+import { track } from "@/lib/analytics";
 
 type Scholar = { id: string; name: string; era: string; field: string; summary: string; works: string };
 
