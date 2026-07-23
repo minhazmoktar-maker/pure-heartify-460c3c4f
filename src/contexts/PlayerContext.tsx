@@ -117,6 +117,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   // streak isn't reset by a page refresh mid-listen.
   const listenSecondsRef = useRef<number>(0);
   const streakRecordedTodayRef = useRef<boolean>(false);
+  // Unflushed seconds waiting to be posted to record_listen_seconds. Batching
+  // (~30s) keeps this off the hot path while still crediting the weekly recap
+  // long before the tab is closed.
+  const pendingListenSecondsRef = useRef<number>(0);
+  const flushingListenRef = useRef<boolean>(false);
 
   const utcToday = () => new Date().toISOString().slice(0, 10);
 
