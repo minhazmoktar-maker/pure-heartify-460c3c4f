@@ -9,12 +9,13 @@ import albumQuran from "@/assets/album-quran.jpg";
  */
 export function reciterQuranTracks(reciterId: string): Track[] {
   const r = reciterById(reciterId);
-  if (!r || r.comingSoon || !r.mp3quranSlug) return [];
+  if (!r || !reciterHasAudio(r)) return [];
   return SURAHS.map((s) => trackFor(r, s.number, s.nameEn, s.nameAr, s.ayahs));
 }
 
 export function reciterHasAudio(r: ReciterRecord): boolean {
-  return !r.comingSoon && Boolean(r.mp3quranSlug);
+  if (r.comingSoon) return false;
+  return Boolean(r.baseUrl) || Boolean(r.mp3quranSlug && r.server);
 }
 
 function trackFor(
