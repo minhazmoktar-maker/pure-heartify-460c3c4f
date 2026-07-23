@@ -20,18 +20,36 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const timeAgo = formatTimeAgo(video.publishedAt);
   const liked = isFavorite(video.id);
   const isEmbeddableVideo = /^[a-zA-Z0-9_-]{11}$/.test(video.id);
-  // Prefer maxres (1280x720) with hq fallback for crisper thumbnails.
+  // Prefer maxres (1280x720) with a fallback chain for crisper thumbnails.
+  // Chain: maxresdefault -> hqdefault -> mqdefault -> provided thumbnailUrl -> hide card
+  const [thumbFailed, setThumbFailed] = useState(false);
   const hiResThumb = isEmbeddableVideo
     ? `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`
     : video.thumbnailUrl;
   const handleThumbError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
-    // Fallback chain: maxresdefault -> hqdefault -> provided thumbnailUrl
     if (img.src.includes("maxresdefault.jpg") && isEmbeddableVideo) {
       img.src = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
       return;
     }
-    if (img.src !== video.thumbnailUrl && video.thumbnailUrl) img.src = video.thumbnailUrl;
+    if (img.src.includes("hqdefault.jpg") && isEmbeddableVideo) {
+      img.src = `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`;
+      return;
+    }
+    if (video.thumbnailUrl && img.src !== video.thumbnailUrl) {
+      img.src = video.thumbnailUrl;
+      return;
+    }
+    // All sources exhausted — hide the card entirely rather than showing a blank tile.
+    setThumbFailed(true);
+  };
+  // YouTube returns a 120x90 "video unavailable" placeholder even when a
+  // video is deleted; detect that specific tiny image and hide the card.
+  const handleThumbLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth > 0 && img.naturalWidth <= 120 && img.src.includes("i.ytimg.com")) {
+      setThumbFailed(true);
+    }
   };
 
   const handleClick = (e: React.MouseEvent) => {
