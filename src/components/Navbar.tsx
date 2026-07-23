@@ -180,7 +180,7 @@ const Navbar = () => {
               <NotificationsBell isAdmin={isAdmin} />
               <Link
                 to="/profile"
-                aria-label="Open profile"
+                aria-label="View profile and settings"
                 className="flex h-8 w-8 items-center justify-center rounded-pill bg-primary transition-colors hover:opacity-90"
                 title="Profile"
               >
