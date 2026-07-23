@@ -151,6 +151,48 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const PREVIEW_SECONDS = 30;
 
+  // Hydrate listening minutes + streak-recorded marker from localStorage so a
+  // refresh doesn't cost the user credit for the seconds they already spent.
+  useEffect(() => {
+    if (!user) return;
+    const today = utcToday();
+    const mins = readJson<Record<string, { day: string; seconds: number }>>(LISTEN_MINUTES_KEY, {});
+    const rec = mins[user.id];
+    listenSecondsRef.current = rec && rec.day === today ? rec.seconds : 0;
+    const mark = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
+    streakRecordedTodayRef.current = mark[user.id] === today;
+  }, [user]);
+
+  const bumpListenSeconds = useCallback((delta: number) => {
+    if (!user || !isFinite(delta) || delta <= 0) return;
+    const today = utcToday();
+    listenSecondsRef.current += delta;
+    const mins = readJson<Record<string, { day: string; seconds: number }>>(LISTEN_MINUTES_KEY, {});
+    mins[user.id] = { day: today, seconds: listenSecondsRef.current };
+    writeJson(LISTEN_MINUTES_KEY, mins);
+    if (
+      !streakRecordedTodayRef.current &&
+      listenSecondsRef.current >= STREAK_MIN_LISTEN_SECONDS
+    ) {
+      streakRecordedTodayRef.current = true;
+      const mark = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
+      mark[user.id] = today;
+      writeJson(STREAK_MARK_KEY, mark);
+      supabase.rpc("record_streak_activity").then(({ error }) => {
+        if (error) {
+          if (import.meta.env.DEV) console.warn("[streak] listen record failed", error);
+          streakRecordedTodayRef.current = false;
+          const m = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
+          delete m[user.id];
+          writeJson(STREAK_MARK_KEY, m);
+          return;
+        }
+        qc.invalidateQueries({ queryKey: ["streak", user.id] });
+        qc.invalidateQueries({ queryKey: ["dailyDose"] });
+      });
+    }
+  }, [user, qc]);
+
   // Lazily construct audio element. iOS Safari REQUIRES construction inside
   // a user-gesture path AND `preload="none"` to avoid the "delay until user
   // interaction" behaviour that leaves the element in an indefinite waiting
