@@ -48,19 +48,13 @@ function json(body: unknown, status = 200, cachePrivate = true) {
   });
 }
 
-async function loadBlockedChannels(service: any, userId: string | null): Promise<Set<string>> {
-  const set = new Set<string>();
-  try {
-    const { data: bc } = await service.from("blocked_creators").select("channel_id");
-    for (const r of bc ?? []) if ((r as any).channel_id) set.add((r as any).channel_id);
-    if (userId) {
-      const { data: ub } = await service.from("user_blocks").select("channel_id").eq("user_id", userId);
-      for (const r of ub ?? []) if ((r as any).channel_id) set.add((r as any).channel_id);
-    }
-  } catch (e) {
-    console.warn("[surfaces] blocklist load failed", (e as Error).message);
-  }
-  return set;
+async function loadBlockedChannels(_service: any, _userId: string | null): Promise<Set<string>> {
+  // Admin-level creator blocks are enforced at ingest time by a DB trigger
+  // against `blocked_creators.pattern`, so the candidate pool is already
+  // scrubbed. `user_blocks` is user↔user (blocker_id / blocked_user_id),
+  // not a channel blocklist, so it does not belong here. Return empty to
+  // avoid firing SQL against columns that don't exist.
+  return new Set();
 }
 
 async function loadHiddenVideos(service: any, userId: string | null): Promise<Set<string>> {
