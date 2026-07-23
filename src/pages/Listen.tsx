@@ -71,7 +71,7 @@ export default function Listen() {
       <SEO
         title="Listen — Qur'an & Halal Lectures"
         description="Stream the whole Qur'an from the world's most beloved reciters and browse reviewed lectures from over 100 trusted scholars, all halal-first."
-        canonical="/listen"
+        path="/listen"
       />
       <Navbar />
       <main className="mx-auto max-w-[1400px] px-4 pb-24 pt-4 md:px-6 md:pt-8">
