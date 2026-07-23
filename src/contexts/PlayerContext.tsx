@@ -350,6 +350,14 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       // On some Android WebViews `currentTime` momentarily drops to 0 when the
       // buffer wraps. Ignore that spurious zero to keep the seek bar smooth.
       if (a.currentTime === 0 && lastPos > 1 && !a.seeking) return;
+      // Accumulate listening seconds only while actually playing (not seeking
+      // and not while paused). We use the delta of currentTime rather than
+      // wall-clock so scrubs, buffering pauses, and background tab throttling
+      // don't inflate the counter.
+      const delta = a.currentTime - lastPos;
+      if (!a.paused && !a.seeking && delta > 0 && delta < 2) {
+        bumpListenSeconds(delta);
+      }
       lastPos = a.currentTime;
       setProgress(a.currentTime);
       saveLocal(a.currentTime);
