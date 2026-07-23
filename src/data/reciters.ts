@@ -45,7 +45,7 @@ export const RECITERS: ReciterRecord[] = [
   { id: "minsh",         name: "Muhammad Siddiq Al-Minshawi",   location: "Cairo",         mp3quranSlug: "minsh",        server: 10 },
   { id: "basit",         name: "Abdul Basit Kazi",              location: "Toronto",       mp3quranSlug: "basit_mjwd",   server: 7  },
   { id: "salimi",        name: "Mansour Al-Salimi",             location: "Jeddah",        mp3quranSlug: "salimi",       server: 8  },
-  { id: "okasha",        name: "Okasha Kameny",                 location: "Kumasi",        mp3quranSlug: null, comingSoon: true },
+  { id: "okasha",        name: "Okasha Kameny",                 location: "Kumasi",        mp3quranSlug: "okasha/Rewayat-Albizi-A-n-Ibn-Katheer", server: 16 },
   { id: "dokhin",        name: "Haithm Aldokhin",               location: "Doha",          mp3quranSlug: "aldokhin",     server: 13 },
   { id: "qurafi",        name: "Abdullah Al-Qurafi",            location: "Madinah",       mp3quranSlug: "qurafi",       server: 12 },
   { id: "ayyub",         name: "Muhammad Ayyub",                location: "Madinah",       mp3quranSlug: "ayyub",        server: 6  },
