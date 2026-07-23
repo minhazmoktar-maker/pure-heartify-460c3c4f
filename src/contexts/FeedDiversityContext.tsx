@@ -204,15 +204,23 @@ export const FeedDiversityProvider = ({ children }: { children: ReactNode }) => 
       const set = seenVideoIds.current;
       if (set.has(videoId)) {
         const owner = ownersRef.current.get(videoId) ?? "unknown";
-        if (owner !== source) {
-          appendAudit({
-            id: `${videoId}:${source}:${Date.now()}`,
-            videoId,
-            attemptedFrom: source,
-            claimedBy: owner,
-            at: Date.now(),
-          });
+        // Idempotent for the owning source: re-renders of the same rail
+        // must keep rendering their own items. Only a *different* source
+        // trying to claim an already-owned id counts as a duplicate.
+        if (owner === source || owner === "unknown") {
+          if (owner === "unknown") {
+            ownersRef.current.set(videoId, source);
+            flush();
+          }
+          return true;
         }
+        appendAudit({
+          id: `${videoId}:${source}:${Date.now()}`,
+          videoId,
+          attemptedFrom: source,
+          claimedBy: owner,
+          at: Date.now(),
+        });
         return false;
       }
       set.add(videoId);
