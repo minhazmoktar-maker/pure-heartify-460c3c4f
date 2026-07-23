@@ -86,6 +86,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   };
 
   if (!isEmbeddableVideo) return null; // hide non-embeddable fallback videos
+  if (thumbFailed) return null; // hide cards whose thumbnails are all unavailable
 
   return (
     <FadeIn
@@ -101,6 +102,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         <img
           src={hiResThumb}
           onError={handleThumbError}
+          onLoad={handleThumbLoad}
           alt={video.title}
           loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
