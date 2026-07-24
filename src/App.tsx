@@ -50,6 +50,7 @@ const AdminDedup = lazy(() => import("./pages/AdminDedup.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const ReviewMagic = lazy(() => import("./pages/ReviewMagic.tsx"));
+const AdminMintReviewToken = lazy(() => import("./pages/AdminMintReviewToken.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers.tsx"));
 
