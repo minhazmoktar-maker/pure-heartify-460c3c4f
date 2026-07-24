@@ -81,7 +81,8 @@ const Index = () => {
       <SurfaceRail surface="recently_added" title="Recently added" priority
         seeAllHref="/section/recently-added" />
       <SurfaceRail surface="listen" title="Listen"
-        subtitle="Recitation, adhan, nasheed and lectures" priority />
+        subtitle="Recitation, adhan, nasheed and lectures" priority
+        seeAllHref="/section/listen" />
     </main>
   );
 
