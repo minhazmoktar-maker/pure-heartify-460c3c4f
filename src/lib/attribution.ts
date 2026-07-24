@@ -82,7 +82,7 @@ export async function captureAttributionOnce(): Promise<void> {
     sessionStorage.setItem(CAPTURED_KEY, "1");
     await supabase
       .from("attributions")
-      .upsert(snapshot, { onConflict: "session_id", ignoreDuplicates: false });
+      .upsert(snapshot, { onConflict: "session_id", ignoreDuplicates: true });
   } catch (err) {
     if (import.meta.env.DEV) console.warn("[attribution] capture failed", err);
   }
