@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
 import SEO from "@/components/SEO";
 import TodayHero from "@/components/TodayHero";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
@@ -13,6 +12,7 @@ import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
 import HomeHero from "@/components/HomeHero";
+import TopPickHero from "@/components/TopPickHero";
 import ScholarsRail from "@/components/ScholarsRail";
 
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
