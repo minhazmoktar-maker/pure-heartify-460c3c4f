@@ -111,6 +111,12 @@ export interface YouTubeVideo {
   category: HalalCategory;
   halalScore: number;
   publishedAt: string;
+  /**
+   * Wave M2 — Beneficial Intelligence Engine reason chip.
+   * When present, the card explains why this specific video was recommended
+   * (e.g. "Because you learn Fiqh", "Trusted source", "New voice worth hearing").
+   */
+  reason?: string | null;
 }
 
 interface YouTubeProxyResponse {
