@@ -1,41 +1,22 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import PageSkeleton from "./components/PageSkeleton";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { PlayerProvider } from "@/contexts/PlayerContext";
-import GatedPreviewGuard from "@/components/premium/GatedPreviewGuard";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LocaleProvider } from "@/contexts/LocaleContext";
+import { KidsModeProvider } from "./contexts/KidsModeContext";
+import ErrorBoundary from "./components/ErrorBoundary";
+import AdminRoute from "./components/AdminRoute";
+import AppShell from "./components/AppShell";
 import Index from "./pages/Index.tsx";
 const Login = lazy(() => import("./pages/Login.tsx"));
 const Signup = lazy(() => import("./pages/Signup.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const OAuthConsent = lazy(() => import("./pages/OAuthConsent.tsx"));
-import { MobileBridge } from "./components/MobileBridge";
-import ReferralBridge from "./components/ReferralBridge";
-import AdhanNotifier from "./components/AdhanNotifier";
-import OfflineSweeper from "./components/OfflineSweeper";
-import ErrorBoundary from "./components/ErrorBoundary";
-import AdminRoute from "./components/AdminRoute";
-import RouteTransition from "./components/RouteTransition";
-import BackToTop from "./components/BackToTop";
-// AgeGate removed — age is verified at signup only
-// CookieConsent import removed — consent lives on /privacy only.
-const CommandPalette = lazy(() => import("./components/CommandPalette"));
-import BottomTabBar from "./components/BottomTabBar";
-import EdgeSwipeBack from "./components/EdgeSwipeBack";
-import KeyboardFocusScroller from "./components/KeyboardFocusScroller";
-import ScrollRestoration from "./components/ScrollRestoration";
-import SkipLink from "./components/SkipLink";
-import OfflineBanner from "./components/OfflineBanner";
-import { KidsModeProvider } from "./contexts/KidsModeContext";
-import { FeedDiversityProvider } from "./contexts/FeedDiversityContext";
-const PushPermissionPrompt = lazy(() => import("./components/PushPermissionPrompt"));
-const StreakMilestoneDialog = lazy(() => import("./components/StreakMilestoneDialog"));
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
 const Listen = lazy(() => import("./pages/Listen.tsx"));
@@ -266,12 +247,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const RouteFallback = () => (
-  <div className="min-h-dvh bg-background">
-    <PageSkeleton variant="default" />
-  </div>
-);
-
 const App = () => (
   <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
@@ -284,29 +259,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <SkipLink />
-            <OfflineBanner />
-            <ScrollRestoration />
-            <MobileBridge />
-            <ReferralBridge />
-            <AdhanNotifier />
-            <GatedPreviewGuard />
-            <OfflineSweeper />
-            <BackToTop />
-            {/* AgeGate removed — age is verified at signup only */}
-            {/* CookieConsent removed from app root — the persistent toast
-                obstructed the bottom tab bar and violated the "one primary
-                action per surface" rule. Consent controls live at /privacy
-                (footer + Profile → Preferences). Essential cookies only. */}
-            <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
-            <Suspense fallback={null}><CommandPalette /></Suspense>
-            <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
-            <BottomTabBar />
-            <EdgeSwipeBack />
-            <KeyboardFocusScroller />
-            <FeedDiversityProvider>
-            <Suspense fallback={<RouteFallback />}>
-              <RouteTransition>
+            <AppShell>
               <Routes>
                 <Route path="/" element={<Index />} />
                 {/* Common aliases that used to 404 */}
@@ -826,9 +779,7 @@ const App = () => (
                 <Route path="/zuhd" element={<Navigate to="/library/zuhd" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              </RouteTransition>
-            </Suspense>
-            </FeedDiversityProvider>
+            </AppShell>
           </BrowserRouter>
         </PlayerProvider>
           </KidsModeProvider>
