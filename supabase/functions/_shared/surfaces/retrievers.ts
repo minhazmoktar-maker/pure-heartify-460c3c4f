@@ -80,57 +80,74 @@ export async function retrieveBecauseYouWatched(ctx: SurfaceContext) {
   });
 }
 
-// For You v2: personalized against user_taste_profiles. On profile hit,
-// pool_for_you_v2 scores every approved video by topic + creator + language
-// affinity so two users with different histories get materially different
-// pools. Falls back to legacy category heuristic for cold-start users
-// (< 3 signals) and always blends in a small "explore" slot.
+// For You v3 — Wave M2 Beneficial Intelligence Engine.
+// Ranks candidates by BENEFIT (trust + goal alignment + novelty + personal
+// affinity + freshness), never by view count. Falls back to legacy v2 pool
+// if the new RPC is unavailable, then to cold-start category heuristics.
 export async function retrieveForYou(ctx: SurfaceContext) {
   if (!ctx.userId) return [];
 
   // Kick a background refresh so the next request reflects new activity.
   ctx.service.rpc("refresh_user_taste_profile", { _user_id: ctx.userId })
-    .then(({ error }) => { if (error) console.warn("[for_you] refresh error", error.message); });
+    .then(({ error }: { error: { message: string } | null }) => {
+      if (error) console.warn("[for_you] refresh error", error.message);
+    });
 
   const { data: profile } = await ctx.service
     .from("user_taste_profiles").select("signal_count").eq("user_id", ctx.userId).maybeSingle();
-  const warm = ((profile as any)?.signal_count ?? 0) >= 3;
+  const signalCount = (profile as { signal_count?: number } | null)?.signal_count ?? 0;
 
   let personalized: SurfaceVideo[] = [];
-  if (warm) {
-    personalized = await callPool(ctx, "pool_for_you_v2", {
-      _user_id: ctx.userId, _limit: 160, _exclude_premium: !ctx.isPremium,
-    });
+
+  // Try the beneficial engine first — it works for both warm and lukewarm users
+  // because the trust + goal + novelty terms are meaningful without any history.
+  const beneficial = await ctx.service.rpc("pool_beneficial_v1", {
+    _user_id: ctx.userId, _limit: 160, _exclude_premium: !ctx.isPremium,
+  });
+  if (beneficial.error) {
+    console.warn("[for_you] pool_beneficial_v1 error", beneficial.error.message);
   } else {
-    // Cold-start fallback (unchanged legacy path)
-    const { data: hist } = await ctx.service
-      .from("watch_history").select("video_id")
-      .eq("user_id", ctx.userId)
-      .gte("watched_at", new Date(Date.now() - 30 * 86400 * 1000).toISOString())
-      .limit(50);
-    const seedIds = (hist ?? []).map((r: any) => r.video_id);
-    let topCats: string[] = [];
-    if (seedIds.length) {
-      const { data: seedRows } = await ctx.service
-        .from("curated_videos").select("category").in("video_id", seedIds).limit(50);
-      const bag = new Map<string, number>();
-      for (const r of seedRows ?? []) {
-        const c = (r as any).category;
-        if (c) bag.set(c, (bag.get(c) ?? 0) + 1);
+    personalized = (beneficial.data ?? []) as SurfaceVideo[];
+  }
+
+  // If beneficial returned too little, top up with taste-profile pool (warm)
+  // or category heuristic (cold), keeping their reason chips through the merge.
+  if (personalized.length < 40) {
+    if (signalCount >= 3) {
+      const legacy = await callPool(ctx, "pool_for_you_v2", {
+        _user_id: ctx.userId, _limit: 120, _exclude_premium: !ctx.isPremium,
+      });
+      personalized = personalized.concat(legacy);
+    } else {
+      const { data: hist } = await ctx.service
+        .from("watch_history").select("video_id")
+        .eq("user_id", ctx.userId)
+        .gte("watched_at", new Date(Date.now() - 30 * 86400 * 1000).toISOString())
+        .limit(50);
+      const seedIds = (hist ?? []).map((r: { video_id: string }) => r.video_id);
+      let topCats: string[] = [];
+      if (seedIds.length) {
+        const { data: seedRows } = await ctx.service
+          .from("curated_videos").select("category").in("video_id", seedIds).limit(50);
+        const bag = new Map<string, number>();
+        for (const r of seedRows ?? []) {
+          const c = (r as { category: string | null }).category;
+          if (c) bag.set(c, (bag.get(c) ?? 0) + 1);
+        }
+        topCats = Array.from(bag.entries()).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([c]) => c);
       }
-      topCats = Array.from(bag.entries()).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([c]) => c);
-    }
-    if (topCats.length) {
-      const { data } = await ctx.service
-        .from("curated_videos")
-        .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language")
-        .in("moderation_state", ["approved", "auto_approved"])
-        .eq("is_hidden", false).eq("is_archived", false)
-        .in("category", topCats)
-        .gte("published_at", new Date(Date.now() - 90 * 86400 * 1000).toISOString())
-        .order("ingested_at", { ascending: false })
-        .limit(120);
-      personalized = (data ?? []) as SurfaceVideo[];
+      if (topCats.length) {
+        const { data } = await ctx.service
+          .from("curated_videos")
+          .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language")
+          .in("moderation_state", ["approved", "auto_approved"])
+          .eq("is_hidden", false).eq("is_archived", false)
+          .in("category", topCats)
+          .gte("published_at", new Date(Date.now() - 90 * 86400 * 1000).toISOString())
+          .order("ingested_at", { ascending: false })
+          .limit(120);
+        personalized = personalized.concat((data ?? []) as SurfaceVideo[]);
+      }
     }
   }
 
