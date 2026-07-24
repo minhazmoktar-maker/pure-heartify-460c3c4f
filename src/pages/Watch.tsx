@@ -11,6 +11,8 @@ import CommentThread from "@/components/CommentThread";
 import AddToPlaylistDialog from "@/components/AddToPlaylistDialog";
 import NotInterestedMenu from "@/components/NotInterestedMenu";
 import { WatchLaterButton, ShareAtTimeButton } from "@/components/WatchExtras";
+import SeriesRail from "@/components/SeriesRail";
+import { useSeriesEpisodes } from "@/hooks/useSeriesEpisodes";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
 import type { YouTubeVideo } from "@/services/youtube";
@@ -47,8 +49,11 @@ const Watch = () => {
   const relatedVideos = videos?.filter((v) => v.id !== videoId).slice(0, 8) ?? [];
   const isEmbeddableVideo = !!videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId);
 
+  const series = useSeriesEpisodes(currentVideo, videos);
   const currentIndex = videos?.findIndex((v) => v.id === videoId) ?? -1;
-  const nextVideo = videos && currentIndex >= 0 ? videos[(currentIndex + 1) % videos.length] : null;
+  const feedNext = videos && currentIndex >= 0 ? videos[(currentIndex + 1) % videos.length] : null;
+  // Prefer the next series episode when we're in a series — keeps viewers on-topic.
+  const nextVideo = series?.next ?? feedNext;
 
   // Reset facade when navigating between videos
   useEffect(() => {
@@ -347,6 +352,7 @@ const Watch = () => {
               <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
             </button>
           )}
+          {series && <SeriesRail series={series} className="mt-4" />}
           {videoId && <CommentThread videoId={videoId} />}
         </div>
 
