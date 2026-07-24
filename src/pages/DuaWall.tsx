@@ -185,11 +185,15 @@ export default function DuaWall() {
 
         {loading ? (
           <PageSkeleton variant="list" className="max-w-none px-0" />
-        ) : duas.length === 0 ? (
-          <EmptyState icon={Heart} title="No du'as yet" description="Be the first to share a du'a and let the ummah say āmīn." />
+        ) : orderedDuas.length === 0 ? (
+          <EmptyState
+            icon={tab === "trending" ? Flame : Heart}
+            title={tab === "trending" ? "Nothing trending yet" : "No du'as yet"}
+            description={tab === "trending" ? "Check back soon — trending du'as are pulled from the last 7 days." : "Be the first to share a du'a and let the ummah say āmīn."}
+          />
         ) : (
           <ul className="space-y-3">
-            {duas.map((d) => {
+            {orderedDuas.map((d) => {
               const mine = myOwnIds.has(d.id);
               const said = myAmeens.has(d.id);
               return (
