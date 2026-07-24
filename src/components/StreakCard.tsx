@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Flame, Snowflake, Trophy, Share2 } from "lucide-react";
+import { Flame, Snowflake, Trophy, Share2, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useStreak } from "@/hooks/useStreak";
 import { useMyHandle } from "@/hooks/useMyHandle";
 import { shareContent } from "@/lib/share";
@@ -116,11 +117,35 @@ export function StreakCard() {
 
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-3 text-muted-foreground">
-          <span className="inline-flex items-center gap-1" title="Streak freezes protect one missed day">
-            <Snowflake className="h-4 w-4 text-sky-400" aria-hidden />
-            <span className="tabular-nums">{s.freezes}</span>
-            <span className="sr-only">streak freezes</span>
-          </span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className={`inline-flex items-center gap-1.5 rounded-pill px-2 py-1 text-xs transition-colors ${
+                  s.freezes > 0
+                    ? "bg-sky-500/10 text-sky-600 hover:bg-sky-500/15 dark:text-sky-400"
+                    : "hover:bg-muted"
+                }`}
+                aria-label="Streak freeze info"
+              >
+                <Snowflake className="h-3.5 w-3.5" aria-hidden />
+                <span className="tabular-nums font-medium">{s.freezes}</span>
+                {s.freezes > 0 && <span className="hidden sm:inline">Protected</span>}
+                <Info className="h-3 w-3 opacity-60" aria-hidden />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="top" className="w-72 text-sm">
+              <div className="font-semibold text-foreground mb-1">Streak freezes ❄️</div>
+              <p className="text-muted-foreground">
+                {s.freezes > 0
+                  ? "If you miss one day, a freeze automatically saves your streak — no action needed."
+                  : "You'll receive a free freeze soon. Freezes automatically protect your streak if you miss one day."}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                One free freeze granted per week (up to one active at a time).
+              </p>
+            </PopoverContent>
+          </Popover>
           <span className="inline-flex items-center gap-1" title="Earned milestones">
             <Trophy className="h-4 w-4 text-amber-500" aria-hidden />
             <span className="tabular-nums">{s.milestones.length}</span>
