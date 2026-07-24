@@ -28,6 +28,7 @@ const BestIslamicCartoons = lazy(() => import("./pages/BestIslamicCartoons.tsx")
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
+const Verify = lazy(() => import("./pages/Verify.tsx"));
 const Status = lazy(() => import("./pages/Status.tsx"));
 const Creators = lazy(() => import("./pages/Creators.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
