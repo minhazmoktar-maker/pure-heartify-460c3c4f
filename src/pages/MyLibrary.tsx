@@ -29,7 +29,7 @@ export default function MyLibrary() {
       <SEO
         title="Library — Heartify"
         description="Your subscriptions, playlists, watch history, downloads, and saved content — all in one place."
-        canonicalPath="/me"
+        path="/me"
       />
       <Navbar />
       <main id="main" className="mx-auto max-w-[1200px] px-4 py-6 md:px-6 md:py-10">

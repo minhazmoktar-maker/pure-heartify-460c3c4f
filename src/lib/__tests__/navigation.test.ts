@@ -8,32 +8,45 @@ import {
 } from "@/lib/navigation";
 
 describe("navigation spine map", () => {
-  it("has exactly 5 spines", () => {
-    expect(SPINES).toHaveLength(5);
+  it("has exactly 4 spines (Home · Explore · Library · Profile)", () => {
+    expect(SPINES).toHaveLength(4);
+    expect(SPINES.map((s) => s.id)).toEqual(["home", "explore", "library", "profile"]);
   });
 
   it("resolves canonical routes to the expected spine", () => {
+    // Home spine — video-first front door
     expect(resolveSpine("/")).toBe("home");
     expect(resolveSpine("/today")).toBe("home");
-    expect(resolveSpine("/search")).toBe("home");
-    expect(resolveSpine("/channels")).toBe("home");
     expect(resolveSpine("/watch/abc123")).toBe("home");
     expect(resolveSpine("/shorts")).toBe("home");
-    expect(resolveSpine("/quran")).toBe("quran");
-    expect(resolveSpine("/quran/2")).toBe("quran");
-    expect(resolveSpine("/mushaf")).toBe("quran");
-    expect(resolveSpine("/khatm/groups")).toBe("quran");
-    expect(resolveSpine("/prayer")).toBe("prayer");
-    expect(resolveSpine("/qibla")).toBe("prayer");
-    expect(resolveSpine("/mosques")).toBe("prayer");
-    expect(resolveSpine("/dhikr")).toBe("dhikr");
-    expect(resolveSpine("/adhkar")).toBe("dhikr");
-    expect(resolveSpine("/library")).toBe("dhikr");
-    expect(resolveSpine("/library/ibn-qayyim")).toBe("dhikr");
-    expect(resolveSpine("/hadith")).toBe("dhikr");
-    expect(resolveSpine("/profile")).toBe("you");
-    expect(resolveSpine("/bookmarks")).toBe("you");
-    expect(resolveSpine("/plus")).toBe("you");
+
+    // Explore spine — search, channels, supporting Islamic study surfaces
+    expect(resolveSpine("/explore")).toBe("explore");
+    expect(resolveSpine("/search")).toBe("explore");
+    expect(resolveSpine("/channels")).toBe("explore");
+    expect(resolveSpine("/quran")).toBe("explore");
+    expect(resolveSpine("/quran/2")).toBe("explore");
+    expect(resolveSpine("/mushaf")).toBe("explore");
+    expect(resolveSpine("/khatm/groups")).toBe("explore");
+    expect(resolveSpine("/prayer")).toBe("explore");
+    expect(resolveSpine("/qibla")).toBe("explore");
+    expect(resolveSpine("/mosques")).toBe("explore");
+    expect(resolveSpine("/dhikr")).toBe("explore");
+    expect(resolveSpine("/adhkar")).toBe("explore");
+    expect(resolveSpine("/library")).toBe("explore");
+    expect(resolveSpine("/library/ibn-qayyim")).toBe("explore");
+    expect(resolveSpine("/hadith")).toBe("explore");
+
+    // Library spine — user's video investment
+    expect(resolveSpine("/me")).toBe("library");
+    expect(resolveSpine("/playlists")).toBe("library");
+    expect(resolveSpine("/bookmarks")).toBe("library");
+    expect(resolveSpine("/offline")).toBe("library");
+
+    // Profile spine — identity + settings
+    expect(resolveSpine("/profile")).toBe("profile");
+    expect(resolveSpine("/achievements")).toBe("profile");
+    expect(resolveSpine("/plus")).toBe("profile");
   });
 
   it("falls back to home for unknown routes", () => {
@@ -60,9 +73,8 @@ describe("navigation spine map", () => {
 
   it("returns canonical entry paths for each spine", () => {
     expect(spinePath("home")).toBe("/");
-    expect(spinePath("quran")).toBe("/quran");
-    expect(spinePath("prayer")).toBe("/prayer");
-    expect(spinePath("dhikr")).toBe("/dhikr");
-    expect(spinePath("you")).toBe("/profile");
+    expect(spinePath("explore")).toBe("/explore");
+    expect(spinePath("library")).toBe("/me");
+    expect(spinePath("profile")).toBe("/profile");
   });
 });
