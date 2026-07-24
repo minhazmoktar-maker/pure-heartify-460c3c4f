@@ -125,7 +125,8 @@ Deno.serve(async (req) => {
       { headers: { Range: `${from}-${to}`, "Range-Unit": "items" } },
     );
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: `fetch failed: ${res.status}` }), {
+      const detail = await res.text().catch(() => "");
+      return new Response(JSON.stringify({ error: `fetch failed: ${res.status}`, detail, from, to }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
