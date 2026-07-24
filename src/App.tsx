@@ -35,6 +35,7 @@ import OfflineBanner from "./components/OfflineBanner";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
 import { FeedDiversityProvider } from "./contexts/FeedDiversityContext";
 const PushPermissionPrompt = lazy(() => import("./components/PushPermissionPrompt"));
+const StreakMilestoneDialog = lazy(() => import("./components/StreakMilestoneDialog"));
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
 const Listen = lazy(() => import("./pages/Listen.tsx"));
