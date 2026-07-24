@@ -51,14 +51,34 @@ const Watch = () => {
 
   const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
   const currentCategory = (currentVideo as any)?.category;
+  const seenRelatedIdsRef = useRef<Set<string>>(new Set());
   const relatedQuery = useInfiniteFeed({
     category: currentCategory && currentCategory !== "All" ? currentCategory : undefined,
     limit: 12,
     sort: "fresh",
-    getExcludeIds: () => (videoId ? [videoId] : []),
+    getExcludeIds: () => {
+      const ids = Array.from(seenRelatedIdsRef.current);
+      if (videoId) ids.push(videoId);
+      return ids;
+    },
   });
-  const relatedVideos = (relatedQuery.data?.pages.flatMap((p) => p.items) ?? [])
-    .filter((v) => v.id !== videoId);
+  const relatedVideos = (() => {
+    const seen = new Set<string>();
+    if (videoId) seen.add(videoId);
+    const out: YouTubeVideo[] = [];
+    for (const v of relatedQuery.data?.pages.flatMap((p) => p.items) ?? []) {
+      if (seen.has(v.id)) continue;
+      seen.add(v.id);
+      out.push(v);
+    }
+    return out;
+  })();
+  useEffect(() => {
+    for (const v of relatedVideos) seenRelatedIdsRef.current.add(v.id);
+  }, [relatedVideos.length]);
+  useEffect(() => {
+    seenRelatedIdsRef.current = new Set();
+  }, [videoId, currentCategory]);
   const relatedSentinelRef = useInfiniteScroll(
     () => {
       if (relatedQuery.hasNextPage && !relatedQuery.isFetchingNextPage) {
