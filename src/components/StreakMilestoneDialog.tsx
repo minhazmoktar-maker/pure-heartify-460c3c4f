@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { celebrateMilestone } from "@/lib/celebrate";
 import { track } from "@/lib/analytics";
+import { haptic } from "@/lib/haptics";
 
 /**
  * Global listener for `heartify:streak-milestone` custom events dispatched
@@ -49,6 +50,7 @@ export function StreakMilestoneDialog() {
     const text = `Alhamdulillah — ${milestone}-day Heartify streak. ${copy.verse}`;
     const url = `${window.location.origin}/?ref=streak-${milestone}`;
     void track("streak_milestone_shared", { milestone });
+    haptic("success");
     try {
       if (navigator.share) {
         await navigator.share({ title: `${milestone}-day streak`, text, url });
