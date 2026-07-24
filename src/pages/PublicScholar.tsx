@@ -8,7 +8,7 @@ import { Share2, GraduationCap, MapPin, Calendar, BookOpen, ChevronLeft, Chevron
 import { SCHOLARS } from "@/data/scholars";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
-import { halaltubeSearchUrl } from "@/lib/halaltube";
+
 
 export default function PublicScholar() {
   const { slug = "" } = useParams();
