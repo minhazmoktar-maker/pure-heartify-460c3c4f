@@ -42,19 +42,41 @@ export default function CreatorDashboard() {
       setChannels(list);
       if (list.length > 0) {
         const ids = list.map((c) => c.id);
-        const [{ data: follows }, { data: comments }] = await Promise.all([
+        const ytIds = list.map((c) => c.youtube_channel_id).filter(Boolean);
+        const [{ data: follows }, { data: vids }] = await Promise.all([
           supabase.from("channel_follows").select("channel_id", { count: "exact" }).in("channel_id", ids),
-          supabase.from("video_comments").select("id", { count: "exact", head: true }),
+          supabase.from("curated_videos").select("video_id,title,channel_id").in("channel_id", ytIds).limit(2000),
         ]);
         const followMap: Record<string, number> = {};
         (follows ?? []).forEach((f: any) => {
           followMap[f.channel_id] = (followMap[f.channel_id] ?? 0) + 1;
         });
+        const videoIds = (vids ?? []).map((v: any) => v.video_id);
+        const titleMap: Record<string, string> = Object.fromEntries((vids ?? []).map((v: any) => [v.video_id, v.title]));
+        let inboxItems: InboxItem[] = [];
+        let commentTotal = 0;
+        if (videoIds.length > 0) {
+          const { data: cmts, count } = await supabase
+            .from("video_comments")
+            .select("id,body,created_at,video_id", { count: "exact" })
+            .in("video_id", videoIds)
+            .order("created_at", { ascending: false })
+            .limit(10);
+          commentTotal = count ?? 0;
+          inboxItems = (cmts ?? []).map((c: any) => ({
+            id: c.id,
+            body: c.body,
+            created_at: c.created_at,
+            video_id: c.video_id,
+            video_title: titleMap[c.video_id] ?? null,
+          }));
+        }
         const s: typeof stats = {};
         list.forEach((c) => {
-          s[c.id] = { followers: followMap[c.id] ?? 0, comments: 0, watchers: 0 };
+          s[c.id] = { followers: followMap[c.id] ?? 0, comments: commentTotal, watchers: 0 };
         });
         setStats(s);
+        setInbox(inboxItems);
       }
       setLoading(false);
     })();
