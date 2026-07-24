@@ -115,25 +115,29 @@ Deno.serve(async (req) => {
 
   const t0 = Date.now();
 
+
+
+
   // 1. Pull rows in pages of 1000.
   const rows: Row[] = [];
   let from = 0;
+  const pageSize = 1000;
   while (rows.length < limit) {
-    const to = Math.min(from + 999, limit - 1);
+    const take = Math.min(pageSize, limit - rows.length);
     const res = await pg(
-      `curated_videos?select=id,video_id,title,channel_title,thumbnail_url&order=created_at.desc`,
-      { headers: { Range: `${from}-${to}`, "Range-Unit": "items" } },
+      `curated_videos?select=id,video_id,title,channel_title,thumbnail_url&order=ingested_at.desc.nullslast&limit=${take}&offset=${from}`,
     );
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: `fetch failed: ${res.status}` }), {
+      const detail = await res.text().catch(() => "");
+      return new Response(JSON.stringify({ error: "pg_fetch_failed_v2", status: res.status, detail, from, take }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     const batch = (await res.json()) as Row[];
     if (!batch.length) break;
     rows.push(...batch);
-    if (batch.length < 1000) break;
-    from += 1000;
+    if (batch.length < take) break;
+    from += take;
   }
 
   // 2. Compliance scan.
