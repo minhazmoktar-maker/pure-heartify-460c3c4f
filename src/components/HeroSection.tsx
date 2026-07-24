@@ -24,9 +24,9 @@ const HeroSection = () => {
           <span className="inline-block rounded-pill bg-gold/20 px-3 py-1 text-sm font-bold text-gold md:text-base">
             ✦ Reclaim Your Attention
           </span>
-          <h1 className="mt-4 font-heading text-title font-bold leading-tight text-cream md:text-display">
+          <h2 className="mt-4 font-heading text-title font-bold leading-tight text-cream md:text-display">
             Every recommendation should earn your time.
-          </h1>
+          </h2>
           <p className="mt-4 text-sm leading-relaxed text-cream md:text-base">
             Heartify is built for people who choose learning over endless scrolling.
           </p>

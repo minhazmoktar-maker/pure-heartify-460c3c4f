@@ -133,6 +133,7 @@ const Index = () => {
           }}
         />
         <Navbar />
+        <h1 className="sr-only">Heartify — Reclaim your attention with curated halal video, audio & Qur'an</h1>
 
         {user ? (
           <>

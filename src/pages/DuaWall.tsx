@@ -104,6 +104,7 @@ export default function DuaWall() {
       <Navbar />
       <main className="container mx-auto max-w-3xl px-4 pb-24 pt-24">
         <SectionHeader
+          as="h1"
           title="Du'a Wall"
           description="Share what you're praying for. Say Ameen to lift each other before Allah."
           icon={Users}
