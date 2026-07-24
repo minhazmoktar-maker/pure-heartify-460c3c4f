@@ -1,333 +1,258 @@
-# Heartify — Video-First, Trust-Led, Benefit-Maximizing Strategy & Moat
+# Heartify — Company Thesis
 
-> *"YouTube shows me what will keep me watching. Heartify shows me the most beneficial thing I actually want to watch next — and proves why it's safe."*
-
-## 0. Identity lock
-
-Heartify is **the world's most trusted platform for discovering and watching halal, beneficial content.**
-
-- **Video is the product.** Every screen, feature, and metric exists to help a user discover, trust, watch, or learn from a beneficial video.
-- **Trust is the primary differentiator.** Every video carries a verifiable, signed chain of moderation. This is the single durable advantage that no ad-funded platform can copy.
-- **Benefit is the objective function.** We rank, retrieve, and recommend to maximize *long-term benefit per minute spent* — not raw watch time, and not raw engagement.
-- **Everything else is supporting.** Qur'an audio, prayer times, journals, streaks, and family features are re-rankers and retention layers on top of the video experience — they are never the spine.
+*A timeless strategy document. Written to guide Heartify for the next decade, not the next quarter.*
 
 ---
 
-## 0.5 Product principles (permanent, non-negotiable)
+## 0. Why Heartify exists
 
-These principles sit above every feature decision. If a proposal violates one, it does not ship — regardless of engagement lift.
+YouTube already exists. It is the most powerful video platform in history. It can, and often does, recommend halal videos to Muslims. So the honest question is:
 
-1. **Every minute on Heartify should leave the user better than before.**
-2. **Maximize value received per minute spent — not time spent.** Retention, completion rate, and DAU still matter deeply; we pursue them *through* benefit, never at its expense.
-3. **The core question the engine answers every time it ranks a video:**
-   > *"What is the most beneficial thing this person wants to watch right now?"*
-   Users must feel understood, not lectured. Benefit and desire are ranked together — never one without the other.
-4. **Never use manipulative engagement tactics.** Dark patterns, artificial urgency, guilt-driven notifications, or ragebait framings are forbidden. Any tool that helps a user discover beneficial content — including infinite scroll, autoplay, or push — is fair game when it serves benefit.
-5. **Session-quality test** — every recommendation must plausibly answer *yes* to at least one:
-   - Did it teach something?
-   - Did it strengthen faith?
-   - Did it build a skill?
-   - Did it answer a real question?
-   - Did it improve the person's life?
-   If none → the recommendation failed, no matter how long they watched.
-6. **Feature filter (non-negotiable).** Every proposal must answer *yes* to:
-   > Does this make Heartify better at **discovering, trusting, watching, or learning from** beneficial videos?
-   If no → future backlog.
+> *Why should Heartify exist if YouTube already exists?*
 
-**Non-goals.** Heartify is explicitly **not** a prayer app, a productivity/habit-tracker app, a general-purpose social network, a Muslim TikTok / doom-scroll product, a "daily spiritual operating system," or an ad marketplace.
+Because YouTube is optimized for **watch time**, and watch time is not the same thing as **benefit**.
+
+YouTube's business model rewards attention regardless of what that attention costs the viewer. Its halal recommendations are accidents of its algorithm — a byproduct of engagement, not a commitment. On any given day, the same feed that surfaces a beneficial lecture will also surface content that pulls the viewer somewhere they did not want to go. There is no institution behind the recommendation, no reviewer, no accountability, no promise. The platform is neutral; the outcome is not.
+
+Heartify exists because a growing part of humanity — Muslims first, and any family that cares about what enters their attention second — needs a fundamentally different kind of platform. Not a smaller YouTube. Not a "safer" YouTube. A platform whose entire reason for existing is:
+
+> **Help every person spend their limited attention on the highest-value content available to them at this moment.**
+
+That principle is our north star. It is designed to still make sense in 2036 and in 2046. It is what we optimize for. Everything else — retention, completion, DAU, session length — is measured, respected, and pursued *through* that principle, never in place of it.
+
+Heartify's promise is not "less bad." Heartify's promise is that every minute here should leave the person better than before.
 
 ---
 
-## 1. First principles — what YouTube structurally cannot do
+## 0.5 Product principles (permanent)
 
-YouTube's north-star metric is *watch-time × ad-load*. That single fact creates permanent constraints Heartify exploits:
+These principles predate every feature. They will outlast every roadmap.
 
-| YouTube constraint (permanent) | Heartify unlock (all video-anchored) |
-| --- | --- |
-| UGC-first catalog, no per-video safety guarantee | **Signed moderation attestation** on every video — public and verifiable. |
-| Cannot pick theological sides → cannot verify sources | **Institutional trust graph** — universities, masjids, academies, foundations sign creators. |
-| Ad CPM punishes no-music / no-face / long-form content | **Direct funding rails** — sadaqah, waqf, reviewed-content bonus pool pay beneficial creators *more* per 1k views. |
-| Ranking objective is session length | **Benefit-weighted ranking** — trust, learning fit, and finish-rate outrank raw watch-time. |
-| Multilingual long-tail is under-served (Arabic, Urdu, Bangla, Bahasa, Hausa, Turkish, Pashto…) | **Multilingual beneficial corpus** already crawled across 18+ languages, with human tier labels. |
-| Recommendation dataset is engagement-only | **Halal-labeled dataset with negative signals** — every rejection is a proprietary training example. |
-| 1 account = 1 ad graph; shared devices hurt revenue | **Household + Kids Mode** as a first-class safety guarantee, not an afterthought. |
-
-These are **structural**, not policy choices. YouTube cannot copy them without breaking its own economics.
+1. **Attention is sacred.** A person's minutes are finite and irreplaceable. Wasting them is a moral failure, not a metric miss.
+2. **Optimize for benefit, measure engagement.** Retention, completion, session length, and DAU are health signals — never the target. We refuse to optimize for engagement in isolation.
+3. **Every recommendation should improve someone's life.** If it can't clear that bar, it doesn't ship.
+4. **Users must feel understood, not lectured.** Benefit and desire together — not one without the other.
+5. **No manipulative tactics, ever.** Dark patterns, artificial urgency, guilt prompts, ragebait framings are forbidden. Implementation choices like infinite scroll, autoplay, and push cadence remain available *only* when they demonstrably serve benefit.
+6. **Session-quality checklist.** Every session should be able to answer *yes* to at least one: Did they learn something? Did their faith grow? Did they gain a skill? Was a real question answered? Was their life improved?
+7. **Trust is earned per-video, not per-brand.** A trusted channel does not launder a bad video. Every video stands on its own attestation.
 
 ---
 
-## 1.5 The direct answer: "Why leave YouTube if it already recommends halal videos to me?"
+## 1. The one-sentence durability test
 
-Because YouTube's halal videos are **accidents of its algorithm**. Heartify's halal videos are the **entire point** of ours.
+> *YouTube shows me what will keep me watching. Heartify shows me the most beneficial thing I actually want to watch next — and proves why it's safe.*
 
-The moat is **not one thing**. It is a compound of seven advantages that only work together:
+If any product decision blurs that sentence, the decision is wrong.
 
-1. **Trusted, per-video moderation** — every video carries a signed attestation. YouTube can't do this at UGC scale.
-2. **Verified beneficial sources** — scholars, universities, masjids, and institutes publicly stake their reputations on creators. YouTube can't pick theological sides.
-3. **Multilingual beneficial corpus** — 18+ languages, human-tiered. YouTube's long-tail is engagement-labeled, not benefit-labeled.
-4. **Superior discovery *inside* that corpus** — a filtered denominator makes every taste signal more meaningful. YouTube optimizes over the whole internet; we optimize over what's already beneficial.
-5. **Family safety** — Kids Mode inherits the full attestation chain. YouTube Kids is a separate, weaker catalog.
-6. **Beneficial-source ecosystem** — scholars, universities, foundations, masjids, and independent educators earn *more per 1k views* here than on YouTube for the same content. YouTube's ad marketplace can't pay them fairly.
-7. **Transparent recommendations** — every video shows *why* it was recommended and *who* reviewed it. YouTube's ranker is opaque by design.
-
-**Any one of these, YouTube can imitate. All seven, simultaneously, it structurally cannot** — because its business model is ad-CPM × session length, and every one of the seven above costs it money.
-
-That compound is the moat. And the philosophy that binds them is simple:
-
-> **Heartify is not trying to maximize time spent. It is trying to maximize value received per minute spent.**
+The gap between YouTube and Heartify is not a UI gap. It is a **business-model gap**. YouTube cannot optimize for benefit-per-minute without contradicting its ad marketplace. Heartify can, because that is the entire company.
 
 ---
 
-## 2. The seven moats
+## 1.5 The compound moat — why YouTube cannot simply copy this
 
-Ranked so effort concentrates on the moats that most directly protect the video experience.
+Our moat is not moderation. Moderation alone is a feature. Any large company can hire moderators.
 
-### M1 — Trust & moderation (primary differentiator)
+Our moat is the **compound** of eight advantages that only work when they exist together. Remove any one and the rest weaken. Together they become extremely difficult to copy — not because the ideas are secret, but because a platform whose revenue depends on maximizing watch time cannot structurally commit to any of them.
 
-The single feature that would still matter if every other feature disappeared.
+Each pillar below explicitly answers the same question: *Why can't YouTube copy this?*
 
-- Tier A/B/C/D scoring baked into `channel_candidates` + `curated_videos`.
-- **Signed moderation attestation** stored per video: reviewer ID, timestamp, tier, model version, rule hits.
-- Public `/verify/:content_id` page shows the full chain — reviewer(s), institution endorsements, tier, and the exact rules that fired.
-- **Reviewer chain visible on every card and watch page** — *"Reviewed by X · Endorsed by Y · Tier A"*.
-- **Trust is a ranking signal**, not just a filter — tier A + institutionally-endorsed content ranks above tier C even at equal engagement.
-- Report-a-video with a public SLA and audit log.
+### 1. Benefit-first ranking
+The ranker's objective function is *value received per minute spent*, not time spent. Every candidate is scored on trust, learning progression, session context, and post-watch benefit signals — not just click probability.
+**Why YouTube cannot copy:** their revenue is priced against watch time. Switching the objective function would repricing their entire ad marketplace overnight.
 
-**Why YouTube can't:** per-video human attestation at planetary UGC scale is economically impossible.
+### 2. Trust and transparency
+Every video carries a signed, immutable moderation attestation: reviewer, timestamp, tier, model version, rule hits. Every viewer can open `/verify/:content_id` and see exactly why a video is on the platform. Every ranking decision exposes a *"Why you're seeing this"* explanation.
+**Why YouTube cannot copy:** their catalog is billions of items uploaded per week under a general-purpose policy. Per-video attestation at that scale contradicts their supply model.
 
-### M2 — Beneficial Intelligence Engine (primary discovery moat)
+### 3. The world's largest verified beneficial-video graph
+A multilingual knowledge graph connecting topics, scholars, institutions, sources, madhāhib, languages, and difficulty levels — grown one attested video at a time, across 18+ languages. This graph is the retrieval substrate.
+**Why YouTube cannot copy:** the graph is only valuable *after* the corpus is filtered to beneficial content. Their corpus isn't, and filtering it retroactively would destroy the ad inventory their business depends on.
 
-Not a "recommender." An engine that combines many signals to answer one question, every time:
+### 4. A global beneficial-creator ecosystem
+Scholars, universities, institutes, foundations, masjids, independent educators, researchers, engineers, doctors, historians, language teachers, productivity experts, entrepreneurs, documentary creators, parents, and children's educators — all paid through mechanisms (sadaqah, waqf memberships, reviewed-content pools, institutional grants) that reward *reviewed benefit*, not raw views.
+**Why YouTube cannot copy:** their CPM model literally cannot pay a scholar or a university more than a viral entertainer per minute. Ours can — and does.
 
-> **What's the most beneficial video this person wants to watch right now?**
+### 5. Personalization inside a trusted corpus
+Personalization on YouTube requires accepting the whole catalog. Personalization on Heartify happens *only* inside content already verified as beneficial. The output cannot cross the trust boundary.
+**Why YouTube cannot copy:** their personalization strength comes from optimizing against the full catalog. Constraining it to a beneficial subset shrinks the model's degrees of freedom in exactly the way their engagement business punishes.
 
-**Signals combined into a single benefit-weighted objective:**
+### 6. Family-safe by default
+Kids Mode is not a filtered version of the adult product. It is the same product, minus content that has not been separately attested as safe for children by named reviewers or institutions.
+**Why YouTube cannot copy:** YouTube Kids exists but is a walled garden separate from the main product. On Heartify, family safety is a default posture of the whole platform.
 
-- **Trust** — tier, attestation, institutional endorsements.
-- **Knowledge graph** — topics (aqeedah, fiqh, seerah, tafsir, adab, dawah, science-of-hadith, and beneficial non-religious topics), institutions, scholar lineages, madhhab, languages.
-- **User goals** — what the user told us they want to learn or grow in.
-- **Learning progress** — where they are in a path or series; don't recommend chapter 5 before chapter 2.
-- **Difficulty progression** — beginner → intermediate → advanced within a topic.
-- **Diversity** — pool-level channel caps, MMR reranking, session-shuffle seeds. Top-channel share ≤ 5%, repeat rate < 1% are hard invariants.
-- **Freshness** — new beneficial content surfaces quickly; the corpus does not feel static.
-- **Discovery** — session-diverse retrieval prevents filter bubbles inside a filtered corpus.
-- **Session context** — what the user has watched in *this* session (avoid repeats, respect intent).
-- **Time available** — surface a 3-minute reflection when the user has 3 minutes; a 45-minute lecture when they have 45.
-- **Prayer context (when relevant)** — a Qur'an minute before Zuhr, a reflection after Maghrib. Contextual re-ranking only, never a separate product.
-- **Language and dialect** — respect the user's preferred language(s) and regional scholarship.
-- **Negative-signal dataset** — every past rejection ("female-presenter," "music," "clickbait," "duplicate," "off-topic") trains the next ranking pass.
+### 7. Explainable recommendations
+Every recommendation exposes its reasoning: the trust chain, the graph edges, the taste signals, the session context. Users can inspect, correct, and improve the ranker's model of them.
+**Why YouTube cannot copy:** their ranker is a competitive asset kept opaque on purpose. Explainability at their scale is a business-strategy contradiction, not just an engineering task.
 
-**Compounding data assets** (each grows in value monthly):
+### 8. Learning progression over years
+Heartify remembers what a user watched, understood, bookmarked, and asked — and uses it to advance them along explicit learning paths across the Islamic sciences, Arabic, Qur'anic literacy, science, history, entrepreneurship, and language. The value compounds year over year.
+**Why YouTube cannot copy:** their memory model is a taste graph, not a curriculum. They have no concept of a user progressing from beginner to intermediate to advanced within a discipline — because they don't need one to sell ads.
 
-1. Halal-labeled corpus with tier, topic, language, presenter type, music signal, thumbnail signal, and rule hits.
-2. Islamic + beneficial knowledge graph across topics, institutions, scholar lineages, madhhab, and languages.
-3. Multilingual understanding across 18+ languages.
-4. Behavioral taste graph on a filtered corpus — every signal carries more meaning per event than on a general platform.
-5. Negative-signal dataset — proprietary training examples no competitor has.
-6. Session-diverse retrieval defaults.
+**Any one of these, alone, is a feature. Together, they are a category.**
 
-**Transparency is a feature, not a footnote.** Every recommended video exposes *"Why you're seeing this"* — the trust factors, graph factors, and taste factors that ranked it. Users are never lectured; they are shown their own signals.
+---
 
-**Why it's hard to copy.** Rebuilding this requires *simultaneously* investing in halal moderation labels + multilingual NLP + an Islamic + beneficial ontology + a long-tail multilingual catalog + benefit-weighted ranking. Any single-vertical competitor is missing three of five. YouTube is missing all five and cannot justify the ROI.
+## 2. Long-term network effects — why the moat compounds every year
 
-### M3 — Beneficial-source ecosystem (broadened)
+The company's advantage should be *larger* in year 5 than year 1, and larger in year 10 than year 5. Every year on Heartify strengthens all of the following, and each strengthens the others.
 
-Fix the compensation gap that makes YouTube hostile to beneficial content — for the **full range of beneficial sources**, not just individual creators:
+- **More trusted creators.** Every added scholar, institution, or beneficial educator raises the ceiling of quality supply and the depth of the knowledge graph.
+- **More moderation knowledge.** Every rejected video is a training signal. The negative-signal dataset — content refused, and why — is proprietary and grows faster than any competitor's, because we alone have been building it from day one under a benefit-first rubric.
+- **A richer Islamic knowledge graph.** Every attested video extends topical, scholarly, institutional, linguistic, and madhhab coverage.
+- **A richer beneficial-knowledge graph.** Beyond Islamic sciences: medicine, engineering, history, business, parenting, languages, sciences. Every new node compounds discovery quality for every other node.
+- **Better personalization.** Every reflection, every finish, every "not for me" — measured *inside* the trusted corpus — makes the ranker sharper.
+- **More learning paths.** Every institution that authors a course, every scholar who endorses a sequence, becomes a durable path other users can walk.
+- **More institutions.** Every masjid, university, foundation, or research center that joins turns Heartify from a platform into infrastructure. Institutions do not switch easily.
+- **More community trust.** Every parent who trusts us with their child, every scholar who endorses a channel, every reviewer whose signature appears on an attestation, deposits trust that a new entrant cannot rebuild from scratch.
 
-- Scholars and independent educators
-- Universities and academic institutes
-- Islamic institutes and academies
-- Foundations and endowments
-- Masjids
-- Educational and research organizations
-- Researchers and subject-matter experts
-- Beneficial creators (Islamic education, science, medicine, engineering, history, business, language learning, parenting, productivity, documentaries, and more)
+The moat is not a wall. It is a compounding process. Every year we operate correctly, the gap to a hypothetical copier widens.
 
-**Funding rails:**
+---
 
-- **Sadaqah tipping** on every video.
-- **Monthly waqf memberships** to a specific creator or institution.
-- **Reviewed-content bonus pool** distributed by **tier × trust-graph edges × finish-rate**, never raw views.
-- **Institutional grants** — a masjid, university, or foundation sponsors a specific creator or series.
-- **Transparent earnings dashboard** — no demonetization roulette.
-- **"Claim your channel / institution"** flow open to every beneficial source.
+## 3. The creator economy is a first-class strategic pillar
 
-**Target:** the top ~2,000 beneficial sources globally earn **more per 1k views** on Heartify than on YouTube within 24 months → they publish exclusive-first here → supply-side lock.
+Heartify's ambition on the supply side is simple and total:
 
-**Why YouTube can't:** they cannot pay non-ad-friendly content more than ad-friendly content without collapsing their marketplace.
+> **If your work genuinely improves people's lives, Heartify should be the best place in the world to publish it.**
 
-### M4 — Family safety (Kids Mode)
+Not the best place for Islamic scholars alone. The best place for:
 
-The trust promise made concrete for parents. *Serves the benefit objective by* guaranteeing that every minute a child spends here is beneficial and safe.
+- Scholars, teachers of Qur'an, hadith, fiqh, aqīdah, seerah, and Arabic
+- Universities and research centers
+- Institutes, foundations, and masjids
+- Independent educators
+- Researchers across the sciences
+- Engineers and doctors
+- Historians
+- Language teachers
+- Productivity experts and entrepreneurs
+- Documentary creators
+- Parents teaching parenting
+- Children's educators
 
-- Kids Mode = tier A only + explicit institutional whitelist + child seat lock.
-- Parent audit dashboard: what the child watched, when, and *why* it was approved.
-- Report-a-video with a public SLA.
-- A parent can hand a phone to a 7-year-old and walk away.
+Because our monetization does not depend on ads against watch time, we can pay beneficial creators fairly *by category and by benefit*. A scholar teaching tafsīr, a physician explaining a disease, a historian narrating the fall of empires, and a mother teaching Qur'an to her children can all earn a living here — including creators whose fields YouTube's ad marketplace structurally underpays.
 
-### M5 — Ritual-aware discovery (supporting)
+Payout mechanisms:
+- Sadaqah tipping on every video
+- Monthly waqf memberships to a creator or an institution
+- Reviewed-content bonus pool: tier × trust-graph edges × finish-rate, never raw views
+- Institutional grants
+- "Claim your channel / institution" onboarding for every beneficial source
 
-Ritual features exist **only to inform which video to show right now.** They are never a standalone product line. *Serves the benefit objective by* matching content to the moment — a Qur'an minute is more valuable before Zuhr than at midnight.
+The strategic outcome: over time, the best beneficial creators publish to Heartify *first* — not because we outbid YouTube on money, but because we outbid them on **fit, dignity, and durability of income for beneficial work**.
 
-**In scope (as re-rankers over the video surface):** prayer-time-aware home rail ordering, Ramadan mode, Jumu'ah rail, Qiyam rail, prayer-anchored push at ≤3/week.
+---
 
-**Explicit non-goals:** no full prayer app, no qibla-as-a-product, no habit tracker as a product line, no productivity dashboard.
+## 4. Unique jobs Heartify performs
 
-### M6 — Spiritual memory (optional retention layer)
+1. **Guarantee a family that every minute their child spends here is beneficial and safe.** No other mass-scale platform can promise this.
+2. **Recommend the highest-benefit next video the user actually wants — not the stickiest one.** Every recommendation is a small act of respect for the user's attention.
+3. **Progress a learner across years, not sessions.** Explicit learning paths, memory, and difficulty progression — a curriculum, not a taste graph.
+4. **Fund beneficial creators fairly.** Categories YouTube's ad marketplace underpays are here paid on tier, trust, and finish-rate.
+5. **Coordinate the Ummah at scale around video.** Global khatm rooms, Qiyām nights, masjid-hosted watch rooms, institution-run cohorts — all anchored to videos, never to chat for its own sake.
 
-Not a spine. A lock-in layer that reinforces videos already watched. *Serves the benefit objective by* turning consumption into retention of what was learned.
+---
 
-- Ayah bookmarks with personal reflections, dua lists, khatm ledger, weekly muhasaba journal.
-- *"What I learned this month"* AI summary drawn only from videos the user watched + notes they wrote.
-- Year-in-iman recap (shareable, private by default).
-- Full export (JSON + PDF) — the strongest possible trust signal.
+## 5. Moats — the seven strategic pillars
+
+Ranked. Each answers *"Why can't YouTube copy this?"* in a single line.
+
+### M1 — Trust and moderation (primary differentiator)
+Every video carries a signed attestation. Every reviewer chain is public. Trust is a first-class ranking signal. Reports have a public SLA.
+**Why YouTube cannot copy:** per-video attestation at billion-item scale contradicts their supply and revenue model.
+
+### M2 — Beneficial Intelligence Engine
+The ranker answers: *"What is the most beneficial thing this person wants to watch right now?"* Signals: trust, knowledge graph, user goals, learning progress, difficulty progression, diversity, freshness, discovery, session context, time available, prayer context, language/dialect, negative-signal dataset. Every recommendation is explainable.
+**Why YouTube cannot copy:** their objective function is watch time. Replacing it is a company-scale rewrite of their ad marketplace.
+
+### M3 — Beneficial-source ecosystem
+Scholars, universities, institutes, foundations, masjids, educational organizations, independent educators, researchers, and beneficial creators across every field that improves lives. Monetization: sadaqah, waqf, reviewed-content pool, institutional grants.
+**Why YouTube cannot copy:** their CPM cannot pay a scholar or a professor competitively. Ours can.
+
+### M4 — Family safety by default
+Kids Mode = tier A + explicit institutional whitelist + child seat lock. Household model with parent-audit dashboard.
+**Why YouTube cannot copy:** family safety is a separate walled product for them (YouTube Kids). For us it is the default posture of the whole platform.
+
+### M5 — Ritual-aware discovery (supporting, not primary)
+Prayer times, Ramadan, Jumu'ah, and Qiyām re-rank the video surface. Ritual is a *context signal for discovery*, never a separate product line.
+**Why YouTube cannot copy:** they have no reason to know when a user prays, and cannot ask.
+
+### M6 — Longitudinal spiritual and learning memory (optional retention)
+Bookmarks, personal reflections, ayah/dua bookmarks that link back to source videos, "what I learned this month" AI summaries drawn only from the user's own history, year-in-īmān recaps, one-click full export.
+**Why YouTube cannot copy:** their memory is a taste graph tuned to sell ads, not a curriculum tuned to advance a learner.
 
 ### M7 — Ummah coordination (long-term, deferred)
-
-Video-anchored coordination. *Serves the benefit objective by* letting users learn together, not chat aimlessly.
-
-- Global Ramadan khatm room, synchronized Qiyam nights, masjid-hosted watch rooms, institution-run cohort classes with certificates.
-
-Every feature here is a **watch room**, not a chat product.
+Global Ramadan khatm rooms, synchronized Qiyām nights, masjid-hosted watch rooms, institution-run cohort classes with certificates. Every feature video-anchored.
+**Why YouTube cannot copy:** they can build a live product, but not a platform whose audience is already gathered around beneficial video.
 
 ---
 
-## 3. The flywheel
-
-Trust powers benefit-weighted discovery. Discovery attracts beneficial sources. Sources bring institutions. Institutions deepen trust.
+## 6. The flywheel
 
 ```text
-        ┌───────────────────────────────────────────────┐
-        │                                               │
-        ▼                                               │
-  Trust: signed attestations on every video (M1)        │
-        │                                               │
-        ▼                                               │
-  Beneficial Intelligence Engine ranks by benefit,      │
-  not watch-time (M2)                                   │
-        │                                               │
-        ▼                                               │
-  Households watch more of what actually helps them,    │
-  finish more, tip more (M4, M3)                        │
-        │                                               │
-        ▼                                               │
-  Beneficial sources earn more here than on YouTube     │
-  → publish exclusive-first (M3)                        │
-        │                                               │
-        ▼                                               │
-  Institutions endorse sources publicly (M1, M3) ───────┘
+Trusted moderation
+      ↓
+Beneficial corpus grows
+      ↓
+Knowledge graph deepens
+      ↓
+Recommendations get sharper (per person, per moment)
+      ↓
+Users spend more of their attention here — because it earns it
+      ↓
+Beneficial creators and institutions publish here first
+      ↓
+Trust attestations, endorsements, and reviewer chains multiply
+      ↓
+Moderation gets faster, cheaper, and more accurate
+      ↓
+(back to top — larger every cycle)
 ```
 
-Every full loop **strengthens the video experience** and **raises value per minute spent**. Rituals (M5), memory (M6), and coordination (M7) are retention accelerators on top.
+Every rotation makes every other rotation cheaper. That is the definition of a moat.
 
 ---
 
-## 4. Unique jobs Heartify performs (all video-outcome)
+## 7. Internal north-star metrics
 
-1. **Certify the source** — every video carries a verifiable chain of trust.
-2. **Recommend the highest-benefit next video the user actually wants** — not the stickiest one.
-3. **Guarantee zero-doubt watch** — a parent, a revert, a student can press play without vigilance.
-4. **Pay the beneficial source fairly** — even when the content has no music, no faces, and no clickbait.
-5. **Learn from what you watched** — bookmarks, reflections, and monthly recaps reinforce the video.
-6. **Serve the household** — one subscription, six seats, one safety guarantee.
-7. **Meet the moment** — prayer-time, Jumu'ah, Ramadan, Qiyam re-rank the feed contextually.
+**Primary — benefit-weighted (what we optimize for)**
+- Finish-rate on recommended videos
+- Session-quality rating (post-watch: *"Did this help you?"*)
+- Learning-path progression
+- Trust-attestation coverage (% of surfaced videos with a valid signed attestation)
+- Report-to-resolution median
 
-Everything on the roadmap must map to one of these seven jobs.
+**Guardrails (invariants — never violated)**
+- Top-channel share ≤ 5%
+- Repeat rate < 1%
+- Push CTR ≥ 12% at ≤ 3/week cap
+- Zero manipulative-pattern findings per quarterly audit
 
----
+**Health signals (measured, never the target on their own)**
+- Retention (D1 / D7 / D30)
+- DAU
+- Session length
+- Completion rate
 
-## 5. Switching costs we deliberately create (all anchored to video)
-
-- **Trust attestations** — content you already trust here is unlabeled anywhere else (M1).
-- **Personalized benefit-weighted recommendations** — the taste graph on a filtered corpus doesn't transfer (M2).
-- **Waqf memberships to specific creators or institutions** — leaving cuts off a source you personally sponsor (M3).
-- **Household seats + Kids Mode profiles** (M4).
-- **Watched-video ledger with reflections** (M6).
-
----
-
-## 6. Structural trust advantages
-
-1. Signed per-video moderation — verifiable public record.
-2. Institutional endorsements — masjids, universities, foundations publicly stake reputation.
-3. Non-ad revenue — no incentive to boost sensational content.
-4. Data portability — users can export everything.
-5. Public SLA on reports.
-6. Kids Mode — testable by any parent in 60 seconds.
-7. Transparent recommendations — every video exposes its ranking factors.
+Health signals are treated as *consequences* of benefit. If retention rises because the product got manipulative, we treat that as a regression, not a win.
 
 ---
 
-## 7. Long-term user value
+## 8. Founder principles
 
-- A safe, calm, beneficial place to watch — for years, across devices.
-- A benefit-weighted engine that gets more useful monthly as the corpus, graph, and negative-signal set grow.
-- Sadaqah and waqf routed transparently to sources the user personally chose.
-- A private, exportable record of what they watched, saved, and learned.
-- A family-safe environment for children without constant supervision.
+Company principles. Not engineering principles. These outlive any specific feature, roadmap, executive, or investor.
 
----
-
-## 8. Source ecosystem — why beneficial sources become exclusive-first
-
-1. Higher take-home per 1k views for no-music / no-face / long-form content (M3).
-2. Institutional endorsement portal (M1) — a masjid, university, or foundation publicly signs a creator.
-3. Reviewed-content bonus pool weighted by tier + trust-graph + finish-rate (M3).
-4. Direct sponsorship rails — an institution funds a specific creator or series (M3).
-5. Benefit-weighted ranking — long, calm, one-camera lectures rank as well as short-form when they teach more (M2).
-6. Waqf memberships — users pay *for the source's ongoing work*, not per video (M3).
-7. Transparent, tier-based moderation — no demonetization roulette (M1).
-
-At ~2,000 top beneficial sources publishing here exclusive-first → **supply-side lock**.
+1. **Benefit before engagement.** If a feature grows engagement without growing benefit, it does not ship.
+2. **Trust before scale.** We will grow slower than we could, in order to remain worth trusting. A single unsafe recommendation costs more than a million safe ones earned.
+3. **Quality before quantity.** A smaller catalog of attested, beneficial video beats a larger catalog of unknown video every time.
+4. **Long-term trust beats short-term growth.** Every trade-off between this quarter and this decade resolves toward the decade.
+5. **Every recommendation should improve someone's life.** If it cannot clear that bar, do not surface it. Silence is a valid output.
+6. **Users are not a resource to be harvested.** Their attention is a trust placed in us. We spend it as if it were our own.
+7. **Creators who genuinely improve lives are our partners, not our supply.** We pay them fairly, credit them publicly, and defend their dignity.
+8. **Explainability is a right, not a favor.** Every recommendation must be able to explain itself in plain language.
+9. **Family safety is the default, not a mode.** A feature that cannot be shown to a child is a feature that requires justification.
+10. **Build something worthy of becoming infrastructure for beneficial knowledge.** In ten years, universities, masjids, and families should treat Heartify the way libraries were once treated — a shared public good for the good of humanity.
 
 ---
 
-## 9. How the four actors reinforce each other
-
-| Actor | Gives | Gets |
-| --- | --- | --- |
-| **Households** | Subs, sadaqah, memberships, feedback signals | Trusted, benefit-weighted discovery; safe kids mode; family memory |
-| **Beneficial sources** (creators, scholars, researchers, independent educators) | Reviewed video, teaching cohorts, live sessions | Fair pay, endorsement, audience, waqf income |
-| **Institutions** (universities, masjids, foundations, institutes) | Endorsements, signed credentials, grants, classes | Reach, brand, distribution |
-| **Heartify** | Trust graph, moderation, benefit engine, distribution, payments | Sub revenue, waqf overhead, institutional partnerships |
-
-Remove any actor and the loop breaks.
-
----
-
-## 10. Internal north-star metrics
-
-We measure engagement — retention, completion rate, DAU — because a benefit engine that no one uses helps no one. We just refuse to *optimize* for engagement in isolation.
-
-**Primary (benefit-weighted):**
-
-- Finish-rate on recommended videos.
-- Session-quality rating (post-watch micro-survey: *"Did this help you?"*).
-- Learning-path progression completion.
-- Trust-attestation coverage ≥ 99.5%.
-- Median report-to-resolution < 24h.
-
-**Guardrails (never regress):**
-
-- Top-channel share ≤ 5%.
-- Repeat rate < 1%.
-- Push CTR ≥ 12% at ≤ 3/week cap.
-- Zero manipulative-pattern findings in quarterly audits.
-
-**Health (watched, never the target):**
-
-- Retention (D1/D7/D30), DAU, session length, completion rate. Healthy numbers here are a *consequence* of benefit, not a substitute for it.
-
----
-
-## 11. The one-sentence durability test
-
-If YouTube copies our UI perfectly tomorrow, this sentence is still true and still ours:
-
-> *"YouTube shows me what will keep me watching. Heartify shows me the most beneficial thing I actually want to watch next — and proves why it's safe."*
-
-That gap is a **business-model gap**, not a UI gap. It is the moat.
-
----
-
-*See `docs/ROADMAP_MOAT.md` for the sequenced, benefit-first roadmap that ships these moats.*
+*Written to be true in 2026 and in 2036. If a future decision violates any principle in Section 8, the decision is wrong — regardless of the metrics it moves.*
