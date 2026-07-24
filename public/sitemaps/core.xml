@@ -429,4 +429,17 @@
     <xhtml:link rel="alternate" hreflang="tr" href="https://pure-heartify.lovable.app/terms?lang=tr"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/terms"/>
   </url>
+  <url>
+    <loc>https://pure-heartify.lovable.app/halal</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pure-heartify.lovable.app/halal?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://pure-heartify.lovable.app/halal?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://pure-heartify.lovable.app/halal?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pure-heartify.lovable.app/halal?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pure-heartify.lovable.app/halal?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://pure-heartify.lovable.app/halal?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pure-heartify.lovable.app/halal?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/halal"/>
+  </url>
 </urlset>
