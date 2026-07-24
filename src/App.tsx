@@ -247,12 +247,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const RouteFallback = () => (
-  <div className="min-h-dvh bg-background">
-    <PageSkeleton variant="default" />
-  </div>
-);
-
 const App = () => (
   <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
@@ -265,29 +259,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <SkipLink />
-            <OfflineBanner />
-            <ScrollRestoration />
-            <MobileBridge />
-            <ReferralBridge />
-            <AdhanNotifier />
-            <GatedPreviewGuard />
-            <OfflineSweeper />
-            <BackToTop />
-            {/* AgeGate removed — age is verified at signup only */}
-            {/* CookieConsent removed from app root — the persistent toast
-                obstructed the bottom tab bar and violated the "one primary
-                action per surface" rule. Consent controls live at /privacy
-                (footer + Profile → Preferences). Essential cookies only. */}
-            <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
-            <Suspense fallback={null}><CommandPalette /></Suspense>
-            <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
-            <BottomTabBar />
-            <EdgeSwipeBack />
-            <KeyboardFocusScroller />
-            <FeedDiversityProvider>
-            <Suspense fallback={<RouteFallback />}>
-              <RouteTransition>
+            <AppShell>
               <Routes>
                 <Route path="/" element={<Index />} />
                 {/* Common aliases that used to 404 */}
