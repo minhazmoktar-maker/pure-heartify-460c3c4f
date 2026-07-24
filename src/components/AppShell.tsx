@@ -13,6 +13,7 @@ import KeyboardFocusScroller from "./KeyboardFocusScroller";
 import ScrollRestoration from "./ScrollRestoration";
 import SkipLink from "./SkipLink";
 import OfflineBanner from "./OfflineBanner";
+import SessionPushNudge from "./SessionPushNudge";
 import { FeedDiversityProvider } from "@/contexts/FeedDiversityContext";
 
 const CommandPalette = lazy(() => import("./CommandPalette"));
