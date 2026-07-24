@@ -1,11 +1,12 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Sparkles, Clock, CheckCircle2, Flame, PlayCircle } from "lucide-react";
+import { Sparkles, Clock, CheckCircle2, Flame, PlayCircle, Share2, Heart } from "lucide-react";
 import { useDailyDose } from "@/hooks/useDailyDose";
 import { useUserInterests } from "@/hooks/useUserInterests";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { shareContent } from "@/lib/share";
 
 const DailyDoseHero = () => {
   const { user } = useAuth();
