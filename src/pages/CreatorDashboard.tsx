@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Loader2, ExternalLink, Users } from "lucide-react";
+import { Loader2, ExternalLink, Users, MessageSquare } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+interface InboxItem {
+  id: string;
+  body: string;
+  created_at: string;
+  video_id: string;
+  video_title: string | null;
+}
 
 interface OwnedChannel {
   id: string;
@@ -21,6 +29,7 @@ export default function CreatorDashboard() {
   const [loading, setLoading] = useState(true);
   const [channels, setChannels] = useState<OwnedChannel[]>([]);
   const [stats, setStats] = useState<Record<string, { followers: number; comments: number; watchers: number }>>({});
+  const [inbox, setInbox] = useState<InboxItem[]>([]);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
