@@ -1,142 +1,46 @@
-# Heartify — One Spine, One Identity
+# Retention & Growth Build Plan
 
-**Identity:** *The safest, best place to discover and watch halal, beneficial content.*
-**Split:** 80% video/discovery/trust · 20% supporting Islamic tools that reinforce the video habit.
-**Rule for every feature:** does it strengthen video, trust, retention, or the journey? If not → More, merged, or cut.
+Ship the checklist in 4 waves, highest-ROI first. Each wave is independently shippable and measurable.
 
----
+## Wave R1 — Retention Core (this turn + next)
+**Goal: lift D2/D7 retention.**
 
-## 1. Information architecture
+1. **Streak Freeze** — 1 free freeze/week, auto-consumed on missed day.
+   - Table: `streak_freezes` already exists. Add `auto_consume_streak_freeze()` DB function + weekly grant cron.
+   - UI: freeze badge on `/profile?tab=streak` + "Freeze available" chip.
+2. **Personalized quiet-time push** — replace generic push with per-user scheduled push using `notification_preferences.quiet_hours` + top personalized pick.
+   - Edge fn `personalized-push` already exists → extend with per-user timezone scheduling + streak status + 1 video thumbnail.
+   - Cron every 15min, fires when user's local quiet-time window opens.
+3. **`useNeverEmpty()` guarantee** — every rail falls back to editor's picks if personalized <3 items.
+4. **"Welcome back" flow** — if `last_seen > 7 days`, show one-time modal: "Your streak is safe if you watch today" + one-tap resume.
 
-Four spines in the bottom tab bar. Everything else lives inside them or under Profile → More.
+## Wave R2 — Growth Loops
+5. **Weekly recap → auto-share card** — Friday cron generates PNG via existing `shareImage.ts`, pushes with WhatsApp share intent.
+6. **Referral instrumentation** — track `share_events → referral_clicks → install → activation`; reward both sides with badge (schema exists).
+7. **Programmatic SEO expansion** — auto-generate 200+ `/halal/:slug` pages from top search queries + scholars + surahs.
 
-```text
-Bottom tab bar (4 tabs)
-├─ Home        For You feed = the front door. Video-first.
-├─ Explore     Search · Categories · Series · Reciters · Scholars · Trending · Editor picks
-├─ Library     Subscriptions · Continue · History · Playlists · Downloads · Saved
-└─ Profile     You · Streak · Trust · Settings · More
-```
+## Wave R3 — Habit Formation
+8. **Notification budget UI** — `/profile?tab=notifications` slider: 1/day, 3/week, Jumu'ah only.
+9. **Continue Watching rail** above the fold on `/` for signed-in users (uses `watch_history`).
+10. **Ritual bundles** — "Morning" one-tap combo (Adhkar + ayah + 5-min video) on Today screen.
+11. **Prayer-time contextual content** — post-Fajr / post-Isha rails driven by user's `salah_log` + locale.
 
-**Profile → More (supporting tools, still one tap deep):**
-Today's Dose · Qur'an · Prayer times · Dhikr · Khatm · Wird · Du'a wall · Journal · Zakat · Salah log · Weekly recap · Kids mode
-
-Nothing is deleted — everything is reachable — but only video-adjacent surfaces get spine real estate.
-
-## 2. Home (video-first front door)
-
-Above the fold, in order:
-
-1. **Streak chip** — top-right of every screen, always visible.
-2. **Continue watching** rail (if any).
-3. **Daily Dose slim card** — one 3-min pick, one tap to play. Replaces Today-first hero.
-4. **For You** infinite grid — session-diverse, trust-pill on every card.
-5. **Editorial rails:** Named-editor picks · New series episodes · From channels you follow · Trending in your language · Because you watched X.
-6. **Prayer-aware nudge** (supporting, not blocking): a subtle "Fajr in 42 min — 3-min pre-Fajr pick" chip that opens a curated short video. Prayer strengthens video, not the other way around.
-7. **Rolling trust counter** in the footer: *"3,412 videos reviewed this week · 218 removed."*
-
-One default action per session: *tap the top card to watch.*
-
-## 3. Explore
-
-Full-screen search sheet (Instagram/YouTube pattern) with recent, trending, voice, per-language. Below the search: tabbed rows for Categories, Series, Reciters, Scholars, Editor collections, Trending. Listen (audio) lives here as a chip, not as its own tab.
-
-## 4. Library
-
-Single home for the user's investment: Subscriptions, Continue Watching, History, Playlists, Downloads (offline audio), Saved videos, Bookmarked ayahs. Consolidation unlocks the habit-loop "investment" leg.
-
-## 5. Profile
-
-Identity + streak + trust badge + settings + **More** grid of supporting tools. Creator Hub reachable from here for approved creators. Admin tools gated behind role.
-
-## 6. Onboarding (redesigned, video-first)
-
-Five steps, ≤60 seconds:
-
-1. **Language & region** (drives locale-aware feed).
-2. **Identity, not topics** — "I'm a new Muslim / student / parent / lifelong learner / revert." (Beats topic-checkboxes for personalization.)
-3. **Pick 3 interests** — visual chips (Qur'an, tafsir, sīrah, history, science, family, productivity, language, du'a, kids). Feeds the taste profile.
-4. **Follow 5 suggested channels** — pre-populates the feed so session #1 doesn't feel empty.
-5. **Turn on the streak** — one push permission ask, framed as "we'll protect your streak, not spam you." Prayer / adhan push is offered later inside More, not at onboarding.
-
-Onboarding never asks about Zakat, Journal, Wird, or Khatm. Those are earned discoveries.
-
-## 7. Notifications (product > religious)
-
-Cap 3/week stays. Copy shifts to product triggers:
-- "New episode from *Stories of the Prophets*."
-- "*Ustadh X* just posted a 9-min lecture."
-- "Your streak is at 6 days — one video keeps it alive."
-Adhan / Fajr / Wird pushes stay available but opt-in in More.
-
-## 8. Trust surfacing (the underleveraged moat)
-
-- **Trust pill on every card** — tier badge + reviewer + reviewed-at.
-- **Watch page** shows the moderation decision reason (expandable).
-- **Home footer counter** (rolling weekly).
-- **Trust page** linked from Profile.
-
-## 9. Watch experience polish
-
-- Series auto-queue + "Continue series" surface.
-- Optimistic UI on like / save / follow / not-interested.
-- One-tap "share as image" on every video, ayah, dhikr (wire existing `shareImage.ts`).
-- Post-Daily-Dose completion moment: small celebratory sheet, streak +1, "watch one more" CTA.
-
-## 10. Creator loop
-
-Creator Hub earns its keep by showing creators their **impressions, watch minutes, follower delta** — weekly email + dashboard. Named-editor bylines appear on editorial rails.
-
-## 11. Roadmap (three waves)
-
-**Wave 1 — IA & spine (this sprint)**
-1. New 4-tab bottom bar; Prayer & Dhikr leave the spine.
-2. Home rebuilt: Continue → Daily Dose slim → For You grid → editorial rails → trust counter.
-3. Profile → More grid housing Today, Qur'an, Prayer, Dhikr, Khatm, Wird, Journal, Du'a, Zakat, Salah, Recaps, Kids.
-4. Menu sheet trimmed **32 → 8**.
-5. Global **streak chip** in header on every screen.
-6. Full-screen search sheet.
-7. Onboarding rewritten (5 steps, identity + interests + 5-channel warm-up).
-
-**Wave 2 — watch polish & trust**
-8. Trust pill on every card + watch-page decision reason.
-9. Series auto-queue + Continue Series rail.
-10. Optimistic UI on primary taps.
-11. Share-as-image on video / ayah / dhikr.
-12. Post-Daily-Dose completion moment.
-13. Rolling public "reviewed this week" counter on Home.
-14. Notification copy rewritten to product triggers.
-
-**Wave 3 — growth, creators, SEO**
-15. Creator dashboard: impressions + watch minutes + follower delta.
-16. Named-editor curated rails.
-17. Public **/surah/[name]** and **/scholar/[slug]** SEO landings.
-18. axe-core in CI + real-device perf lab (mid-range Android 3G).
-19. Native-reviewer pass per locale.
-20. Route audit — hide ≥6 dead routes from nav (keep code for SEO / direct links).
-
-Everything outside these three waves is frozen until Wave 3 ships.
-
-## 12. What we are *not* doing
-
-- Not making Today the front door.
-- Not building isolated Islamic utilities that don't feed the video habit.
-- Not chasing DAU vanity — **north-star is beneficial-minutes watched per WAU**; secondary is 7-day streak %.
-- Not deleting supporting tools — they live in More and reinforce, not compete.
-
----
+## Wave R4 — Trust Moat & Instrumentation
+12. **Retention analytics dashboard** — `/admin/retention` D1/D7/D30 by source, streak length p50/p90, push CTR, empty-rail impressions (0 target).
+13. **Report → response SLA badge** — public `/trust` shows median review time.
+14. **A/B test framework wired to onboarding** — use existing `experiments` infra to test 3-step vs 9-step first-run.
 
 ## Technical notes
+- No new tables needed for Wave R1 — reuse `streak_freezes`, `notification_preferences`, `web_push_subscriptions`, `user_taste_profiles`.
+- All crons via `pg_cron` + `pg_net` (already enabled).
+- Edge fns use existing `X-Cron-Secret` gate pattern.
+- All UI additions honor mobile-first + existing design tokens.
 
-- Nav config in `src/config/nav.ts` — one edit + `BottomTabBar.tsx` update handles the 5→4 change.
-- `Index.tsx` swaps `TodayHero` for a slim `DailyDoseCard`; existing `useDailyDose` hook is reused unchanged.
-- **Streak chip** = new tiny component reading `streaks`, dropped into `AppShell.tsx` header. Global across every route.
-- **More grid** = new `src/components/profile/MoreGrid.tsx` with route links to existing pages — zero page-level rewrites, zero data-migration risk.
-- **Full-screen search** = promote `SearchAutocomplete` to a route-level sheet triggered by the header magnifier.
-- **Trust pill** = extend `YouTubeVideoCard` with a small badge reading `moderation_state` + `trust_tier` from `channel_trust_profiles` (already joined server-side).
-- **Onboarding** rewrite lives in existing `src/pages/Onboarding.tsx` — 5 steps instead of 9.
-- No DB migrations required for Wave 1. Wave 3 creator metrics reuse `feed_impressions` + `watch_history` (already indexed).
+## Sequencing
+Start with **Wave R1** in this turn: Streak Freeze end-to-end (biggest single retention lever, ~1 day of work, immediately visible on the screen you're on). Then Personalized Push. Waves R2-R4 follow in subsequent turns after verifying R1 lifts metrics.
 
----
-
-**Approve this plan and I'll ship Wave 1 in the next turn.** If you want a specific tab set beyond Home/Explore/Library/Profile, or a different onboarding order, say so now — that cascades everything.
+## Success metrics per wave
+- R1: D2 retention +10-20%, streak break rate -30%
+- R2: viral coefficient measurable, +20% organic traffic
+- R3: sessions/week 3→4+
+- R4: full observability, data-driven iteration
