@@ -14,6 +14,7 @@ type Tile = {
 
 const PRIMARY: Tile[] = [
   { to: "/listen", label: "Reciters & Scholars", hint: "Audio lectures & full Qur'an", icon: Radio },
+  { to: "/sources", label: "Beneficial sources", hint: "Every verified institution", icon: ShieldCheck },
   { to: "/channels", label: "Trusted channels", hint: "Every creator, vetted", icon: ShieldCheck },
   { to: "/creators", label: "Editor picks", hint: "Curated by our reviewers", icon: Sparkles },
   { to: "/scholars", label: "Scholars", hint: "Contemporary & classical", icon: GraduationCap },

@@ -4135,42 +4135,60 @@ export type Database = {
           country: string | null
           created_at: string
           created_by: string | null
+          description: string | null
+          domain: string | null
+          homepage_url: string | null
           id: string
+          is_public: boolean
           language: string | null
+          logo_url: string | null
           match_pattern: string
           min_subs: number | null
           name: string
           notes: string | null
           organization_type: string
           updated_at: string
+          verified_at: string | null
           weight: number | null
         }
         Insert: {
           country?: string | null
           created_at?: string
           created_by?: string | null
+          description?: string | null
+          domain?: string | null
+          homepage_url?: string | null
           id?: string
+          is_public?: boolean
           language?: string | null
+          logo_url?: string | null
           match_pattern: string
           min_subs?: number | null
           name: string
           notes?: string | null
           organization_type: string
           updated_at?: string
+          verified_at?: string | null
           weight?: number | null
         }
         Update: {
           country?: string | null
           created_at?: string
           created_by?: string | null
+          description?: string | null
+          domain?: string | null
+          homepage_url?: string | null
           id?: string
+          is_public?: boolean
           language?: string | null
+          logo_url?: string | null
           match_pattern?: string
           min_subs?: number | null
           name?: string
           notes?: string | null
           organization_type?: string
           updated_at?: string
+          verified_at?: string | null
           weight?: number | null
         }
         Relationships: []
@@ -5231,6 +5249,21 @@ export type Database = {
       export_user_data: { Args: { _uid: string }; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
+      get_beneficial_sources_directory: {
+        Args: { _domain?: string; _limit?: number }
+        Returns: {
+          country: string
+          description: string
+          domain: string
+          homepage_url: string
+          id: string
+          language: string
+          logo_url: string
+          name: string
+          organization_type: string
+          verified_at: string
+        }[]
+      }
       get_channel_trust_history: {
         Args: { _channel_id: string; _limit?: number }
         Returns: {
