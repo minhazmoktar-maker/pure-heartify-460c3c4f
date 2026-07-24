@@ -653,6 +653,8 @@ export const TRUSTED_CHANNELS: string[] = [
   "EconplusDal", "Institute for New Economic Thinking", "INET",
   "The Plain Bagel", "Visual Capitalist",
   "NileBlue", "Sabine Hossenfelder", "Science Without the Gobbledygook",
+  // Community-requested trusted podcasts / speakers
+  "2 Cents Podcast", "Sazzad Ahsan", "Nafees Salim",
 ];
 
 
