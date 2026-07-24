@@ -18,6 +18,8 @@ import { FeedDiversityProvider } from "@/contexts/FeedDiversityContext";
 const CommandPalette = lazy(() => import("./CommandPalette"));
 const PushPermissionPrompt = lazy(() => import("./PushPermissionPrompt"));
 const StreakMilestoneDialog = lazy(() => import("./StreakMilestoneDialog"));
+const StreakFreezeUsedToast = lazy(() => import("./StreakFreezeUsedToast"));
+const WelcomeBackDialog = lazy(() => import("./WelcomeBackDialog"));
 
 const RouteFallback = () => (
   <div className="min-h-dvh bg-background">
