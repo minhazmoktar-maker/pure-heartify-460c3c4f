@@ -80,9 +80,11 @@ export function useStreak() {
       const payload = (data ?? {}) as {
         milestone_hit?: number | null;
         freeze_granted?: boolean;
+        freeze_used?: boolean;
+        next_freeze_at?: string | null;
+        current?: number;
       } & Record<string, unknown>;
       await track("streak_activity_recorded", payload);
-      // Fire global milestone celebration when the DB reports a new one.
       if (payload.milestone_hit && typeof window !== "undefined") {
         window.dispatchEvent(
           new CustomEvent("heartify:streak-milestone", {
@@ -90,6 +92,13 @@ export function useStreak() {
               milestone: payload.milestone_hit,
               freezeGranted: !!payload.freeze_granted,
             },
+          }),
+        );
+      }
+      if (payload.freeze_used && typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("heartify:streak-freeze-used", {
+            detail: { current: payload.current ?? 0 },
           }),
         );
       }
