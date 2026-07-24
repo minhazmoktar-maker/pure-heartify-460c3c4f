@@ -333,7 +333,24 @@ const Watch = () => {
                   {videoId && <AddToPlaylistDialog videoId={videoId} />}
                   {videoId && <WatchLaterButton videoId={videoId} />}
                   {videoId && <ShareAtTimeButton videoId={videoId} />}
+                  {videoId && currentVideo && (
+                    <ShareImageButton
+                      input={{
+                        variant: "video",
+                        kicker: "Watching on Heartify",
+                        translation: currentVideo.title,
+                        attribution: `— ${currentVideo.channelTitle}`,
+                      }}
+                      meta={{
+                        title: currentVideo.title,
+                        text: `${currentVideo.title} · Heartify`,
+                        url: `https://pure-heartify.lovable.app/watch/${videoId}`,
+                      }}
+                      label="Share image"
+                    />
+                  )}
                   {videoId && <NotInterestedMenu videoId={videoId} />}
+
                   {videoId && <AdminVideoRemoveButton videoId={videoId} title={currentVideo.title} />}
 
 
