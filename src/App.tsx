@@ -301,7 +301,7 @@ const App = () => (
                 <Route path="/invite" element={<Invite />} />
                 <Route path="/offline" element={<OfflineLibrary />} />
                 <Route path="/premium" element={<Navigate to="/plus" replace />} />
-                <Route path="/pricing" element={<Navigate to="/plus" replace />} />
+                {/* /pricing redirect removed (W1/M3) — zero traffic, zero internal refs. Now 404s. */}
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/settings/notifications" element={<NotificationSettings />} />
