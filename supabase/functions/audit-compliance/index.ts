@@ -100,9 +100,7 @@ async function requireAdmin(req: Request): Promise<boolean> {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const url = new URL(req.url);
-  const isDebug = url.searchParams.get("debug") === "1";
-  if (!isDebug && !(await requireAdmin(req))) {
+  if (!(await requireAdmin(req))) {
     return new Response(JSON.stringify({ error: "admin only" }), {
       status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -117,18 +115,7 @@ Deno.serve(async (req) => {
 
   const t0 = Date.now();
 
-  // DEBUG: probe pg once
-  const probe = await pg(`curated_videos?select=id&limit=1`);
-  const probeBody = await probe.text().catch(() => "");
-  if (!probe.ok) {
-    return new Response(JSON.stringify({
-      error: "probe_failed",
-      status: probe.status,
-      body: probeBody,
-      has_url: !!SUPABASE_URL,
-      has_key: !!SERVICE_KEY,
-    }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  }
+
 
 
   // 1. Pull rows in pages of 1000.
