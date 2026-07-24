@@ -39,6 +39,7 @@ export default function DuaWall() {
   const [anon, setAnon] = useState(false);
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
+  const [tab, setTab] = useState<"recent" | "trending">("recent");
 
   const load = async () => {
     setLoading(true);
