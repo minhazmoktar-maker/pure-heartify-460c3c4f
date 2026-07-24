@@ -483,10 +483,10 @@ const App = () => (
                 <Route path="/admin/gsc" element={<Navigate to="/admin/users" replace />} />
                 <Route path="/admin/permissions" element={<Navigate to="/admin/users" replace />} />
                 <Route path="/admin/alerts" element={<Navigate to="/admin/users" replace />} />
-                <Route path="/owner-profile" element={<Navigate to="/admin/users" replace />} />
+                {/* /owner-profile redirect removed (W1/M3) — zero traffic, zero internal refs. Now 404s. */}
 
                 <Route path="/mfa-enroll" element={<Navigate to="/security/mfa" replace />} />
-                <Route path="/mfa-verify" element={<Navigate to="/security/mfa/verify" replace />} />
+                {/* /mfa-verify redirect removed (W1/M3) — zero traffic, zero internal refs. Now 404s. */}
                 <Route path="/security/mfa" element={<MfaEnroll />} />
                 <Route path="/security/mfa/verify" element={<MfaVerify />} />
 
