@@ -72,6 +72,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   };
 
   const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     if (!user) {
       navigate("/login");
@@ -83,6 +84,13 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
       channel: video.channelTitle,
       thumbnail: video.thumbnailUrl,
     });
+  };
+
+  // Stop taps on the overlay controls from bubbling into the card's
+  // navigate-to-watch handler. Needed on touch devices where the controls
+  // are always visible and there's no hover state to gate them.
+  const stopBubble = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
   };
 
   if (!isEmbeddableVideo) return null; // hide non-embeddable fallback videos
@@ -117,9 +125,17 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         <span className="absolute right-2 top-2 rounded-card bg-foreground/70 px-1.5 py-0.5 text-micro font-medium text-background">
           {video.category}
         </span>
-        <div className="absolute left-2 top-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <div
+          className="absolute left-2 top-2 flex items-center gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+          onClick={stopBubble}
+          onPointerDown={stopBubble}
+          onMouseDown={stopBubble}
+          onTouchStart={stopBubble}
+        >
           <button
+            type="button"
             onClick={handleBookmark}
+            onPointerDown={stopBubble}
             aria-label={liked ? "Remove bookmark" : "Bookmark video"}
             className="rounded-pill bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-background"
             title={liked ? "Remove bookmark" : "Bookmark"}
