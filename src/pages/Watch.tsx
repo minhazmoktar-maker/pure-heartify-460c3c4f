@@ -352,6 +352,7 @@ const Watch = () => {
               <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
             </button>
           )}
+          {series && <SeriesRail series={series} className="mt-4" />}
           {videoId && <CommentThread videoId={videoId} />}
         </div>
 
