@@ -18,7 +18,7 @@ import { HALAL_TOPICS } from "@/data/halalTopics";
 export default function HalalTopic() {
   const { slug } = useParams<{ slug: string }>();
   const key = (slug ?? "").toLowerCase();
-  const topic = TOPICS[key];
+  const topic = HALAL_TOPICS[key];
   const { data: videos, isLoading } = useYouTubeVideos(topic?.category ?? "All");
 
   const items = useMemo(() => (videos ?? []).slice(0, 48), [videos]);
