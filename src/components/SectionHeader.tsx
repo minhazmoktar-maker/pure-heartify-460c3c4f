@@ -14,7 +14,7 @@ interface SectionHeaderProps {
   /** Optional custom action slot rendered on the right (replaces the built-in action button). */
   actions?: ReactNode;
   className?: string;
-  as?: "h2" | "h3";
+  as?: "h1" | "h2" | "h3";
   align?: "start" | "center";
 }
 
