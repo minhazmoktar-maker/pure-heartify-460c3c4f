@@ -8,6 +8,7 @@ import TodayHero from "@/components/TodayHero";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
 import StreakAtRiskBanner from "@/components/StreakAtRiskBanner";
 import RamadanBanner from "@/components/RamadanBanner";
+import JumuahBanner from "@/components/JumuahBanner";
 import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
@@ -148,6 +149,7 @@ const Index = () => {
             <div className="mx-auto max-w-[1800px] space-y-3 px-4 pt-3 md:px-6">
               <StreakAtRiskBanner />
               <RamadanBanner />
+              <JumuahBanner />
               <FirstSessionCard />
               <WeeklyRecapCard />
             </div>

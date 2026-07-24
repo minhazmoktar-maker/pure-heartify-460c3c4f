@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Loader2, ExternalLink, Users } from "lucide-react";
+import { Loader2, ExternalLink, Users, MessageSquare } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+
+interface InboxItem {
+  id: string;
+  body: string;
+  created_at: string;
+  video_id: string;
+  video_title: string | null;
+}
 
 interface OwnedChannel {
   id: string;
@@ -21,6 +29,7 @@ export default function CreatorDashboard() {
   const [loading, setLoading] = useState(true);
   const [channels, setChannels] = useState<OwnedChannel[]>([]);
   const [stats, setStats] = useState<Record<string, { followers: number; comments: number; watchers: number }>>({});
+  const [inbox, setInbox] = useState<InboxItem[]>([]);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -33,19 +42,41 @@ export default function CreatorDashboard() {
       setChannels(list);
       if (list.length > 0) {
         const ids = list.map((c) => c.id);
-        const [{ data: follows }, { data: comments }] = await Promise.all([
+        const ytIds = list.map((c) => c.youtube_channel_id).filter(Boolean);
+        const [{ data: follows }, { data: vids }] = await Promise.all([
           supabase.from("channel_follows").select("channel_id", { count: "exact" }).in("channel_id", ids),
-          supabase.from("video_comments").select("id", { count: "exact", head: true }),
+          supabase.from("curated_videos").select("video_id,title,channel_id").in("channel_id", ytIds).limit(2000),
         ]);
         const followMap: Record<string, number> = {};
         (follows ?? []).forEach((f: any) => {
           followMap[f.channel_id] = (followMap[f.channel_id] ?? 0) + 1;
         });
+        const videoIds = (vids ?? []).map((v: any) => v.video_id);
+        const titleMap: Record<string, string> = Object.fromEntries((vids ?? []).map((v: any) => [v.video_id, v.title]));
+        let inboxItems: InboxItem[] = [];
+        let commentTotal = 0;
+        if (videoIds.length > 0) {
+          const { data: cmts, count } = await supabase
+            .from("video_comments")
+            .select("id,body,created_at,video_id", { count: "exact" })
+            .in("video_id", videoIds)
+            .order("created_at", { ascending: false })
+            .limit(10);
+          commentTotal = count ?? 0;
+          inboxItems = (cmts ?? []).map((c: any) => ({
+            id: c.id,
+            body: c.body,
+            created_at: c.created_at,
+            video_id: c.video_id,
+            video_title: titleMap[c.video_id] ?? null,
+          }));
+        }
         const s: typeof stats = {};
         list.forEach((c) => {
-          s[c.id] = { followers: followMap[c.id] ?? 0, comments: 0, watchers: 0 };
+          s[c.id] = { followers: followMap[c.id] ?? 0, comments: commentTotal, watchers: 0 };
         });
         setStats(s);
+        setInbox(inboxItems);
       }
       setLoading(false);
     })();
@@ -119,6 +150,38 @@ export default function CreatorDashboard() {
               </li>
             ))}
           </ul>
+        )}
+
+        {!loading && channels.length > 0 && (
+          <section className="mt-8">
+            <h2 className="mb-3 flex items-center gap-2 text-title font-semibold text-foreground">
+              <MessageSquare className="h-4 w-4" /> Recent comments
+              {inbox.length > 0 && (
+                <span className="ml-1 rounded-pill bg-primary/15 px-2 py-0.5 text-micro font-medium text-primary">
+                  {inbox.length}
+                </span>
+              )}
+            </h2>
+            {inbox.length === 0 ? (
+              <div className="rounded-card border border-dashed border-border py-8 text-center text-micro text-muted-foreground">
+                No comments yet on your videos.
+              </div>
+            ) : (
+              <ul className="space-y-2">
+                {inbox.map((c) => (
+                  <li key={c.id} className="rounded-card border border-border bg-card p-3">
+                    <Link to={`/watch/${c.video_id}`} className="block hover:opacity-80">
+                      <p className="line-clamp-2 text-sm text-foreground">{c.body}</p>
+                      <p className="mt-1 text-micro text-muted-foreground">
+                        on <span className="text-foreground">{c.video_title ?? c.video_id}</span> ·{" "}
+                        {new Date(c.created_at).toLocaleDateString()}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         )}
       </div>
     </>
