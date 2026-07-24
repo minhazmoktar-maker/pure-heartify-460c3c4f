@@ -13,6 +13,7 @@ import KeyboardFocusScroller from "./KeyboardFocusScroller";
 import ScrollRestoration from "./ScrollRestoration";
 import SkipLink from "./SkipLink";
 import OfflineBanner from "./OfflineBanner";
+import SessionPushNudge from "./SessionPushNudge";
 import { FeedDiversityProvider } from "@/contexts/FeedDiversityContext";
 
 const CommandPalette = lazy(() => import("./CommandPalette"));
@@ -53,6 +54,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <OfflineSweeper />
       <BackToTop />
       <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
+      <SessionPushNudge />
       <Suspense fallback={null}><CommandPalette /></Suspense>
       <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
       <Suspense fallback={null}><StreakFreezeUsedToast /></Suspense>
