@@ -233,7 +233,68 @@ export default function NotificationSettings() {
           </div>
         </section>
 
-        {/* Matrix */}
+        {/* Quiet hours — silence pushes during sleep, respected server-side */}
+        <section className="mb-8 rounded-card border border-border bg-card p-5">
+          <div className="flex items-start gap-3">
+            <BellOff className="mt-0.5 h-5 w-5 text-muted-foreground" />
+            <div className="flex-1">
+              <div className="font-semibold">Quiet hours</div>
+              <div className="text-micro text-muted-foreground">
+                No pushes during this window in your local time.
+              </div>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <label className="text-sm">
+                  <span className="mb-1 block text-micro text-muted-foreground">From</span>
+                  <select
+                    className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                    value={quietStart}
+                    onChange={(e) => saveQuietHours(Number(e.target.value), quietEnd, timezone)}
+                    aria-label="Quiet hours start"
+                  >
+                    {Array.from({ length: 24 }).map((_, h) => (
+                      <option key={h} value={h}>{h.toString().padStart(2, "0")}:00</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-sm">
+                  <span className="mb-1 block text-micro text-muted-foreground">To</span>
+                  <select
+                    className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                    value={quietEnd}
+                    onChange={(e) => saveQuietHours(quietStart, Number(e.target.value), timezone)}
+                    aria-label="Quiet hours end"
+                  >
+                    {Array.from({ length: 24 }).map((_, h) => (
+                      <option key={h} value={h}>{h.toString().padStart(2, "0")}:00</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-sm">
+                  <span className="mb-1 block text-micro text-muted-foreground">Time zone</span>
+                  <div className="flex gap-2">
+                    <input
+                      className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                      value={timezone}
+                      onChange={(e) => setTimezone(e.target.value)}
+                      onBlur={() => saveQuietHours(quietStart, quietEnd, timezone)}
+                      aria-label="Time zone"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => saveQuietHours(quietStart, quietEnd, detectTimezone())}
+                    >
+                      Auto
+                    </Button>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
         <section className="overflow-hidden rounded-card border border-border bg-card">
           <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-border bg-muted/40 px-5 py-3 text-micro font-semibold uppercase tracking-wider text-muted-foreground">
             <div>Notification</div>
