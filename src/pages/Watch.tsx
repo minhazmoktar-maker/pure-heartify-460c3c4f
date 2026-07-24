@@ -354,6 +354,16 @@ const Watch = () => {
                     category={currentVideo.category}
                     size="md"
                   />
+                  {videoId && (
+                    <Link
+                      to={`/verify/${videoId}`}
+                      className="inline-flex items-center gap-1 rounded-pill border border-border px-2.5 py-1 text-micro font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      title="See the reviewer chain, tier, and public attestation for this video"
+                    >
+                      <ShieldCheck className="h-3 w-3 text-primary" />
+                      Verify moderation
+                    </Link>
+                  )}
                   <button
                     onClick={handleBookmark}
                     className="inline-flex items-center gap-1 rounded-pill border border-border px-3 py-1 text-micro font-medium transition-colors hover:bg-accent"
