@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Flame, Snowflake, Trophy, Share2 } from "lucide-react";
+import { Flame, Snowflake, Trophy, Share2, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useStreak } from "@/hooks/useStreak";
 import { useMyHandle } from "@/hooks/useMyHandle";
 import { shareContent } from "@/lib/share";
