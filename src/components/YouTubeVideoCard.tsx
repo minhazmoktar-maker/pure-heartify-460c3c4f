@@ -181,6 +181,18 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
             </span>
           </div>
           <p className="text-micro text-muted-foreground">{timeAgo}</p>
+          {video.reason ? (
+            // Wave M2 — Beneficial Intelligence Engine reason chip.
+            // Explains WHY the Beneficial Intelligence Engine surfaced this
+            // video ("Because you learn Fiqh", "Trusted source", …). Absent
+            // on legacy rails so we don't clutter cards without a reason.
+            <p
+              className="mt-1 line-clamp-1 text-[11px] font-medium text-primary/80"
+              title={`Why you're seeing this: ${video.reason}`}
+            >
+              {video.reason}
+            </p>
+          ) : null}
 
         </div>
       </div>
