@@ -111,8 +111,32 @@ export default function DuaWall() {
           title="Du'a Wall"
           description="Share what you're praying for. Say Ameen to lift each other before Allah."
           icon={Users}
-          className="mb-6"
+          className="mb-4"
         />
+
+        {/* Social proof — surfaces today's activity so newcomers feel the ummah at work. */}
+        {!loading && duas.length > 0 && (() => {
+          const nowMs = Date.now();
+          const dayMs = 24 * 60 * 60 * 1000;
+          const todays = duas.filter((d) => nowMs - new Date(d.created_at).getTime() < dayMs);
+          const totalAmeens = duas.reduce((sum, d) => sum + (d.ameen_count || 0), 0);
+          const todayAmeens = todays.reduce((sum, d) => sum + (d.ameen_count || 0), 0);
+          return (
+            <div className="mb-4 flex flex-wrap gap-2">
+              <SocialProofChip icon={Sparkles} tone="primary" label={`${todays.length} du'a${todays.length === 1 ? "" : "s"} today`} />
+              <SocialProofChip icon={Heart} tone="success" label={`${todayAmeens.toLocaleString()} Ameens today`} />
+              <SocialProofChip icon={MessageCircle} label={`${totalAmeens.toLocaleString()} Ameens all-time`} />
+            </div>
+          );
+        })()}
+
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "recent" | "trending")} className="mb-4">
+          <TabsList className="grid w-full grid-cols-2 sm:w-auto">
+            <TabsTrigger value="recent" className="gap-1.5"><Sparkles className="h-3.5 w-3.5" />Recent</TabsTrigger>
+            <TabsTrigger value="trending" className="gap-1.5"><Flame className="h-3.5 w-3.5" />Trending</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
 
 
         <Card className="mb-6">
