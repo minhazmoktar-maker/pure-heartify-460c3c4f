@@ -5,74 +5,15 @@ import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import EditorByline from "@/components/EditorByline";
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
-import type { HalalCategory } from "@/services/youtube";
+import { HALAL_TOPICS } from "@/data/halalTopics";
 
 /**
- * Wave 2 — Programmatic-SEO topic landing.
+ * Wave 2 + R4 — Programmatic-SEO topic landing.
  * URL pattern: /halal/:slug (e.g. /halal/quran, /halal/parenting).
- * Each landing carries its own <title>, meta description, canonical, JSON-LD
- * ItemList, an editorial byline, and the live video grid for that topic.
+ * Topic catalog lives in `src/data/halalTopics.ts` so the sitemap
+ * generator and the /halal hub stay in sync with this page.
  */
 
-const TOPICS: Record<
-  string,
-  {
-    title: string;
-    kicker: string;
-    description: string;
-    category: HalalCategory;
-    reason: string;
-  }
-> = {
-  quran: {
-    title: "Halal Qur'an Videos — Tafsir, Recitation & Reflection",
-    kicker: "Qur'an",
-    description:
-      "Reviewed Qur'an tafsir, recitation, and reflection videos from trusted scholars — curated by Heartify Editors.",
-    category: "Quran",
-    reason: "Hand-picked tafsir and recitation series that respect the sciences of the Qur'an.",
-  },
-  seerah: {
-    title: "Halal Seerah Videos — Life of the Prophet ﷺ",
-    kicker: "Lectures",
-    description:
-      "Reviewed Seerah lectures and series about the life of the Prophet Muhammad ﷺ from trusted teachers.",
-    category: "Lectures",
-    reason: "A curated Seerah shelf covering childhood, Makkah, Madinah and the final sermon.",
-  },
-  parenting: {
-    title: "Halal Islamic Parenting Videos",
-    kicker: "Islamic",
-    description:
-      "Reviewed Islamic parenting videos from trusted educators — tarbiyah, discipline, du'a and household rhythm.",
-    category: "Islamic",
-    reason: "Practical parenting talks vetted for tone, sources, and tarbiyah quality.",
-  },
-  learning: {
-    title: "Halal Islamic Learning — Fiqh, Aqeedah & Adab",
-    kicker: "Education",
-    description:
-      "Reviewed Islamic learning videos on fiqh, aqeedah, hadith and adab from trusted scholars.",
-    category: "Education",
-    reason: "Structured learning content across the classical Islamic sciences.",
-  },
-  history: {
-    title: "Halal Islamic History Videos",
-    kicker: "Education",
-    description:
-      "Reviewed Islamic history videos — companions, dynasties, and civilizations — from trusted historians.",
-    category: "Education",
-    reason: "Rigorous history content that avoids sensationalism and cites its sources.",
-  },
-  motivation: {
-    title: "Halal Islamic Motivation & Reminders",
-    kicker: "Self-Improvement",
-    description:
-      "Reviewed Islamic reminders and short motivational lectures curated by Heartify Editors.",
-    category: "Self-Improvement",
-    reason: "Short, high-quality reminders that leave you closer to Allah, not more anxious.",
-  },
-};
 
 export default function HalalTopic() {
   const { slug } = useParams<{ slug: string }>();
