@@ -5,7 +5,7 @@ import ReferralCard from "@/components/ReferralCard";
 import ShareImageButton from "@/components/ShareImageButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 import { useReferral } from "@/hooks/useReferral";
-import { SEO } from "@/components/SEO";
+import SEO from "@/components/SEO";
 import { track } from "@/lib/analytics";
 
 /**
@@ -79,7 +79,8 @@ export default function Invite() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             <WhatsAppShareButton
-              text={`${inviteText} ${shareUrl ?? ""}`.trim()}
+              message={inviteText}
+              url={shareUrl ?? (typeof window !== "undefined" ? window.location.origin : "")}
             />
             <ShareImageButton
               variant="solid"
