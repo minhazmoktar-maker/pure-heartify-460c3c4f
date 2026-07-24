@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
 import SEO from "@/components/SEO";
 import TodayHero from "@/components/TodayHero";
 import WeeklyRecapCard from "@/components/WeeklyRecapCard";
@@ -13,6 +12,7 @@ import FirstSessionCard from "@/components/FirstSessionCard";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
 import HomeHero from "@/components/HomeHero";
+import TopPickHero from "@/components/TopPickHero";
 import ScholarsRail from "@/components/ScholarsRail";
 
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
@@ -137,11 +137,13 @@ const Index = () => {
 
         {user ? (
           <>
-            {/* One collapsed hero — greeting + next salah + today's ayah
-                stacked in a single card; resume-in-1-tap overrides it when
-                a continue-watching item exists. Search pill lives on top. */}
-            <HomeHero />
+            {/* TODAY-FIRST: Daily Dose is the single above-the-fold action.
+                One screen, one purpose — no supermarket of rails on first paint. */}
             <TodayHero />
+
+            {/* Supporting: search pill + salaam + today's ayah live below the
+                primary action, not above it. */}
+            <HomeHero />
 
             <div className="mx-auto max-w-[1800px] space-y-3 px-4 pt-3 md:px-6">
               <StreakAtRiskBanner />
@@ -162,8 +164,11 @@ const Index = () => {
           </>
         ) : (
           <>
-            {/* Signed-out collapsed hero — same one-card shape, no resume.
-                Sign-in nudge lives inside the primary rails block below. */}
+            {/* TODAY-FIRST for guests: one full-bleed Top Pick with a single
+                Play CTA. The halal-first moat is shown on-card (Reviewed ·
+                Family-safe pill) — no marketing paragraph above the fold. */}
+            <TopPickHero />
+
             <HomeHero />
             <p className="mx-auto mt-2 max-w-[1800px] px-4 text-center text-caption text-muted-foreground md:px-6">
               <a href="/login" className="underline underline-offset-2 hover:text-foreground">
@@ -182,8 +187,6 @@ const Index = () => {
                 <InfiniteVideoGrid sort="recent" limit={24} />
               </Suspense>
             </section>
-
-            <HeroSection />
           </>
         )}
 
