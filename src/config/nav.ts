@@ -51,6 +51,7 @@ import {
   Heart,
   Clock,
   Flame,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
