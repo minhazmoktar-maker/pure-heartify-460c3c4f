@@ -1,54 +1,36 @@
-import { lazy, Suspense, useEffect, useMemo } from "react";
+import { useEffect } from "react";
+import DailyDoseHero from "@/components/DailyDoseHero";
 import NextSalahWidget from "@/components/NextSalahWidget";
 import { StreakCard } from "@/components/StreakCard";
 import VerseOfDayCard from "@/components/VerseOfDayCard";
 import { useAuth } from "@/contexts/AuthContext";
 
-// DailyDoseHero owns the 3-thumbnail surface. Lazy so the streak + verse
-// cards paint immediately even on cold cache.
-const DailyDoseHero = lazy(() => import("@/components/DailyDoseHero"));
-
-function firstName(email?: string | null): string | null {
-  if (!email) return null;
-  const raw = email.split("@")[0] ?? "";
-  const clean = raw.replace(/[._-]+/g, " ").trim();
-  if (!clean) return null;
-  return clean.charAt(0).toUpperCase() + clean.slice(1);
-}
-
 /**
- * The signed-in "Today shape" — one obvious next action per surface:
- *   Salaam · Next salah countdown · Streak · Verse · Daily dose.
- * Personal frame answers "why open this app?" in one glance.
+ * The signed-in "Today shape" — one obvious next action per surface.
+ * Sprint 2: Daily Dose is now the HERO of the personal frame. It paints
+ * eagerly (no lazy delay) so returning users see today's session on first
+ * frame. Salah countdown + streak/verse cards sit beneath as supporting
+ * context, not as the primary CTA.
  */
 const TodayHero = () => {
   const { user } = useAuth();
-  const name = useMemo(
-    () => (user?.user_metadata?.full_name as string | undefined) ?? firstName(user?.email),
-    [user],
-  );
-  // Prewarm the /today offline cache so returning users have a fully
-  // populated Today screen even if they lose connectivity mid-session.
+
+  // Prewarm /today offline cache in idle time.
   useEffect(() => {
     const idle = (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback;
     const run = () => { void import("@/pages/Today").then((m) => m.loadDaily?.()).catch(() => {}); };
     if (idle) idle(run); else window.setTimeout(run, 1200);
   }, []);
+
   return (
     <>
-      
-      {user && (
-        <section
-          className="mx-auto mt-2 max-w-[1800px] px-4 md:px-6"
-          aria-label="Greeting"
-        >
-          <p className="text-sm text-muted-foreground">
-            <span lang="ar" dir="rtl" className="font-quran text-foreground">السلام عليكم</span>
-            {name ? <> · <span className="text-foreground">{name}</span></> : null}
-          </p>
-        </section>
-      )}
+      {/* HERO: Today's Daily Dose — the primary reason to open the app */}
+      {user ? <DailyDoseHero /> : null}
+
+      {/* Next salah — supporting context */}
       <NextSalahWidget />
+
+      {/* Streak + verse — the daily rituals */}
       <section
         className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6"
         aria-label="Your day at a glance"
@@ -58,9 +40,6 @@ const TodayHero = () => {
           <VerseOfDayCard />
         </div>
       </section>
-      <Suspense fallback={null}>
-        <DailyDoseHero />
-      </Suspense>
     </>
   );
 };

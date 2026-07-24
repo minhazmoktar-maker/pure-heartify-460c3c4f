@@ -150,38 +150,42 @@ export default function HomeHero() {
           )}
         </div>
 
-        {/* Next salah row */}
-        <div className="mt-3 border-t border-border/60 pt-3">
-          {!settings?.location ? (
-            <Link
-              to="/prayer"
-              className="flex items-center gap-2 text-sm text-foreground"
-              aria-label="Set your location for prayer times"
-            >
-              <MapPin className="h-4 w-4 text-primary" aria-hidden />
-              <span className="font-semibold">Set location</span>
-              <span className="text-muted-foreground">for prayer times</span>
-            </Link>
-          ) : next ? (
-            <Link
-              to="/prayer"
-              className={"flex items-center gap-2 text-sm " + (approx ? "opacity-70" : "")}
-              aria-label={`Next prayer: ${next.label} in ${formatCountdown(next.time.getTime() - now.getTime())}`}
-            >
-              <Compass className="h-4 w-4 text-primary" aria-hidden />
-              <span className="font-semibold text-foreground">Next: {next.label}</span>
-              <span className="text-muted-foreground">
-                {formatTime(next.time)} · in{" "}
-                <span className="tabular-nums font-medium text-foreground">
-                  {formatCountdown(next.time.getTime() - now.getTime())}
+        {/* Next salah row — only shown to signed-out visitors. Signed-in
+            users get the full NextSalahWidget below in TodayHero, so we
+            skip this row to avoid duplication. */}
+        {!user && (
+          <div className="mt-3 border-t border-border/60 pt-3">
+            {!settings?.location ? (
+              <Link
+                to="/prayer"
+                className="flex items-center gap-2 text-sm text-foreground"
+                aria-label="Set your location for prayer times"
+              >
+                <MapPin className="h-4 w-4 text-primary" aria-hidden />
+                <span className="font-semibold">Set location</span>
+                <span className="text-muted-foreground">for prayer times</span>
+              </Link>
+            ) : next ? (
+              <Link
+                to="/prayer"
+                className={"flex items-center gap-2 text-sm " + (approx ? "opacity-70" : "")}
+                aria-label={`Next prayer: ${next.label} in ${formatCountdown(next.time.getTime() - now.getTime())}`}
+              >
+                <Compass className="h-4 w-4 text-primary" aria-hidden />
+                <span className="font-semibold text-foreground">Next: {next.label}</span>
+                <span className="text-muted-foreground">
+                  {formatTime(next.time)} · in{" "}
+                  <span className="tabular-nums font-medium text-foreground">
+                    {formatCountdown(next.time.getTime() - now.getTime())}
+                  </span>
                 </span>
-              </span>
-              {approx ? (
-                <span className="ml-auto shrink-0 text-micro font-semibold text-primary">Confirm</span>
-              ) : null}
-            </Link>
-          ) : null}
-        </div>
+                {approx ? (
+                  <span className="ml-auto shrink-0 text-micro font-semibold text-primary">Confirm</span>
+                ) : null}
+              </Link>
+            ) : null}
+          </div>
+        )}
 
         {/* Today's ayah — Amiri Arabic + short English gloss */}
         <div className="mt-3 border-t border-border/60 pt-3">
