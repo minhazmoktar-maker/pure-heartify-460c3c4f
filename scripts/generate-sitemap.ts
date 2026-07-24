@@ -168,6 +168,8 @@ const families: Array<{ name: string; entries: Entry[] }> = [
   { name: "durood", entries: (DUROOD as Array<{ slug: string }>).map((d) => ({ path: `/durood/${d.slug}`, changefreq: "monthly", priority: "0.6" })) },
   // Qur'an surahs 1..114 and juz 1..30 (surah pages are generated on demand)
   { name: "surahs", entries: Array.from({ length: 114 }, (_, i) => ({ path: `/surah/${i + 1}`, changefreq: "monthly", priority: "0.7" })) },
+  { name: "reciters", entries: RECITERS.map((r) => ({ path: `/reciter/${r.id}`, changefreq: "monthly", priority: "0.7" })) },
+  { name: "halal-topics", entries: Object.keys(HALAL_TOPICS).map((slug) => ({ path: `/halal/${slug}`, changefreq: "weekly", priority: "0.7" })) },
 ];
 
 const coreFiles = writeChunked("core", core);
