@@ -108,6 +108,7 @@ const GroupKhatmJoin = lazy(() => import("./pages/GroupKhatmJoin.tsx"));
 const AdminViral = lazy(() => import("./pages/AdminViral.tsx"));
 const Leaderboards = lazy(() => import("./pages/Leaderboards.tsx"));
 const TeamStreaks = lazy(() => import("./pages/TeamStreaks.tsx"));
+const Family = lazy(() => import("./pages/Family.tsx"));
 const DhikrCircles = lazy(() => import("./pages/DhikrCircles.tsx"));
 const PublicDhikrCircle = lazy(() => import("./pages/PublicDhikrCircle.tsx"));
 const PublicDua = lazy(() => import("./pages/PublicDua.tsx"));
