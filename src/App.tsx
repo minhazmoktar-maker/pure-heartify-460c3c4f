@@ -50,6 +50,7 @@ const AdminDedup = lazy(() => import("./pages/AdminDedup.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
 const ReviewMagic = lazy(() => import("./pages/ReviewMagic.tsx"));
+const AdminMintReviewToken = lazy(() => import("./pages/AdminMintReviewToken.tsx"));
 const AdminRoles = lazy(() => import("./pages/AdminRoles.tsx"));
 const AdminUsers = lazy(() => import("./pages/AdminUsers.tsx"));
 
@@ -467,6 +468,7 @@ const App = () => (
                 <Route path="/admin/dedup" element={<AdminRoute><AdminDedup /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
                 <Route path="/review/:token" element={<ReviewMagic />} />
+                <Route path="/admin/mint-review-token" element={<AdminMintReviewToken />} />
 
                 <Route path="/admin/moderation-log" element={<Navigate to="/admin/moderation" replace />} />
                 <Route path="/admin/audit" element={<AdminRoute><Audit /></AdminRoute>} />
