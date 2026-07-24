@@ -213,6 +213,8 @@ const Zakat = lazy(() => import("./pages/Zakat.tsx"));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings.tsx"));
 const Playlists = lazy(() => import("./pages/Playlists.tsx"));
 const PlaylistDetail = lazy(() => import("./pages/PlaylistDetail.tsx"));
+const Explore = lazy(() => import("./pages/Explore.tsx"));
+const MyLibrary = lazy(() => import("./pages/MyLibrary.tsx"));
 const Appeals = lazy(() => import("./pages/Appeals.tsx"));
 const Transparency = lazy(() => import("./pages/Transparency.tsx"));
 const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
