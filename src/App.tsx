@@ -349,6 +349,7 @@ const App = () => (
                 <Route path="/khatm/join/:code" element={<GroupKhatmJoin />} />
                 <Route path="/leaderboards" element={<Leaderboards />} />
                 <Route path="/teams" element={<TeamStreaks />} />
+                <Route path="/family" element={<Family />} />
                 <Route path="/dhikr/circles" element={<DhikrCircles />} />
                 <Route path="/c/:id" element={<PublicDhikrCircle />} />
                 <Route path="/d/:id" element={<PublicDua />} />
