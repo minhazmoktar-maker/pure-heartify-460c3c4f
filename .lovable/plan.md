@@ -1,65 +1,56 @@
-# Plan — Tighten strategy to a video-first, trust-led moat
+# Plan — Benefit-First Strategy Revision (approved constraints incorporated)
 
-Scope: docs only. Rewrite `docs/STRATEGY_MOAT.md` and `docs/ROADMAP_MOAT.md` to lock Heartify's identity as *the world's most trusted platform for discovering and watching halal, beneficial content*. No code changes.
+Doc-only. Rewrite `docs/STRATEGY_MOAT.md` and `docs/ROADMAP_MOAT.md` around a benefit-first, video-first, trust-led philosophy — while explicitly keeping engagement metrics (retention, completion, DAU) as measured health signals we care about but never optimize for in isolation.
 
-## Identity lock (applied to both docs)
+## Constraints locked in
 
-- Positioning: **video-first platform**. Qur'an, prayer, journal, streaks, family = supporting tools that make video discovery, trust, retention, or learning stronger. They are never the product spine.
-- Every feature filter becomes: *"Does it make Heartify better at discovering, trusting, watching, or learning from beneficial videos?"* If no → future backlog.
-- Remove all language that repositions Heartify as a "daily spiritual operating system." Replace with "video-first, trust-led."
+- Video-first identity preserved.
+- **Trust remains the primary differentiator.**
+- Engagement metrics are kept and measured; we never optimize for engagement at the expense of benefit; manipulative tactics are forbidden.
+- No language banning implementation choices (infinite scroll, autoplay, push cadence). Those stay available whenever they serve benefit.
+- Core question becomes: *"What is the most beneficial thing this person **wants** to watch right now?"* — benefit + desire together; never lecture.
+- YouTube comparison reframed as a **compound moat**: trusted moderation · verified beneficial sources · multilingual beneficial corpus · superior discovery inside that corpus · family safety · source ecosystem · transparent recommendations.
+- Permanent principle: **"Heartify is not trying to maximize time spent. It is trying to maximize value received per minute spent."**
 
-## Rewrite of `docs/STRATEGY_MOAT.md`
+## `docs/STRATEGY_MOAT.md` — changes
 
-Re-ordered and re-weighted moats:
+1. **Section 0 identity lock** — keep video-first + trust-as-primary-differentiator, add benefit as the *objective function*.
+2. **New Section 0.5 — Product principles (permanent)**:
+   - Every minute should leave the user better than before.
+   - Maximize value received per minute spent — not time spent. Retention, completion, and DAU still matter and are pursued *through* benefit.
+   - Core ranking question: *"What is the most beneficial thing this person wants to watch right now?"* Users must feel understood, not lectured.
+   - No manipulative engagement tactics. Implementation tools (infinite scroll, autoplay, push) remain available when they serve benefit.
+   - Session-quality checklist (taught? faith? skill? question answered? life improved?).
+   - Existing feature filter retained.
+3. **New Section 1.5 — Direct answer to "Why leave YouTube if it already recommends halal videos?"** Framed as a **compound moat** listing all seven advantages that only work together (trusted per-video moderation · verified beneficial sources · multilingual beneficial corpus · superior discovery inside that corpus · family safety · source ecosystem · transparent recommendations). Closing line: *YouTube's halal videos are accidents of its algorithm; Heartify's are the entire point of ours.*
+4. **M1 Trust & moderation** — retained as the primary differentiator.
+5. **Rename M2 → Beneficial Intelligence Engine.** Objective stated as *"What's the most beneficial video this person wants to watch right now?"* Signals combined: Trust · Knowledge graph · User goals · Learning progress · Difficulty progression · Diversity · Freshness · Discovery · Session context · Time available · Prayer context · Language/dialect · Negative-signal dataset. Transparency (*"Why you're seeing this"*) is a first-class feature. No prohibitions on implementation techniques.
+6. **Rename M3 → Beneficial-source ecosystem.** Broaden actors: scholars, universities, institutes, foundations, masjids, educational organizations, independent educators, researchers, creators. Payout math unchanged.
+7. **M4 (Family Safety), M5 (Ritual re-rankers only), M6 (Memory), M7 (Ummah)** retained, each gets a one-line *"Serves the benefit objective by…"* clause.
+8. **Section 4 Unique jobs** — update job #2 to *"Recommend the highest-benefit next video the user actually wants — not the stickiest one."*
+9. **New Section 10 — Internal north-star metrics.**
+   - Primary (benefit-weighted): finish-rate on recommended videos, session-quality rating, learning-path progression, trust-attestation coverage, report resolution median.
+   - Guardrails: top-channel share ≤ 5%, repeat rate < 1%, push CTR ≥ 12% at ≤ 3/week, zero manipulative-pattern findings quarterly.
+   - Health (measured, never the target on their own): retention (D1/D7/D30), DAU, session length, completion rate — treated as *consequences* of benefit.
+10. **Durability test (Section 11)** — updated to:
+    > *"YouTube shows me what will keep me watching. Heartify shows me the most beneficial thing I actually want to watch next — and proves why it's safe."*
+    Emphasize the gap is a **business-model gap**, not a UI gap.
 
-1. **M1 — Trust & moderation (primary moat)**
-   - Signed per-video attestations, tier A–D, public `/verify/:content_id`.
-   - Human + institution review chain visible on every card.
-   - Trust becomes a ranking signal, not just a filter.
-2. **M2 — Discovery & recommendation (primary moat)** — new dedicated section explaining the compounding data advantages:
-   - Halal-labeled corpus (title/description/tags/thumbnail signals + human tier).
-   - Islamic knowledge graph (topics, madhhab, language, scholar lineage, institution).
-   - Multilingual understanding across 18+ languages already crawled.
-   - Behavioral taste graph on a filtered corpus (denominator YouTube can't replicate without abandoning ad economics).
-   - Negative-signal dataset (why videos were rejected) — proprietary and cumulative.
-   - Why it's hard to copy: requires simultaneous investment in moderation labels + multilingual NLP + Islamic ontology + long-tail catalog.
-3. **M3 — Beneficial-creator ecosystem** — broaden from scholars to **all beneficial creators**: Islamic education, dawah, Qur'an, science, history, entrepreneurship, language learning, parenting, documentaries, productivity, engineering, medicine.
-   - Sadaqah tipping, waqf memberships, reviewed-content bonus pool weighted by tier + trust-graph + finish-rate.
-   - Institutional grants and cross-creator endorsements.
-   - Target: top ~2,000 beneficial creators globally earn more per 1k views on Heartify than on YouTube within 24 months.
-4. **M4 — Family safety (Kids Mode)** — tier-A + explicit whitelist + parent audit dashboard + report SLA.
-5. **M5 — Ritual integrations (supporting, contextual discovery only)** — prayer-time-aware recommendations, Ramadan surfaces, Jumu'ah rail, Qiyam recommendations. Explicit non-goals: no full prayer app, no productivity app, no habit tracker as a product line. Rituals only exist to inform *which video to show right now*.
-6. **M6 — Spiritual memory (optional retention layer)** — bookmarks, notes, khatm ledger, year-in-iman. Kept as a lock-in mechanism, not a spine.
-7. **M7 — Ummah coordination (long-term)** — synchronized viewing (global khatm rooms, Qiyam watch rooms, masjid-hosted rooms). Deferred; still video-anchored.
+## `docs/ROADMAP_MOAT.md` — changes
 
-Other section changes:
-- Rewrite the flywheel diagram around **Trust → Discovery → Creators → Households → back to Trust**.
-- Rewrite "Unique jobs" list to be video-outcome jobs (certify the source, discover the beneficial video, guarantee zero-doubt watch, pay the beneficial creator fairly, learn from what you watched).
-- Rewrite the one-sentence durability test to keep the video framing: *"YouTube shows me what will keep me watching. Heartify shows me the most beneficial thing to watch right now — and proves why it's safe."*
-- Add explicit **Non-goals** section: not a prayer app, not a productivity app, not a social network, not a Muslim TikTok.
+1. **Execution rules** — keep the video-first test, add the benefit test (raises value per minute, not just time). Explicit: engagement metrics are measured; no manipulative tactics; implementation techniques remain available when they serve benefit.
+2. **New Wave 0 — Principle lock (docs + telemetry only).** Codify the benefit objective and benefit-weighted metrics next to engagement metrics; add manipulative-pattern audit to quarterly review. Ships first, no product surface.
+3. **Wave 1 — Trust Spine (M1)** unchanged, with *"Serves the benefit objective by…"* clause.
+4. **Wave 2 — renamed Beneficial Intelligence Engine.** Scope adds user goals, learning progress, difficulty progression, time-available, session context, prayer context, language/dialect. Post-watch session-quality micro-survey feeds back into ranking. Proof metrics reframed: finish-rate ≥ +15%, session-quality ≥ 4.2/5, top-channel share ≤ 5%, repeat < 1%.
+5. **Wave 3 — renamed Beneficial-source ecosystem** to match broadened actors.
+6. **Waves 4–7** retained, each with a *"Serves the benefit objective by…"* clause.
+7. **Priority order** updated to reflect Wave 0 addition and renames.
 
-## Rewrite of `docs/ROADMAP_MOAT.md`
+## Out of scope
 
-Waves re-ordered and re-scoped to match the new priority. Each wave keeps proof metrics; each is filtered by the video-first test.
+- No code, schema, migrations, RPCs, edge functions, tests, or CI changes.
+- No component edits.
 
-- **Wave 1 — Trust Spine (was M2).** Signed attestations on every video, `/verify/:id`, reviewer chain on cards, trust-weighted ranking. Proof: ≥99% of surfaced videos carry a valid signed attestation; parent-audit NPS ≥+40.
-- **Wave 2 — Discovery Moat.** Knowledge graph tables (topics, institutions, scholars, languages, madhhab), multilingual embeddings on the approved corpus, negative-signal dataset wired into ranking, per-video "why you're seeing this" already exposed. Proof: session-diversity holds while finish-rate improves ≥15%; top-channel share stays ≤5%.
-- **Wave 3 — Beneficial Creator Ecosystem (broadened).** Sadaqah tipping, waqf memberships, reviewed-content bonus pool across all beneficial categories, creator earnings dashboard, "Claim your channel" for non-scholar beneficial creators. Proof: top 100 beneficial creators earn ≥1.5× YouTube CPM equivalents; ≥500 active waqf memberships.
-- **Wave 4 — Family Safety / Kids Mode.** Tier-A-only Kids Mode, parent audit log, report-a-video SLA, child seat lock. Proof: 100/100 random Kids Mode videos pass human re-review; median report-to-resolution <24h.
-- **Wave 5 — Ritual-Aware Discovery (supporting).** Prayer-time-aware home rail ordering, Ramadan mode surfacing, Jumu'ah rail, Qiyam rail. Explicitly **not** a prayer app; rituals only re-rank video surfaces. Proof: prayer-window sessions show higher finish-rate and lower bounce vs. control.
-- **Wave 6 — Learning Loop (optional memory).** Bookmarks with reflections, "what I learned this month" summary drawn from watched + noted videos, year-in-iman recap. Proof: ≥30% of DAU save ≥1 reflection/week.
-- **Wave 7 — Ummah Coordination (deferred).** Synchronized watch rooms, masjid-hosted rooms, institution-led cohort classes. Still video-anchored.
+## Deliverable
 
-Add a top-of-file **Execution Rules** section:
-1. Video-first test gates every proposed feature.
-2. Ritual, memory, and coordination features may only ship as re-rankers or retention layers over the video experience.
-3. Waves ship sequentially; no parallel wave unless one is genuinely blocked.
-4. Every wave writes back to `STRATEGY_MOAT.md` if reality changes the thesis.
-
-Close with: *Next action — on approval, open a dedicated plan for Wave 1 (Trust Spine) focused entirely on the watch experience.*
-
-## Deliverables
-
-- `docs/STRATEGY_MOAT.md` — rewritten per above.
-- `docs/ROADMAP_MOAT.md` — rewritten per above.
-- No code, no schema, no config changes in this pass.
+Two revised markdown files. Approve to switch to build mode; I write both in one pass.
