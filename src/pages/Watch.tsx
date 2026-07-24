@@ -49,8 +49,11 @@ const Watch = () => {
   const relatedVideos = videos?.filter((v) => v.id !== videoId).slice(0, 8) ?? [];
   const isEmbeddableVideo = !!videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId);
 
+  const series = useSeriesEpisodes(currentVideo, videos);
   const currentIndex = videos?.findIndex((v) => v.id === videoId) ?? -1;
-  const nextVideo = videos && currentIndex >= 0 ? videos[(currentIndex + 1) % videos.length] : null;
+  const feedNext = videos && currentIndex >= 0 ? videos[(currentIndex + 1) % videos.length] : null;
+  // Prefer the next series episode when we're in a series — keeps viewers on-topic.
+  const nextVideo = series?.next ?? feedNext;
 
   // Reset facade when navigating between videos
   useEffect(() => {
