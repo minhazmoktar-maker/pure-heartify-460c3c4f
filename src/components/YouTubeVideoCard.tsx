@@ -103,7 +103,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           src={hiResThumb}
           onError={handleThumbError}
           onLoad={handleThumbLoad}
-          alt={video.title}
+          alt={`${video.title} — ${video.channelTitle} thumbnail`}
           loading={index < 4 ? "eager" : "lazy"}
           decoding="async"
           width={1280}
