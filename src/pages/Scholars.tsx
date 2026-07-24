@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import SEO from "@/components/SEO";
 import { useVerifiedScholars } from "@/hooks/useVerifiedScholars";
-import { halaltubeSpeakerUrl, halaltubeSearchUrl } from "@/lib/halaltube";
 import { track } from "@/lib/analytics";
 
 type Scholar = { id: string; name: string; era: string; field: string; summary: string; works: string };
