@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Heart, Loader2, Send, Share2, Trash2, Users } from "lucide-react";
+import { Flame, Heart, Loader2, MessageCircle, Send, Share2, Sparkles, Trash2, Users } from "lucide-react";
+import SocialProofChip from "@/components/SocialProofChip";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
 import Navbar from "@/components/Navbar";
 import SectionHeader from "@/components/SectionHeader";
@@ -37,6 +39,20 @@ export default function DuaWall() {
   const [anon, setAnon] = useState(false);
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
+  const [tab, setTab] = useState<"recent" | "trending">("recent");
+
+  // "Trending" ranks du'as posted in the last 7 days by Ameen count, tiebreak
+  // by recency. "Recent" preserves the RPC's newest-first order.
+  const orderedDuas = useMemo(() => {
+    if (tab === "recent") return duas;
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return [...duas]
+      .filter((d) => new Date(d.created_at).getTime() >= cutoff)
+      .sort((a, b) => {
+        if (b.ameen_count !== a.ameen_count) return b.ameen_count - a.ameen_count;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+  }, [duas, tab]);
 
   const load = async () => {
     setLoading(true);
@@ -108,8 +124,32 @@ export default function DuaWall() {
           title="Du'a Wall"
           description="Share what you're praying for. Say Ameen to lift each other before Allah."
           icon={Users}
-          className="mb-6"
+          className="mb-4"
         />
+
+        {/* Social proof — surfaces today's activity so newcomers feel the ummah at work. */}
+        {!loading && duas.length > 0 && (() => {
+          const nowMs = Date.now();
+          const dayMs = 24 * 60 * 60 * 1000;
+          const todays = duas.filter((d) => nowMs - new Date(d.created_at).getTime() < dayMs);
+          const totalAmeens = duas.reduce((sum, d) => sum + (d.ameen_count || 0), 0);
+          const todayAmeens = todays.reduce((sum, d) => sum + (d.ameen_count || 0), 0);
+          return (
+            <div className="mb-4 flex flex-wrap gap-2">
+              <SocialProofChip icon={Sparkles} tone="primary" label={`${todays.length} du'a${todays.length === 1 ? "" : "s"} today`} />
+              <SocialProofChip icon={Heart} tone="success" label={`${todayAmeens.toLocaleString()} Ameens today`} />
+              <SocialProofChip icon={MessageCircle} label={`${totalAmeens.toLocaleString()} Ameens all-time`} />
+            </div>
+          );
+        })()}
+
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "recent" | "trending")} className="mb-4">
+          <TabsList className="grid w-full grid-cols-2 sm:w-auto">
+            <TabsTrigger value="recent" className="gap-1.5"><Sparkles className="h-3.5 w-3.5" />Recent</TabsTrigger>
+            <TabsTrigger value="trending" className="gap-1.5"><Flame className="h-3.5 w-3.5" />Trending</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
 
 
         <Card className="mb-6">
@@ -145,11 +185,15 @@ export default function DuaWall() {
 
         {loading ? (
           <PageSkeleton variant="list" className="max-w-none px-0" />
-        ) : duas.length === 0 ? (
-          <EmptyState icon={Heart} title="No du'as yet" description="Be the first to share a du'a and let the ummah say āmīn." />
+        ) : orderedDuas.length === 0 ? (
+          <EmptyState
+            icon={tab === "trending" ? Flame : Heart}
+            title={tab === "trending" ? "Nothing trending yet" : "No du'as yet"}
+            description={tab === "trending" ? "Check back soon — trending du'as are pulled from the last 7 days." : "Be the first to share a du'a and let the ummah say āmīn."}
+          />
         ) : (
           <ul className="space-y-3">
-            {duas.map((d) => {
+            {orderedDuas.map((d) => {
               const mine = myOwnIds.has(d.id);
               const said = myAmeens.has(d.id);
               return (
