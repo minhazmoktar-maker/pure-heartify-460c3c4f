@@ -28,7 +28,7 @@ export default function Invite() {
       <SEO
         title="Invite a friend — Heartify"
         description="Share Heartify with someone who'd benefit. A calm, halal space for beneficial content."
-        canonical="/invite"
+        path="/invite"
       />
 
       <main className="mx-auto max-w-2xl px-4 pt-4 pb-24">
