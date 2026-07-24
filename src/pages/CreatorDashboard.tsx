@@ -151,6 +151,38 @@ export default function CreatorDashboard() {
             ))}
           </ul>
         )}
+
+        {!loading && channels.length > 0 && (
+          <section className="mt-8">
+            <h2 className="mb-3 flex items-center gap-2 text-title font-semibold text-foreground">
+              <MessageSquare className="h-4 w-4" /> Recent comments
+              {inbox.length > 0 && (
+                <span className="ml-1 rounded-pill bg-primary/15 px-2 py-0.5 text-micro font-medium text-primary">
+                  {inbox.length}
+                </span>
+              )}
+            </h2>
+            {inbox.length === 0 ? (
+              <div className="rounded-card border border-dashed border-border py-8 text-center text-micro text-muted-foreground">
+                No comments yet on your videos.
+              </div>
+            ) : (
+              <ul className="space-y-2">
+                {inbox.map((c) => (
+                  <li key={c.id} className="rounded-card border border-border bg-card p-3">
+                    <Link to={`/watch/${c.video_id}`} className="block hover:opacity-80">
+                      <p className="line-clamp-2 text-sm text-foreground">{c.body}</p>
+                      <p className="mt-1 text-micro text-muted-foreground">
+                        on <span className="text-foreground">{c.video_title ?? c.video_id}</span> ·{" "}
+                        {new Date(c.created_at).toLocaleDateString()}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
       </div>
     </>
   );
