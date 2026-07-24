@@ -11,7 +11,9 @@ import CommentThread from "@/components/CommentThread";
 import AddToPlaylistDialog from "@/components/AddToPlaylistDialog";
 import NotInterestedMenu from "@/components/NotInterestedMenu";
 import { WatchLaterButton, ShareAtTimeButton } from "@/components/WatchExtras";
+import ShareImageButton from "@/components/ShareImageButton";
 import SeriesRail from "@/components/SeriesRail";
+
 import { useSeriesEpisodes } from "@/hooks/useSeriesEpisodes";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
