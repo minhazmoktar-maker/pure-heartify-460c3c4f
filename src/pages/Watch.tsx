@@ -50,7 +50,7 @@ const Watch = () => {
   const completedRef = useRef<string | null>(null);
 
   const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
-  const currentCategory = (currentVideo as any)?.category as string | undefined;
+  const currentCategory = (currentVideo as any)?.category;
   const relatedQuery = useInfiniteFeed({
     category: currentCategory && currentCategory !== "All" ? currentCategory : undefined,
     limit: 12,
