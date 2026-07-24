@@ -72,6 +72,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   };
 
   const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     if (!user) {
       navigate("/login");
@@ -83,6 +84,13 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
       channel: video.channelTitle,
       thumbnail: video.thumbnailUrl,
     });
+  };
+
+  // Stop taps on the overlay controls from bubbling into the card's
+  // navigate-to-watch handler. Needed on touch devices where the controls
+  // are always visible and there's no hover state to gate them.
+  const stopBubble = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
   };
 
   if (!isEmbeddableVideo) return null; // hide non-embeddable fallback videos
