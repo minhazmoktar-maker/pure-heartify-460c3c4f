@@ -5289,6 +5289,7 @@ export type Database = {
       get_moderation_config: { Args: { _key: string }; Returns: Json }
       get_ops_dashboard: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
+      get_public_attestation: { Args: { _video_id: string }; Returns: Json }
       get_public_dhikr_circle: {
         Args: { _circle_id: string }
         Returns: {
