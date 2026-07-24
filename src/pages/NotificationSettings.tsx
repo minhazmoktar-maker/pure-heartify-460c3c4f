@@ -43,10 +43,21 @@ const RECOMMENDED_DEFAULTS: Record<string, { push: boolean; email: boolean; inAp
   weekly_recap: { push: false, email: true,  inApp: true },
 };
 
+function detectTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  } catch {
+    return "UTC";
+  }
+}
+
 export default function NotificationSettings() {
   const { user, loading: authLoading } = useAuth();
   const push = useWebPush();
   const [prefs, setPrefs] = useState<Record<string, Pref>>({});
+  const [quietStart, setQuietStart] = useState<number>(22);
+  const [quietEnd, setQuietEnd] = useState<number>(7);
+  const [timezone, setTimezone] = useState<string>(detectTimezone());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,7 +68,7 @@ export default function NotificationSettings() {
       await supabase.rpc("seed_default_notification_prefs", { _user_id: user.id }).then(() => {}, () => {});
       const { data } = await supabase
         .from("notification_preferences")
-        .select("id, kind, push_enabled, email_enabled, in_app_enabled")
+        .select("id, kind, push_enabled, email_enabled, in_app_enabled, quiet_hours_start, quiet_hours_end, timezone")
         .eq("user_id", user.id);
       const map: Record<string, Pref> = {};
       for (const kind of KINDS) {
@@ -70,9 +81,39 @@ export default function NotificationSettings() {
         };
       }
       setPrefs(map);
+      const first = (data ?? [])[0] as (Pref & { quiet_hours_start?: number | null; quiet_hours_end?: number | null; timezone?: string | null }) | undefined;
+      if (first) {
+        if (typeof first.quiet_hours_start === "number") setQuietStart(first.quiet_hours_start);
+        if (typeof first.quiet_hours_end === "number") setQuietEnd(first.quiet_hours_end);
+        if (first.timezone) setTimezone(first.timezone);
+      }
       setLoading(false);
     })();
   }, [user]);
+
+  const saveQuietHours = async (nextStart: number, nextEnd: number, nextTz: string) => {
+    if (!user) return;
+    setQuietStart(nextStart);
+    setQuietEnd(nextEnd);
+    setTimezone(nextTz);
+    // Apply across every kind row so the cron dispatcher sees consistent values.
+    const rows = KINDS.map((k) => ({
+      user_id: user.id,
+      kind: k.key,
+      push_enabled: prefs[k.key]?.push_enabled ?? true,
+      email_enabled: prefs[k.key]?.email_enabled ?? false,
+      in_app_enabled: prefs[k.key]?.in_app_enabled ?? true,
+      quiet_hours_start: nextStart,
+      quiet_hours_end: nextEnd,
+      timezone: nextTz,
+    }));
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert(rows, { onConflict: "user_id,kind" });
+    if (error) {
+      toast({ title: "Couldn't save quiet hours", description: error.message, variant: "destructive" });
+    }
+  };
 
   const update = async (kind: string, field: "push_enabled" | "email_enabled" | "in_app_enabled", value: boolean) => {
     if (!user) return;
@@ -192,7 +233,68 @@ export default function NotificationSettings() {
           </div>
         </section>
 
-        {/* Matrix */}
+        {/* Quiet hours — silence pushes during sleep, respected server-side */}
+        <section className="mb-8 rounded-card border border-border bg-card p-5">
+          <div className="flex items-start gap-3">
+            <BellOff className="mt-0.5 h-5 w-5 text-muted-foreground" />
+            <div className="flex-1">
+              <div className="font-semibold">Quiet hours</div>
+              <div className="text-micro text-muted-foreground">
+                No pushes during this window in your local time.
+              </div>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <label className="text-sm">
+                  <span className="mb-1 block text-micro text-muted-foreground">From</span>
+                  <select
+                    className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                    value={quietStart}
+                    onChange={(e) => saveQuietHours(Number(e.target.value), quietEnd, timezone)}
+                    aria-label="Quiet hours start"
+                  >
+                    {Array.from({ length: 24 }).map((_, h) => (
+                      <option key={h} value={h}>{h.toString().padStart(2, "0")}:00</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-sm">
+                  <span className="mb-1 block text-micro text-muted-foreground">To</span>
+                  <select
+                    className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                    value={quietEnd}
+                    onChange={(e) => saveQuietHours(quietStart, Number(e.target.value), timezone)}
+                    aria-label="Quiet hours end"
+                  >
+                    {Array.from({ length: 24 }).map((_, h) => (
+                      <option key={h} value={h}>{h.toString().padStart(2, "0")}:00</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-sm">
+                  <span className="mb-1 block text-micro text-muted-foreground">Time zone</span>
+                  <div className="flex gap-2">
+                    <input
+                      className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                      value={timezone}
+                      onChange={(e) => setTimezone(e.target.value)}
+                      onBlur={() => saveQuietHours(quietStart, quietEnd, timezone)}
+                      aria-label="Time zone"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => saveQuietHours(quietStart, quietEnd, detectTimezone())}
+                    >
+                      Auto
+                    </Button>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
         <section className="overflow-hidden rounded-card border border-border bg-card">
           <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-border bg-muted/40 px-5 py-3 text-micro font-semibold uppercase tracking-wider text-muted-foreground">
             <div>Notification</div>

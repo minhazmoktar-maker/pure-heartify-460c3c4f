@@ -2828,6 +2828,7 @@ export type Database = {
           push_enabled: boolean
           quiet_hours_end: number | null
           quiet_hours_start: number | null
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -2840,6 +2841,7 @@ export type Database = {
           push_enabled?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -2852,6 +2854,7 @@ export type Database = {
           push_enabled?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
