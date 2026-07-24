@@ -298,6 +298,7 @@ const App = () => (
                 (footer + Profile → Preferences). Essential cookies only. */}
             <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
             <Suspense fallback={null}><CommandPalette /></Suspense>
+            <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
             <BottomTabBar />
             <EdgeSwipeBack />
             <KeyboardFocusScroller />
