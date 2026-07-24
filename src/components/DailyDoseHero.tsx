@@ -99,6 +99,20 @@ const DailyDoseHero = () => {
                 )}
               </p>
             </div>
+            {!allDone && (() => {
+              const nextVideo = videos.find((v) => !completedVideoIds.includes(v.video_id)) ?? videos[0];
+              if (!nextVideo) return null;
+              return (
+                <Link
+                  to={`/watch/${nextVideo.video_id}`}
+                  aria-label={`Start today's session — ${nextVideo.title}`}
+                  className="inline-flex shrink-0 items-center gap-2 rounded-pill bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition-all hover:brightness-110 active:scale-[0.98]"
+                >
+                  <PlayCircle className="h-5 w-5" aria-hidden />
+                  {done > 0 ? "Continue today's session" : "Start today's session"}
+                </Link>
+              );
+            })()}
           </div>
 
           {/* Progress bar */}
