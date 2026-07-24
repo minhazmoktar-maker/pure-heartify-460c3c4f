@@ -1,5 +1,5 @@
-import { Search, Menu, Moon, ShieldCheck, Home, Heart, Clock, Flame, ListMusic, Settings, ShieldAlert, Crown, Compass, BookOpen, CircleDot, Sunrise, Calculator, CalendarDays, Sparkles, MapPin, BookText, ListChecks, Award, Target, Bell, LineChart, BookMarked, MoonStar, Milestone, GraduationCap, HandCoins, Scroll, Download } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Menu, Sparkles, ShieldAlert } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { hasUnseenChangelog } from "@/data/changelog";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +10,7 @@ import { useScrolled } from "@/hooks/useScrolled";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
 import Logomark from "@/components/Logomark";
 import { cn } from "@/lib/utils";
+import { MAIN_NAV_ITEMS, ADMIN_NAV_ITEMS, type NavItem } from "@/config/nav";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
