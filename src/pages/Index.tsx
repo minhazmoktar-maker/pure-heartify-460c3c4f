@@ -53,7 +53,8 @@ const Index = () => {
       <SurfaceRail surface="trending" title="Trending"
         subtitle="Rising this week across Heartify" />
       <SurfaceRail surface="listen" title="Listen"
-        subtitle="Recitation, adhan, nasheed and lectures" />
+        subtitle="Recitation, adhan, nasheed and lectures"
+        seeAllHref="/section/listen" />
     </main>
   );
 
@@ -80,7 +81,8 @@ const Index = () => {
       <SurfaceRail surface="recently_added" title="Recently added" priority
         seeAllHref="/section/recently-added" />
       <SurfaceRail surface="listen" title="Listen"
-        subtitle="Recitation, adhan, nasheed and lectures" priority />
+        subtitle="Recitation, adhan, nasheed and lectures" priority
+        seeAllHref="/section/listen" />
     </main>
   );
 

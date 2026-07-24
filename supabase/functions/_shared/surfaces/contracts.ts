@@ -21,8 +21,8 @@ export const CONTRACTS: Record<string, SurfaceContract> = {
   },
   listen: {
     name: "listen",
-    minItems: 12, maxItems: 24, maxPerChannel: 1,
-    minDistinctChannels: 6, minDistinctCategories: 2,
+    minItems: 12, maxItems: 40, maxPerChannel: 1,
+    minDistinctChannels: 8, minDistinctCategories: 2,
     anonAllowed: true,
   },
   recently_added: {

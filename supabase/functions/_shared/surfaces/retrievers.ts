@@ -189,7 +189,7 @@ export async function retrieveListen(ctx: SurfaceContext) {
     .in("category", AUDIO_CATS)
     .order("halal_score", { ascending: false, nullsFirst: false })
     .order("ingested_at", { ascending: false })
-    .limit(120);
+    .limit(240);
   return shuffleWithSeed((data ?? []) as SurfaceVideo[], sessionSeed(ctx.sessionId + "lis"));
 }
 

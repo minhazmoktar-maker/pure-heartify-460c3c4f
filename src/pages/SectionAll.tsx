@@ -72,6 +72,47 @@ const SectionAll = () => {
     );
   }
 
+  if (sectionId === "listen") {
+    return (
+      <PullToRefresh
+        onRefresh={onRefresh}
+        refreshKey={ptrKey}
+        refreshingLabel="Refreshing Listen…"
+        disabled={typeof navigator !== "undefined" && !navigator.onLine}
+      >
+      <div className="min-h-dvh bg-background pb-12">
+        <SEO
+          title="Listen — Recitation, adhan, nasheed & lectures | Heartify"
+          description="Endless halal-first audio-friendly videos: Qur'an recitation, adhan, nasheed, duas, and lectures — always moderated, always calm."
+          path="/section/listen"
+        />
+        <Navbar />
+        <div className="mx-auto max-w-[1800px] px-4 py-6 md:px-6">
+          <button
+            onClick={() => navigate("/")}
+            className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to For You
+          </button>
+          <div className="mb-6">
+            <h1 className="text-title font-bold text-foreground">
+              <Sparkles className="mr-1 inline h-5 w-5 text-primary" />
+              Listen
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Recitation, adhan, nasheed, duas and lectures — audio-first videos we've approved onto Heartify.
+            </p>
+          </div>
+          <Suspense fallback={<PageSkeleton variant="grid" className="max-w-none px-0" />}>
+            <InfiniteVideoGrid sectionId="listen" limit={40} sort="fresh" />
+          </Suspense>
+        </div>
+        </div>
+      </PullToRefresh>
+    );
+  }
+
   const section = CURATED_SECTIONS.find((s) => s.id === sectionId);
 
   // Create an expanded version of the section with more results
