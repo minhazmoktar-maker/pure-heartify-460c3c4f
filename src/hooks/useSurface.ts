@@ -20,6 +20,9 @@ interface SurfaceResponseItem {
   ingested_at: string | null;
   halal_score: number | null;
   content_language: string | null;
+  /** Wave M2 — reason chip returned by pool_beneficial_v1. */
+  reason?: string | null;
+  benefit_score?: number | null;
 }
 
 interface SurfaceResponse {
@@ -49,6 +52,7 @@ function toVideo(r: SurfaceResponseItem): YouTubeVideo {
     category: ((r.category as HalalCategory) ?? "All"),
     halalScore: r.halal_score ?? 90,
     publishedAt: r.published_at ?? r.ingested_at ?? new Date().toISOString(),
+    reason: r.reason ?? null,
   };
 }
 
