@@ -108,6 +108,7 @@ const GroupKhatmJoin = lazy(() => import("./pages/GroupKhatmJoin.tsx"));
 const AdminViral = lazy(() => import("./pages/AdminViral.tsx"));
 const Leaderboards = lazy(() => import("./pages/Leaderboards.tsx"));
 const TeamStreaks = lazy(() => import("./pages/TeamStreaks.tsx"));
+const Family = lazy(() => import("./pages/Family.tsx"));
 const DhikrCircles = lazy(() => import("./pages/DhikrCircles.tsx"));
 const PublicDhikrCircle = lazy(() => import("./pages/PublicDhikrCircle.tsx"));
 const PublicDua = lazy(() => import("./pages/PublicDua.tsx"));
@@ -348,6 +349,7 @@ const App = () => (
                 <Route path="/khatm/join/:code" element={<GroupKhatmJoin />} />
                 <Route path="/leaderboards" element={<Leaderboards />} />
                 <Route path="/teams" element={<TeamStreaks />} />
+                <Route path="/family" element={<Family />} />
                 <Route path="/dhikr/circles" element={<DhikrCircles />} />
                 <Route path="/c/:id" element={<PublicDhikrCircle />} />
                 <Route path="/d/:id" element={<PublicDua />} />
