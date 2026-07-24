@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
     );
     if (!res.ok) {
       const detail = await res.text().catch(() => "");
-      return new Response(JSON.stringify({ error: `fetch failed: ${res.status}`, detail, from, take }), {
+      return new Response(JSON.stringify({ error: "pg_fetch_failed_v2", status: res.status, detail, from, take }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
