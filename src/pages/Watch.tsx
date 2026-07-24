@@ -1,6 +1,6 @@
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ChevronRight, Heart, Play } from "lucide-react";
+import { ArrowLeft, ChevronRight, Heart, Play, ShieldCheck } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
