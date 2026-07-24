@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
   while (rows.length < limit) {
     const to = Math.min(from + 999, limit - 1);
     const res = await pg(
-      `curated_videos?select=id,video_id,title,channel_title,thumbnail_url&order=created_at.desc`,
+      `curated_videos?select=id,video_id,title,channel_title,thumbnail_url&order=ingested_at.desc.nullslast`,
       { headers: { Range: `${from}-${to}`, "Range-Unit": "items" } },
     );
     if (!res.ok) {
