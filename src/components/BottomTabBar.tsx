@@ -1,20 +1,22 @@
 import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, BookOpen, Sunrise, MoonStar, User } from "lucide-react";
+import { Home, Compass, Library, User } from "lucide-react";
 import { SPINES, shouldShowBottomBar, resolveSpine, type SpineId } from "@/lib/navigation";
 import { soundTap } from "@/lib/soundHaptics";
 import { cn } from "@/lib/utils";
 
 /**
- * Mobile-only bottom tab bar — Home · Quran · Prayer · Dhikr · You.
+ * Mobile-only bottom tab bar — Home · Explore · Library · Profile.
+ * The 4 spines reflect Heartify's identity: halal-first video &
+ * content discovery. Supporting Islamic tools live one tap deep
+ * under Profile → More rather than competing for tab space.
  */
 
 const ICONS: Record<SpineId, React.ComponentType<{ className?: string }>> = {
   home: Home,
-  quran: BookOpen,
-  prayer: Sunrise,
-  dhikr: MoonStar,
-  you: User,
+  explore: Compass,
+  library: Library,
+  profile: User,
 };
 
 export default function BottomTabBar() {

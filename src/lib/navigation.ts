@@ -1,26 +1,20 @@
 /**
  * Heartify Information Architecture — the product spine.
  *
- * Every one of the app's 190+ routes is mapped to EXACTLY ONE of five
- * top-level spines. This file is the single source of truth for:
+ * Heartify has ONE identity: halal-first video & content discovery.
+ * The bottom tab bar surfaces the 4 spines that serve that mission.
+ * Every one of the app's ~200 routes still maps to exactly one spine
+ * (for smart-back, breadcrumbs, and analytics), but supporting Islamic
+ * tools live *inside* Profile → More rather than competing for tab
+ * real-estate with the video experience.
+ *
+ * Consumed by:
  *   - The mobile bottom tab bar (BottomTabBar)
  *   - "Smart back" fallback when history is empty
- *   - Breadcrumb / tab highlighting
- *   - Navbar mega-menu grouping
- *
- * Rules:
- *   1. Every route belongs to exactly one spine.
- *   2. Public share routes (/u/:handle, /d/:id, ...) inherit from the
- *      closest matching group.
- *   3. Auth pages, legal, and admin surfaces live in "system" (not a
- *      user-facing tab) but keep a home spine for smart-back.
- *
- * Adding a route: append the pattern here, then run
- *   `bunx vitest run src/lib/__tests__/navigation.test.ts` to verify
- *   coverage.
+ *   - Route-owning tests
  */
 
-export type SpineId = "home" | "quran" | "prayer" | "dhikr" | "you";
+export type SpineId = "home" | "explore" | "library" | "profile";
 
 export interface SpineDefinition {
   id: SpineId;
@@ -31,7 +25,7 @@ export interface SpineDefinition {
 }
 
 /**
- * The five spines. Order = display order in the bottom tab bar.
+ * The four spines. Order = display order in the bottom tab bar.
  * Icons are resolved at render-time by BottomTabBar to avoid a lucide
  * dependency at module-load.
  */
@@ -43,89 +37,89 @@ export const SPINES: readonly SpineDefinition[] = [
     owns: [
       "/",
       "/today",
-      "/search",
-      "/channels",
       "/shorts",
-      "/creators",
-      "/creators/dashboard",
-      "/playlists",
-      /^\/section\//,
       /^\/watch\//,
-      /^\/p\//,          // playlist detail share
       /^\/w\//,          // weekly recap shares
       /^\/b\//,          // badge shares
       /^\/s\//,          // streak shares
     ],
   },
   {
-    id: "quran",
-    label: "Quran",
-    path: "/quran",
+    id: "explore",
+    label: "Explore",
+    path: "/explore",
     owns: [
+      "/explore",
+      "/search",
+      "/listen",
+      "/channels",
+      "/creators",
+      "/scholars",
+      "/trust",
+      /^\/section\//,
+      /^\/scholar\//,
+      // Supporting Islamic study/discovery surfaces live under Explore too.
       "/quran", "/mushaf", "/hifz", "/tajweed", "/khatm", "/khatm/groups",
+      "/hadith", "/seerah", "/names", "/hisnul", "/adhkar", "/masnoon-duas",
+      "/kids-duas", "/dua-wall", "/dhikr", "/wird", "/learn", "/library",
+      "/quotes", "/glossary", "/quiz", "/stories",
+      "/prophets", "/sahaba", "/madhabs", "/pillars", "/sacred-mosques",
+      "/aqeedah", "/akhlaq", "/history", "/miracles", "/battles",
+      "/nawawi-40", "/farewell-sermon", "/ahlul-bayt",
+      "/quran-sciences", "/hadith-sciences", "/tibb", "/adab",
+      "/parenting", "/marriage-rights", "/parents-rights", "/muslim-rights",
+      "/womens-fiqh", "/womens-purity", "/seeking-knowledge",
+      "/major-sins", "/tawbah", "/jannah", "/kalimahs", "/travel-adab",
+      "/eating-sunnah", "/means-of-reward", "/signs-of-hour",
+      "/inheritance", "/islamic-finance", "/shared-economy", "/dreams",
+      "/baby-names", "/fatwa", "/halal-check", "/digital-purification",
+      "/prayer", "/qibla", "/mosques", "/salah", "/salah-guide",
+      "/adhan-iqamah", "/sunnah-prayers", "/wudu", "/ghusl",
+      "/purification", "/janazah", "/ruqya", "/fasting", "/ramadan",
+      "/hajj", "/umrah", "/zakat", "/sadaqah", "/wasiyyah", "/nikah",
+      "/hijri", "/events", "/alphabet", "/new-muslim",
+      "/dhikr/circles", "/teams", "/leaderboards", "/reminders",
+      "/challenges", "/journal",
       /^\/quran\//, /^\/mushaf\//, /^\/khatm\//,
       /^\/ayah\//, /^\/surah\//, /^\/juz\//,
       /^\/k\//,          // khatm-group share
-    ],
-  },
-  {
-    id: "prayer",
-    label: "Prayer",
-    path: "/prayer",
-    owns: [
-      "/prayer", "/qibla", "/mosques",
-      "/salah", "/salah-guide", "/adhan-iqamah", "/sunnah-prayers",
-      "/wudu", "/ghusl", "/purification", "/janazah", "/ruqya",
-      "/fasting", "/ramadan", "/hajj", "/umrah",
-      "/zakat", "/sadaqah", "/wasiyyah", "/nikah",
-      /^\/salah\/[^/]+$/, /^\/masjid\//, /^\/mosque\//,
-    ],
-  },
-  {
-    id: "dhikr",
-    label: "Dhikr",
-    path: "/dhikr",
-    owns: [
-      "/dhikr", "/adhkar", "/wird", "/hisnul",
-      "/masnoon-duas", "/kids-duas",
-      "/dua-wall", "/journal", "/reminders", "/challenges",
-      "/dhikr/circles", "/teams", "/leaderboards",
-      "/learn", "/library", "/hadith", "/seerah",
-      "/names", "/quotes", "/glossary", "/quiz", "/stories",
-      "/new-muslim", "/alphabet", "/hijri", "/events",
-      "/prophets", "/sahaba", "/scholars", "/madhabs",
-      "/pillars", "/sacred-mosques", "/aqeedah", "/akhlaq", "/history",
-      "/miracles", "/battles", "/nawawi-40", "/farewell-sermon",
-      "/ahlul-bayt", "/quran-sciences", "/hadith-sciences",
-      "/tibb", "/adab", "/parenting", "/marriage-rights",
-      "/parents-rights", "/muslim-rights", "/womens-fiqh", "/womens-purity",
-      "/seeking-knowledge", "/major-sins", "/tawbah", "/jannah",
-      "/kalimahs", "/travel-adab", "/eating-sunnah", "/means-of-reward",
-      "/signs-of-hour", "/inheritance", "/islamic-finance",
-      "/shared-economy", "/dreams", "/baby-names",
-      "/fatwa", "/halal-check", "/digital-purification",
       /^\/library\//,
       /^\/hadith\//,
-      /^\/c\//,          // dhikr circle share
-      /^\/d\//,          // dua share
-      /^\/t\//,          // team share
+      /^\/c\//, /^\/d\//, /^\/t\//,
       /^\/name\//, /^\/prophet\//, /^\/sahabi\//, /^\/hijri-month\//,
       /^\/event\//, /^\/pillar\//, /^\/iman\//, /^\/madhhab\//,
-      /^\/seerah\//, /^\/scholar\//, /^\/battle\//, /^\/miracle\//,
+      /^\/seerah\//, /^\/battle\//, /^\/miracle\//,
       /^\/prophet-name\//, /^\/sign-of-hour\//,
       /^\/virtue\//, /^\/hisn\//,
       /^\/adhkar-set\//, /^\/quran-dua\//, /^\/sunnah\//,
       /^\/durood\//, /^\/kalimah\//,
+      /^\/salah\/[^/]+$/, /^\/masjid\//, /^\/mosque\//,
     ],
   },
   {
-    id: "you",
-    label: "You",
+    id: "library",
+    label: "Library",
+    path: "/me",
+    owns: [
+      "/me",
+      "/playlists",
+      "/bookmarks",
+      "/offline",
+      "/creators/dashboard",
+      "/profile?tab=history",
+      "/profile?tab=favorites",
+      "/profile?tab=continue",
+      /^\/p\//,          // playlist share
+    ],
+  },
+  {
+    id: "profile",
+    label: "Profile",
     path: "/profile",
     owns: [
-      "/profile", "/bookmarks", "/achievements", "/recap",
-      "/offline", "/onboarding", "/appeals", "/transparency",
-      "/plus", "/plus/join", "/redeem", "/changelog",
+      "/profile", "/achievements", "/recap", "/onboarding",
+      "/appeals", "/transparency", "/plus", "/plus/join",
+      "/redeem", "/changelog", "/salah", "/salah-tracker",
       "/settings/notifications", "/account/export-data",
       "/security/mfa", "/security/mfa/verify",
       /^\/appeals\//,
@@ -141,7 +135,7 @@ export const SPINES: readonly SpineDefinition[] = [
 /** Auth, legal, admin, and OAuth surfaces. Not tab-worthy but tracked. */
 export const SYSTEM_ROUTES = [
   "/login", "/signup", "/forgot-password", "/reset-password", "/verify-email",
-  "/privacy", "/terms", "/about", "/trust", "/status", "/contact",
+  "/privacy", "/terms", "/about", "/status", "/contact",
   "/.lovable/oauth/consent",
   /^\/admin(\/|$)/,
 ] as const;
@@ -159,7 +153,6 @@ function matches(pattern: string | RegExp, path: string): boolean {
  * Falls back to "home" so `smartBack()` always has somewhere to go.
  */
 export function resolveSpine(pathname: string): SpineId {
-  // Normalise trailing slash
   const p = pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
   for (const spine of SPINES) {
     for (const pattern of spine.owns) {
@@ -176,7 +169,6 @@ export function isSystemRoute(pathname: string): boolean {
 
 /** Should the mobile bottom tab bar be visible for this route? */
 export function shouldShowBottomBar(pathname: string): boolean {
-  // Hide on immersive surfaces
   const HIDDEN = [
     /^\/watch\//,      // full-bleed video
     /^\/shorts/,       // vertical feed
