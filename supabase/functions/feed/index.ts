@@ -255,6 +255,7 @@ Deno.serve(async (req) => {
         "live-streams": ["Quran", "Adhan", "Lectures"],
         "revert-stories": ["Dawah", "Islamic", "Spirituality"],
         "news-current-affairs": ["Islamic", "Podcasts", "Education"],
+        "listen": ["Quran", "Adhan", "Nasheeds", "Lectures", "Duas"],
       };
       return SECTION_CATEGORY_ALIASES[sectionId] ?? null;
     })();
