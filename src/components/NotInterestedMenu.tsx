@@ -1,5 +1,7 @@
-import { ThumbsDown, MoreVertical } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { ThumbsDown, MoreVertical, Info } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNegativeFeedback, type NegativeReason } from "@/hooks/useNegativeFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
