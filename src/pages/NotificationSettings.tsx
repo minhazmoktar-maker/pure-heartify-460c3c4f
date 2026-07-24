@@ -43,10 +43,21 @@ const RECOMMENDED_DEFAULTS: Record<string, { push: boolean; email: boolean; inAp
   weekly_recap: { push: false, email: true,  inApp: true },
 };
 
+function detectTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  } catch {
+    return "UTC";
+  }
+}
+
 export default function NotificationSettings() {
   const { user, loading: authLoading } = useAuth();
   const push = useWebPush();
   const [prefs, setPrefs] = useState<Record<string, Pref>>({});
+  const [quietStart, setQuietStart] = useState<number>(22);
+  const [quietEnd, setQuietEnd] = useState<number>(7);
+  const [timezone, setTimezone] = useState<string>(detectTimezone());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,7 +68,7 @@ export default function NotificationSettings() {
       await supabase.rpc("seed_default_notification_prefs", { _user_id: user.id }).then(() => {}, () => {});
       const { data } = await supabase
         .from("notification_preferences")
-        .select("id, kind, push_enabled, email_enabled, in_app_enabled")
+        .select("id, kind, push_enabled, email_enabled, in_app_enabled, quiet_hours_start, quiet_hours_end, timezone")
         .eq("user_id", user.id);
       const map: Record<string, Pref> = {};
       for (const kind of KINDS) {
@@ -70,9 +81,39 @@ export default function NotificationSettings() {
         };
       }
       setPrefs(map);
+      const first = (data ?? [])[0] as (Pref & { quiet_hours_start?: number | null; quiet_hours_end?: number | null; timezone?: string | null }) | undefined;
+      if (first) {
+        if (typeof first.quiet_hours_start === "number") setQuietStart(first.quiet_hours_start);
+        if (typeof first.quiet_hours_end === "number") setQuietEnd(first.quiet_hours_end);
+        if (first.timezone) setTimezone(first.timezone);
+      }
       setLoading(false);
     })();
   }, [user]);
+
+  const saveQuietHours = async (nextStart: number, nextEnd: number, nextTz: string) => {
+    if (!user) return;
+    setQuietStart(nextStart);
+    setQuietEnd(nextEnd);
+    setTimezone(nextTz);
+    // Apply across every kind row so the cron dispatcher sees consistent values.
+    const rows = KINDS.map((k) => ({
+      user_id: user.id,
+      kind: k.key,
+      push_enabled: prefs[k.key]?.push_enabled ?? true,
+      email_enabled: prefs[k.key]?.email_enabled ?? false,
+      in_app_enabled: prefs[k.key]?.in_app_enabled ?? true,
+      quiet_hours_start: nextStart,
+      quiet_hours_end: nextEnd,
+      timezone: nextTz,
+    }));
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert(rows, { onConflict: "user_id,kind" });
+    if (error) {
+      toast({ title: "Couldn't save quiet hours", description: error.message, variant: "destructive" });
+    }
+  };
 
   const update = async (kind: string, field: "push_enabled" | "email_enabled" | "in_app_enabled", value: boolean) => {
     if (!user) return;
