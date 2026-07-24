@@ -137,6 +137,7 @@ const core: Entry[] = [
   { path: "/signup", changefreq: "monthly", priority: "0.5" },
   { path: "/privacy", changefreq: "yearly", priority: "0.3" },
   { path: "/terms", changefreq: "yearly", priority: "0.3" },
+  { path: "/halal", changefreq: "weekly", priority: "0.8" },
 ];
 
 // Entity families → chunked child sitemaps
