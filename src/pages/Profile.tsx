@@ -327,6 +327,11 @@ const Profile = () => {
 
             <div className="pt-4">
               <ReferralCard />
+              <div className="mt-2 text-right">
+                <Link to="/invite" className="text-xs font-medium text-primary hover:underline">
+                  Open full invite page →
+                </Link>
+              </div>
             </div>
 
             {/* Danger zone — required by Apple App Store guideline 5.1.1(v). */}
