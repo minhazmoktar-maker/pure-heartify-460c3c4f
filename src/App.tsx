@@ -300,6 +300,7 @@ const App = () => (
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
+                <Route path="/verify/:videoId" element={<Verify />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
                 <Route path="/guides/best-islamic-cartoons" element={<BestIslamicCartoons />} />
                 <Route path="/status" element={<Status />} />
