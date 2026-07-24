@@ -1,120 +1,65 @@
-# Heartify Moat & Category-Defining Strategy
+# Plan — Tighten strategy to a video-first, trust-led moat
 
-**Deliverable:** `docs/STRATEGY_MOAT.md` (comprehensive first-principles strategy) + a phased implementation roadmap (`docs/ROADMAP_MOAT.md`) that we execute wave by wave.
+Scope: docs only. Rewrite `docs/STRATEGY_MOAT.md` and `docs/ROADMAP_MOAT.md` to lock Heartify's identity as *the world's most trusted platform for discovering and watching halal, beneficial content*. No code changes.
 
----
+## Identity lock (applied to both docs)
 
-## Part 1 — The strategic thesis (written to `docs/STRATEGY_MOAT.md`)
+- Positioning: **video-first platform**. Qur'an, prayer, journal, streaks, family = supporting tools that make video discovery, trust, retention, or learning stronger. They are never the product spine.
+- Every feature filter becomes: *"Does it make Heartify better at discovering, trusting, watching, or learning from beneficial videos?"* If no → future backlog.
+- Remove all language that repositions Heartify as a "daily spiritual operating system." Replace with "video-first, trust-led."
 
-### 1. Why YouTube structurally cannot follow us
+## Rewrite of `docs/STRATEGY_MOAT.md`
 
-YouTube optimizes **watch time × ad load**. That business model creates permanent structural constraints Heartify can exploit:
+Re-ordered and re-weighted moats:
 
-- YouTube cannot **cap** a user's session — we can. Time-well-spent is a feature we can charge for; they'd cannibalize revenue.
-- YouTube cannot **sanctify time** (Fajr → Isha, Jumu'ah, Ramadan, khatm). Their homepage is timezone-blind attention bait; ours is a **liturgical clock**.
-- YouTube cannot **verify scholars** as first-class institutional entities without picking sides. We can build an *isnad*-style trust graph they'd never touch.
-- YouTube cannot **share an account across a household** — their revenue model requires 1 user = 1 profile = 1 ad graph. We can build family/household as the primitive.
-- YouTube cannot **pay non-ad-friendly creators well**. A khutbah with no music, no cuts, no thumbnails-with-faces gets ~$0.30 CPM. We can pay them via *waqf*, *sadaqah jariyah*, memberships, and ummah tipping.
-- YouTube cannot **promise "you'll leave calmer than you arrived"** — their KPI is the opposite.
+1. **M1 — Trust & moderation (primary moat)**
+   - Signed per-video attestations, tier A–D, public `/verify/:content_id`.
+   - Human + institution review chain visible on every card.
+   - Trust becomes a ranking signal, not just a filter.
+2. **M2 — Discovery & recommendation (primary moat)** — new dedicated section explaining the compounding data advantages:
+   - Halal-labeled corpus (title/description/tags/thumbnail signals + human tier).
+   - Islamic knowledge graph (topics, madhhab, language, scholar lineage, institution).
+   - Multilingual understanding across 18+ languages already crawled.
+   - Behavioral taste graph on a filtered corpus (denominator YouTube can't replicate without abandoning ad economics).
+   - Negative-signal dataset (why videos were rejected) — proprietary and cumulative.
+   - Why it's hard to copy: requires simultaneous investment in moderation labels + multilingual NLP + Islamic ontology + long-tail catalog.
+3. **M3 — Beneficial-creator ecosystem** — broaden from scholars to **all beneficial creators**: Islamic education, dawah, Qur'an, science, history, entrepreneurship, language learning, parenting, documentaries, productivity, engineering, medicine.
+   - Sadaqah tipping, waqf memberships, reviewed-content bonus pool weighted by tier + trust-graph + finish-rate.
+   - Institutional grants and cross-creator endorsements.
+   - Target: top ~2,000 beneficial creators globally earn more per 1k views on Heartify than on YouTube within 24 months.
+4. **M4 — Family safety (Kids Mode)** — tier-A + explicit whitelist + parent audit dashboard + report SLA.
+5. **M5 — Ritual integrations (supporting, contextual discovery only)** — prayer-time-aware recommendations, Ramadan surfaces, Jumu'ah rail, Qiyam recommendations. Explicit non-goals: no full prayer app, no productivity app, no habit tracker as a product line. Rituals only exist to inform *which video to show right now*.
+6. **M6 — Spiritual memory (optional retention layer)** — bookmarks, notes, khatm ledger, year-in-iman. Kept as a lock-in mechanism, not a spine.
+7. **M7 — Ummah coordination (long-term)** — synchronized viewing (global khatm rooms, Qiyam watch rooms, masjid-hosted rooms). Deferred; still video-anchored.
 
-**Positioning:** Heartify is not a halal YouTube. Heartify is the **daily spiritual operating system for Muslim households** — a *time-sanctifying* product where video is the medium, not the mission.
+Other section changes:
+- Rewrite the flywheel diagram around **Trust → Discovery → Creators → Households → back to Trust**.
+- Rewrite "Unique jobs" list to be video-outcome jobs (certify the source, discover the beneficial video, guarantee zero-doubt watch, pay the beneficial creator fairly, learn from what you watched).
+- Rewrite the one-sentence durability test to keep the video framing: *"YouTube shows me what will keep me watching. Heartify shows me the most beneficial thing to watch right now — and proves why it's safe."*
+- Add explicit **Non-goals** section: not a prayer app, not a productivity app, not a social network, not a Muslim TikTok.
 
-### 2. The seven moats (each one YouTube cannot copy even with a pixel-perfect clone)
+## Rewrite of `docs/ROADMAP_MOAT.md`
 
-**M1 — Ritual ownership (habit moat).**
-Own the Muslim day. Fajr reflection card, Duha nudge, pre-Zuhr Qur'an minute, Asr reset, Maghrib gratitude, Isha wind-down, Jumu'ah moment, nightly witr, monthly khatm, Ramadan mode. Push tied to *local prayer times*, not engagement windows. Once a user's *streak* lives in Heartify, YouTube cannot import it.
+Waves re-ordered and re-scoped to match the new priority. Each wave keeps proof metrics; each is filtered by the video-first test.
 
-**M2 — Institutional trust graph (credibility moat).**
-Verified scholars, madrasahs, masjids, universities, and dawah orgs as first-class entities with signed *ijazah*-style credentials. Videos carry provenance chains ("Reviewed by Sh. X, endorsed by Y Institute"). Ranking uses this graph. YouTube would have to declare theology to replicate this — they never will.
+- **Wave 1 — Trust Spine (was M2).** Signed attestations on every video, `/verify/:id`, reviewer chain on cards, trust-weighted ranking. Proof: ≥99% of surfaced videos carry a valid signed attestation; parent-audit NPS ≥+40.
+- **Wave 2 — Discovery Moat.** Knowledge graph tables (topics, institutions, scholars, languages, madhhab), multilingual embeddings on the approved corpus, negative-signal dataset wired into ranking, per-video "why you're seeing this" already exposed. Proof: session-diversity holds while finish-rate improves ≥15%; top-channel share stays ≤5%.
+- **Wave 3 — Beneficial Creator Ecosystem (broadened).** Sadaqah tipping, waqf memberships, reviewed-content bonus pool across all beneficial categories, creator earnings dashboard, "Claim your channel" for non-scholar beneficial creators. Proof: top 100 beneficial creators earn ≥1.5× YouTube CPM equivalents; ≥500 active waqf memberships.
+- **Wave 4 — Family Safety / Kids Mode.** Tier-A-only Kids Mode, parent audit log, report-a-video SLA, child seat lock. Proof: 100/100 random Kids Mode videos pass human re-review; median report-to-resolution <24h.
+- **Wave 5 — Ritual-Aware Discovery (supporting).** Prayer-time-aware home rail ordering, Ramadan mode surfacing, Jumu'ah rail, Qiyam rail. Explicitly **not** a prayer app; rituals only re-rank video surfaces. Proof: prayer-window sessions show higher finish-rate and lower bounce vs. control.
+- **Wave 6 — Learning Loop (optional memory).** Bookmarks with reflections, "what I learned this month" summary drawn from watched + noted videos, year-in-iman recap. Proof: ≥30% of DAU save ≥1 reflection/week.
+- **Wave 7 — Ummah Coordination (deferred).** Synchronized watch rooms, masjid-hosted rooms, institution-led cohort classes. Still video-anchored.
 
-**M3 — Household network effects (multi-user moat).**
-Family seats, parent-child linked accounts, shared streaks, khatm groups, Ramadan family leaderboards, kid-safe locked profiles that parents administer. Each added household member multiplies switching cost geometrically. YouTube's ad model punishes shared identity.
+Add a top-of-file **Execution Rules** section:
+1. Video-first test gates every proposed feature.
+2. Ritual, memory, and coordination features may only ship as re-rankers or retention layers over the video experience.
+3. Waves ship sequentially; no parallel wave unless one is genuinely blocked.
+4. Every wave writes back to `STRATEGY_MOAT.md` if reality changes the thesis.
 
-**M4 — Beneficial-creator economics (supply moat).**
-Non-ad revenue rails: sadaqah tipping, monthly *waqf* memberships to a scholar, khatm sponsorships, institutional grants, and a "reviewed-content" bonus pool. Scholars who post no-music/no-face content earn *more* on Heartify than on YouTube. Over 24 months this pulls the top ~2000 beneficial creators exclusive-first.
+Close with: *Next action — on approval, open a dedicated plan for Wave 1 (Trust Spine) focused entirely on the watch experience.*
 
-**M5 — Longitudinal spiritual memory (data moat that isn't creepy).**
-User-owned journals, dua lists, ayah bookmarks, khatm progress, "what I learned this year" recap, weekly *muhasaba*. This data is portable *out* but expensive to *recreate*. Compounds monthly. YouTube's watch history is disposable; a 3-year khatm log is not.
+## Deliverables
 
-**M6 — Zero-doubt discovery (safety moat for parents).**
-Every video signed with a moderation attestation (tier, reviewer, timestamp). A parent can hand a phone to a child without vigilance. That single guarantee is worth more than any recommendation algorithm — and YouTube cannot ship it because their catalog is UGC-first.
-
-**M7 — Ummah-scale coordination (civic moat).**
-Global khatm during Ramadan (1M users → 30 juz'/day collectively), synchronized Qiyam nights, disaster-time dua campaigns, masjid-hosted watch parties. Heartify becomes the coordination layer for the ummah. YouTube livestream cannot do this — it has no membership primitive.
-
-### 3. The flywheel
-
-```text
-    Institutions endorse scholars
-             │
-             ▼
-   Scholars publish reviewed content
-             │
-             ▼
-   Households consume + fund via waqf/sadaqah
-             │
-             ▼
-   Streaks + family seats + journals lock in
-             │
-             ▼
-   Scholars earn more here than on YouTube
-             │
-             ▼
-   More institutions endorse Heartify ──► loop
-```
-
-Every loop adds: trust (M2), habit (M1), household lock-in (M3), creator supply (M4), memory (M5).
-
-### 4. What we explicitly refuse to be
-
-- Not a YouTube clone. Not an infinite-scroll dopamine machine.
-- Not "TikTok for Muslims."
-- Not an ad marketplace.
-- Not a general-purpose social network.
-
-If a proposed feature does not strengthen at least one of M1–M7, we don't ship it.
-
-### 5. The one-sentence test (durable even if YouTube copies our UI)
-
-> *"YouTube shows me what will keep me watching. Heartify shows me what will make me a better Muslim by Isha."*
-
----
-
-## Part 2 — Implementation roadmap (written to `docs/ROADMAP_MOAT.md`)
-
-Six waves, each ships a moat. Every wave ends with measurable proof.
-
-**Wave M1 — Ritual Spine (habit).**
-`liturgical_day` engine keyed to local prayer times; five prayer-anchored micro-moments; Jumu'ah + Ramadan + Qiyam modes; streak tied to ritual completion, not watch time.
-*Proof:* D30 retention up vs. control cohort.
-
-**Wave M2 — Trust Graph (credibility).**
-`institutions`, `scholar_credentials`, `content_attestations` tables. Signed reviewer chain surfaced on every card. Institution onboarding portal. Public `/verify/:content_id` page.
-*Proof:* ≥ 500 videos with full attestation chain; parent-audit NPS.
-
-**Wave M3 — Household (network effects).**
-Family seats (up to 6), parent-admin child profiles, shared streaks, family khatm, family Ramadan leaderboard, "invite a family member" as onboarding step.
-*Proof:* households with ≥ 2 seats show 3× D90 vs. singletons.
-
-**Wave M4 — Beneficial-Creator Economics (supply).**
-Sadaqah tipping, monthly *waqf* memberships, reviewed-content bonus pool funded by household subs, transparent scholar earnings dashboard. Stripe / Paddle rails.
-*Proof:* top-100 scholars earn more per 1k views on Heartify than YouTube's estimated CPM.
-
-**Wave M5 — Spiritual Memory (data lock-in).**
-Year-in-*iman* recap, muhasaba journal, khatm ledger, dua list, "what I learned" AI summary from own history. Full export (JSON + PDF) so it's portable but valuable.
-*Proof:* users with ≥ 90 days of memory show 5× share rate on year-end recap.
-
-**Wave M6 — Ummah Coordination (civic).**
-Global Ramadan khatm, live Qiyam nights, masjid-hosted rooms, disaster dua campaigns, institution-run classes with cohort progress.
-*Proof:* first global khatm completes ≥ 1 full Qur'an cycle with ≥ 10k participants.
-
-Each wave gets its own build plan when we get there. This plan approves the **strategy documents + the six-wave shape**, not the code for wave M1 yet.
-
----
-
-## Files this plan creates
-
-1. `docs/STRATEGY_MOAT.md` — the full first-principles document (Part 1 above, expanded with the seven moats, flywheel, refusals, and one-sentence test).
-2. `docs/ROADMAP_MOAT.md` — the six-wave implementation roadmap (Part 2 above, with per-wave acceptance metrics and dependencies).
-
-No app code changes in this plan. After approval, we start Wave M1 (Ritual Spine) as its own plan.
+- `docs/STRATEGY_MOAT.md` — rewritten per above.
+- `docs/ROADMAP_MOAT.md` — rewritten per above.
+- No code, no schema, no config changes in this pass.
