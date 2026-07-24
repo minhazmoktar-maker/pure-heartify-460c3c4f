@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { CalendarDays, CheckCircle2, CircleDot, BookOpen, Flame, Trophy, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import ShareImageButton from "@/components/ShareImageButton";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 
 type SalahEntry = { fajr?: string; dhuhr?: string; asr?: string; maghrib?: string; isha?: string };
 
