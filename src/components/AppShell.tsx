@@ -21,6 +21,7 @@ const PushPermissionPrompt = lazy(() => import("./PushPermissionPrompt"));
 const StreakMilestoneDialog = lazy(() => import("./StreakMilestoneDialog"));
 const StreakFreezeUsedToast = lazy(() => import("./StreakFreezeUsedToast"));
 const WelcomeBackDialog = lazy(() => import("./WelcomeBackDialog"));
+const InstallPromptBanner = lazy(() => import("./InstallPromptBanner"));
 
 const RouteFallback = () => (
   <div className="min-h-dvh bg-background">
