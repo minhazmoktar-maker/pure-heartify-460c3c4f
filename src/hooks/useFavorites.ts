@@ -131,23 +131,49 @@ export function useFavorites() {
         return { action: "added" as const };
       }
     },
+    // Optimistic UI — Wave 2. The bookmark heart flips instantly; we roll
+    // back on error and always re-sync on settle to reconcile with the row id.
+    onMutate: async ({ videoId, title, channel, thumbnail }) => {
+      const key = ["favorites", user?.id ?? "anon"];
+      await queryClient.cancelQueries({ queryKey: key });
+      const prev = queryClient.getQueryData<FavoriteVideo[]>(key) ?? [];
+      const existing = prev.find((f) => f.video_id === videoId);
+      const next: FavoriteVideo[] = existing
+        ? prev.filter((f) => f.video_id !== videoId)
+        : [
+            {
+              id: `optimistic-${videoId}`,
+              video_id: videoId,
+              video_title: title,
+              channel_title: channel,
+              thumbnail_url: thumbnail,
+              created_at: new Date().toISOString(),
+            },
+            ...prev,
+          ];
+      queryClient.setQueryData(key, next);
+      return { prev, key };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx) queryClient.setQueryData(ctx.key, ctx.prev);
+      toast({ title: "Failed to update bookmark", variant: "destructive", duration: 2000 });
+    },
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
       toast({
         title: result.action === "added"
           ? user ? "Bookmarked!" : "Saved on this device — sign in to sync"
           : "Removed from bookmarks",
         duration: 2500,
       });
-      // Contextual push ask — only after signed-in user adds a bookmark.
       if (result.action === "added" && user) {
         requestContextualPush("favorite");
       }
     },
-    onError: () => {
-      toast({ title: "Failed to update bookmark", variant: "destructive", duration: 2000 });
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
   });
+
 
   return { favorites: favoritesQuery.data ?? [], isFavorite, toggleFavorite, isLoading: favoritesQuery.isLoading };
 }
