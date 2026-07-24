@@ -1,37 +1,34 @@
-// Phase 8 — Normalized haptics API.
-//
-// One place to trigger tactile feedback for the entire app. Every helper:
-//   • No-ops when prefers-reduced-motion is set.
-//   • No-ops when device/browser has no vibration or Capacitor Haptics.
-//   • Delegates to Capacitor Haptics on native, Web Vibration on browsers.
-//   • Uses named intents (not raw ms values) so the feel stays consistent
-//     across features (dhikr tap should feel identical to a bump on Wird).
-//
-// Intent → duration mapping (kept centralized so future tuning is one edit):
-//   light      →  8ms  — subtle acknowledgement (counter bump, toggle)
-//   selection  → 12ms  — nav/tab/segment change
-//   success    → [10, 30, 10] — completion / streak save
-//   warning    → [15, 40, 15] — reversible destructive intent
-//   error      → [40, 20, 40] — hard failure
-//
-// Prefer this over calling `navigator.vibrate` or `buzz()` directly.
+// Micro-delight haptic helper. Safely no-ops when unsupported or when the user
+// has requested reduced motion. Never throws.
 
-import { buzz } from "@/lib/celebrate";
+type Kind = "tap" | "light" | "medium" | "heavy" | "success" | "warning" | "impact";
 
-export type HapticIntent = "light" | "selection" | "success" | "warning" | "error";
+function reducedMotion(): boolean {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  try {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
+}
 
-const PATTERNS: Record<HapticIntent, number | number[]> = {
-  light: 8,
-  selection: 12,
-  success: [10, 30, 10],
-  warning: [15, 40, 15],
-  error: [40, 20, 40],
+const PATTERNS: Record<Kind, number | number[]> = {
+  tap: 8,
+  light: 6,
+  medium: 14,
+  heavy: 22,
+  success: [10, 40, 18],
+  warning: [20, 60, 20],
+  impact: 24,
 };
 
-/**
- * Trigger a named haptic intent. Fire-and-forget; never throws.
- * Reduced-motion users get silence.
- */
-export function haptic(intent: HapticIntent = "light"): void {
-  void buzz(PATTERNS[intent]);
+export function haptic(kind: Kind = "tap"): void {
+  if (typeof navigator === "undefined") return;
+  if (typeof navigator.vibrate !== "function") return;
+  if (reducedMotion()) return;
+  try {
+    navigator.vibrate(PATTERNS[kind]);
+  } catch {
+    /* swallow */
+  }
 }

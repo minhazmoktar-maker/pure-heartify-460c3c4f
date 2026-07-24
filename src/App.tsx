@@ -103,6 +103,7 @@ const HadithSciences = lazy(() => import("./pages/HadithSciences.tsx"));
 const Hajj = lazy(() => import("./pages/Hajj.tsx"));
 const HeartifyPlus = lazy(() => import("./pages/HeartifyPlus.tsx"));
 const PlusInvite = lazy(() => import("./pages/PlusInvite.tsx"));
+const Invite = lazy(() => import("./pages/Invite.tsx"));
 const OfflineLibrary = lazy(() => import("./pages/OfflineLibrary.tsx"));
 const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const Hifz = lazy(() => import("./pages/Hifz.tsx"));
@@ -344,6 +345,7 @@ const App = () => (
                 <Route path="/creators" element={<Creators />} />
                 <Route path="/plus" element={<HeartifyPlus />} />
                 <Route path="/plus/join" element={<PlusInvite />} />
+                <Route path="/invite" element={<Invite />} />
                 <Route path="/offline" element={<OfflineLibrary />} />
                 <Route path="/premium" element={<Navigate to="/plus" replace />} />
                 <Route path="/pricing" element={<Navigate to="/plus" replace />} />
