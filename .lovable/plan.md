@@ -1,65 +1,56 @@
-## Goal
+# World-Class Engagement Roadmap
 
-Bring back the Listen section as a real, working destination at `/listen`, with (a) **every reciter** you listed streaming the **whole Qur'an (all 114 surahs)** and (b) at least **10 lectures per speaker** you listed.
+The 10 concerns cover ~8–12 weeks of work. To ship "top-notch, perfectly," I'll execute in **5 sequenced sprints**, each independently valuable and shippable. Each sprint ends with a working, verified feature — not scaffolding.
 
-## Current state (verified)
+## Sprint 1 — The "Why Open It Today?" Loop (highest ROI)
+Goal: Every user has a reason to open Heartify tomorrow.
 
-- `src/components/AudioSection.tsx` — a complete audio browser + player exists, but it is **orphaned**: no route renders it. That's why "the Listen section doesn't work."
-- `src/data/audio.ts` — hand-curated catalog of ~30 tracks across 6–7 reciters. No lecture entries.
-- `reciters` / `reciter_audio_sources` DB tables exist but aren't wired into the Listen UI.
-- Bottom tab bar has no Listen entry.
+1. **Daily push cron** — `pg_cron` job at 6am local (per user timezone) invokes `personalized-push` with three templates: Daily Dose ready · Streak-at-risk (evening) · Next adhan (10 min before). Respects the existing 3/week cap and per-user notification prefs.
+2. **Streak psychology upgrade**
+   - Milestone celebrations (7/30/100/365 day) with confetti + shareable card.
+   - 1 free "streak freeze" per week auto-granted, visible in Profile.
+   - Streak-at-risk banner already exists — wire it to push.
+3. **Email lifecycle** (Lovable Emails, needs domain — will prompt user if missing): Welcome (t+0), Rediscover (t+3d if inactive), Streak-broken (t+1d after break), Weekly recap (Fridays).
 
-## What to build
+## Sprint 2 — Anchored Daily Ritual + Session Complete
+Goal: One clear thing to do per day, with a satisfying finish.
 
-### 1. Route + navigation
-- Add `<Route path="/listen" element={<Listen />}>` and a `Listen.tsx` page that renders `<Navbar/> + <AudioSection/>`.
-- Add a **Listen** entry to `BottomTabBar` and the Profile "Quick actions" list.
-- Redirect `/audio` → `/listen`.
+1. **Daily Dose becomes the hero** — full-width card at top of home for signed-in users, with visible progress ring, "Complete" state, and tomorrow preview after completion.
+2. **Session-complete screen** — after Daily Dose or 10+ min of listening: "You listened 12 min · +1 streak · Tomorrow: [preview]" with share button.
+3. **Prayer times promoted** — next-salah countdown pinned above Daily Dose on mobile home.
 
-### 2. Reciter roster (all 40, whole Qur'an)
+## Sprint 3 — Social Gravity (safe, no DMs, no comments explosion)
+1. **Aggregate social proof** — "12,483 Muslims listened this week" chips on video cards (from existing `feed_impressions`).
+2. **Du'a Wall trending → home** — top 3 du'as with Ameen counts on home for signed-in users.
+3. **Household mode** — Parent can see kids' watch history; Kids Mode already exists, add a Household dashboard in Profile.
 
-For each reciter, generate 114 tracks (`title = "Surah N — <name>"`, `url = <cdn>/NNN.mp3`, `category="Quran"`, `album = "Complete Qur'an — <reciter>"`). Playable reciters use **mp3quran.net** (verified free CDN); ones without a public halal CDN mount are shipped as `comingSoon:true` so the UI shows an honest placeholder instead of a wrong track.
+## Sprint 4 — Content Depth (Learning Paths + Series)
+1. **Learning Paths as first-class**: `learning_paths` table + `/paths` route + progress bars. Seed with 3 paths (Seerah 30-day, Juz Amma tafsir, Arabic 90-day) from existing `learningPaths.ts`.
+2. **Series detection** — SQL job groups multi-part videos by title similarity (`Part 1/2/3`, `Ep 01`), exposes "Next episode" on Watch page.
+3. **Mood/intent picker** — 4-tap chooser on home ("5 min / 30 min / I'm sad / I want to learn") → dedicated `/mood/:intent` surface.
 
-Reciters with a verified mp3quran slug (playable now): Mishary Rashid Alafasy (`afs`), Sa'ud ash-Shuraim (`shur`), Maher Al-Muaiqly (`maher`), Saad Al-Ghamdi (`s_gmd`), Nasser Al-Qatami (`qtm`), Ali Al-Hudhaify (`hthfi`), Muhammad Siddiq Al-Minshawi (`minsh`), Mahmoud Khalil Al-Husary (`husr`), Yasser Ad-Dossari (`yasser`), Khalid Al-Jileel (`jleel`), Fahad Al-Kandari (`kndri`), Abdul Basit Kazi (`basit_mjwd`), Abdul Rashid Sufi (`sufi`), Bandar Baleelah (`baleela`), Muhammad Al-Luhaidan (`luhaidan_hafs`), Raad Al-Kurdi (`raad`), Ahmad Nuaina (`nuaina`), Anas Al-Emadi (`emadi`), Abdulrahman Al-Majed (`majed`), Mansour Al-Salimi (`salimi`), Ahmad Al-Nufais (`nufais`), Hazza Al-Balushi (`balushi`), Muhammad Ayyub (`ayyub`), Abdul Badee Ghailan (`ghailan`), Ahmad Al-Hudhaify (`ahmed_huth`), Yousef Bin Noah Ahmad (`ynoah`), Haithm Aldokhin (`aldokhin`), Abdullah Al-Qurafi (`qurafi`), Tarek Bouchalkha (`bouchalkha`), Hassan Saleh (`saleh`), Ahmad bin Talib bin Humaid (`ahmed_humaid`), Ibrahim Idris (`idris`), Muhammad Nour (`nour`).
+## Sprint 5 — Growth Loops + Polish
+1. **Referral UI** in Profile: copyable link, QR code, WhatsApp/Telegram share templates, "Invite 3 → 1 mo Premium" milestone.
+2. **Share-a-Daily-Dose image card** — extends existing `shareImage.ts` with a Daily-Dose template, deep-linked back with `?ref`.
+3. **Mobile install banner** — one-time dismissible on `/`.
+4. **Delight micro-moments** — Framer Motion: streak-extend confetti, first-favorite heart burst, Khatm-completion sequence.
+5. **Public `/trust/scholars-board`** — lists moderating scholars (from `scholars.ts`) with credentials. Massive credibility differentiator.
 
-Reciters shipped as `comingSoon` (no verified public mount today): Sheikh Ismail AlBatnuni, Dr. Ahmed Elsayed, Suhayb Nummer, Sheikh Abu Quds, Badr Al-Turki, Recitations of Ottawa, Okasha Kameny, Hafidh Abdalla Ibrahim.
+## What I'll skip (with rationale)
+- **Audio waveform / chapter markers** — nice, but low retention lift; deferred.
+- **Monetization overhaul** — user hasn't asked to charge yet; premium hooks stay as-is.
+- **Real-time incident status page** — infra work, low user impact; deferred.
+- **Content appeals visible to submitters** — small creator base; can ship post-launch.
 
-Each is created with `country`, `is_verified: true`, and links to a filterable reciter chip in the UI. As mounts are confirmed, the flag flips off — the entry remains stable.
+## Verification per sprint
+Each sprint ends with: (a) Playwright screenshot of the new surface, (b) TypeScript build clean, (c) at least one automated test where behavior is testable.
 
-### 3. Speakers → lecture rails (100+ names, ≥10 each)
+## Technical notes
+- All new tables ship with GRANTs + RLS in the same migration.
+- Push cron uses existing `personalized-push` — no new edge function.
+- Email lifecycle will prompt for domain via the email setup dialog if none exists.
+- No new dependencies unless a sprint truly needs one (Framer Motion is already in the project).
 
-Lectures live inside YouTube through Heartify's existing halal-only pipeline. Two-step delivery:
+---
 
-- **Immediate:** add a `speakers` metadata table (name, slug, region, cover). In `Listen.tsx`, render a "Speakers" grid; each card deep-links to `/search?q=<speaker>&kind=lecture` which already returns the ≥10 latest halal-reviewed lectures for that speaker from `curated_videos`.
-- **Data seed:** insert every requested speaker into `verified_scholars` (rows already exist for many). Trigger the existing `discover-trusted-sources` edge function to backfill any speaker with < 10 curated videos, so every card lands on a rail that meets the "≥10 lectures" bar.
-
-Rendering a hand-typed list of 1,000+ YouTube IDs would drift and break; routing through the reviewed corpus keeps every lecture halal-first and self-healing.
-
-### 4. Player correctness
-- Wire `PlayerContext.playQueue` to the reciter's 114-surah list on tap so users can play the whole Qur'an in order.
-- Add a "Play whole Qur'an" CTA on each reciter card.
-- Preserve resume position (`audio_playback_positions` already exists).
-
-### 5. Verification
-- Playwright: open `/listen`, filter to Alafasy, press Play whole Qur'an, assert `<audio src>` matches `server8.mp3quran.net/afs/001.mp3` and advances to `002.mp3` on `ended`.
-- Playwright: open a speaker card → assert `/search?q=…` returns ≥10 lecture cards.
-- Unit test: `src/data/audio.ts` exports exactly 40 reciters and every playable reciter has 114 tracks with valid URLs.
-
-## Files touched (technical)
-
-```text
-src/pages/Listen.tsx                     (new)
-src/App.tsx                              (route + redirect + BottomTabBar)
-src/components/BottomTabBar.tsx          (add Listen tab)
-src/data/audio.ts                        (helper `reciterCatalog()` generates 114 tracks; new reciter list)
-src/data/reciters.ts                     (new — 40 reciter records + mp3quran slug map)
-src/data/speakers.ts                     (new — 100+ speaker records)
-src/components/AudioSection.tsx          (reciter + speaker rails; "Play whole Qur'an" CTA)
-supabase/migrations/…                    (seed missing speakers into verified_scholars if needed)
-tests/e2e/listen.spec.ts                 (playback + speaker rail assertions)
-```
-
-## Non-goals
-- No hand-coded YouTube IDs per lecture; the curated pipeline is the source of truth.
-- No new payment gating; existing Premium flags carry over.
-- No changes to moderation rules — every added source flows through the halal-first triggers already in place.
+**Approve this plan and I'll start Sprint 1 in the next turn.** Or tell me to re-order — e.g. start with Sprint 4 (Learning Paths) if content depth matters more to you than push.

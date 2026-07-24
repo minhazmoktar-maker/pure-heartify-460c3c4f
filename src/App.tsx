@@ -35,6 +35,7 @@ import OfflineBanner from "./components/OfflineBanner";
 import { KidsModeProvider } from "./contexts/KidsModeContext";
 import { FeedDiversityProvider } from "./contexts/FeedDiversityContext";
 const PushPermissionPrompt = lazy(() => import("./components/PushPermissionPrompt"));
+const StreakMilestoneDialog = lazy(() => import("./components/StreakMilestoneDialog"));
 
 const Shorts = lazy(() => import("./pages/Shorts.tsx"));
 const Listen = lazy(() => import("./pages/Listen.tsx"));
@@ -298,6 +299,7 @@ const App = () => (
                 (footer + Profile → Preferences). Essential cookies only. */}
             <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
             <Suspense fallback={null}><CommandPalette /></Suspense>
+            <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
             <BottomTabBar />
             <EdgeSwipeBack />
             <KeyboardFocusScroller />
