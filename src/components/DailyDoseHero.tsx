@@ -166,9 +166,52 @@ const DailyDoseHero = () => {
           </div>
 
           {allDone && (
-            <div className="rounded-card border border-primary/30 bg-primary/5 p-4 text-sm text-foreground">
-              You invested <strong>{dose.total_minutes} minutes</strong> in beneficial content today.
-              Come back tomorrow — your streak is now <strong>{streak.current_streak} days</strong>. 🌿
+            <div className="relative overflow-hidden rounded-card border border-primary/30 bg-gradient-to-br from-primary/15 via-accent/10 to-primary/5 p-5 motion-safe:animate-fade-in">
+              <div className="flex items-start gap-3">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/15 text-primary motion-safe:animate-scale-in">
+                  <Heart className="h-5 w-5" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-micro font-semibold uppercase tracking-wider text-primary">
+                    Session complete
+                  </p>
+                  <p className="mt-1 text-base font-semibold text-foreground">
+                    Alhamdulillah — you invested {dose.total_minutes} beneficial minutes today.
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Your streak is now <strong className="text-foreground">{streak.current_streak} {streak.current_streak === 1 ? "day" : "days"}</strong>.
+                    Come back tomorrow for a fresh dose — ~18 minutes, no scrolling.
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        shareContent({
+                          kind: "streak_milestone",
+                          title: "Heartify — Daily Dose complete",
+                          text: `Alhamdulillah — ${dose.total_minutes} beneficial minutes today. ${streak.current_streak}-day streak on Heartify.`,
+                        })
+                      }
+                      className="inline-flex items-center gap-1.5 rounded-pill bg-primary px-3.5 py-1.5 text-caption font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                    >
+                      <Share2 className="h-3.5 w-3.5" aria-hidden />
+                      Share your progress
+                    </button>
+                    <Link
+                      to="/quran"
+                      className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-background/70 px-3.5 py-1.5 text-caption font-semibold text-foreground transition-colors hover:bg-background"
+                    >
+                      Read a page of Qur'an
+                    </Link>
+                    <Link
+                      to="/listen"
+                      className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-background/70 px-3.5 py-1.5 text-caption font-semibold text-foreground transition-colors hover:bg-background"
+                    >
+                      Listen to recitation
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
