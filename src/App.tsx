@@ -265,10 +265,12 @@ const App = () => (
             <AppShell>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/me" element={<MyLibrary />} />
                 {/* Common aliases that used to 404 */}
                 <Route path="/auth" element={<Navigate to="/login" replace />} />
                 <Route path="/notifications" element={<Navigate to="/settings/notifications" replace />} />
-                <Route path="/discover" element={<Navigate to="/search" replace />} />
+                <Route path="/discover" element={<Navigate to="/explore" replace />} />
                 <Route path="/settings" element={<Navigate to="/profile" replace />} />
                 <Route path="/dua" element={<Navigate to="/dua-wall" replace />} />
                 <Route path="/duas" element={<Navigate to="/dua-wall" replace />} />
