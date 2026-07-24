@@ -20,35 +20,36 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const timeAgo = formatTimeAgo(video.publishedAt);
   const liked = isFavorite(video.id);
   const isEmbeddableVideo = /^[a-zA-Z0-9_-]{11}$/.test(video.id);
-  // Prefer maxres (1280x720) with a fallback chain for crisper thumbnails.
-  // Chain: maxresdefault -> hqdefault -> mqdefault -> provided thumbnailUrl -> hide card
+  // Prefer maxres (1280x720), but YouTube often returns a successful 120×90
+  // placeholder instead of firing onError. Treat that tiny placeholder like a
+  // failed source and keep walking the fallback chain so rails never reserve an
+  // empty card slot.
+  const thumbnailCandidates = [
+    isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg` : undefined,
+    isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg` : undefined,
+    isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg` : undefined,
+    video.thumbnailUrl,
+  ].filter((src, pos, arr): src is string => Boolean(src) && arr.indexOf(src) === pos);
   const [thumbFailed, setThumbFailed] = useState(false);
-  const hiResThumb = isEmbeddableVideo
-    ? `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`
-    : video.thumbnailUrl;
-  const handleThumbError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.currentTarget;
-    if (img.src.includes("maxresdefault.jpg") && isEmbeddableVideo) {
-      img.src = `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
-      return;
-    }
-    if (img.src.includes("hqdefault.jpg") && isEmbeddableVideo) {
-      img.src = `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`;
-      return;
-    }
-    if (video.thumbnailUrl && img.src !== video.thumbnailUrl) {
-      img.src = video.thumbnailUrl;
-      return;
-    }
-    // All sources exhausted — hide the card entirely rather than showing a blank tile.
-    setThumbFailed(true);
+  const [thumbnailSrc, setThumbnailSrc] = useState(thumbnailCandidates[0] ?? video.thumbnailUrl);
+
+  const advanceThumbnail = (currentSrc: string) => {
+    const currentIndex = thumbnailCandidates.findIndex((src) => currentSrc.includes(src) || src.includes(currentSrc));
+    const nextIndex = currentIndex >= 0 ? currentIndex + 1 : 1;
+    const nextSrc = thumbnailCandidates[nextIndex];
+    if (nextSrc) setThumbnailSrc(nextSrc);
+    else setThumbFailed(true);
   };
-  // YouTube returns a 120x90 "video unavailable" placeholder even when a
-  // video is deleted; detect that specific tiny image and hide the card.
+
+  const handleThumbError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    advanceThumbnail(e.currentTarget.src);
+  };
+  // YouTube returns a 120x90 "video unavailable" placeholder for unavailable
+  // sizes/videos; detect it and try the next real thumbnail size first.
   const handleThumbLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     if (img.naturalWidth > 0 && img.naturalWidth <= 120 && img.src.includes("i.ytimg.com")) {
-      setThumbFailed(true);
+      advanceThumbnail(img.src);
     }
   };
 
@@ -94,7 +95,6 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   };
 
   if (!isEmbeddableVideo) return null; // hide non-embeddable fallback videos
-  if (thumbFailed) return null; // hide cards whose thumbnails are all unavailable
 
   return (
     <FadeIn
@@ -107,18 +107,22 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         className="relative overflow-hidden rounded-card"
         style={{ viewTransitionName: `video-${video.id}` } as React.CSSProperties}
       >
-        <img
-          src={hiResThumb}
-          onError={handleThumbError}
-          onLoad={handleThumbLoad}
-          alt={`${video.title} — ${video.channelTitle} thumbnail`}
-          loading={index < 4 ? "eager" : "lazy"}
-          decoding="async"
-          width={1280}
-          height={720}
-          className="aspect-video w-full bg-muted object-cover transition-transform duration-short group-hover:scale-105"
-          {...({ fetchpriority: index < 2 ? "high" : "low" } as Record<string, string>)}
-        />
+        {thumbFailed ? (
+          <div className="aspect-video w-full bg-muted" aria-label={`${video.title} thumbnail unavailable`} />
+        ) : (
+          <img
+            src={thumbnailSrc}
+            onError={handleThumbError}
+            onLoad={handleThumbLoad}
+            alt={`${video.title} — ${video.channelTitle} thumbnail`}
+            loading={index < 4 ? "eager" : "lazy"}
+            decoding="async"
+            width={1280}
+            height={720}
+            className="aspect-video w-full bg-muted object-cover transition-transform duration-short group-hover:scale-105"
+            {...({ fetchpriority: index < 2 ? "high" : "low" } as Record<string, string>)}
+          />
+        )}
         <div className="absolute bottom-2 left-2 right-2">
           <TrustBadges channelTitle={video.channelTitle} halalScore={video.halalScore} />
         </div>
