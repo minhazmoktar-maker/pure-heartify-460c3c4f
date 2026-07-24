@@ -1,0 +1,24 @@
+line,path,dest,internal_refs,sitemap,share_prefix,verdict,notes
+313,/auth,/login,src/pages/DhikrCircles.tsx;src/components/AgeGate.tsx;src/hooks/useFirstRunOnboarding.ts,no,no,KEEP,3 internal refs
+314,/notifications,/settings/notifications,src/components/CommandPalette.tsx,no,no,KEEP,1 internal refs
+315,/discover,/search,src/test/deep-links.test.tsx,no,no,KEEP,1 internal refs
+316,/settings,/profile,src/components/CommandPalette.tsx,no,no,KEEP,1 internal refs
+317,/dua,/dua-wall,src/test/deep-links.test.tsx,no,no,KEEP,1 internal refs
+318,/duas,/dua-wall,src/components/RamadanBanner.tsx,no,no,KEEP,1 internal refs
+323,/audio,/listen,src/test/deep-links.test.tsx;src/pages/OfflineLibrary.tsx;src/components/HomeHero.tsx;src/components/NotificationsBell.tsx,no,no,KEEP,4 internal refs
+350,/premium,/plus,src/test/deep-links.test.tsx,no,no,KEEP,1 internal refs
+351,/pricing,/plus,,no,no,REMOVE,GSC 0 imp/0 clicks 90d; no internal refs; not in sitemap/emails/marketing docs
+474,/creators/claim,/claim-channel,src/test/deep-links.test.tsx,no,no,KEEP,1 internal refs
+506,/admin,/admin/console,src/pages/AdminRetention.tsx;src/pages/AdminFeatureFlags.tsx;src/hooks/useFirstRunOnboarding.ts;src/pages/AdminExperiments.tsx;src/pages/AdminConsole.tsx;src/lib/__tests__/navigation.test.ts,no,no,KEEP,6 internal refs
+518,/admin/moderation-log,/admin/moderation,src/pages/ModerationLog.tsx,no,no,KEEP,1 internal refs
+521,/admin/review,/admin/moderation,src/pages/AdminReview.tsx;src/pages/AdminDiscovery.tsx,no,no,KEEP,2 internal refs
+522,/admin/reports,/admin/moderation,src/pages/AdminReports.tsx;src/components/NotificationsBell.tsx,no,no,KEEP,2 internal refs
+524,/admin/entitlements,/admin/users,src/pages/AdminEntitlements.tsx,no,no,KEEP,1 internal refs
+525,/admin/roles,/admin/users,src/pages/AdminRoles.tsx,no,no,KEEP,1 internal refs
+526,/owner,/admin/users,src/components/__tests__/AdminRoute.test.tsx,no,no,KEEP,1 internal refs
+530,/admin/gsc,/admin/users,,no,no,KEEP,GSC 0 imp but docs/APP_GUIDE.md documents it as canonical admin route; keep until real page ships
+531,/admin/permissions,/admin/users,,no,no,KEEP,GSC 0 imp but docs/APP_GUIDE.md documents it as canonical admin route; keep until real page ships
+532,/admin/alerts,/admin/users,,no,no,KEEP,GSC 0 imp but referenced as ADMIN_ALERTS_URL default in supabase/functions/dispatch-alert
+533,/owner-profile,/admin/users,,no,no,REMOVE,GSC 0 imp/0 clicks 90d; no refs anywhere; legacy path
+535,/mfa-enroll,/security/mfa,src/components/MfaStatusCard.tsx,no,no,KEEP,1 internal refs
+536,/mfa-verify,/security/mfa/verify,,no,no,REMOVE,GSC 0 imp/0 clicks 90d; no refs; /security/mfa/verify is canonical
