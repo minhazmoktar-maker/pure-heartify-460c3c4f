@@ -401,7 +401,9 @@ const App = () => (
                 <Route path="/hajj" element={<Hajj />} />
                 <Route path="/qibla" element={<Qibla />} />
                 <Route path="/halal-check" element={<HalalCheck />} />
+                <Route path="/halal" element={<HalalHub />} />
                 <Route path="/halal/:slug" element={<HalalTopic />} />
+                <Route path="/reciter/:id" element={<PublicReciter />} />
 
                 <Route path="/dua-wall" element={<DuaWall />} />
                 <Route path="/baby-names" element={<BabyNames />} />
