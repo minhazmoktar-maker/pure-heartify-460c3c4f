@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { CalendarDays, CheckCircle2, CircleDot, BookOpen, Flame, Trophy, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
+import ShareImageButton from "@/components/ShareImageButton";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 
 type SalahEntry = { fajr?: string; dhuhr?: string; asr?: string; maghrib?: string; isha?: string };
 
@@ -105,7 +107,38 @@ const Recap = () => {
           </div>
         </div>
 
+        {/* Share row */}
+        <div className="mb-6 flex flex-wrap items-center gap-2 rounded-card border border-border bg-card p-4">
+          <div className="min-w-0 flex-1 pr-2">
+            <div className="font-heading text-sm font-semibold text-foreground">Share your week</div>
+            <div className="text-micro text-muted-foreground">
+              Encourage a friend — generate a beautiful card of your progress.
+            </div>
+          </div>
+          <ShareImageButton
+            variant="solid"
+            label="Share recap"
+            input={{
+              variant: "quote",
+              kicker: "My week on Heartify",
+              translation: `${totals.prayed} prayers · ${totals.dhikr.toLocaleString()} dhikr · ${totals.verses.toLocaleString()} ayat · ${totals.perfectDays} perfect days`,
+              attribution: `${streak.current}-day streak · ${onTimePct}% on time`,
+            }}
+            meta={{
+              title: "My Heartify week",
+              text: `${totals.prayed} prayers · ${totals.dhikr.toLocaleString()} dhikr · ${streak.current}-day streak. Join me on Heartify.`,
+              url: typeof window !== "undefined" ? `${window.location.origin}/recap` : "/recap",
+            }}
+          />
+          <WhatsAppShareButton
+            message={`My last 7 days on Heartify: ${totals.prayed} prayers, ${totals.dhikr.toLocaleString()} dhikr, ${streak.current}-day streak. Join me ↓`}
+            url={typeof window !== "undefined" ? `${window.location.origin}/` : "https://pure-heartify.lovable.app/"}
+            label="WhatsApp"
+          />
+        </div>
+
         {/* Stats grid */}
+
         <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
           {stats.map(({ label, value, sub, icon: Icon, color }) => (
             <div key={label} className="rounded-card border border-border bg-card p-4">
