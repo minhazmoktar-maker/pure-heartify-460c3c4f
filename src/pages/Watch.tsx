@@ -400,9 +400,16 @@ const Watch = () => {
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1">
             {relatedVideos.map((video, index) => (
-              <YouTubeVideoCard key={video.id} video={video} index={index} />
+              <YouTubeVideoCard key={`${video.id}-${index}`} video={video} index={index} />
             ))}
           </div>
+          <div ref={relatedSentinelRef} aria-hidden className="h-10" />
+          {relatedQuery.isFetchingNextPage && (
+            <p className="mt-2 text-center text-xs text-muted-foreground">Loading more…</p>
+          )}
+          {!relatedQuery.hasNextPage && relatedVideos.length > 0 && (
+            <p className="mt-2 text-center text-xs text-muted-foreground">You've reached the end</p>
+          )}
         </aside>
       </div>
     </div>
