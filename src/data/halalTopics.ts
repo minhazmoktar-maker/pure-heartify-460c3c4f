@@ -67,7 +67,7 @@ export const HALAL_TOPICS: Record<string, HalalTopic> = {
     kicker: "Kids",
     description:
       "Reviewed kid-safe Islamic cartoons, stories of the Prophets, and learning videos vetted for the whole family.",
-    category: "Kids",
+    category: "Islamic",
     reason: "Every video is safe for children — no music, no mixed content, no engagement bait.",
   },
   duas: {
