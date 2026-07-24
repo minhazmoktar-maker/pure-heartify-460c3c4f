@@ -41,6 +41,19 @@ export default function DuaWall() {
   const [posting, setPosting] = useState(false);
   const [tab, setTab] = useState<"recent" | "trending">("recent");
 
+  // "Trending" ranks du'as posted in the last 7 days by Ameen count, tiebreak
+  // by recency. "Recent" preserves the RPC's newest-first order.
+  const orderedDuas = useMemo(() => {
+    if (tab === "recent") return duas;
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return [...duas]
+      .filter((d) => new Date(d.created_at).getTime() >= cutoff)
+      .sort((a, b) => {
+        if (b.ameen_count !== a.ameen_count) return b.ameen_count - a.ameen_count;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+  }, [duas, tab]);
+
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase.rpc("list_dua_wall", { _limit: 100 });
