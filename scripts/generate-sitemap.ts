@@ -33,6 +33,8 @@ import { PILLARS, ARTICLES } from "../src/data/foundations";
 import { KALIMAHS } from "../src/data/kalimahs";
 import { JUZ } from "../src/data/juz";
 import { DUROOD } from "../src/data/durood";
+import { RECITERS } from "../src/data/reciters";
+import { HALAL_TOPICS } from "../src/data/halalTopics";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
