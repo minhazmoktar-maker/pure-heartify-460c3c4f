@@ -5,7 +5,7 @@ import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import EditorByline from "@/components/EditorByline";
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
-import type { YouTubeVideoCategory } from "@/services/youtube";
+import type { HalalCategory } from "@/services/youtube";
 
 /**
  * Wave 2 — Programmatic-SEO topic landing.
