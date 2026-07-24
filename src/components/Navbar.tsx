@@ -1,5 +1,5 @@
 import { Menu, Search, Sparkles, ShieldAlert } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { hasUnseenChangelog } from "@/data/changelog";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
