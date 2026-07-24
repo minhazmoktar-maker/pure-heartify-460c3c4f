@@ -187,26 +187,30 @@ export default function HomeHero() {
           </div>
         )}
 
-        {/* Today's ayah — Amiri Arabic + short English gloss */}
-        <div className="mt-3 border-t border-border/60 pt-3">
-          <Link to="/quran" className="block group" aria-label="Open Qur'an reader">
-            <p
-              lang="ar"
-              dir="rtl"
-              className="font-quran text-xl leading-[1.8] text-foreground [font-feature-settings:'liga','calt','ss01']"
-              style={{ fontWeight: 700 }}
-            >
-              {FALLBACK_AYAH.arabic}
-            </p>
-            <p className="mt-1.5 text-sm italic text-foreground/90">
-              {FALLBACK_AYAH.english}
-            </p>
-            <div className="mt-1.5 flex items-center gap-1.5 text-micro text-muted-foreground group-hover:text-foreground transition-colors">
-              <BookOpen className="h-3 w-3" aria-hidden />
-              {FALLBACK_AYAH.ref}
-            </div>
-          </Link>
-        </div>
+        {/* Today's ayah — signed-out only. Signed-in users get the full
+            VerseOfDayCard inside TodayHero, so we skip here to avoid two
+            ayah cards competing above the fold (the 5-second test). */}
+        {!user && (
+          <div className="mt-3 border-t border-border/60 pt-3">
+            <Link to="/quran" className="block group" aria-label="Open Qur'an reader">
+              <p
+                lang="ar"
+                dir="rtl"
+                className="font-quran text-xl leading-[1.8] text-foreground [font-feature-settings:'liga','calt','ss01']"
+                style={{ fontWeight: 700 }}
+              >
+                {FALLBACK_AYAH.arabic}
+              </p>
+              <p className="mt-1.5 text-sm italic text-foreground/90">
+                {FALLBACK_AYAH.english}
+              </p>
+              <div className="mt-1.5 flex items-center gap-1.5 text-micro text-muted-foreground group-hover:text-foreground transition-colors">
+                <BookOpen className="h-3 w-3" aria-hidden />
+                {FALLBACK_AYAH.ref}
+              </div>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
