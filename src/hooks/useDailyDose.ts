@@ -40,24 +40,14 @@ export function useDailyDose() {
     staleTime: 5 * 60 * 1000,
     retry: false,
     queryFn: async () => {
-      // Ensure we have a live session token before hitting the auth-gated function.
-      let { data: sess } = await supabase.auth.getSession();
-      let token = sess.session?.access_token;
-
-      // Verify the token is still valid server-side; a stale/revoked session
-      // returns 403 session_not_found and the edge function then rejects as 401.
-      const { error: userErr } = await supabase.auth.getUser();
-      if (userErr) {
-        const { data: refreshed, error: refreshErr } =
-          await supabase.auth.refreshSession();
-        if (refreshErr || !refreshed.session) {
-          await supabase.auth.signOut();
-          throw new Error("Session expired. Please sign in again.");
-        }
-        token = refreshed.session.access_token;
-      }
-
+      // Grab whatever token we currently have. Do NOT proactively call
+      // getUser()/refreshSession() here — a transient network blip would
+      // otherwise cascade into a forced sign-out. Supabase's auth client
+      // already auto-refreshes tokens in the background.
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
       if (!token) throw new Error("Not signed in");
+
       const { data, error } = await supabase.functions.invoke("generate-daily-dose", {
         body: {},
         headers: { Authorization: `Bearer ${token}` },
