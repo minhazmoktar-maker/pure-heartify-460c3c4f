@@ -17,6 +17,8 @@ import SeriesRail from "@/components/SeriesRail";
 import { useSeriesEpisodes } from "@/hooks/useSeriesEpisodes";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
+import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { YouTubeVideo } from "@/services/youtube";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
