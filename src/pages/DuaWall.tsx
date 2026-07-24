@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Heart, Loader2, Send, Share2, Trash2, Users } from "lucide-react";
+import { Flame, Heart, Loader2, MessageCircle, Send, Share2, Sparkles, Trash2, Users } from "lucide-react";
+import SocialProofChip from "@/components/SocialProofChip";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
 import Navbar from "@/components/Navbar";
 import SectionHeader from "@/components/SectionHeader";
