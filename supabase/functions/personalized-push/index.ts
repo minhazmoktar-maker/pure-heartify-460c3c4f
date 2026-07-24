@@ -140,6 +140,36 @@ async function dispatch(cands: Candidate[]): Promise<number> {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
+  // Authorization: shared cron token OR admin JWT. Otherwise anyone on the
+  // internet could spam every opted-in user with push notifications.
+  const cronToken = req.headers.get("x-cron-token") ?? req.headers.get("X-Cron-Secret");
+  const isCron =
+    !!cronToken &&
+    (cronToken === Deno.env.get("AUDIT_CRON_TOKEN") ||
+      cronToken === Deno.env.get("CRON_SECRET"));
+  if (!isCron) {
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const asUser = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData } = await asUser.auth.getUser();
+    const user = userData?.user;
+    if (!user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
+    const { data: isAdmin } = await admin.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    if (!isAdmin) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
+  }
+
+
   // Only pull users who have any push channel enabled AND a general opt-in.
   const { data: prefs } = await admin
     .from("notification_preferences")
