@@ -50,7 +50,23 @@ const Watch = () => {
   const completedRef = useRef<string | null>(null);
 
   const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
-  const relatedVideos = videos?.filter((v) => v.id !== videoId).slice(0, 8) ?? [];
+  const currentCategory = (currentVideo as any)?.category as string | undefined;
+  const relatedQuery = useInfiniteFeed({
+    category: currentCategory && currentCategory !== "All" ? currentCategory : undefined,
+    limit: 12,
+    sort: "fresh",
+    getExcludeIds: () => (videoId ? [videoId] : []),
+  });
+  const relatedVideos = (relatedQuery.data?.pages.flatMap((p) => p.items) ?? [])
+    .filter((v) => v.id !== videoId);
+  const relatedSentinelRef = useInfiniteScroll(
+    () => {
+      if (relatedQuery.hasNextPage && !relatedQuery.isFetchingNextPage) {
+        relatedQuery.fetchNextPage();
+      }
+    },
+    !!relatedQuery.hasNextPage && !relatedQuery.isFetchingNextPage,
+  );
   const isEmbeddableVideo = !!videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId);
 
   const series = useSeriesEpisodes(currentVideo, videos);
