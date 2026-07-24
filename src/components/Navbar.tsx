@@ -74,40 +74,8 @@ const Navbar = () => {
               <nav className="flex-1 overflow-y-auto overscroll-contain px-6 pb-6 flex flex-col gap-1">
                 {(() => {
                   const q = menuFilter.trim().toLowerCase();
-                  const items = [
-                    { to: "/", label: "Home", icon: Home },
-                    { to: "/today", label: "Today (Daily Dose)", icon: Sunrise },
-                    { to: "/prayer", label: "Prayer & Qibla", icon: Compass },
-                    { to: "/quran", label: "Quran reader", icon: BookOpen },
-                    { to: "/khatm", label: "Khatm tracker", icon: BookMarked },
-                    { to: "/bookmarks", label: "Bookmarks", icon: BookMarked },
-                    { to: "/dhikr", label: "Dhikr & Tasbih", icon: CircleDot },
-                    { to: "/adhkar", label: "Adhkar & Duas", icon: Sunrise },
-                    { to: "/zakat", label: "Zakat calculator", icon: Calculator },
-                    { to: "/hijri", label: "Hijri calendar", icon: CalendarDays },
-                    { to: "/names", label: "99 Names of Allah", icon: Sparkles },
-                    { to: "/mosques", label: "Mosque finder", icon: MapPin },
-                    { to: "/hadith", label: "Hadith library", icon: BookText },
-                    { to: "/seerah", label: "Seerah timeline", icon: Milestone },
-                    { to: "/learn", label: "Learning paths", icon: GraduationCap },
-                    { to: "/wird", label: "Wird builder", icon: CircleDot },
-                    { to: "/sadaqah", label: "Sadaqah tracker", icon: HandCoins },
-                    { to: "/wasiyyah", label: "Wasiyyah (will)", icon: Scroll },
-                    { to: "/ramadan", label: "Ramadan planner", icon: Moon },
-                    { to: "/salah", label: "Salah tracker", icon: ListChecks },
-                    { to: "/fasting", label: "Fasting tracker", icon: MoonStar },
-                    { to: "/achievements", label: "Achievements", icon: Award },
-                    { to: "/challenges", label: "Daily challenges", icon: Target },
-                    { to: "/reminders", label: "Habit reminders", icon: Bell },
-                    { to: "/recap", label: "Weekly recap", icon: LineChart },
-                    { to: "/journal", label: "Journal (Niyyah)", icon: BookMarked },
-                    { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
-                    { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
-                    { to: "/profile?tab=history", label: "Watch history", icon: Clock },
-                    { to: "/profile?tab=streak", label: "Daily dose & streak", icon: Flame },
-                    { to: "/profile?tab=interests", label: "My interests", icon: ListMusic },
-                    { to: "/offline", label: "Offline downloads", icon: Download },
-                    { to: "/profile", label: "Profile & settings", icon: Settings },
+                  const items: NavItem[] = [
+                    ...MAIN_NAV_ITEMS,
                     { to: "/changelog", label: unseenChangelog ? "What's new •" : "What's new", icon: Sparkles },
                   ];
                   const filtered = q ? items.filter((i) => i.label.toLowerCase().includes(q)) : items;
@@ -128,14 +96,8 @@ const Navbar = () => {
                 {isAdmin && !menuFilter && (
                   <>
                     <div className="mt-4 mb-1 px-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Admin</div>
-                    {[
-                      ...(isOwner ? [{ to: "/admin/users", label: "Users, roles & entitlements", icon: Crown }] : []),
-                      { to: "/admin/moderation", label: "Moderation" },
-                      { to: "/admin/viral", label: "Viral & flags" },
-                      { to: "/admin/console", label: "Admin console" },
-                      { to: "/admin/audit", label: "Audit log" },
-                    ].map((l) => {
-                      const Icon = "icon" in l && l.icon ? l.icon : ShieldAlert;
+                    {ADMIN_NAV_ITEMS.filter((l) => (l.owner ? isOwner : true)).map((l) => {
+                      const Icon = l.icon ?? ShieldAlert;
                       return (
                         <SheetClose asChild key={l.to}>
                           <Link to={l.to} className="flex min-h-11 items-center gap-3 rounded-card px-3 py-2 text-sm hover:bg-secondary">
