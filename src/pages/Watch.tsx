@@ -17,6 +17,8 @@ import SeriesRail from "@/components/SeriesRail";
 import { useSeriesEpisodes } from "@/hooks/useSeriesEpisodes";
 
 import { useYouTubeVideos } from "@/hooks/useYouTubeVideos";
+import { useInfiniteFeed } from "@/hooks/useInfiniteFeed";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { YouTubeVideo } from "@/services/youtube";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,7 +50,23 @@ const Watch = () => {
   const completedRef = useRef<string | null>(null);
 
   const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
-  const relatedVideos = videos?.filter((v) => v.id !== videoId).slice(0, 8) ?? [];
+  const currentCategory = (currentVideo as any)?.category;
+  const relatedQuery = useInfiniteFeed({
+    category: currentCategory && currentCategory !== "All" ? currentCategory : undefined,
+    limit: 12,
+    sort: "fresh",
+    getExcludeIds: () => (videoId ? [videoId] : []),
+  });
+  const relatedVideos = (relatedQuery.data?.pages.flatMap((p) => p.items) ?? [])
+    .filter((v) => v.id !== videoId);
+  const relatedSentinelRef = useInfiniteScroll(
+    () => {
+      if (relatedQuery.hasNextPage && !relatedQuery.isFetchingNextPage) {
+        relatedQuery.fetchNextPage();
+      }
+    },
+    !!relatedQuery.hasNextPage && !relatedQuery.isFetchingNextPage,
+  );
   const isEmbeddableVideo = !!videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId);
 
   const series = useSeriesEpisodes(currentVideo, videos);
@@ -382,9 +400,16 @@ const Watch = () => {
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1">
             {relatedVideos.map((video, index) => (
-              <YouTubeVideoCard key={video.id} video={video} index={index} />
+              <YouTubeVideoCard key={`${video.id}-${index}`} video={video} index={index} />
             ))}
           </div>
+          <div ref={relatedSentinelRef} aria-hidden className="h-10" />
+          {relatedQuery.isFetchingNextPage && (
+            <p className="mt-2 text-center text-xs text-muted-foreground">Loading more…</p>
+          )}
+          {!relatedQuery.hasNextPage && relatedVideos.length > 0 && (
+            <p className="mt-2 text-center text-xs text-muted-foreground">You've reached the end</p>
+          )}
         </aside>
       </div>
     </div>
