@@ -28,6 +28,7 @@ const BestIslamicCartoons = lazy(() => import("./pages/BestIslamicCartoons.tsx")
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
+const Verify = lazy(() => import("./pages/Verify.tsx"));
 const Status = lazy(() => import("./pages/Status.tsx"));
 const Creators = lazy(() => import("./pages/Creators.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
@@ -299,6 +300,7 @@ const App = () => (
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
+                <Route path="/verify/:videoId" element={<Verify />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
                 <Route path="/guides/best-islamic-cartoons" element={<BestIslamicCartoons />} />
                 <Route path="/status" element={<Status />} />
