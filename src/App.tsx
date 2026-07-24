@@ -31,6 +31,7 @@ const Trust = lazy(() => import("./pages/Trust.tsx"));
 const Verify = lazy(() => import("./pages/Verify.tsx"));
 const Status = lazy(() => import("./pages/Status.tsx"));
 const Creators = lazy(() => import("./pages/Creators.tsx"));
+const Sources = lazy(() => import("./pages/Sources.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
 const ExportData = lazy(() => import("./pages/ExportData.tsx"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail.tsx"));
