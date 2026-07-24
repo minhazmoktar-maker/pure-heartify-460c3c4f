@@ -77,7 +77,22 @@ export function useStreak() {
     try {
       const { data, error } = await supabase.rpc("record_streak_activity");
       if (error) throw error;
-      await track("streak_activity_recorded", data as Record<string, unknown>);
+      const payload = (data ?? {}) as {
+        milestone_hit?: number | null;
+        freeze_granted?: boolean;
+      } & Record<string, unknown>;
+      await track("streak_activity_recorded", payload);
+      // Fire global milestone celebration when the DB reports a new one.
+      if (payload.milestone_hit && typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("heartify:streak-milestone", {
+            detail: {
+              milestone: payload.milestone_hit,
+              freezeGranted: !!payload.freeze_granted,
+            },
+          }),
+        );
+      }
       await refresh();
       return data;
     } catch (err) {
