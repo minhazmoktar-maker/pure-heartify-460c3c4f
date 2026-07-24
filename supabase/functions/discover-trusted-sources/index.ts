@@ -373,16 +373,43 @@ async function runJob(admin: Admin, jobId: string) {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  // Authorization: shared cron secret OR admin JWT (mirrors discover-channels)
+  const cronSecret = req.headers.get('X-Cron-Secret');
+  const isCron = cronSecret && cronSecret === Deno.env.get('CRON_SECRET');
+  if (!isCron) {
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const asUser = createClient(
+      SUPABASE_URL,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: userData } = await asUser.auth.getUser();
+    const user = userData?.user;
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const { data: isAdmin } = await admin.rpc('has_role', { _user_id: user.id, _role: 'admin' });
+    if (!isAdmin) {
+      return new Response(JSON.stringify({ error: 'forbidden' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
   if (!YOUTUBE_API_KEY) {
     return new Response(JSON.stringify({ error: 'YOUTUBE_API_KEY not configured' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-
-  const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
 
   const { data: job, error } = await admin
     .from('discovery_jobs')
