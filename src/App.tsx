@@ -213,6 +213,8 @@ const Zakat = lazy(() => import("./pages/Zakat.tsx"));
 const NotificationSettings = lazy(() => import("./pages/NotificationSettings.tsx"));
 const Playlists = lazy(() => import("./pages/Playlists.tsx"));
 const PlaylistDetail = lazy(() => import("./pages/PlaylistDetail.tsx"));
+const Explore = lazy(() => import("./pages/Explore.tsx"));
+const MyLibrary = lazy(() => import("./pages/MyLibrary.tsx"));
 const Appeals = lazy(() => import("./pages/Appeals.tsx"));
 const Transparency = lazy(() => import("./pages/Transparency.tsx"));
 const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
@@ -263,10 +265,12 @@ const App = () => (
             <AppShell>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/me" element={<MyLibrary />} />
                 {/* Common aliases that used to 404 */}
                 <Route path="/auth" element={<Navigate to="/login" replace />} />
                 <Route path="/notifications" element={<Navigate to="/settings/notifications" replace />} />
-                <Route path="/discover" element={<Navigate to="/search" replace />} />
+                <Route path="/discover" element={<Navigate to="/explore" replace />} />
                 <Route path="/settings" element={<Navigate to="/profile" replace />} />
                 <Route path="/dua" element={<Navigate to="/dua-wall" replace />} />
                 <Route path="/duas" element={<Navigate to="/dua-wall" replace />} />

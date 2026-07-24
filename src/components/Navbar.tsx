@@ -10,7 +10,8 @@ import { useScrolled } from "@/hooks/useScrolled";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
 import Logomark from "@/components/Logomark";
 import { cn } from "@/lib/utils";
-import { MAIN_NAV_ITEMS, ADMIN_NAV_ITEMS, type NavItem } from "@/config/nav";
+import { ALL_NAV_ITEMS, ADMIN_NAV_ITEMS, type NavItem } from "@/config/nav";
+import StreakChip from "@/components/StreakChip";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -75,7 +76,7 @@ const Navbar = () => {
                 {(() => {
                   const q = menuFilter.trim().toLowerCase();
                   const items: NavItem[] = [
-                    ...MAIN_NAV_ITEMS,
+                    ...ALL_NAV_ITEMS,
                     { to: "/changelog", label: unseenChangelog ? "What's new •" : "What's new", icon: Sparkles },
                   ];
                   const filtered = q ? items.filter((i) => i.label.toLowerCase().includes(q)) : items;
@@ -140,6 +141,7 @@ const Navbar = () => {
           </Link>
           {user ? (
             <>
+              <StreakChip className="hidden sm:inline-flex" />
               <NotificationsBell isAdmin={isAdmin} />
               <Link
                 to="/profile"
