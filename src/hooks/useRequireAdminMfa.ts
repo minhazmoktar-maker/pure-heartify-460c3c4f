@@ -37,12 +37,7 @@ export function useRequireAdminMfa() {
 
       if (!isAdmin && !owner) { navigate("/"); return; }
 
-      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      const { data: factors } = await supabase.auth.mfa.listFactors();
-      const hasTotp = factors?.totp?.some((f) => f.status === "verified");
-
-      if (!hasTotp) { navigate("/security/mfa"); return; }
-      if (aal?.currentLevel !== "aal2") { navigate("/security/mfa/verify"); return; }
+      // MFA/AAL2 step-up disabled per product decision — role check alone gates admin routes.
       setOk(true);
     })();
   }, [user, loading, navigate]);
