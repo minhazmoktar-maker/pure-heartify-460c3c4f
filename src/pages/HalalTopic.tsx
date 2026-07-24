@@ -20,7 +20,7 @@ const TOPICS: Record<
     title: string;
     kicker: string;
     description: string;
-    category: YouTubeVideoCategory;
+    category: HalalCategory;
     reason: string;
   }
 > = {
@@ -34,42 +34,42 @@ const TOPICS: Record<
   },
   seerah: {
     title: "Halal Seerah Videos — Life of the Prophet ﷺ",
-    kicker: "Seerah",
+    kicker: "Lectures",
     description:
       "Reviewed Seerah lectures and series about the life of the Prophet Muhammad ﷺ from trusted teachers.",
-    category: "Seerah",
+    category: "Lectures",
     reason: "A curated Seerah shelf covering childhood, Makkah, Madinah and the final sermon.",
   },
   parenting: {
     title: "Halal Islamic Parenting Videos",
-    kicker: "Parenting",
+    kicker: "Islamic",
     description:
       "Reviewed Islamic parenting videos from trusted educators — tarbiyah, discipline, du'a and household rhythm.",
-    category: "Parenting",
+    category: "Islamic",
     reason: "Practical parenting talks vetted for tone, sources, and tarbiyah quality.",
   },
   learning: {
     title: "Halal Islamic Learning — Fiqh, Aqeedah & Adab",
-    kicker: "Learning",
+    kicker: "Education",
     description:
       "Reviewed Islamic learning videos on fiqh, aqeedah, hadith and adab from trusted scholars.",
-    category: "Learning",
+    category: "Education",
     reason: "Structured learning content across the classical Islamic sciences.",
   },
   history: {
     title: "Halal Islamic History Videos",
-    kicker: "History",
+    kicker: "Education",
     description:
       "Reviewed Islamic history videos — companions, dynasties, and civilizations — from trusted historians.",
-    category: "History",
+    category: "Education",
     reason: "Rigorous history content that avoids sensationalism and cites its sources.",
   },
   motivation: {
     title: "Halal Islamic Motivation & Reminders",
-    kicker: "Motivation",
+    kicker: "Self-Improvement",
     description:
       "Reviewed Islamic reminders and short motivational lectures curated by Heartify Editors.",
-    category: "Motivation",
+    category: "Self-Improvement",
     reason: "Short, high-quality reminders that leave you closer to Allah, not more anxious.",
   },
 };
