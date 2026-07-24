@@ -21,6 +21,7 @@ const PushPermissionPrompt = lazy(() => import("./PushPermissionPrompt"));
 const StreakMilestoneDialog = lazy(() => import("./StreakMilestoneDialog"));
 const StreakFreezeUsedToast = lazy(() => import("./StreakFreezeUsedToast"));
 const WelcomeBackDialog = lazy(() => import("./WelcomeBackDialog"));
+const InstallPromptBanner = lazy(() => import("./InstallPromptBanner"));
 
 const RouteFallback = () => (
   <div className="min-h-dvh bg-background">
@@ -55,6 +56,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <BackToTop />
       <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
       <SessionPushNudge />
+      <Suspense fallback={null}><InstallPromptBanner /></Suspense>
       <Suspense fallback={null}><CommandPalette /></Suspense>
       <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
       <Suspense fallback={null}><StreakFreezeUsedToast /></Suspense>
