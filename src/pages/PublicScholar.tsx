@@ -93,10 +93,10 @@ export default function PublicScholar() {
         </Card>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Button asChild size="lg" onClick={() => track("scholar.lectures_opened", { slug: s.slug, source: "halaltube_search" })}>
-            <a href={halaltubeSearchUrl(s.translit)} target="_blank" rel="noopener noreferrer">
+          <Button asChild size="lg" onClick={() => track("scholar.lectures_opened", { slug: s.slug, source: "internal_search" })}>
+            <Link to={`/search?q=${encodeURIComponent(s.translit)}`}>
               <PlayCircle className="h-4 w-4 mr-2" /> Watch lectures
-            </a>
+            </Link>
           </Button>
           <Button asChild variant="outline"><Link to="/scholars">All scholars</Link></Button>
           <Button variant="outline" onClick={onShare}><Share2 className="h-4 w-4 mr-2" /> Share</Button>
