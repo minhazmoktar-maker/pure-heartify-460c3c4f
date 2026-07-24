@@ -5591,6 +5591,16 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      pool_beneficial_v1: {
+        Args: { _exclude_premium?: boolean; _limit?: number; _user_id: string }
+        Returns: Database["public"]["CompositeTypes"]["beneficial_video"][]
+        SetofOptions: {
+          from: "*"
+          to: "beneficial_video"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       pool_continue_watching: {
         Args: { _limit?: number; _user_id: string }
         Returns: Database["public"]["CompositeTypes"]["surface_video"][]
@@ -5934,6 +5944,24 @@ export type Database = {
         | "note"
     }
     CompositeTypes: {
+      beneficial_video: {
+        video_id: string | null
+        title: string | null
+        channel_id: string | null
+        channel_title: string | null
+        thumbnail_url: string | null
+        category: string | null
+        section_id: string | null
+        published_at: string | null
+        ingested_at: string | null
+        halal_score: number | null
+        view_count: number | null
+        is_trusted_channel: boolean | null
+        is_premium_only: boolean | null
+        content_language: string | null
+        reason: string | null
+        benefit_score: number | null
+      }
       surface_video: {
         video_id: string | null
         title: string | null
