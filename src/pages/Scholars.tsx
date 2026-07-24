@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import SEO from "@/components/SEO";
 import { useVerifiedScholars } from "@/hooks/useVerifiedScholars";
-import { halaltubeSpeakerUrl, halaltubeSearchUrl } from "@/lib/halaltube";
 import { track } from "@/lib/analytics";
 
 type Scholar = { id: string; name: string; era: string; field: string; summary: string; works: string };
@@ -93,21 +92,11 @@ const Scholars = () => {
                         size="sm"
                         variant="secondary"
                         asChild
-                        onClick={() => track("scholar.lectures_opened", { id: s.id, source: "halaltube_speaker" })}
+                        onClick={() => track("scholar.lectures_opened", { id: s.id, source: "internal_search" })}
                       >
-                        <a href={halaltubeSpeakerUrl(s.display_name)} target="_blank" rel="noopener noreferrer">
-                          <PlayCircle className="h-4 w-4 mr-1.5" /> Lectures
-                        </a>
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        asChild
-                        onClick={() => track("scholar.lectures_opened", { id: s.id, source: "halaltube_search" })}
-                      >
-                        <a href={halaltubeSearchUrl(s.display_name)} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-1.5" /> Search HalalTube
-                        </a>
+                        <Link to={`/search?q=${encodeURIComponent(s.display_name)}`}>
+                          <PlayCircle className="h-4 w-4 mr-1.5" /> Watch lectures
+                        </Link>
                       </Button>
                     </div>
                   </div>
