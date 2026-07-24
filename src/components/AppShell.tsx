@@ -56,6 +56,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <BackToTop />
       <Suspense fallback={null}><PushPermissionPrompt /></Suspense>
       <SessionPushNudge />
+      <Suspense fallback={null}><InstallPromptBanner /></Suspense>
       <Suspense fallback={null}><CommandPalette /></Suspense>
       <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
       <Suspense fallback={null}><StreakFreezeUsedToast /></Suspense>
