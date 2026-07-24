@@ -309,6 +309,7 @@ const App = () => (
                 <Route path="/account/export-data" element={<ExportData />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/creators" element={<Creators />} />
+                <Route path="/sources" element={<Sources />} />
                 <Route path="/plus" element={<HeartifyPlus />} />
                 <Route path="/plus/join" element={<PlusInvite />} />
                 <Route path="/invite" element={<Invite />} />
