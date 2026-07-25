@@ -171,6 +171,7 @@ export default function Today() {
         </header>
 
         {/* Streak strip */}
+        <h2 className="sr-only">Your daily worship stats</h2>
         <div className="mb-6 grid gap-3 sm:grid-cols-3">
           <Card>
             <CardContent className="flex items-center justify-between p-4">
