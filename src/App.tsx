@@ -45,6 +45,7 @@ const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
 const AdminModeration = lazy(() => import("./pages/AdminModeration.tsx"));
 const AdminSLA = lazy(() => import("./pages/AdminSLA.tsx"));
 const AdminDiscovery = lazy(() => import("./pages/AdminDiscovery.tsx"));
+const AdminGlobalDiscovery = lazy(() => import("./pages/AdminGlobalDiscovery.tsx"));
 const AdminChannelPipeline = lazy(() => import("./pages/AdminChannelPipeline.tsx"));
 const AdminApprovedChannels = lazy(() => import("./pages/AdminApprovedChannels.tsx"));
 const AdminOps = lazy(() => import("./pages/AdminOps.tsx"));
@@ -482,6 +483,7 @@ const App = () => (
                 <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
                 <Route path="/admin/sla" element={<AdminRoute><AdminSLA /></AdminRoute>} />
                 <Route path="/admin/discovery" element={<AdminRoute><AdminDiscovery /></AdminRoute>} />
+                <Route path="/admin/global-discovery" element={<AdminRoute><AdminGlobalDiscovery /></AdminRoute>} />
                 <Route path="/admin/channel-pipeline" element={<AdminRoute><AdminChannelPipeline /></AdminRoute>} />
                 <Route path="/admin/approved-channels" element={<AdminRoute><AdminApprovedChannels /></AdminRoute>} />
                 <Route path="/admin/ops" element={<AdminRoute><AdminOps /></AdminRoute>} />
