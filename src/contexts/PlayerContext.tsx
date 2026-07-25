@@ -206,7 +206,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       const mark = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
       mark[user.id] = today;
       writeJson(STREAK_MARK_KEY, mark);
-      supabase.rpc("record_streak_activity").then(({ error }) => {
+      supabase.rpc("record_streak_activity", { _client_date: today }).then(({ error }) => {
         if (error) {
           if (import.meta.env.DEV) console.warn("[streak] listen record failed", error);
           streakRecordedTodayRef.current = false;
