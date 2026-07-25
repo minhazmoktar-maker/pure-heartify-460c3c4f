@@ -352,6 +352,19 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/guides/best-islamic-cartoons"/>
   </url>
   <url>
+    <loc>https://pure-heartify.lovable.app/guides/islamic-calendar-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/guides/islamic-calendar-2026"/>
+  </url>
+  <url>
     <loc>https://pure-heartify.lovable.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
