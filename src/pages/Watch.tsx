@@ -315,7 +315,7 @@ const Watch = () => {
                   <div className="w-full max-w-md px-4">
                     <img
                       src={nextVideo.thumbnailUrl}
-                      alt={nextVideo.title}
+                      alt={`Up next: ${nextVideo.title} by ${nextVideo.channelTitle}`}
                       className="aspect-video w-full rounded-card object-cover"
                     />
                     <h3 className="mt-3 line-clamp-2 text-center text-sm font-semibold text-foreground">{nextVideo.title}</h3>
