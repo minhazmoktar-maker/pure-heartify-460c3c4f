@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ThumbsDown, MoreVertical, Info, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ThumbsDown, MoreVertical, Info, Trash2, Shield, ShieldOff } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNegativeFeedback, type NegativeReason } from "@/hooks/useNegativeFeedback";
