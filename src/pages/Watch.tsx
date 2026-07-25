@@ -152,7 +152,11 @@ const Watch = () => {
                 onSuccess: (res) => {
                   // Fire the RPC that also handles freezes, milestones, badges, and
                   // in-app notifications. Idempotent per user/day.
-                  void supabase.rpc("record_streak_activity");
+                  void supabase.rpc("record_streak_activity", {
+                    _client_date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+                      .toISOString()
+                      .slice(0, 10),
+                  });
                   // Small confetti + haptic on every dose video completion
                   celebrateSmall();
                   if (res?.justCompleted) {
