@@ -202,6 +202,7 @@ export default function Today() {
           </Card>
         </div>
 
+        <h2 className="sr-only">Today's spiritual reflections</h2>
         <div className="grid gap-6 md:grid-cols-2">
           {/* Ayah */}
           <Card>
