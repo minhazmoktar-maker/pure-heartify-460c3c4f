@@ -123,7 +123,10 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const pendingListenSecondsRef = useRef<number>(0);
   const flushingListenRef = useRef<boolean>(false);
 
-  const utcToday = () => new Date().toISOString().slice(0, 10);
+  // Local calendar date (YYYY-MM-DD) — used for streak boundaries so users
+  // in timezones offset from UTC don't lose their streak on UTC rollover.
+  const utcToday = () =>
+    new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
