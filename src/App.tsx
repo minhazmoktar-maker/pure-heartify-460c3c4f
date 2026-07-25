@@ -25,6 +25,7 @@ const Redeem = lazy(() => import("./pages/Redeem.tsx"));
 const Changelog = lazy(() => import("./pages/Changelog.tsx"));
 const OmarSuleimanRamadanSeries = lazy(() => import("./pages/OmarSuleimanRamadanSeries.tsx"));
 const BestIslamicCartoons = lazy(() => import("./pages/BestIslamicCartoons.tsx"));
+const HijriCalendar2026 = lazy(() => import("./pages/HijriCalendar2026.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
