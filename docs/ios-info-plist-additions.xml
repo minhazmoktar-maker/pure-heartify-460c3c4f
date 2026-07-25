@@ -1,0 +1,74 @@
+<!--
+  Heartify — iOS Info.plist additions.
+
+  After `npx cap add ios`, open `ios/App/App/Info.plist` and merge the keys
+  below into the top-level <dict>. Every key here has a matching runtime
+  capability the app already uses; App Store review will reject the build if
+  a used capability is missing its purpose string.
+
+  DO NOT wrap this whole file into Info.plist — copy the <key>/<value> pairs
+  only. Keep the copy under App Store Connect > Privacy Nutrition Label in
+  sync with Data Safety (see docs/play-data-safety.md).
+-->
+
+<!-- Notifications (adhan, streak reminders, personalized push) -->
+<key>NSUserNotificationUsageDescription</key>
+<string>Heartify sends prayer time reminders, streak nudges, and daily dose notifications you've enabled in Settings.</string>
+
+<!-- Location — prayer times + qibla (WhenInUse only, never Always) -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Heartify uses your location to calculate accurate prayer times and Qibla direction for where you are.</string>
+
+<!-- Camera — profile photo + report attachments -->
+<key>NSCameraUsageDescription</key>
+<string>Heartify uses the camera when you take a profile photo or attach a screenshot to a moderation report.</string>
+
+<!-- Photo library — profile photo + share sheet image save -->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Heartify accesses your photos when you pick a profile picture.</string>
+<key>NSPhotoLibraryAddUsageDescription</key>
+<string>Heartify saves shareable ayah and dhikr images to your photo library when you tap Save.</string>
+
+<!-- Microphone — voice-note comments (future); safe to include now -->
+<key>NSMicrophoneUsageDescription</key>
+<string>Heartify uses the microphone only if you record a voice comment or reply.</string>
+
+<!-- Motion — pedometer-style dhikr counter -->
+<key>NSMotionUsageDescription</key>
+<string>Heartify uses motion data for the shake-to-count dhikr counter, only while that screen is open.</string>
+
+<!-- Bluetooth — audio route detection for AirPods/car -->
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>Heartify uses Bluetooth to detect connected audio devices so recitation plays cleanly through your headphones or car.</string>
+
+<!-- Local network — Chromecast/AirPlay device discovery -->
+<key>NSLocalNetworkUsageDescription</key>
+<string>Heartify uses the local network to find AirPlay devices you can cast recitation to.</string>
+
+<!-- App Tracking Transparency — Heartify does NOT track across apps.
+     Even so, iOS requires the key if the binary links AdSupport/IDFA
+     indirectly. Set it to make the intent explicit. -->
+<key>NSUserTrackingUsageDescription</key>
+<string>Heartify does not track you across other companies' apps or websites. This permission is only used for optional, anonymous product analytics.</string>
+
+<!-- Background audio — required for Listen (Quran, scholars) -->
+<key>UIBackgroundModes</key>
+<array>
+  <string>audio</string>
+  <string>remote-notification</string>
+  <string>fetch</string>
+</array>
+
+<!-- App Transport Security — production is all HTTPS; do not add
+     NSAllowsArbitraryLoads. If a specific reciter host lacks TLS in future,
+     scope an exception under NSExceptionDomains. -->
+
+<!-- Encryption export compliance (self-classification: only standard TLS) -->
+<key>ITSAppUsesNonExemptEncryption</key>
+<false/>
+
+<!-- Associated Domains handled in Signing & Capabilities, not Info.plist:
+       applinks:pure-heartify.lovable.app
+       applinks:heartify.app  (once custom domain is live)
+     Ensure `public/.well-known/apple-app-site-association` is served with
+     Content-Type: application/json and no redirects. -->

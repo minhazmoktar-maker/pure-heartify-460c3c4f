@@ -90,7 +90,7 @@ const AudioPlayer = () => {
                   {currentTrack.artist} · {currentTrack.language}
                 </p>
               </div>
-              <span className="ml-1 hidden items-center gap-1 md:inline-flex">
+              <span className="ml-1 inline-flex items-center gap-1">
                 <DownloadTrackButton track={currentTrack} />
                 <ReportAudioDialog track={currentTrack} errorCode={lastError?.code} compact />
               </span>

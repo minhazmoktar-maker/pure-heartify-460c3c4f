@@ -121,6 +121,20 @@ const Watch = () => {
     return () => clearInterval(iv);
   }, [showOverlay, nextVideo, navigate]);
 
+  // Credit the streak after 30s of active viewing, even if the user navigates
+  // away before the video ends. record_streak_activity is idempotent per day.
+  useEffect(() => {
+    if (!user || !videoId || !playerActivated) return;
+    const t = setTimeout(() => {
+      void supabase.rpc("record_streak_activity", {
+        _client_date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 10),
+      });
+    }, 30_000);
+    return () => clearTimeout(t);
+  }, [user, videoId, playerActivated]);
+
   // Track watch history + first-play growth event
   useEffect(() => {
     if (!user || !videoId || !currentVideo) return;
