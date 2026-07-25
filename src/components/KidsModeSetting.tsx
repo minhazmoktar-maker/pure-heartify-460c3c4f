@@ -14,7 +14,7 @@ import { toast } from "sonner";
 export default function KidsModeSetting() {
   const { enabled, setEnabled } = useKidsMode();
   const [pinLocked, setPinLocked] = useState<boolean>(() => hasHouseholdPin());
-  const [dialog, setDialog] = useState<{ open: boolean; mode: "set" | "verify"; intent: "toggle-off" | "add-pin" }>({
+  const [dialog, setDialog] = useState<{ open: boolean; mode: "set" | "verify"; intent: "toggle-off" | "add-pin" | "remove-pin" }>({
     open: false,
     mode: "set",
     intent: "add-pin",
@@ -30,21 +30,16 @@ export default function KidsModeSetting() {
   };
 
   const handleRemovePin = () => {
-    setDialog({ open: true, mode: "verify", intent: "toggle-off" }); // reuse verify flow
+    setDialog({ open: true, mode: "verify", intent: "remove-pin" });
   };
 
   const onDialogSuccess = () => {
     if (dialog.intent === "toggle-off") {
-      // Verified — either turn Kids Mode off, or if triggered from "Remove PIN"
-      // we still need a way to detect. Simpler: after verify success, if Kids
-      // Mode is currently on, turn it off; otherwise treat as PIN removal.
-      if (enabled) {
-        setEnabled(false);
-      } else {
-        clearHouseholdPin();
-        setPinLocked(false);
-        toast.success("Household PIN removed");
-      }
+      setEnabled(false);
+    } else if (dialog.intent === "remove-pin") {
+      clearHouseholdPin();
+      setPinLocked(false);
+      toast.success("Household PIN removed");
     } else if (dialog.intent === "add-pin") {
       setPinLocked(true);
     }
