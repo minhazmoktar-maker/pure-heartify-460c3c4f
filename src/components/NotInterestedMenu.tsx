@@ -87,6 +87,16 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation();
+              removeFromAccount();
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Remove from my account
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
               setWhyOpen(true);
             }}
           >
