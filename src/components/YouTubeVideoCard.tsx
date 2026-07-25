@@ -150,7 +150,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
             <NotInterestedMenu videoId={video.id} compact />
           </div>
         </div>
-        <div className="absolute inset-0 flex items-center justify-center bg-primary/10 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-primary/10 opacity-0 transition-opacity group-hover:opacity-100">
           <Play className="h-10 w-10 fill-primary-foreground text-primary-foreground drop-shadow-lg" />
         </div>
       </div>
