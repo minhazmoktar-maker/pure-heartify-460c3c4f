@@ -123,7 +123,10 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const pendingListenSecondsRef = useRef<number>(0);
   const flushingListenRef = useRef<boolean>(false);
 
-  const utcToday = () => new Date().toISOString().slice(0, 10);
+  // Local calendar date (YYYY-MM-DD) — used for streak boundaries so users
+  // in timezones offset from UTC don't lose their streak on UTC rollover.
+  const utcToday = () =>
+    new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
@@ -206,7 +209,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       const mark = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
       mark[user.id] = today;
       writeJson(STREAK_MARK_KEY, mark);
-      supabase.rpc("record_streak_activity").then(({ error }) => {
+      supabase.rpc("record_streak_activity", { _client_date: today }).then(({ error }) => {
         if (error) {
           if (import.meta.env.DEV) console.warn("[streak] listen record failed", error);
           streakRecordedTodayRef.current = false;
