@@ -5797,7 +5797,7 @@ export type Database = {
         Returns: undefined
       }
       record_listen_seconds: { Args: { _seconds: number }; Returns: number }
-      record_streak_activity: { Args: never; Returns: Json }
+      record_streak_activity: { Args: { _client_date?: string }; Returns: Json }
       redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
       refresh_active_taste_profiles: {
