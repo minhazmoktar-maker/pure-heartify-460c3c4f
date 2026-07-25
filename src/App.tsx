@@ -483,6 +483,7 @@ const App = () => (
                 <Route path="/admin/moderation" element={<AdminRoute><AdminModeration /></AdminRoute>} />
                 <Route path="/admin/sla" element={<AdminRoute><AdminSLA /></AdminRoute>} />
                 <Route path="/admin/discovery" element={<AdminRoute><AdminDiscovery /></AdminRoute>} />
+                <Route path="/admin/global-discovery" element={<AdminRoute><AdminGlobalDiscovery /></AdminRoute>} />
                 <Route path="/admin/channel-pipeline" element={<AdminRoute><AdminChannelPipeline /></AdminRoute>} />
                 <Route path="/admin/approved-channels" element={<AdminRoute><AdminApprovedChannels /></AdminRoute>} />
                 <Route path="/admin/ops" element={<AdminRoute><AdminOps /></AdminRoute>} />
