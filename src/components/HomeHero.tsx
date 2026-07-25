@@ -103,10 +103,13 @@ export default function HomeHero() {
               src={resume.thumbnailUrl}
               alt=""
               loading="eager"
+              decoding="async"
               width={224}
               height={128}
               className="h-full w-full object-cover"
+              {...({ fetchpriority: "high" } as { fetchpriority: string })}
             />
+
             <div className="absolute inset-0 grid place-items-center bg-black/25">
               <Play className="h-6 w-6 fill-white text-white" aria-hidden />
             </div>
