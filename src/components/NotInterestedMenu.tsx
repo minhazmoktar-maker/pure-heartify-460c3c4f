@@ -64,7 +64,7 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
       if (platformRemoved) {
         const { error } = await supabase.from("removed_videos").delete().eq("video_id", videoId);
         if (error) throw error;
-        setPlatformRemoved(false);
+        qc.setQueryData(["removed_video", videoId], false);
         toast({ title: "Video restored to platform" });
       } else {
         const reason = window.prompt("Reason for removing this video?", "Inappropriate content") ?? "Inappropriate content";
