@@ -294,7 +294,7 @@ const Watch = () => {
                   {videoId && (
                     <img
                       src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
-                      alt={currentVideo?.title ?? "Video thumbnail"}
+                      alt={currentVideo ? `${currentVideo.title} — video thumbnail from ${currentVideo.channelTitle}` : "Video preview thumbnail"}
                       width={1280}
                       height={720}
                       decoding="async"
