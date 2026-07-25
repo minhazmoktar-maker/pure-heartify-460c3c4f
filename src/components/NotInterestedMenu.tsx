@@ -28,6 +28,50 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [whyOpen, setWhyOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [platformRemoved, setPlatformRemoved] = useState(false);
+  const [adminBusy, setAdminBusy] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    let cancelled = false;
+    supabase
+      .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
+      .then(({ data }) => { if (!cancelled) setIsAdmin(!!data); });
+    supabase
+      .from("removed_videos").select("id").eq("video_id", videoId).maybeSingle()
+      .then(({ data }) => { if (!cancelled) setPlatformRemoved(!!data); });
+    return () => { cancelled = true; };
+  }, [user, videoId]);
+
+  const removeFromPlatform = async () => {
+    if (!user || !isAdmin) return;
+    setAdminBusy(true);
+    try {
+      if (platformRemoved) {
+        const { error } = await supabase.from("removed_videos").delete().eq("video_id", videoId);
+        if (error) throw error;
+        setPlatformRemoved(false);
+        toast({ title: "Video restored to platform" });
+      } else {
+        const reason = window.prompt("Reason for removing this video?", "Inappropriate content") ?? "Inappropriate content";
+        const { error } = await supabase.from("removed_videos").insert({
+          video_id: videoId, reason, removed_by: user.id,
+        });
+        if (error) throw error;
+        await supabase.from("curated_videos").delete().eq("video_id", videoId);
+        setPlatformRemoved(true);
+        toast({ title: "Removed from the platform" });
+      }
+      qc.invalidateQueries({ queryKey: ["for_you"] });
+      qc.invalidateQueries({ queryKey: ["recommendations"] });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Please try again";
+      toast({ title: "Action failed", description: msg, variant: "destructive" });
+    } finally {
+      setAdminBusy(false);
+    }
+  };
 
   const removeFromAccount = async () => {
     if (!user) return nav("/login");
