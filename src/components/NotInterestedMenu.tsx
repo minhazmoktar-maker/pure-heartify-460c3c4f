@@ -6,7 +6,7 @@ import { useNegativeFeedback, type NegativeReason } from "@/hooks/useNegativeFee
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
@@ -28,21 +28,34 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [whyOpen, setWhyOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [platformRemoved, setPlatformRemoved] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [adminBusy, setAdminBusy] = useState(false);
 
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    let cancelled = false;
-    supabase
-      .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
-      .then(({ data }) => { if (!cancelled) setIsAdmin(!!data); });
-    supabase
-      .from("removed_videos").select("id").eq("video_id", videoId).maybeSingle()
-      .then(({ data }) => { if (!cancelled) setPlatformRemoved(!!data); });
-    return () => { cancelled = true; };
-  }, [user, videoId]);
+  // Cached per-session: single query shared across every video card.
+  const { data: isAdmin = false } = useQuery({
+    queryKey: ["is_admin", user?.id],
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+      return !!data;
+    },
+  });
+
+  // Only check per-video removal state when menu is open AND admin.
+  const { data: platformRemoved = false } = useQuery({
+    queryKey: ["removed_video", videoId],
+    enabled: !!user && isAdmin && menuOpen,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("removed_videos").select("id").eq("video_id", videoId).maybeSingle();
+      return !!data;
+    },
+  });
 
   const removeFromPlatform = async () => {
     if (!user || !isAdmin) return;
