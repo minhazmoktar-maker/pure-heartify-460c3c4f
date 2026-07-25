@@ -137,6 +137,26 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
           >
             <Trash2 className="mr-2 h-4 w-4" /> Remove from my account
           </DropdownMenuItem>
+          {isAdmin && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Admin</DropdownMenuLabel>
+              <DropdownMenuItem
+                disabled={adminBusy}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFromPlatform();
+                }}
+                className={platformRemoved ? "" : "text-destructive focus:text-destructive"}
+              >
+                {platformRemoved ? (
+                  <><ShieldOff className="mr-2 h-4 w-4" /> Restore to platform</>
+                ) : (
+                  <><Shield className="mr-2 h-4 w-4" /> Remove from platform</>
+                )}
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={(e) => {
