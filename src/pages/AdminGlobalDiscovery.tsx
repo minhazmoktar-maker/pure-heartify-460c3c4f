@@ -54,6 +54,7 @@ export default function AdminGlobalDiscovery() {
       <SEO
         title="Global Discovery — Admin"
         description="Progress toward Heartify's goal of 7,000 verified beneficial educational channels worldwide."
+        path="/admin/global-discovery"
       />
       <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
         <header className="space-y-2">
