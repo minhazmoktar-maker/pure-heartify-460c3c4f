@@ -75,7 +75,12 @@ export function useStreak() {
     if (!user || recording) return null;
     setRecording(true);
     try {
-      const { data, error } = await supabase.rpc("record_streak_activity");
+      // Use the user's LOCAL date so timezones offset from UTC don't skip a
+      // calendar day and reset the streak. RPC clamps to ±1 UTC day.
+      const localDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10);
+      const { data, error } = await supabase.rpc("record_streak_activity", { _client_date: localDate });
       if (error) throw error;
       const payload = (data ?? {}) as {
         milestone_hit?: number | null;
