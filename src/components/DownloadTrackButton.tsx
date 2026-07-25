@@ -64,7 +64,22 @@ export default function DownloadTrackButton({ track, className }: Props) {
         setUpgradeFeature("Unlimited offline downloads");
         setUpgradeOpen(true);
       } else {
-        toast.error(e instanceof Error ? e.message : "Download failed");
+        // Most external audio hosts (e.g. mp3quran.net CDN) don't allow
+        // cross-origin fetch, so offline caching via IndexedDB fails. Fall
+        // back to a native browser download so the user still gets the file.
+        try {
+          const a = document.createElement("a");
+          a.href = track.url!;
+          a.download = `${track.title || track.id}.mp3`;
+          a.rel = "noopener";
+          a.target = "_blank";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          toast.success("Downloading via your browser");
+        } catch {
+          toast.error(e instanceof Error ? e.message : "Download failed");
+        }
       }
     }
   }, [status, track.id, track.url, track.isPremium, isPremium]);
