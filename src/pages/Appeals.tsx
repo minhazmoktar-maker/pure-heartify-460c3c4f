@@ -44,8 +44,9 @@ export default function Appeals() {
     <>
       <SEO path="/appeals"
         title="Appeals — Heartify"
-        description="Appeal a moderation decision. We review every request from a real human."
+        description="Appeal a moderation decision on Heartify. Every appeal is read by a real human reviewer who explains the outcome and any next steps within a few days."
       />
+
       <PageHeader
         title="Appeals"
         subtitle="If a video, comment, or account action seems wrong, tell us — a real reviewer will read it."
