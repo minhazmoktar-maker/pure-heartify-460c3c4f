@@ -4943,6 +4943,15 @@ export type Database = {
         }
         Relationships: []
       }
+      channel_discovery_progress: {
+        Row: {
+          approved_30d: number | null
+          approved_7d: number | null
+          approved_channels: number | null
+          category: string | null
+        }
+        Relationships: []
+      }
       leaderboard_public: {
         Row: {
           computed_at: string | null
@@ -5303,6 +5312,18 @@ export type Database = {
           title: string
           video_id: string
           view_count: number
+        }[]
+      }
+      get_global_discovery_stats: {
+        Args: never
+        Returns: {
+          goal: number
+          pct_complete: number
+          total_approved: number
+          total_langs: number
+          total_pending: number
+          total_queries: number
+          total_topics: number
         }[]
       }
       get_heartify_trending_ids: {
