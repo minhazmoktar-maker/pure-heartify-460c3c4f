@@ -294,7 +294,7 @@ const Watch = () => {
                   {videoId && (
                     <img
                       src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
-                      alt={currentVideo?.title ?? "Video thumbnail"}
+                      alt={currentVideo ? `${currentVideo.title} — video thumbnail from ${currentVideo.channelTitle}` : "Video preview thumbnail"}
                       width={1280}
                       height={720}
                       decoding="async"
@@ -315,7 +315,7 @@ const Watch = () => {
                   <div className="w-full max-w-md px-4">
                     <img
                       src={nextVideo.thumbnailUrl}
-                      alt={nextVideo.title}
+                      alt={`Up next: ${nextVideo.title} by ${nextVideo.channelTitle}`}
                       className="aspect-video w-full rounded-card object-cover"
                     />
                     <h3 className="mt-3 line-clamp-2 text-center text-sm font-semibold text-foreground">{nextVideo.title}</h3>
