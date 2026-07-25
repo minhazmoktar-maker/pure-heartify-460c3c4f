@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { ThumbsDown, MoreVertical, Info } from "lucide-react";
+import { ThumbsDown, MoreVertical, Info, Trash2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNegativeFeedback, type NegativeReason } from "@/hooks/useNegativeFeedback";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   videoId: string;
@@ -22,7 +25,33 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
   const { user } = useAuth();
   const nav = useNavigate();
   const { notInterested } = useNegativeFeedback();
+  const qc = useQueryClient();
+  const { toast } = useToast();
   const [whyOpen, setWhyOpen] = useState(false);
+
+  const removeFromAccount = async () => {
+    if (!user) return nav("/login");
+    try {
+      await Promise.all([
+        supabase.from("watch_history").delete().eq("user_id", user.id).eq("video_id", videoId),
+        supabase.from("favorites").delete().eq("user_id", user.id).eq("video_id", videoId),
+        supabase.from("user_hidden_videos").upsert(
+          { user_id: user.id, video_id: videoId, reason: "not_interested" as NegativeReason },
+          { onConflict: "user_id,video_id" },
+        ),
+      ]);
+      qc.invalidateQueries({ queryKey: ["watch_history"] });
+      qc.invalidateQueries({ queryKey: ["favorites"] });
+      qc.invalidateQueries({ queryKey: ["hidden_videos"] });
+      qc.invalidateQueries({ queryKey: ["for_you"] });
+      qc.invalidateQueries({ queryKey: ["recommendations"] });
+      toast({ title: "Removed from your account" });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Please try again";
+      toast({ title: "Could not remove", description: msg, variant: "destructive" });
+    }
+  };
+
 
   return (
     <>
@@ -54,6 +83,16 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
               {r.label}
             </DropdownMenuItem>
           ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              removeFromAccount();
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Remove from my account
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={(e) => {
