@@ -73,7 +73,7 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
         });
         if (error) throw error;
         await supabase.from("curated_videos").delete().eq("video_id", videoId);
-        setPlatformRemoved(true);
+        qc.setQueryData(["removed_video", videoId], true);
         toast({ title: "Removed from the platform" });
       }
       qc.invalidateQueries({ queryKey: ["for_you"] });
