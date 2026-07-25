@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ThumbsDown, MoreVertical, Info, Trash2, Shield, ShieldOff } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -6,7 +6,7 @@ import { useNegativeFeedback, type NegativeReason } from "@/hooks/useNegativeFee
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
@@ -28,21 +28,34 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [whyOpen, setWhyOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [platformRemoved, setPlatformRemoved] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [adminBusy, setAdminBusy] = useState(false);
 
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    let cancelled = false;
-    supabase
-      .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
-      .then(({ data }) => { if (!cancelled) setIsAdmin(!!data); });
-    supabase
-      .from("removed_videos").select("id").eq("video_id", videoId).maybeSingle()
-      .then(({ data }) => { if (!cancelled) setPlatformRemoved(!!data); });
-    return () => { cancelled = true; };
-  }, [user, videoId]);
+  // Cached per-session: single query shared across every video card.
+  const { data: isAdmin = false } = useQuery({
+    queryKey: ["is_admin", user?.id],
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+      return !!data;
+    },
+  });
+
+  // Only check per-video removal state when menu is open AND admin.
+  const { data: platformRemoved = false } = useQuery({
+    queryKey: ["removed_video", videoId],
+    enabled: !!user && isAdmin && menuOpen,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("removed_videos").select("id").eq("video_id", videoId).maybeSingle();
+      return !!data;
+    },
+  });
 
   const removeFromPlatform = async () => {
     if (!user || !isAdmin) return;
@@ -51,7 +64,7 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
       if (platformRemoved) {
         const { error } = await supabase.from("removed_videos").delete().eq("video_id", videoId);
         if (error) throw error;
-        setPlatformRemoved(false);
+        qc.setQueryData(["removed_video", videoId], false);
         toast({ title: "Video restored to platform" });
       } else {
         const reason = window.prompt("Reason for removing this video?", "Inappropriate content") ?? "Inappropriate content";
@@ -60,7 +73,7 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
         });
         if (error) throw error;
         await supabase.from("curated_videos").delete().eq("video_id", videoId);
-        setPlatformRemoved(true);
+        qc.setQueryData(["removed_video", videoId], true);
         toast({ title: "Removed from the platform" });
       }
       qc.invalidateQueries({ queryKey: ["for_you"] });
@@ -99,7 +112,7 @@ export default function NotInterestedMenu({ videoId, compact }: Props) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
         <DropdownMenuTrigger asChild>
           <button
             aria-label="Feedback on this video"
