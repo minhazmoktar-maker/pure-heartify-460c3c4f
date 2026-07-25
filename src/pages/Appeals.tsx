@@ -33,7 +33,7 @@ export default function Appeals() {
   if (!user) {
     return (
       <div className="container mx-auto max-w-xl px-4 py-16 text-center">
-        <SEO path="/appeals" title="Appeals — Heartify" description="Appeal a moderation decision." />
+        <SEO path="/appeals" title="Appeals — Heartify" description="Sign in to file or track a moderation appeal on Heartify. A real human reviewer reads every request and responds within a few days." />
         <p className="text-heading font-semibold">Sign in to file or view appeals</p>
         <Link to="/login" className="mt-4 inline-block text-primary hover:underline">Sign in</Link>
       </div>
@@ -44,8 +44,9 @@ export default function Appeals() {
     <>
       <SEO path="/appeals"
         title="Appeals — Heartify"
-        description="Appeal a moderation decision. We review every request from a real human."
+        description="Appeal a moderation decision on Heartify. Every appeal is read by a real human reviewer who explains the outcome and any next steps within a few days."
       />
+
       <PageHeader
         title="Appeals"
         subtitle="If a video, comment, or account action seems wrong, tell us — a real reviewer will read it."
