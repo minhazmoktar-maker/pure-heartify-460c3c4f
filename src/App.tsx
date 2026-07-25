@@ -45,6 +45,7 @@ const AdminEntitlements = lazy(() => import("./pages/AdminEntitlements.tsx"));
 const AdminModeration = lazy(() => import("./pages/AdminModeration.tsx"));
 const AdminSLA = lazy(() => import("./pages/AdminSLA.tsx"));
 const AdminDiscovery = lazy(() => import("./pages/AdminDiscovery.tsx"));
+const AdminGlobalDiscovery = lazy(() => import("./pages/AdminGlobalDiscovery.tsx"));
 const AdminChannelPipeline = lazy(() => import("./pages/AdminChannelPipeline.tsx"));
 const AdminApprovedChannels = lazy(() => import("./pages/AdminApprovedChannels.tsx"));
 const AdminOps = lazy(() => import("./pages/AdminOps.tsx"));
