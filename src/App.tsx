@@ -305,6 +305,8 @@ const App = () => (
                 <Route path="/verify/:videoId" element={<Verify />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
                 <Route path="/guides/best-islamic-cartoons" element={<BestIslamicCartoons />} />
+                <Route path="/guides/islamic-calendar-2026" element={<HijriCalendar2026 />} />
+                <Route path="/guides/hijri-calendar-guide" element={<HijriCalendar2026 />} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/account/export-data" element={<ExportData />} />
