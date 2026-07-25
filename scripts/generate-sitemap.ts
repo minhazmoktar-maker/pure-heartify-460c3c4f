@@ -131,6 +131,7 @@ const core: Entry[] = [
   { path: "/digital-purification", changefreq: "monthly", priority: "0.8" },
   { path: "/guides/omar-suleiman-ramadan-series", changefreq: "monthly", priority: "0.7" },
   { path: "/guides/best-islamic-cartoons", changefreq: "monthly", priority: "0.7" },
+  { path: "/guides/islamic-calendar-2026", changefreq: "monthly", priority: "0.8" },
   { path: "/about", changefreq: "monthly", priority: "0.6" },
   { path: "/contact", changefreq: "monthly", priority: "0.5" },
   { path: "/login", changefreq: "monthly", priority: "0.4" },
