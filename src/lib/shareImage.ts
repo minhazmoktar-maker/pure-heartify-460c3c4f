@@ -67,6 +67,10 @@ function wrapText(
   return lines;
 }
 
+function setTracking(ctx: CanvasRenderingContext2D, value: string) {
+  (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = value;
+}
+
 function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -160,9 +164,9 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
 
   ctx.fillStyle = GOLD;
   ctx.font = "600 24px 'Inter', system-ui, sans-serif";
-  ctx.letterSpacing = "6px";
+  setTracking(ctx, "6px");
   ctx.fillText("CERTIFICATE OF CONSISTENCY", W / 2, mark ? 316 : 254);
-  ctx.letterSpacing = "0px";
+  setTracking(ctx, "0px");
 
   // Divider
   ctx.strokeStyle = "rgba(217,180,91,0.55)";
@@ -206,9 +210,9 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
 
   ctx.fillStyle = GOLD;
   ctx.font = "700 34px 'Inter', system-ui, sans-serif";
-  ctx.letterSpacing = "4px";
+  setTracking(ctx, "4px");
   ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF WORSHIP`, W / 2, 754);
-  ctx.letterSpacing = "0px";
+  setTracking(ctx, "0px");
 
   // Citation
   const citation =
