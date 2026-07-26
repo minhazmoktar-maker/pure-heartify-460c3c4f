@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { celebrateMilestone } from "@/lib/celebrate";
 import { track } from "@/lib/analytics";
 import { haptic } from "@/lib/haptics";
+import ShareImageButton from "@/components/ShareImageButton";
+import { useMyHandle } from "@/hooks/useMyHandle";
 
 /**
  * Global listener for `heartify:streak-milestone` custom events dispatched
@@ -29,6 +31,7 @@ const COPY: Record<number, { headline: string; verse: string }> = {
 export function StreakMilestoneDialog() {
   const [milestone, setMilestone] = useState<number | null>(null);
   const [freezeGranted, setFreezeGranted] = useState(false);
+  const { handle, displayName } = useMyHandle();
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -95,7 +98,24 @@ export function StreakMilestoneDialog() {
           </p>
         )}
 
-        <div className="mt-6 flex gap-2">
+        <div className="mt-6 flex flex-col gap-2">
+          <ShareImageButton
+            label="Share certificate"
+            variant="solid"
+            className="w-full justify-center"
+            input={{
+              variant: "certificate",
+              recipient: displayName || (handle ? `@${handle}` : "A Heartify believer"),
+              days: milestone,
+              citation: copy.verse || undefined,
+            }}
+            meta={{
+              title: `${milestone}-day streak`,
+              text: `Alhamdulillah — ${milestone}-day Heartify streak.`,
+              url: `${window.location.origin}/?ref=streak-${milestone}`,
+            }}
+          />
+        <div className="flex gap-2">
           <Button onClick={share} className="flex-1 gap-2">
             <Share2 className="h-4 w-4" aria-hidden />
             Share
@@ -103,6 +123,7 @@ export function StreakMilestoneDialog() {
           <Button variant="outline" onClick={() => setMilestone(null)} className="flex-1">
             Continue
           </Button>
+        </div>
         </div>
       </DialogContent>
     </Dialog>
