@@ -15,15 +15,22 @@ export function useMyHandle() {
     queryKey: ["my-handle", user?.id ?? "anon"],
     enabled: !!user,
     staleTime: 15 * 60 * 1000,
-    queryFn: async (): Promise<string | null> => {
-      if (!user) return null;
+    queryFn: async (): Promise<{ handle: string | null; displayName: string | null }> => {
+      if (!user) return { handle: null, displayName: null };
       const { data } = await supabase
         .from("profiles")
-        .select("handle")
+        .select("handle,display_name")
         .eq("user_id", user.id)
         .maybeSingle();
-      return (data?.handle as string | null) ?? null;
+      return {
+        handle: (data?.handle as string | null) ?? null,
+        displayName: (data?.display_name as string | null) ?? null,
+      };
     },
   });
-  return { handle: q.data ?? null, loading: q.isLoading };
+  return {
+    handle: q.data?.handle ?? null,
+    displayName: q.data?.displayName ?? null,
+    loading: q.isLoading,
+  };
 }

@@ -3,10 +3,12 @@
 // graceful fallback to download. No external deps; renders synchronously on
 // an OffscreenCanvas when available, otherwise a detached DOM canvas.
 //
-// Variants: "ayah", "dhikr", "video", "dua", "quote"
+// Variants: "ayah", "dhikr", "video", "dua", "quote", "certificate"
 // Every card carries the Heartify mark so shared images become a growth loop.
 
-export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote";
+import heartifyMark from "@/assets/heartify-mark.png";
+
+export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote" | "certificate";
 
 export interface ShareImageInput {
   variant: ShareImageVariant;
@@ -14,7 +16,13 @@ export interface ShareImageInput {
   arabic?: string;         // Arabic line (drawn in Amiri if loaded)
   translation?: string;    // Latin translation / caption
   attribution?: string;    // e.g. "— Surah Al-Fatihah 1:1", "Sahih Muslim"
+  // Certificate-only fields
+  recipient?: string;      // user's name / handle
+  days?: number;           // streak days
+  citation?: string;       // small line under the seal (e.g. hadith)
+  dateLabel?: string;      // issue date, defaults to today
 }
+
 
 const W = 1080;
 const H = 1080;
@@ -59,12 +67,209 @@ function wrapText(
   return lines;
 }
 
-export async function generateShareImage(input: ShareImageInput): Promise<Blob> {
+function setTracking(ctx: CanvasRenderingContext2D, value: string) {
+  (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = value;
+}
+
+function loadImage(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG encode failed"))), "image/png", 0.95);
+  });
+}
+
+/**
+ * Certificate of consistency — an appreciation award card carrying the
+ * Heartify mark, the user's name and their streak day count.
+ */
+async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D unavailable");
+
+  const GOLD = "#d9b45b";
+  const GOLD_SOFT = "#f0dca8";
+  const INK = "#f8fafc";
+
+  // Deep emerald parchment
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, "#07160f");
+  bg.addColorStop(0.55, "#0d2b1e");
+  bg.addColorStop(1, "#071a13");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Soft centre glow
+  const glow = ctx.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.42, W * 0.65);
+  glow.addColorStop(0, "rgba(217,180,91,0.18)");
+  glow.addColorStop(1, "rgba(217,180,91,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Double gold frame
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 6;
+  ctx.strokeRect(48, 48, W - 96, H - 96);
+  ctx.strokeStyle = "rgba(217,180,91,0.45)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(70, 70, W - 140, H - 140);
+
+  // Corner flourishes
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 3;
+  const c = 46;
+  const corners: Array<[number, number, number, number]> = [
+    [70, 70, 1, 1],
+    [W - 70, 70, -1, 1],
+    [70, H - 70, 1, -1],
+    [W - 70, H - 70, -1, -1],
+  ];
+  for (const [x, y, dx, dy] of corners) {
+    ctx.beginPath();
+    ctx.moveTo(x + dx * c, y);
+    ctx.lineTo(x + dx * 14, y);
+    ctx.quadraticCurveTo(x, y, x, y + dy * 14);
+    ctx.lineTo(x, y + dy * c);
+    ctx.stroke();
+  }
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+
+  // Logo mark
+  const mark = await loadImage(heartifyMark);
+  if (mark) {
+    const size = 104;
+    ctx.save();
+    ctx.shadowColor = "rgba(217,180,91,0.35)";
+    ctx.shadowBlur = 24;
+    ctx.drawImage(mark, W / 2 - size / 2, 118, size, size);
+    ctx.restore();
+  }
+
+  ctx.fillStyle = INK;
+  ctx.font = "800 44px 'Fraunces', Georgia, serif";
+  ctx.fillText("Heartify", W / 2, mark ? 272 : 210);
+
+  ctx.fillStyle = GOLD;
+  ctx.font = "600 24px 'Inter', system-ui, sans-serif";
+  setTracking(ctx, "6px");
+  ctx.fillText("CERTIFICATE OF CONSISTENCY", W / 2, mark ? 316 : 254);
+  setTracking(ctx, "0px");
+
+  // Divider
+  ctx.strokeStyle = "rgba(217,180,91,0.55)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 170, 348);
+  ctx.lineTo(W / 2 + 170, 348);
+  ctx.stroke();
+
+  ctx.fillStyle = "#cbd5e1";
+  ctx.font = "500 26px 'Inter', system-ui, sans-serif";
+  ctx.fillText("This is proudly presented to", W / 2, 400);
+
+  // Recipient name
+  const name = (input.recipient || "A Heartify believer").trim();
+  ctx.fillStyle = INK;
+  let nameSize = 76;
+  ctx.font = `700 ${nameSize}px 'Fraunces', Georgia, serif`;
+  while (ctx.measureText(name).width > W - 220 && nameSize > 36) {
+    nameSize -= 4;
+    ctx.font = `700 ${nameSize}px 'Fraunces', Georgia, serif`;
+  }
+  ctx.fillText(name, W / 2, 480);
+
+  ctx.strokeStyle = "rgba(248,250,252,0.25)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 260, 508);
+  ctx.lineTo(W / 2 + 260, 508);
+  ctx.stroke();
+
+  ctx.fillStyle = "#cbd5e1";
+  ctx.font = "500 26px 'Inter', system-ui, sans-serif";
+  ctx.fillText("in appreciation of", W / 2, 556);
+
+  // Streak days — the hero number
+  const days = Math.max(0, Math.round(input.days ?? 0));
+  ctx.fillStyle = GOLD_SOFT;
+  ctx.font = "800 168px 'Inter', system-ui, sans-serif";
+  ctx.fillText(String(days), W / 2, 706);
+
+  ctx.fillStyle = GOLD;
+  ctx.font = "700 34px 'Inter', system-ui, sans-serif";
+  setTracking(ctx, "4px");
+  ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF WORSHIP`, W / 2, 754);
+  setTracking(ctx, "0px");
+
+  // Citation
+  const citation =
+    input.citation ??
+    "“The most beloved deeds to Allah are those done regularly.” — Bukhari";
+  ctx.fillStyle = "#a9b8ae";
+  ctx.font = "italic 23px 'Inter', system-ui, sans-serif";
+  const cLines = wrapText(ctx, citation, W - 200, 2);
+  let cy = 800;
+  for (const line of cLines) {
+    ctx.fillText(line, W / 2, cy);
+    cy += 34;
+  }
+
+  // Seal
+  const sealX = W / 2;
+  const sealY = 906;
+  ctx.beginPath();
+  ctx.arc(sealX, sealY, 52, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(217,180,91,0.14)";
+  ctx.fill();
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(sealX, sealY, 42, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(217,180,91,0.5)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = GOLD_SOFT;
+  ctx.font = "800 30px 'Fraunces', Georgia, serif";
+  ctx.fillText("✦", sealX, sealY + 12);
+
+  // Footer: date + domain
+  const date =
+    input.dateLabel ??
+    new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  ctx.fillStyle = "#8ea095";
+  ctx.font = "500 22px 'Inter', system-ui, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(date, 110, H - 108);
+  ctx.textAlign = "right";
+  ctx.fillText("pure-heartify.lovable.app", W - 110, H - 108);
+  ctx.textAlign = "center";
+
+  return await toBlob(canvas);
+}
+
+export async function generateShareImage(input: ShareImageInput): Promise<Blob> {
+  if (input.variant === "certificate") return renderCertificate(input);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D unavailable");
+
 
   const p = palette(input.variant);
 

@@ -8,10 +8,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useStreak } from "@/hooks/useStreak";
 import { useMyHandle } from "@/hooks/useMyHandle";
 import { shareContent } from "@/lib/share";
+import ShareImageButton from "@/components/ShareImageButton";
 
 export function StreakCard() {
   const s = useStreak();
-  const { handle } = useMyHandle();
+  const { handle, displayName } = useMyHandle();
   const [celebrate, setCelebrate] = useState(false);
   const MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
 
@@ -151,9 +152,26 @@ export function StreakCard() {
             <span className="tabular-nums">{s.milestones.length}</span>
           </span>
         </div>
-        <Button variant="outline" size="sm" onClick={share} className="gap-1.5">
-          <Share2 className="h-4 w-4" aria-hidden /> Share
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={share} className="gap-1.5">
+            <Share2 className="h-4 w-4" aria-hidden /> Share
+          </Button>
+          <ShareImageButton
+            label="Certificate"
+            variant="solid"
+            className="px-3 py-1.5 text-xs"
+            input={{
+              variant: "certificate",
+              recipient: displayName || (handle ? `@${handle}` : "A Heartify believer"),
+              days: s.current,
+            }}
+            meta={{
+              title: "My Heartify streak certificate",
+              text: `Alhamdulillah — ${s.current}-day Heartify streak.`,
+              url: handle ? `${window.location.origin}/s/${handle}/${s.current}` : undefined,
+            }}
+          />
+        </div>
       </div>
     </Card>
   );
