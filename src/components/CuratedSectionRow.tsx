@@ -160,6 +160,16 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
   };
 
+  // Horizontal infinite scroll — keep pulling pages as the rail is scrolled
+  // right. The cross-rail seen-set is sent as exclude_ids, so later pages
+  // can never repeat a video shown anywhere else on the page.
+  useHorizontalInfiniteScroll(
+    scrollRef,
+    () => { if (hasNextPage && !isFetchingNextPage) void fetchNextPage(); },
+    shouldLoad && !!hasNextPage && !isFetchingNextPage,
+  );
+
+
   if (!shouldLoad || (isLoading && videos.length === 0)) {
     return (
       <section
