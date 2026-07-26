@@ -3,10 +3,12 @@
 // graceful fallback to download. No external deps; renders synchronously on
 // an OffscreenCanvas when available, otherwise a detached DOM canvas.
 //
-// Variants: "ayah", "dhikr", "video", "dua", "quote"
+// Variants: "ayah", "dhikr", "video", "dua", "quote", "certificate"
 // Every card carries the Heartify mark so shared images become a growth loop.
 
-export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote";
+import heartifyMark from "@/assets/heartify-mark.png";
+
+export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote" | "certificate";
 
 export interface ShareImageInput {
   variant: ShareImageVariant;
@@ -14,7 +16,13 @@ export interface ShareImageInput {
   arabic?: string;         // Arabic line (drawn in Amiri if loaded)
   translation?: string;    // Latin translation / caption
   attribution?: string;    // e.g. "— Surah Al-Fatihah 1:1", "Sahih Muslim"
+  // Certificate-only fields
+  recipient?: string;      // user's name / handle
+  days?: number;           // streak days
+  citation?: string;       // small line under the seal (e.g. hadith)
+  dateLabel?: string;      // issue date, defaults to today
 }
+
 
 const W = 1080;
 const H = 1080;
