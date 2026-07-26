@@ -30,6 +30,40 @@ import { triggerIfDelightful } from "@/lib/inAppReview";
 import { celebrateSmall, celebrateBig, celebrateMilestone } from "@/lib/celebrate";
 import { toast } from "sonner";
 
+/**
+ * Related-rail memory for the whole tab session.
+ *
+ * Related videos are excluded server-side via `exclude_ids`, so keeping this
+ * set alive across watch-page navigations guarantees that watching video A
+ * then video B never surfaces the same suggestions twice.
+ */
+const WATCH_SEEN_KEY = "heartify.watch_related_seen";
+const WATCH_SEEN_CAP = 600;
+
+const watchSessionSeen: Set<string> = (() => {
+  try {
+    const raw = sessionStorage.getItem(WATCH_SEEN_KEY);
+    return new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set<string>();
+  }
+})();
+
+function persistWatchSessionSeen() {
+  try {
+    // Keep the tail — the most recently surfaced ids matter most.
+    if (watchSessionSeen.size > WATCH_SEEN_CAP) {
+      const trimmed = Array.from(watchSessionSeen).slice(-WATCH_SEEN_CAP);
+      watchSessionSeen.clear();
+      for (const id of trimmed) watchSessionSeen.add(id);
+    }
+    sessionStorage.setItem(WATCH_SEEN_KEY, JSON.stringify(Array.from(watchSessionSeen)));
+  } catch {
+    /* storage unavailable — in-memory set still works */
+  }
+}
+
+
 const Watch = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const navigate = useNavigate();
