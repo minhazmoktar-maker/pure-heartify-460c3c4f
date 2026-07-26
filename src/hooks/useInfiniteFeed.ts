@@ -26,6 +26,13 @@ interface UseFeedOptions {
    * excludes everything the rails and previous pages have shown.
    */
   getExcludeIds?: () => string[];
+  /**
+   * Extra cache-key discriminator. Use when the same category feed must not
+   * share a cache entry between contexts (e.g. the Related rail on Watch is
+   * keyed by the video being watched, so two different videos never render
+   * the identical related list from cache).
+   */
+  keySuffix?: string;
 }
 
 /**
@@ -99,7 +106,7 @@ export function useInfiniteFeed({
   const sessionId = getSessionId();
 
   return useInfiniteQuery<FeedPage>({
-    queryKey: ["feed", category, sectionId, search, limit, langKey, sort, sessionId],
+    queryKey: ["feed", category, sectionId, search, limit, langKey, sort, sessionId, keySuffix ?? ""],
     queryFn: ({ pageParam }) =>
       fetchFeedPage({
         category: category === "All" ? undefined : category,
