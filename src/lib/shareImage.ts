@@ -217,11 +217,11 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   // Citation
   const citation =
     input.citation ??
-    "“The most beloved deeds to Allah are those done regularly, even if small.” — Bukhari";
+    "“The most beloved deeds to Allah are those done regularly.” — Bukhari";
   ctx.fillStyle = "#a9b8ae";
-  ctx.font = "italic 24px 'Inter', system-ui, sans-serif";
-  const cLines = wrapText(ctx, citation, W - 260, 2);
-  let cy = 806;
+  ctx.font = "italic 23px 'Inter', system-ui, sans-serif";
+  const cLines = wrapText(ctx, citation, W - 200, 2);
+  let cy = 800;
   for (const line of cLines) {
     ctx.fillText(line, W / 2, cy);
     cy += 34;
