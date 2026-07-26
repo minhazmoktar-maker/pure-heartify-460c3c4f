@@ -245,6 +245,11 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
             )}
           </div>
         ))}
+        {isFetchingNextPage && (
+          <div className="flex w-[80px] shrink-0 items-center justify-center text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        )}
       </div>
     </section>
   );
