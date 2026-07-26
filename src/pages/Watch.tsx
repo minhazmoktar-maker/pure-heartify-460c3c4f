@@ -52,11 +52,17 @@ const Watch = () => {
 
   const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
   const currentCategory = (currentVideo as any)?.category;
-  const seenRelatedIdsRef = useRef<Set<string>>(new Set());
+  // Session-wide set of related ids already surfaced on ANY watch page this
+  // session. Kept outside the videoId effect so navigating from one video to
+  // the next never re-shows the same related videos.
+  const seenRelatedIdsRef = useRef<Set<string>>(watchSessionSeen);
   const relatedQuery = useInfiniteFeed({
     category: currentCategory && currentCategory !== "All" ? currentCategory : undefined,
     limit: 12,
     sort: "fresh",
+    // Distinct cache entry per watched video so two videos in the same
+    // category can't render an identical related rail from cache.
+    keySuffix: videoId ?? "",
     getExcludeIds: () => {
       const ids = Array.from(seenRelatedIdsRef.current);
       if (videoId) ids.push(videoId);
@@ -76,10 +82,9 @@ const Watch = () => {
   })();
   useEffect(() => {
     for (const v of relatedVideos) seenRelatedIdsRef.current.add(v.id);
+    persistWatchSessionSeen();
   }, [relatedVideos.length]);
-  useEffect(() => {
-    seenRelatedIdsRef.current = new Set();
-  }, [videoId, currentCategory]);
+
   const relatedSentinelRef = useInfiniteScroll(
     () => {
       if (relatedQuery.hasNextPage && !relatedQuery.isFetchingNextPage) {
