@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
+import { diag, localDateISO } from "@/lib/diagnostics";
 
 export interface StreakState {
   current: number;
@@ -53,6 +54,14 @@ export function useStreak() {
         supabase.from("streak_milestones").select("milestone").eq("user_id", user.id),
       ]);
       const current = streak?.current_streak ?? 0;
+      diag("streak", "state_read", {
+        current,
+        longest: streak?.longest_streak ?? 0,
+        lastCompletedDate: streak?.last_completed_date ?? null,
+        total: streak?.total_doses_completed ?? 0,
+        freezes: freezes?.length ?? 0,
+        clientDate: localDateISO(),
+      });
       return {
         current,
         longest: streak?.longest_streak ?? 0,
@@ -77,11 +86,14 @@ export function useStreak() {
     try {
       // Use the user's LOCAL date so timezones offset from UTC don't skip a
       // calendar day and reset the streak. RPC clamps to ±1 UTC day.
-      const localDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 10);
+      const localDate = localDateISO();
+      diag("streak", "rpc_attempt", { source: "manual", clientDate: localDate });
       const { data, error } = await supabase.rpc("record_streak_activity", { _client_date: localDate });
-      if (error) throw error;
+      if (error) {
+        diag("streak", "rpc_error", { source: "manual", clientDate: localDate, code: error.code, message: error.message });
+        throw error;
+      }
+      diag("streak", "rpc_ok", { source: "manual", clientDate: localDate, result: data });
       const payload = (data ?? {}) as {
         milestone_hit?: number | null;
         freeze_granted?: boolean;

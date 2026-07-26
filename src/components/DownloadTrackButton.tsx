@@ -10,6 +10,7 @@ import {
 import { useEntitlement } from "@/hooks/useEntitlement";
 import UpgradeSheet from "@/components/premium/UpgradeSheet";
 import { cn } from "@/lib/utils";
+import { diag } from "@/lib/diagnostics";
 
 type Props = { track: Track & { isPremium?: boolean }; className?: string };
 
@@ -32,6 +33,7 @@ export default function DownloadTrackButton({ track, className }: Props) {
     if (status === "downloading") return;
     if (status === "saved") {
       await removeOfflineTrack(track.id);
+      diag("download", "removed", { trackId: track.id });
       setStatus("idle");
       toast.success("Removed from downloads");
       return;
@@ -40,15 +42,23 @@ export default function DownloadTrackButton({ track, className }: Props) {
       toast.error("This track isn't available yet");
       return;
     }
+    const startedAt = Date.now();
     try {
       setStatus("downloading");
       setPct(0);
+      diag("download", "start", {
+        trackId: track.id,
+        host: (() => { try { return new URL(track.url!).host; } catch { return "invalid-url"; } })(),
+        isPremium,
+        trackIsPremium: !!track.isPremium,
+      });
       await saveOfflineTrackGated(track.id, track.url, {
         isPremium,
         trackIsPremium: track.isPremium,
         onProgress: setPct,
       });
       setStatus("saved");
+      diag("download", "cached_ok", { trackId: track.id, ms: Date.now() - startedAt });
       toast.success(
         isPremium
           ? "Saved for offline listening"
@@ -57,6 +67,12 @@ export default function DownloadTrackButton({ track, className }: Props) {
     } catch (e: unknown) {
       setStatus("idle");
       const code = (e as { code?: string })?.code;
+      diag("download", "cache_failed", {
+        trackId: track.id,
+        ms: Date.now() - startedAt,
+        code: code ?? null,
+        message: e instanceof Error ? e.message : String(e),
+      });
       if (code === "OFFLINE_TRACK_PREMIUM") {
         setUpgradeFeature("Downloading premium reciters");
         setUpgradeOpen(true);
@@ -76,8 +92,13 @@ export default function DownloadTrackButton({ track, className }: Props) {
           document.body.appendChild(a);
           a.click();
           a.remove();
+          diag("download", "native_fallback_ok", { trackId: track.id });
           toast.success("Downloading via your browser");
-        } catch {
+        } catch (fallbackErr) {
+          diag("download", "native_fallback_failed", {
+            trackId: track.id,
+            message: fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr),
+          });
           toast.error(e instanceof Error ? e.message : "Download failed");
         }
       }
