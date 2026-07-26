@@ -225,6 +225,7 @@ const PlaylistDetail = lazy(() => import("./pages/PlaylistDetail.tsx"));
 const Explore = lazy(() => import("./pages/Explore.tsx"));
 const MyLibrary = lazy(() => import("./pages/MyLibrary.tsx"));
 const Appeals = lazy(() => import("./pages/Appeals.tsx"));
+const Diagnostics = lazy(() => import("./pages/Diagnostics.tsx"));
 const Transparency = lazy(() => import("./pages/Transparency.tsx"));
 const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
 const AdminAppeals = lazy(() => import("./pages/AdminAppeals.tsx"));
@@ -325,6 +326,7 @@ const App = () => (
                 <Route path="/settings/notifications" element={<NotificationSettings />} />
                 <Route path="/playlists" element={<Playlists />} />
                 <Route path="/p/:id" element={<PlaylistDetail />} />
+                <Route path="/diagnostics" element={<Diagnostics />} />
                 <Route path="/appeals" element={<Appeals />} />
                 <Route path="/appeals/:decisionId" element={<Appeals />} />
                 <Route path="/transparency" element={<Transparency />} />

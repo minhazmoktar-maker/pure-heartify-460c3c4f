@@ -6,6 +6,7 @@ import type { Track } from "@/data/audio";
 import { trackById } from "@/data/audio";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { diag } from "@/lib/diagnostics";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import {
   detectPlatform, isIOS, isAndroid,
@@ -209,8 +210,19 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       const mark = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
       mark[user.id] = today;
       writeJson(STREAK_MARK_KEY, mark);
-      supabase.rpc("record_streak_activity", { _client_date: today }).then(({ error }) => {
+      diag("streak", "rpc_attempt", {
+        source: "listen",
+        clientDate: today,
+        listenSeconds: Math.round(listenSecondsRef.current),
+      });
+      supabase.rpc("record_streak_activity", { _client_date: today }).then(({ data, error }) => {
         if (error) {
+          diag("streak", "rpc_error", {
+            source: "listen",
+            clientDate: today,
+            code: error.code,
+            message: error.message,
+          });
           if (import.meta.env.DEV) console.warn("[streak] listen record failed", error);
           streakRecordedTodayRef.current = false;
           const m = readJson<Record<string, string>>(STREAK_MARK_KEY, {});
@@ -218,6 +230,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
           writeJson(STREAK_MARK_KEY, m);
           return;
         }
+        diag("streak", "rpc_ok", { source: "listen", clientDate: today, result: data });
         qc.invalidateQueries({ queryKey: ["streak", user.id] });
         qc.invalidateQueries({ queryKey: ["dailyDose"] });
       });
