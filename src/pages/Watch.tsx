@@ -22,6 +22,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { YouTubeVideo } from "@/services/youtube";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { diag, localDateISO } from "@/lib/diagnostics";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useCompleteDoseVideo } from "@/hooks/useDailyDose";
 import { growth } from "@/lib/growthEvents";
@@ -126,11 +127,17 @@ const Watch = () => {
   useEffect(() => {
     if (!user || !videoId || !playerActivated) return;
     const t = setTimeout(() => {
-      void supabase.rpc("record_streak_activity", {
-        _client_date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-          .toISOString()
-          .slice(0, 10),
-      });
+      const clientDate = localDateISO();
+      diag("streak", "rpc_attempt", { source: "watch_30s", videoId, clientDate });
+      void supabase
+        .rpc("record_streak_activity", { _client_date: clientDate })
+        .then(({ data, error }) => {
+          diag("streak", error ? "rpc_error" : "rpc_ok", {
+            source: "watch_30s",
+            clientDate,
+            ...(error ? { code: error.code, message: error.message } : { result: data }),
+          });
+        });
     }, 30_000);
     return () => clearTimeout(t);
   }, [user, videoId, playerActivated]);
@@ -166,11 +173,19 @@ const Watch = () => {
                 onSuccess: (res) => {
                   // Fire the RPC that also handles freezes, milestones, badges, and
                   // in-app notifications. Idempotent per user/day.
-                  void supabase.rpc("record_streak_activity", {
-                    _client_date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-                      .toISOString()
-                      .slice(0, 10),
-                  });
+                  {
+                    const clientDate = localDateISO();
+                    diag("streak", "rpc_attempt", { source: "dose_complete", videoId, clientDate });
+                    void supabase
+                      .rpc("record_streak_activity", { _client_date: clientDate })
+                      .then(({ data, error }) => {
+                        diag("streak", error ? "rpc_error" : "rpc_ok", {
+                          source: "dose_complete",
+                          clientDate,
+                          ...(error ? { code: error.code, message: error.message } : { result: data }),
+                        });
+                      });
+                  }
                   // Small confetti + haptic on every dose video completion
                   celebrateSmall();
                   if (res?.justCompleted) {

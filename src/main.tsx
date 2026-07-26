@@ -6,9 +6,13 @@ import { initSentry } from "./lib/sentry";
 import { captureAttributionOnce } from "./lib/attribution";
 import { growth } from "./lib/growthEvents";
 import { applyIconToDocument, getSelectedIconId } from "./lib/appIcon";
+import { installDiagConsole } from "./lib/diagnostics";
 
 // Bootstrap error reporting FIRST so early crashes are captured.
 initSentry();
+
+// Streak/download diagnostics: window.heartifyDiag() / heartifyDiagCopy()
+installDiagConsole();
 
 // Phase 10 — apply the user's saved app-icon variant on every boot so the
 // browser tab / installed PWA reflects their choice without a picker mount.
