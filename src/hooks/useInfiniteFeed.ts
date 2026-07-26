@@ -99,6 +99,7 @@ export function useInfiniteFeed({
   enabled = true,
   sort = "fresh",
   getExcludeIds,
+  keySuffix,
 }: UseFeedOptions = {}) {
   const { preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
