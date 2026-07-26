@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useRef } from "react";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
 import type { YouTubeVideo, HalalCategory } from "@/services/youtube";
@@ -136,5 +137,100 @@ export function useSurface(
     meta: q.data?.meta ?? null,
     refetch: q.refetch,
     error: q.error,
+  };
+}
+
+export interface UseSurfaceInfiniteResult extends UseSurfaceResult {
+  fetchNextPage: () => void;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+}
+
+/** Hard stop so a rail can never loop forever against a small pool. */
+const MAX_SURFACE_PAGES = 8;
+
+/**
+ * useSurfaceInfinite — same contract as `useSurface`, but paginated for
+ * horizontally infinite rails.
+ *
+ * The surfaces function has no offset param (each retriever returns a fresh
+ * ranked pool), so pagination works by *exclusion*: every subsequent request
+ * sends the ids this rail already rendered — plus the cross-rail seen-set —
+ * as `exclude_ids`, so the server can only answer with videos the user has
+ * not seen anywhere in the session. That gives infinite scroll and dedup
+ * with a single mechanism.
+ */
+export function useSurfaceInfinite(
+  surface: SurfaceName,
+  opts: {
+    enabled?: boolean;
+    kidsMode?: boolean;
+    getExcludeIds?: () => string[];
+  } = {},
+): UseSurfaceInfiniteResult {
+  const { preferences } = useLocale();
+  const contentLanguages = preferences.content_languages ?? [];
+  const sessionId = getSessionId();
+  const enabled = opts.enabled !== false;
+  // Ids this rail itself has already rendered. Not part of the query key —
+  // read at request time only.
+  const railSeen = useRef<Set<string>>(new Set());
+
+  const q = useInfiniteQuery<SurfaceResponse>({
+    queryKey: ["surface-infinite", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false],
+    enabled,
+    staleTime: 3 * 60_000,
+    gcTime: 15 * 60_000,
+    retry: 1,
+    initialPageParam: 0,
+    getNextPageParam: (last, all) => {
+      if (all.length >= MAX_SURFACE_PAGES) return undefined;
+      if (!last?.items?.length) return undefined;
+      return all.length;
+    },
+    queryFn: async ({ pageParam }) => {
+      const globalExclude = opts.getExcludeIds?.() ?? [];
+      const merged = new Set<string>([...globalExclude, ...railSeen.current]);
+      const excludeIds = Array.from(merged).slice(-1500);
+      const { data, error } = await supabase.functions.invoke("surfaces", {
+        body: {
+          surface,
+          session_id: sessionId,
+          content_languages: contentLanguages,
+          kids_mode: opts.kidsMode ?? false,
+          exclude_ids: excludeIds,
+          page: pageParam,
+        },
+      });
+      if (error) throw new Error(error.message || `surface:${surface} failed`);
+      const resp = data as SurfaceResponse;
+      for (const it of resp?.items ?? []) railSeen.current.add(it.video_id);
+      return resp;
+    },
+  });
+
+  const items = useMemo(() => {
+    const seen = new Set<string>();
+    const out: YouTubeVideo[] = [];
+    for (const page of q.data?.pages ?? []) {
+      for (const r of page?.items ?? []) {
+        if (seen.has(r.video_id)) continue;
+        seen.add(r.video_id);
+        out.push(toVideo(r));
+      }
+    }
+    return out;
+  }, [q.data]);
+
+  return {
+    items,
+    isLoading: q.isLoading,
+    isFetching: q.isFetching,
+    meta: q.data?.pages?.[0]?.meta ?? null,
+    refetch: q.refetch,
+    error: q.error,
+    fetchNextPage: () => { void q.fetchNextPage(); },
+    hasNextPage: !!q.hasNextPage,
+    isFetchingNextPage: q.isFetchingNextPage,
   };
 }

@@ -9,6 +9,7 @@ import { isTrustedChannel } from "@/data/trustedChannels";
 import { Badge } from "@/components/ui/badge";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
+import { useHorizontalInfiniteScroll } from "@/hooks/useHorizontalInfiniteScroll";
 
 interface Props {
   section: CuratedSection;
@@ -94,7 +95,6 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
       seenLocal.add(v.id);
       perChannel.set(key, count + 1);
       out.push(v);
-      if (out.length >= TARGET) break;
     }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -159,6 +159,16 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
   };
+
+  // Horizontal infinite scroll — keep pulling pages as the rail is scrolled
+  // right. The cross-rail seen-set is sent as exclude_ids, so later pages
+  // can never repeat a video shown anywhere else on the page.
+  useHorizontalInfiniteScroll(
+    scrollRef,
+    () => { if (hasNextPage && !isFetchingNextPage) void fetchNextPage(); },
+    shouldLoad && !!hasNextPage && !isFetchingNextPage,
+  );
+
 
   if (!shouldLoad || (isLoading && videos.length === 0)) {
     return (
@@ -235,6 +245,11 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
             )}
           </div>
         ))}
+        {isFetchingNextPage && (
+          <div className="flex w-[80px] shrink-0 items-center justify-center text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        )}
       </div>
     </section>
   );

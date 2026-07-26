@@ -3,7 +3,8 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import VideoCardSkeleton from "@/components/VideoCardSkeleton";
-import { useSurface, type SurfaceName } from "@/hooks/useSurface";
+import { useSurfaceInfinite, type SurfaceName } from "@/hooks/useSurface";
+import { useHorizontalInfiniteScroll } from "@/hooks/useHorizontalInfiniteScroll";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import { isClickbaitTitle } from "@/lib/clickbait";
@@ -47,7 +48,10 @@ const SurfaceRail = ({
   const shouldLoad = usePriorityGate(sectionRef, priority);
 
   const { claim, getSeenSnapshot, resetKey } = useFeedDiversity();
-  const { items: rawItems, isLoading, meta } = useSurface(surface, {
+  const {
+    items: rawItems, isLoading, meta,
+    fetchNextPage, hasNextPage, isFetchingNextPage,
+  } = useSurfaceInfinite(surface, {
     enabled: shouldLoad,
     // Server-side dedup: exclude ids already claimed by earlier rails so
     // the response can't contain them in the first place. Client-side
@@ -55,6 +59,15 @@ const SurfaceRail = ({
     getExcludeIds: getSeenSnapshot,
   });
   const { track } = useImpressionTracker(true);
+
+  // Horizontal infinite scroll — pull the next page as the user nears the
+  // right edge of the rail.
+  useHorizontalInfiniteScroll(
+    scrollRef,
+    () => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); },
+    shouldLoad && hasNextPage && !isFetchingNextPage,
+  );
+
 
   const items = useMemo(() => {
     const out: typeof rawItems = [];
@@ -167,11 +180,12 @@ const SurfaceRail = ({
                 <YouTubeVideoCard video={v} index={i} />
               </div>
             ))}
-        {isLoading && (
-          <div className="flex items-center px-4 text-muted-foreground">
+        {(isLoading || isFetchingNextPage) && (
+          <div className="flex w-[80px] shrink-0 items-center justify-center text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
           </div>
         )}
+
       </div>
       {/* Rec-health telemetry is admin-only and lives at /admin/rec-health.
           Never rendered on user-facing surfaces — no engineering artifacts, ever. */}
