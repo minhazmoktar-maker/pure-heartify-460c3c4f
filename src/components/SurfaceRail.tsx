@@ -48,7 +48,10 @@ const SurfaceRail = ({
   const shouldLoad = usePriorityGate(sectionRef, priority);
 
   const { claim, getSeenSnapshot, resetKey } = useFeedDiversity();
-  const { items: rawItems, isLoading, meta } = useSurface(surface, {
+  const {
+    items: rawItems, isLoading, meta,
+    fetchNextPage, hasNextPage, isFetchingNextPage,
+  } = useSurfaceInfinite(surface, {
     enabled: shouldLoad,
     // Server-side dedup: exclude ids already claimed by earlier rails so
     // the response can't contain them in the first place. Client-side
@@ -56,6 +59,15 @@ const SurfaceRail = ({
     getExcludeIds: getSeenSnapshot,
   });
   const { track } = useImpressionTracker(true);
+
+  // Horizontal infinite scroll — pull the next page as the user nears the
+  // right edge of the rail.
+  useHorizontalInfiniteScroll(
+    scrollRef,
+    () => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); },
+    shouldLoad && hasNextPage && !isFetchingNextPage,
+  );
+
 
   const items = useMemo(() => {
     const out: typeof rawItems = [];
