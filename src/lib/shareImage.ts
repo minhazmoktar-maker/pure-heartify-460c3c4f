@@ -186,16 +186,19 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.font = "500 30px 'Inter', system-ui, sans-serif";
   ctx.fillText("is awarded to", CW / 2, 578);
 
-  // --- Recipient ---
-  const name = (input.recipient || "A Heartify believer").trim().toUpperCase();
+  // --- Recipient (plain sans, title case — matches reference style) ---
+  const raw = (input.recipient || "A Heartify believer").trim();
+  const name = raw.replace(/\s+/g, " ");
   ctx.fillStyle = INK;
-  let nameSize = 104;
-  ctx.font = `700 ${nameSize}px 'Fraunces', Georgia, serif`;
-  while (ctx.measureText(name).width > CW - 620 && nameSize > 44) {
+  let nameSize = 96;
+  const nameFont = (s: number) => `400 ${s}px 'Inter', system-ui, -apple-system, sans-serif`;
+  ctx.font = nameFont(nameSize);
+  while (ctx.measureText(name).width > CW - 620 && nameSize > 40) {
     nameSize -= 4;
-    ctx.font = `700 ${nameSize}px 'Fraunces', Georgia, serif`;
+    ctx.font = nameFont(nameSize);
   }
   ctx.fillText(name, CW / 2, 700);
+
 
   ctx.strokeStyle = "rgba(26,26,26,0.18)";
   ctx.lineWidth = 1.5;
