@@ -98,22 +98,19 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D unavailable");
 
-  const GOLD = "#d9b45b";
-  const GOLD_SOFT = "#f0dca8";
-  const INK = "#f8fafc";
+  const GOLD = "#c9a23e";
+  const GOLD_SOFT = "#e3c876";
+  const INK = "#1a1a1a";
+  const MUTED = "#5c5c5c";
 
-  // Deep emerald parchment
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, "#07160f");
-  bg.addColorStop(0.55, "#0d2b1e");
-  bg.addColorStop(1, "#071a13");
-  ctx.fillStyle = bg;
+  // White parchment background
+  ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, W, H);
 
-  // Soft centre glow
+  // Subtle gold vignette
   const glow = ctx.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.42, W * 0.65);
-  glow.addColorStop(0, "rgba(217,180,91,0.18)");
-  glow.addColorStop(1, "rgba(217,180,91,0)");
+  glow.addColorStop(0, "rgba(201,162,62,0.08)");
+  glow.addColorStop(1, "rgba(201,162,62,0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
 
@@ -121,7 +118,7 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 6;
   ctx.strokeRect(48, 48, W - 96, H - 96);
-  ctx.strokeStyle = "rgba(217,180,91,0.45)";
+  ctx.strokeStyle = "rgba(201,162,62,0.35)";
   ctx.lineWidth = 2;
   ctx.strokeRect(70, 70, W - 140, H - 140);
 
@@ -152,7 +149,7 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   if (mark) {
     const size = 104;
     ctx.save();
-    ctx.shadowColor = "rgba(217,180,91,0.35)";
+    ctx.shadowColor = "rgba(201,162,62,0.25)";
     ctx.shadowBlur = 24;
     ctx.drawImage(mark, W / 2 - size / 2, 118, size, size);
     ctx.restore();
@@ -169,14 +166,14 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   setTracking(ctx, "0px");
 
   // Divider
-  ctx.strokeStyle = "rgba(217,180,91,0.55)";
+  ctx.strokeStyle = "rgba(201,162,62,0.55)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(W / 2 - 170, 348);
   ctx.lineTo(W / 2 + 170, 348);
   ctx.stroke();
 
-  ctx.fillStyle = "#cbd5e1";
+  ctx.fillStyle = MUTED;
   ctx.font = "500 26px 'Inter', system-ui, sans-serif";
   ctx.fillText("This is proudly presented to", W / 2, 400);
 
@@ -191,14 +188,14 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   }
   ctx.fillText(name, W / 2, 480);
 
-  ctx.strokeStyle = "rgba(248,250,252,0.25)";
+  ctx.strokeStyle = "rgba(26,26,26,0.18)";
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(W / 2 - 260, 508);
   ctx.lineTo(W / 2 + 260, 508);
   ctx.stroke();
 
-  ctx.fillStyle = "#cbd5e1";
+  ctx.fillStyle = MUTED;
   ctx.font = "500 26px 'Inter', system-ui, sans-serif";
   ctx.fillText("in appreciation of", W / 2, 556);
 
@@ -211,14 +208,14 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.fillStyle = GOLD;
   ctx.font = "700 34px 'Inter', system-ui, sans-serif";
   setTracking(ctx, "4px");
-  ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF WORSHIP`, W / 2, 754);
+  ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF BENEFICIAL HABITS`, W / 2, 754);
   setTracking(ctx, "0px");
 
   // Citation
   const citation =
     input.citation ??
     "“The most beloved deeds to Allah are those done regularly.” — Bukhari";
-  ctx.fillStyle = "#a9b8ae";
+  ctx.fillStyle = "#6b7280";
   ctx.font = "italic 23px 'Inter', system-ui, sans-serif";
   const cLines = wrapText(ctx, citation, W - 200, 2);
   let cy = 800;
@@ -232,17 +229,17 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   const sealY = 906;
   ctx.beginPath();
   ctx.arc(sealX, sealY, 52, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(217,180,91,0.14)";
+  ctx.fillStyle = "rgba(201,162,62,0.12)";
   ctx.fill();
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.beginPath();
   ctx.arc(sealX, sealY, 42, 0, Math.PI * 2);
-  ctx.strokeStyle = "rgba(217,180,91,0.5)";
+  ctx.strokeStyle = "rgba(201,162,62,0.45)";
   ctx.lineWidth = 1.5;
   ctx.stroke();
-  ctx.fillStyle = GOLD_SOFT;
+  ctx.fillStyle = GOLD;
   ctx.font = "800 30px 'Fraunces', Georgia, serif";
   ctx.fillText("✦", sealX, sealY + 12);
 
@@ -250,7 +247,7 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   const date =
     input.dateLabel ??
     new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
-  ctx.fillStyle = "#8ea095";
+  ctx.fillStyle = "#9ca3af";
   ctx.font = "500 22px 'Inter', system-ui, sans-serif";
   ctx.textAlign = "left";
   ctx.fillText(date, 110, H - 108);
