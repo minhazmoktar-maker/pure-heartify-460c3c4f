@@ -7,6 +7,7 @@ import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import { runDedupedRefresh } from "@/lib/refreshMetrics";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
+import { useHorizontalInfiniteScroll } from "@/hooks/useHorizontalInfiniteScroll";
 
 /**
  * Recently Added — newest videos approved into Heartify (moderation-passed).
@@ -45,6 +46,9 @@ const RecentlyAddedRow = () => {
     isLoading,
     isFetching,
     refetch,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   } = useInfiniteFeed({
     sort: "recent",
     limit: RECENT_LIMIT,
@@ -109,6 +113,13 @@ const RecentlyAddedRow = () => {
   const scroll = (dir: "left" | "right") => {
     scrollRef.current?.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" });
   };
+
+  // Horizontal infinite scroll — load the next page as the rail nears its end.
+  useHorizontalInfiniteScroll(
+    scrollRef,
+    () => { if (hasNextPage && !isFetchingNextPage) void fetchNextPage(); },
+    shouldLoad && !!hasNextPage && !isFetchingNextPage,
+  );
 
   if (!shouldLoad || (isLoading && videos.length === 0)) {
     return (
@@ -230,6 +241,11 @@ const RecentlyAddedRow = () => {
             <YouTubeVideoCard video={video} index={i} />
           </div>
         ))}
+        {isFetchingNextPage && (
+          <div className="flex w-[80px] shrink-0 items-center justify-center text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        )}
       </div>
     </section>
   );

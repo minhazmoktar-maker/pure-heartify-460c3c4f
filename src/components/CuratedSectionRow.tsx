@@ -9,6 +9,7 @@ import { isTrustedChannel } from "@/data/trustedChannels";
 import { Badge } from "@/components/ui/badge";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
+import { useHorizontalInfiniteScroll } from "@/hooks/useHorizontalInfiniteScroll";
 
 interface Props {
   section: CuratedSection;
@@ -94,7 +95,6 @@ const CuratedSectionRow = ({ section, priority = false }: Props) => {
       seenLocal.add(v.id);
       perChannel.set(key, count + 1);
       out.push(v);
-      if (out.length >= TARGET) break;
     }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
