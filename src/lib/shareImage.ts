@@ -169,10 +169,10 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.font = "500 20px 'Inter', system-ui, sans-serif";
   ctx.fillText("pure-heartify.lovable.app", CW - ix - 60, headY + 76);
 
-  // --- Title block ---
+  // --- Title block (light sans, like the reference) ---
   ctx.textAlign = "center";
   ctx.fillStyle = INK;
-  ctx.font = "700 88px 'Fraunces', Georgia, serif";
+  ctx.font = "400 84px 'Inter', system-ui, -apple-system, sans-serif";
   ctx.fillText("Certificate of Recognition", CW / 2, 470);
 
   ctx.strokeStyle = "rgba(201,162,62,0.55)";
@@ -183,8 +183,9 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.stroke();
 
   ctx.fillStyle = MUTED;
-  ctx.font = "500 30px 'Inter', system-ui, sans-serif";
+  ctx.font = "400 30px 'Inter', system-ui, sans-serif";
   ctx.fillText("is awarded to", CW / 2, 578);
+
 
   // --- Recipient (plain sans, title case — matches reference style) ---
   const raw = (input.recipient || "A Heartify believer").trim();
