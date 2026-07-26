@@ -92,9 +92,12 @@ function toBlob(canvas: HTMLCanvasElement): Promise<Blob> {
  * Heartify mark, the user's name and their streak day count.
  */
 async function renderCertificate(input: ShareImageInput): Promise<Blob> {
+  // A4 landscape — 297 × 210 mm (1.414:1) at ~200 dpi
+  const CW = 2339;
+  const CH = 1654;
   const canvas = document.createElement("canvas");
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = CW;
+  canvas.height = CH;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D unavailable");
 
@@ -103,160 +106,205 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   const INK = "#1a1a1a";
   const MUTED = "#5c5c5c";
 
-  // White parchment background
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, CW, CH);
 
-  // Subtle gold vignette
-  const glow = ctx.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.42, W * 0.65);
+  const glow = ctx.createRadialGradient(CW / 2, CH * 0.45, 60, CW / 2, CH * 0.45, CW * 0.6);
   glow.addColorStop(0, "rgba(201,162,62,0.08)");
   glow.addColorStop(1, "rgba(201,162,62,0)");
   ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, CW, CH);
 
   // Double gold frame
+  const M = 70;
   ctx.strokeStyle = GOLD;
-  ctx.lineWidth = 6;
-  ctx.strokeRect(48, 48, W - 96, H - 96);
+  ctx.lineWidth = 7;
+  ctx.strokeRect(M, M, CW - M * 2, CH - M * 2);
   ctx.strokeStyle = "rgba(201,162,62,0.35)";
   ctx.lineWidth = 2;
-  ctx.strokeRect(70, 70, W - 140, H - 140);
+  ctx.strokeRect(M + 24, M + 24, CW - (M + 24) * 2, CH - (M + 24) * 2);
 
-  // Corner flourishes
+  // Corner flourishes on the inner frame
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 3;
-  const c = 46;
+  const c = 60;
+  const ix = M + 24;
+  const iy = M + 24;
   const corners: Array<[number, number, number, number]> = [
-    [70, 70, 1, 1],
-    [W - 70, 70, -1, 1],
-    [70, H - 70, 1, -1],
-    [W - 70, H - 70, -1, -1],
+    [ix, iy, 1, 1],
+    [CW - ix, iy, -1, 1],
+    [ix, CH - iy, 1, -1],
+    [CW - ix, CH - iy, -1, -1],
   ];
   for (const [x, y, dx, dy] of corners) {
     ctx.beginPath();
     ctx.moveTo(x + dx * c, y);
-    ctx.lineTo(x + dx * 14, y);
-    ctx.quadraticCurveTo(x, y, x, y + dy * 14);
+    ctx.lineTo(x + dx * 18, y);
+    ctx.quadraticCurveTo(x, y, x, y + dy * 18);
     ctx.lineTo(x, y + dy * c);
     ctx.stroke();
   }
 
-  ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
 
-  // Logo mark
+  // --- Header row: mark left, wordmark right ---
   const mark = await loadImage(heartifyMark);
+  const headY = 170;
   if (mark) {
-    const size = 104;
-    ctx.save();
-    ctx.shadowColor = "rgba(201,162,62,0.25)";
-    ctx.shadowBlur = 24;
-    ctx.drawImage(mark, W / 2 - size / 2, 118, size, size);
-    ctx.restore();
+    const size = 96;
+    ctx.drawImage(mark, ix + 60, headY, size, size);
   }
-
+  ctx.textAlign = "left";
   ctx.fillStyle = INK;
-  ctx.font = "800 44px 'Fraunces', Georgia, serif";
-  ctx.fillText("Heartify", W / 2, mark ? 272 : 210);
+  ctx.font = "800 40px 'Fraunces', Georgia, serif";
+  ctx.fillText("Heartify", ix + 60 + (mark ? 120 : 0), headY + 62);
 
+  ctx.textAlign = "right";
   ctx.fillStyle = GOLD;
-  ctx.font = "600 24px 'Inter', system-ui, sans-serif";
-  setTracking(ctx, "6px");
-  ctx.fillText("CERTIFICATE OF CONSISTENCY", W / 2, mark ? 316 : 254);
+  ctx.font = "600 22px 'Inter', system-ui, sans-serif";
+  setTracking(ctx, "5px");
+  ctx.fillText("HALAL-FIRST LEARNING", CW - ix - 60, headY + 40);
   setTracking(ctx, "0px");
+  ctx.fillStyle = MUTED;
+  ctx.font = "500 20px 'Inter', system-ui, sans-serif";
+  ctx.fillText("pure-heartify.lovable.app", CW - ix - 60, headY + 76);
 
-  // Divider
+  // --- Title block ---
+  ctx.textAlign = "center";
+  ctx.fillStyle = INK;
+  ctx.font = "700 88px 'Fraunces', Georgia, serif";
+  ctx.fillText("Certificate of Recognition", CW / 2, 470);
+
   ctx.strokeStyle = "rgba(201,162,62,0.55)";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(W / 2 - 170, 348);
-  ctx.lineTo(W / 2 + 170, 348);
+  ctx.moveTo(CW / 2 - 220, 512);
+  ctx.lineTo(CW / 2 + 220, 512);
   ctx.stroke();
 
   ctx.fillStyle = MUTED;
-  ctx.font = "500 26px 'Inter', system-ui, sans-serif";
-  ctx.fillText("This is proudly presented to", W / 2, 400);
+  ctx.font = "500 30px 'Inter', system-ui, sans-serif";
+  ctx.fillText("is awarded to", CW / 2, 578);
 
-  // Recipient name
-  const name = (input.recipient || "A Heartify believer").trim();
+  // --- Recipient ---
+  const name = (input.recipient || "A Heartify believer").trim().toUpperCase();
   ctx.fillStyle = INK;
-  let nameSize = 76;
+  let nameSize = 104;
   ctx.font = `700 ${nameSize}px 'Fraunces', Georgia, serif`;
-  while (ctx.measureText(name).width > W - 220 && nameSize > 36) {
+  while (ctx.measureText(name).width > CW - 620 && nameSize > 44) {
     nameSize -= 4;
     ctx.font = `700 ${nameSize}px 'Fraunces', Georgia, serif`;
   }
-  ctx.fillText(name, W / 2, 480);
+  ctx.fillText(name, CW / 2, 700);
 
   ctx.strokeStyle = "rgba(26,26,26,0.18)";
   ctx.lineWidth = 1.5;
   ctx.beginPath();
-  ctx.moveTo(W / 2 - 260, 508);
-  ctx.lineTo(W / 2 + 260, 508);
+  ctx.moveTo(CW / 2 - 700, 748);
+  ctx.lineTo(CW / 2 + 700, 748);
   ctx.stroke();
 
-  ctx.fillStyle = MUTED;
-  ctx.font = "500 26px 'Inter', system-ui, sans-serif";
-  ctx.fillText("in appreciation of", W / 2, 556);
-
-  // Streak days — the hero number
+  // --- Achievement description ---
   const days = Math.max(0, Math.round(input.days ?? 0));
+  ctx.fillStyle = MUTED;
+  ctx.font = "500 30px 'Inter', system-ui, sans-serif";
+  ctx.fillText("in appreciation of", CW / 2, 826);
+
   ctx.fillStyle = GOLD_SOFT;
-  ctx.font = "800 168px 'Inter', system-ui, sans-serif";
-  ctx.fillText(String(days), W / 2, 706);
+  ctx.font = "800 150px 'Inter', system-ui, sans-serif";
+  ctx.fillText(String(days), CW / 2, 970);
 
   ctx.fillStyle = GOLD;
   ctx.font = "700 34px 'Inter', system-ui, sans-serif";
-  setTracking(ctx, "4px");
-  ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF BENEFICIAL HABITS`, W / 2, 754);
+  setTracking(ctx, "5px");
+  ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF BENEFICIAL HABITS`, CW / 2, 1024);
   setTracking(ctx, "0px");
 
-  // Citation
   const citation =
     input.citation ??
-    "“The most beloved deeds to Allah are those done regularly.” — Bukhari";
+    "\u201cThe most beloved deeds to Allah are those done regularly.\u201d — Bukhari";
   ctx.fillStyle = "#6b7280";
-  ctx.font = "italic 23px 'Inter', system-ui, sans-serif";
-  const cLines = wrapText(ctx, citation, W - 200, 2);
-  let cy = 800;
+  ctx.font = "italic 26px 'Inter', system-ui, sans-serif";
+  const cLines = wrapText(ctx, citation, CW - 700, 2);
+  let cy = 1084;
   for (const line of cLines) {
-    ctx.fillText(line, W / 2, cy);
-    cy += 34;
+    ctx.fillText(line, CW / 2, cy);
+    cy += 38;
   }
 
-  // Seal
-  const sealX = W / 2;
-  const sealY = 906;
+  // --- Footer row: date | seal | signature ---
+  const footY = CH - 220;
+  const colL = ix + 240;
+  const colR = CW - ix - 240;
+
+  // Seal (center)
+  const sealX = CW / 2;
+  const sealY = footY - 20;
   ctx.beginPath();
-  ctx.arc(sealX, sealY, 52, 0, Math.PI * 2);
+  ctx.arc(sealX, sealY, 62, 0, Math.PI * 2);
   ctx.fillStyle = "rgba(201,162,62,0.12)";
   ctx.fill();
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 3;
   ctx.stroke();
   ctx.beginPath();
-  ctx.arc(sealX, sealY, 42, 0, Math.PI * 2);
+  ctx.arc(sealX, sealY, 50, 0, Math.PI * 2);
   ctx.strokeStyle = "rgba(201,162,62,0.45)";
   ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.fillStyle = GOLD;
-  ctx.font = "800 30px 'Fraunces', Georgia, serif";
-  ctx.fillText("✦", sealX, sealY + 12);
+  ctx.font = "800 36px 'Fraunces', Georgia, serif";
+  ctx.textAlign = "center";
+  ctx.fillText("✦", sealX, sealY + 14);
+  ctx.fillStyle = MUTED;
+  ctx.font = "600 20px 'Inter', system-ui, sans-serif";
+  setTracking(ctx, "3px");
+  ctx.fillText("VERIFIED", sealX, sealY + 108);
+  setTracking(ctx, "0px");
 
-  // Footer: date + domain
   const date =
     input.dateLabel ??
     new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
-  ctx.fillStyle = "#9ca3af";
-  ctx.font = "500 22px 'Inter', system-ui, sans-serif";
-  ctx.textAlign = "left";
-  ctx.fillText(date, 110, H - 108);
-  ctx.textAlign = "right";
-  ctx.fillText("pure-heartify.lovable.app", W - 110, H - 108);
+
+  const drawFooterCol = (x: number, value: string, label: string) => {
+    ctx.textAlign = "center";
+    ctx.fillStyle = INK;
+    ctx.font = "500 28px 'Inter', system-ui, sans-serif";
+    ctx.fillText(value, x, footY + 8);
+    ctx.strokeStyle = "rgba(26,26,26,0.25)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x - 200, footY + 34);
+    ctx.lineTo(x + 200, footY + 34);
+    ctx.stroke();
+    ctx.fillStyle = MUTED;
+    ctx.font = "600 20px 'Inter', system-ui, sans-serif";
+    setTracking(ctx, "3px");
+    ctx.fillText(label, x, footY + 70);
+    setTracking(ctx, "0px");
+  };
+
+  drawFooterCol(colL, date, "DATE");
+
+  ctx.fillStyle = INK;
+  ctx.font = "italic 34px 'Fraunces', Georgia, serif";
   ctx.textAlign = "center";
+  ctx.fillText("Heartify", colR, footY + 8);
+  ctx.strokeStyle = "rgba(26,26,26,0.25)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(colR - 200, footY + 34);
+  ctx.lineTo(colR + 200, footY + 34);
+  ctx.stroke();
+  ctx.fillStyle = MUTED;
+  ctx.font = "600 20px 'Inter', system-ui, sans-serif";
+  setTracking(ctx, "3px");
+  ctx.fillText("SIGNATURE", colR, footY + 70);
+  setTracking(ctx, "0px");
 
   return await toBlob(canvas);
 }
+
 
 export async function generateShareImage(input: ShareImageInput): Promise<Blob> {
   if (input.variant === "certificate") return renderCertificate(input);
