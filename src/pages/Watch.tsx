@@ -1,5 +1,6 @@
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { recordRecentTopic } from "@/lib/recentTopics";
 import { ArrowLeft, ChevronRight, Heart, Play, ShieldCheck } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
 import Navbar from "@/components/Navbar";
@@ -86,6 +87,11 @@ const Watch = () => {
 
   const currentVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
   const currentCategory = (currentVideo as any)?.category;
+  // Cold-start signal: remember the topics played this session so the feed
+  // can diversify before any server-side taste profile exists.
+  useEffect(() => {
+    recordRecentTopic(currentCategory);
+  }, [currentCategory]);
   // Session-wide set of related ids already surfaced on ANY watch page this
   // session. Kept outside the videoId effect so navigating from one video to
   // the next never re-shows the same related videos.

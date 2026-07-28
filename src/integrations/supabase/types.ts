@@ -2161,6 +2161,96 @@ export type Database = {
           },
         ]
       }
+      feed_diversity_metrics: {
+        Row: {
+          browser: string | null
+          cold_start: boolean
+          cold_start_strategy: string | null
+          config_version: string | null
+          created_at: string
+          device_class: string | null
+          distinct_categories: number
+          distinct_channels: number
+          distinct_languages: number
+          diversity_level: number | null
+          duplicate_count: number
+          fresh_share: number
+          guarantees: Json
+          id: number
+          item_count: number
+          item_ids: string[]
+          max_per_channel: number
+          pool_size: number
+          self_overlap: number | null
+          session_id: string | null
+          surface: string
+          took_ms: number
+          top_language_share: number
+          trace: Json
+          ui_language: string | null
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          browser?: string | null
+          cold_start?: boolean
+          cold_start_strategy?: string | null
+          config_version?: string | null
+          created_at?: string
+          device_class?: string | null
+          distinct_categories?: number
+          distinct_channels?: number
+          distinct_languages?: number
+          diversity_level?: number | null
+          duplicate_count?: number
+          fresh_share?: number
+          guarantees?: Json
+          id?: number
+          item_count?: number
+          item_ids?: string[]
+          max_per_channel?: number
+          pool_size?: number
+          self_overlap?: number | null
+          session_id?: string | null
+          surface: string
+          took_ms?: number
+          top_language_share?: number
+          trace?: Json
+          ui_language?: string | null
+          user_id?: string | null
+          variant?: string
+        }
+        Update: {
+          browser?: string | null
+          cold_start?: boolean
+          cold_start_strategy?: string | null
+          config_version?: string | null
+          created_at?: string
+          device_class?: string | null
+          distinct_categories?: number
+          distinct_channels?: number
+          distinct_languages?: number
+          diversity_level?: number | null
+          duplicate_count?: number
+          fresh_share?: number
+          guarantees?: Json
+          id?: number
+          item_count?: number
+          item_ids?: string[]
+          max_per_channel?: number
+          pool_size?: number
+          self_overlap?: number | null
+          session_id?: string | null
+          surface?: string
+          took_ms?: number
+          top_language_share?: number
+          trace?: Json
+          ui_language?: string | null
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: []
+      }
       feed_impressions: {
         Row: {
           first_seen_at: string
@@ -5050,6 +5140,43 @@ export type Database = {
         Returns: boolean
       }
       admin_content_freshness: { Args: never; Returns: Json }
+      admin_feed_traces: {
+        Args: {
+          _hours?: number
+          _limit?: number
+          _session_id?: string
+          _surface?: string
+          _user_id?: string
+        }
+        Returns: {
+          browser: string
+          cold_start: boolean
+          cold_start_strategy: string
+          config_version: string
+          created_at: string
+          device_class: string
+          distinct_categories: number
+          distinct_channels: number
+          distinct_languages: number
+          diversity_level: number
+          duplicate_count: number
+          fresh_share: number
+          guarantees: Json
+          id: number
+          item_count: number
+          item_ids: string[]
+          max_per_channel: number
+          pool_size: number
+          self_overlap: number
+          session_id: string
+          surface: string
+          took_ms: number
+          trace: Json
+          ui_language: string
+          user_id: string
+          variant: string
+        }[]
+      }
       admin_moderation_sla: { Args: never; Returns: Json }
       admin_retention_cohorts: {
         Args: never
@@ -5257,6 +5384,20 @@ export type Database = {
       }
       export_user_data: { Args: { _uid: string }; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
+      feed_diversity_dashboard: { Args: { _hours?: number }; Returns: Json }
+      feed_diversity_dashboard_filtered: {
+        Args: {
+          _cohort_id?: string
+          _device_class?: string
+          _hours?: number
+          _language?: string
+          _max_diversity?: number
+          _min_diversity?: number
+          _surface?: string
+          _variant?: string
+        }
+        Returns: Json
+      }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
       get_beneficial_sources_directory: {
         Args: { _domain?: string; _limit?: number }
@@ -5547,6 +5688,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      list_active_categories: {
+        Args: never
+        Returns: {
+          category: string
+          video_count: number
+        }[]
       }
       list_dua_wall: {
         Args: { _limit?: number }
