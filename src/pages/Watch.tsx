@@ -1,5 +1,6 @@
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { recordRecentTopic } from "@/lib/recentTopics";
 import { ArrowLeft, ChevronRight, Heart, Play, ShieldCheck } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
 import Navbar from "@/components/Navbar";
