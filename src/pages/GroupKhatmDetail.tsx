@@ -16,7 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 
 interface Group {
   id: string;
-  owner_id: string;
+  owner_id?: string | null;
   name: string;
   description: string | null;
   intention: string | null;
@@ -25,6 +25,11 @@ interface Group {
   completed_at: string | null;
   created_at: string;
 }
+
+/** Signed-out visitors have no column access to owner_id (privacy). */
+const ANON_GROUP_COLUMNS =
+  "id,name,description,intention,invite_code,is_public,completed_at,created_at";
+
 
 interface Claim {
   juz_number: number;
@@ -61,7 +66,11 @@ export default function GroupKhatmDetail() {
     if (!id) return;
     setLoading(true);
     const [{ data: g }, { data: c }, { data: m }, { data: ev }] = await Promise.all([
-      supabase.from("khatm_groups").select("*").eq("id", id).maybeSingle(),
+      supabase
+        .from("khatm_groups")
+        .select(user ? "*" : ANON_GROUP_COLUMNS)
+        .eq("id", id)
+        .maybeSingle(),
       supabase.from("khatm_juz_claims").select("juz_number,user_id,claimed_at,completed_at").eq("group_id", id),
       supabase.from("khatm_group_members").select("user_id,role").eq("group_id", id),
       supabase
@@ -71,12 +80,13 @@ export default function GroupKhatmDetail() {
         .order("created_at", { ascending: false })
         .limit(30),
     ]);
-    setGroup((g as Group) ?? null);
+    setGroup((g as unknown as Group) ?? null);
     setClaims((c ?? []) as Claim[]);
     setMembers((m ?? []) as Member[]);
     setEvents((ev ?? []) as EventRow[]);
     setLoading(false);
-  }, [id]);
+  }, [id, user]);
+
 
   useEffect(() => {
     void load();
