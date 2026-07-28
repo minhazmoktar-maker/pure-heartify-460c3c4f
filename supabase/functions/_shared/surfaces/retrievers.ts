@@ -307,13 +307,11 @@ function interleave(a: SurfaceVideo[], b: SurfaceVideo[]): SurfaceVideo[] {
 
 // Browse: category-round-robin across ALL approved categories.
 export async function retrieveBrowse(ctx: SurfaceContext) {
-  const { data: cats } = await ctx.service
-    .from("curated_videos").select("category")
-    .in("moderation_state", ["approved", "auto_approved"])
-    .eq("is_hidden", false).eq("is_archived", false)
-    .not("category", "is", null)
-    .limit(1000);
-  const uniq = Array.from(new Set((cats ?? []).map((r: any) => r.category).filter(Boolean))) as string[];
+  // Aggregate server-side: a plain `select category limit N` returns rows in
+  // physical order and can yield a single category, collapsing Browse.
+  const { data: cats } = await ctx.service.rpc("list_active_categories");
+  const uniq = ((cats ?? []) as { category: string }[])
+    .map((r) => r.category).filter(Boolean);
   const chosen = shuffleWithSeed(uniq, sessionSeed(ctx.sessionId + "brw")).slice(0, 12);
   const perCat = 4;
   const buckets: SurfaceVideo[][] = [];
