@@ -15,6 +15,8 @@ import { detectIntent } from "../_shared/search/intent.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
 import { embedOne, toPgVector } from "../_shared/embed.ts";
+import { assessStrict } from "../_shared/halalGuard.ts";
+
 
 const NORMALIZE = (s: string) =>
   s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
