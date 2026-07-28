@@ -18,10 +18,32 @@ import { CONTRACTS, type SurfaceName } from "../_shared/surfaces/contracts.ts";
 import { RETRIEVERS } from "../_shared/surfaces/retrievers.ts";
 import { runUniversalFilters, loadImpressions } from "../_shared/surfaces/filters.ts";
 import { enforceContract, computeStats, checkGuarantees } from "../_shared/surfaces/diversity.ts";
+import { loadFeedConfig } from "../_shared/surfaces/config.ts";
 import type { SurfaceContext, SurfaceResponse, SurfaceVideo } from "../_shared/surfaces/types.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+/** Coarse device/browser classification from the UA — used as a cold-start signal. */
+function classifyClient(ua: string): { deviceClass: string; browser: string } {
+  const u = (ua ?? "").toLowerCase();
+  const deviceClass = /ipad|tablet/.test(u)
+    ? "tablet"
+    : /mobi|android|iphone/.test(u)
+    ? "phone"
+    : "desktop";
+  const browser = /edg\//.test(u)
+    ? "edge"
+    : /chrome|crios/.test(u)
+    ? "chrome"
+    : /firefox|fxios/.test(u)
+    ? "firefox"
+    : /safari/.test(u)
+    ? "safari"
+    : "other";
+  return { deviceClass, browser };
+}
+
 
 function json(body: unknown, status = 200, cachePrivate = true) {
   // T4 — Anon-only edge cache + SWR hydration.
