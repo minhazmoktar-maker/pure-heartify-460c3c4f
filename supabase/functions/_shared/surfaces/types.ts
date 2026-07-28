@@ -52,6 +52,27 @@ export interface SurfaceContext {
   hiddenVideos: Set<string>;
   supabase: any;
   service: any;
+  /** 0..100 content-diversity slider (Profile > Preferences). */
+  diversityLevel?: number;
+  /** Coarse device class: phone | tablet | desktop. */
+  deviceClass?: string;
+  /** Coarse browser family: chrome | safari | firefox | other. */
+  browser?: string;
+  /** Recently played topics/categories reported by the client. */
+  recentTopics?: string[];
+  /** Runtime config resolved from the feature flag. */
+  config?: any;
+  /** Retrieval decision log — surfaced in the admin per-user trace view. */
+  trace?: { step: string; detail?: Record<string, unknown> }[];
+}
+
+/** Append a retrieval decision to the request trace (no-op if absent). */
+export function traceStep(
+  ctx: SurfaceContext,
+  step: string,
+  detail?: Record<string, unknown>,
+): void {
+  if (ctx.trace && ctx.trace.length < 40) ctx.trace.push({ step, detail });
 }
 
 export interface SurfaceResponse {
