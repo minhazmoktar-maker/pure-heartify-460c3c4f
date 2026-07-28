@@ -16,7 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 
 interface Group {
   id: string;
-  owner_id: string;
+  owner_id?: string | null;
   name: string;
   description: string | null;
   intention: string | null;
@@ -25,6 +25,11 @@ interface Group {
   completed_at: string | null;
   created_at: string;
 }
+
+/** Signed-out visitors have no column access to owner_id (privacy). */
+const ANON_GROUP_COLUMNS =
+  "id,name,description,intention,invite_code,is_public,completed_at,created_at";
+
 
 interface Claim {
   juz_number: number;
