@@ -30,6 +30,8 @@ export interface LocalePreferences {
   rtl_override: boolean | null;
   auto_personalize: boolean;
   diversity_level: number;
+  /** Strict Halal mode — blocks tier-2 borderline content. Default ON. */
+  strict_halal: boolean;
   detected_language: LanguageCode | null;
   detected_country: string | null;
 }
@@ -72,6 +74,7 @@ function defaults(): LocalePreferences {
     rtl_override: null,
     auto_personalize: true,
     diversity_level: 50,
+    strict_halal: true,
     detected_language: detectedLang,
     detected_country: detectedCountry,
   };
@@ -130,6 +133,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
           rtl_override: data.rtl_override,
           auto_personalize: data.auto_personalize,
           diversity_level: data.diversity_level ?? prev.diversity_level,
+          strict_halal: (data as { strict_halal?: boolean }).strict_halal !== false,
           detected_language: (data.detected_language as LanguageCode) ?? prev.detected_language,
           detected_country: data.detected_country ?? prev.detected_country,
         }));
@@ -143,6 +147,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
           rtl_override: preferences.rtl_override,
           auto_personalize: preferences.auto_personalize,
           diversity_level: preferences.diversity_level,
+          strict_halal: preferences.strict_halal,
           detected_language: preferences.detected_language,
           detected_country: preferences.detected_country,
         });
