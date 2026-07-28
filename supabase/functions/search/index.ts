@@ -209,6 +209,25 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Strict Halal last-mile gate on search results. Stored preference wins
+    // for signed-in users; anonymous callers default to ON.
+    {
+      let strictHalal = true;
+      if (userId) {
+        const { data: shPref } = await admin
+          .from("user_locale_preferences").select("strict_halal")
+          .eq("user_id", userId).maybeSingle();
+        strictHalal = (shPref as { strict_halal?: boolean } | null)?.strict_halal !== false;
+      }
+      filteredHits = filteredHits.filter((h: Record<string, unknown>) =>
+        assessStrict(
+          { title: h.title as string | null, channel_title: (h.channel_title ?? h.channelTitle) as string | null },
+          strictHalal,
+        ).allowed,
+      );
+    }
+
+
     const [trendingRes, relatedRes] = await Promise.allSettled([
       admin.rpc("get_trending_searches", { _limit: 10, _window_hours: 168 }),
       q ? admin.rpc("get_related_searches", { _query: q, _limit: 6 }) : Promise.resolve({ data: [] }),
