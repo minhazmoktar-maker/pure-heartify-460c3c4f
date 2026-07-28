@@ -364,8 +364,10 @@ Deno.serve(async (req) => {
         for (const v of rows) {
           const id = v.video_id as string;
           if (seen.has(id) || excludeIds.has(id)) continue;
+          if (!assessStrict(v as never, strictHalal).allowed) continue;
           const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
           if (BLOCKED_TOKENS.some((tok) => t.includes(tok))) continue;
+
           seen.add(id);
           filtered.push(v);
           if (filtered.length >= fetchLimit) return;
