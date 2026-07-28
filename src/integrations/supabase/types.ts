@@ -1177,6 +1177,10 @@ export type Database = {
           title: string
           video_id: string
           view_count: number
+          visual_checked_at: string | null
+          visual_confidence: number | null
+          visual_flags: string[]
+          visual_state: string
         }
         Insert: {
           category?: string
@@ -1214,6 +1218,10 @@ export type Database = {
           title: string
           video_id: string
           view_count?: number
+          visual_checked_at?: string | null
+          visual_confidence?: number | null
+          visual_flags?: string[]
+          visual_state?: string
         }
         Update: {
           category?: string
@@ -1251,6 +1259,10 @@ export type Database = {
           title?: string
           video_id?: string
           view_count?: number
+          visual_checked_at?: string | null
+          visual_confidence?: number | null
+          visual_flags?: string[]
+          visual_state?: string
         }
         Relationships: []
       }
@@ -4452,6 +4464,7 @@ export type Database = {
           id: string
           region: string | null
           rtl_override: boolean | null
+          strict_halal: boolean
           ui_language: string
           updated_at: string
           user_id: string
@@ -4467,6 +4480,7 @@ export type Database = {
           id?: string
           region?: string | null
           rtl_override?: boolean | null
+          strict_halal?: boolean
           ui_language?: string
           updated_at?: string
           user_id: string
@@ -4482,6 +4496,7 @@ export type Database = {
           id?: string
           region?: string | null
           rtl_override?: boolean | null
+          strict_halal?: boolean
           ui_language?: string
           updated_at?: string
           user_id?: string
@@ -5630,6 +5645,15 @@ export type Database = {
         }
       }
       grant_referral_tier_rewards: { Args: never; Returns: Json }
+      halal_deny_tier1_pattern: { Args: never; Returns: string }
+      halal_deny_tier2_pattern: { Args: never; Returns: string }
+      halal_text_flags: {
+        Args: { _channel: string; _title: string }
+        Returns: {
+          tier1: boolean
+          tier2: boolean
+        }[]
+      }
       has_active_entitlement: { Args: { _user_id: string }; Returns: boolean }
       has_active_premium: { Args: { _user_id: string }; Returns: boolean }
       has_min_role: {
@@ -5642,6 +5666,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      infer_content_language: {
+        Args: { _channel: string; _title: string }
+        Returns: string
       }
       is_dhikr_circle_member: {
         Args: { _circle_id: string; _user_id: string }
