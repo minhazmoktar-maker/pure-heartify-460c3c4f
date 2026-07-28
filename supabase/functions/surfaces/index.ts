@@ -218,22 +218,40 @@ Deno.serve(async (req) => {
         : Promise.resolve(new Map<string, number>()),
       userId
         ? service.from("user_locale_preferences")
-            .select("diversity_level, ui_language").eq("user_id", userId).maybeSingle()
+            .select("diversity_level, ui_language, strict_halal, content_languages").eq("user_id", userId).maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
 
-    const prefs = (prefsRes as { data: { diversity_level?: number; ui_language?: string } | null }).data;
+    const prefs = (prefsRes as {
+      data: {
+        diversity_level?: number; ui_language?: string;
+        strict_halal?: boolean; content_languages?: string[];
+      } | null;
+    }).data;
     const bodyLevel = Number(body?.diversity_level);
     const diversityLevel = config.sliderEnabled
       ? Math.max(0, Math.min(100, Number.isFinite(bodyLevel) ? bodyLevel : (prefs?.diversity_level ?? 50)))
       : 50;
 
+    // Strict Halal defaults to ON. The stored preference is authoritative for
+    // signed-in users; the body flag only applies to anonymous callers so a
+    // tampered client can never weaken another account's safety setting.
+    const strictHalal = userId
+      ? prefs?.strict_halal !== false
+      : body?.strict_halal !== false;
+
+    // Language: prefer explicit body list, else the stored preference.
+    const effectiveLanguages = contentLanguages.length
+      ? contentLanguages
+      : (Array.isArray(prefs?.content_languages) ? prefs!.content_languages! : []);
+
     const trace: { step: string; detail?: Record<string, unknown> }[] = [];
     const ctx: SurfaceContext = {
-      userId, sessionId, isPremium, contentLanguages, kidsMode,
+      userId, sessionId, isPremium, contentLanguages: effectiveLanguages, strictHalal, kidsMode,
       blockedChannels, hiddenVideos, supabase: service, service,
       diversityLevel, deviceClass, browser, recentTopics, config, trace,
     };
+
 
     // Experiment bucketing (falls back to a config-derived variant).
     let variant = config.sliderEnabled ? `slider_${config.version}` : "legacy_killswitch";
@@ -276,6 +294,7 @@ Deno.serve(async (req) => {
         pool: poolSize, after_universal: universal.length,
         excluded_by_client: universal.length - filtered.length,
         picked: picked.length, max_per_channel: effectiveContract.maxPerChannel,
+        strict_halal: strictHalal, content_languages: effectiveLanguages,
       },
     });
 
@@ -288,11 +307,14 @@ Deno.serve(async (req) => {
       device_class: deviceClass,
       browser,
       ui_language: uiLanguage ?? prefs?.ui_language ?? null,
+      strict_halal: strictHalal,
+      content_languages: effectiveLanguages,
       recent_topics: recentTopics,
       weights: config.weights,
       cold_start_strategy: (ctx as any).coldStartStrategy ?? null,
       steps: trace,
     };
+
 
     const resp: SurfaceResponse = {
       surface,

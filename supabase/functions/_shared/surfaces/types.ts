@@ -47,7 +47,10 @@ export interface SurfaceContext {
   sessionId: string;
   isPremium: boolean;
   contentLanguages: string[];
+  /** Strict Halal mode (default true) — enables tier-2 text blocking. */
+  strictHalal?: boolean;
   kidsMode: boolean;
+
   blockedChannels: Set<string>;
   hiddenVideos: Set<string>;
   supabase: any;

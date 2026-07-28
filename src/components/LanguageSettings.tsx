@@ -72,7 +72,28 @@ export function LanguageSettings() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* UI language */}
+        {/* Strict Halal mode */}
+        <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-3">
+          <div className="space-y-1">
+            <Label htmlFor="strict-halal">
+              {t("language.strict", undefined, "Strict Halal mode")}
+            </Label>
+            <p className="text-micro text-muted-foreground">
+              {t(
+                "language.strictHint",
+                undefined,
+                "Blocks music, entertainment and any content featuring women across every feed, search and recommendation. Recommended.",
+              )}
+            </p>
+          </div>
+          <Switch
+            id="strict-halal"
+            checked={preferences.strict_halal !== false}
+            onCheckedChange={(v) => save({ strict_halal: v })}
+          />
+        </div>
+
+
         <div className="space-y-2">
           <Label>{t("language.ui")}</Label>
           <Select

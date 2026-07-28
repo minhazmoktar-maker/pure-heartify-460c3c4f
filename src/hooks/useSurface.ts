@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
 import { getRecentTopics } from "@/lib/recentTopics";
 import { getDeviceClass } from "@/lib/deviceSignals";
+import { filterHalal } from "@/lib/halalGuard";
 import type { YouTubeVideo, HalalCategory } from "@/services/youtube";
 
 export type SurfaceName =
@@ -106,11 +107,12 @@ export function useSurface(
   const contentLanguages = preferences.content_languages ?? [];
   const diversityLevel = preferences.diversity_level ?? 50;
   const uiLanguage = preferences.ui_language;
+  const strictHalal = preferences.strict_halal !== false;
   const sessionId = getSessionId();
   const enabled = opts.enabled !== false;
 
   const q = useQuery<SurfaceResponse>({
-    queryKey: ["surface", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false, diversityLevel, uiLanguage],
+    queryKey: ["surface", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false, diversityLevel, uiLanguage, strictHalal],
     enabled,
     // Signed-in rails need to feel fresh across visits but not thrash on
     // each mount — 3 min stale is the sweet spot.
@@ -126,6 +128,7 @@ export function useSurface(
           session_id: sessionId,
           content_languages: contentLanguages,
           kids_mode: opts.kidsMode ?? false,
+          strict_halal: strictHalal,
           exclude_ids: excludeIds,
           // Personalization + cold-start signals.
           diversity_level: diversityLevel,
@@ -140,7 +143,7 @@ export function useSurface(
   });
 
   return {
-    items: (q.data?.items ?? []).map(toVideo),
+    items: filterHalal((q.data?.items ?? []).map(toVideo), strictHalal),
     isLoading: q.isLoading,
     isFetching: q.isFetching,
     meta: q.data?.meta ?? null,
@@ -185,10 +188,11 @@ export function useSurfaceInfinite(
   const enabled = opts.enabled !== false;
   // Ids this rail itself has already rendered. Not part of the query key —
   // read at request time only.
+  const strictHalal = preferences.strict_halal !== false;
   const railSeen = useRef<Set<string>>(new Set());
 
   const q = useInfiniteQuery<SurfaceResponse>({
-    queryKey: ["surface-infinite", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false, diversityLevel, uiLanguage],
+    queryKey: ["surface-infinite", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false, diversityLevel, uiLanguage, strictHalal],
     enabled,
     staleTime: 3 * 60_000,
     gcTime: 15 * 60_000,
@@ -209,6 +213,7 @@ export function useSurfaceInfinite(
           session_id: sessionId,
           content_languages: contentLanguages,
           kids_mode: opts.kidsMode ?? false,
+          strict_halal: strictHalal,
           exclude_ids: excludeIds,
           page: pageParam,
           diversity_level: diversityLevel,
@@ -234,8 +239,8 @@ export function useSurfaceInfinite(
         out.push(toVideo(r));
       }
     }
-    return out;
-  }, [q.data]);
+    return filterHalal(out, strictHalal);
+  }, [q.data, strictHalal]);
 
   return {
     items,

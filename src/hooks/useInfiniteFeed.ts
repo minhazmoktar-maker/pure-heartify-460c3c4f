@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { filterHalal } from "@/lib/halalGuard";
 import type { YouTubeVideo, HalalCategory } from "@/services/youtube";
 import { useLocale } from "@/contexts/LocaleContext";
 
@@ -67,6 +68,7 @@ async function fetchFeedPage(opts: {
   sort?: FeedSort;
   sessionId: string;
   excludeIds: string[];
+  strictHalal: boolean;
 }): Promise<FeedPage> {
   const { data, error } = await supabase.functions.invoke("feed", {
     body: {
@@ -79,13 +81,14 @@ async function fetchFeedPage(opts: {
       sort: opts.sort,
       session_id: opts.sessionId,
       exclude_ids: opts.excludeIds,
+      strict_halal: opts.strictHalal,
     },
   });
 
   if (error) throw new Error(error.message || "Failed to fetch feed");
 
   return {
-    items: data?.items ?? [],
+    items: filterHalal((data?.items ?? []) as YouTubeVideo[], opts.strictHalal),
     nextCursor: data?.nextCursor ?? null,
     total: data?.total ?? 0,
   };
@@ -105,9 +108,10 @@ export function useInfiniteFeed({
   const contentLanguages = preferences.content_languages ?? [];
   const langKey = contentLanguages.join(",");
   const sessionId = getSessionId();
+  const strictHalal = preferences.strict_halal !== false;
 
   return useInfiniteQuery<FeedPage>({
-    queryKey: ["feed", category, sectionId, search, limit, langKey, sort, sessionId, keySuffix ?? ""],
+    queryKey: ["feed", category, sectionId, search, limit, langKey, sort, sessionId, keySuffix ?? "", strictHalal],
     queryFn: ({ pageParam }) =>
       fetchFeedPage({
         category: category === "All" ? undefined : category,
@@ -121,6 +125,7 @@ export function useInfiniteFeed({
         // Snapshot at fetch time — deliberately NOT in queryKey so cache
         // stays warm; server dedup is a defense-in-depth layer.
         excludeIds: (getExcludeIds?.() ?? []).slice(-1500),
+        strictHalal,
       }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,

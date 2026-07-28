@@ -15,6 +15,8 @@ import { detectIntent } from "../_shared/search/intent.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
 import { embedOne, toPgVector } from "../_shared/embed.ts";
+import { assessStrict } from "../_shared/halalGuard.ts";
+
 
 const NORMALIZE = (s: string) =>
   s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
@@ -208,6 +210,25 @@ Deno.serve(async (req) => {
         console.error("locale re-rank failed:", (err as Error).message);
       }
     }
+
+    // Strict Halal last-mile gate on search results. Stored preference wins
+    // for signed-in users; anonymous callers default to ON.
+    {
+      let strictHalal = true;
+      if (userId) {
+        const { data: shPref } = await admin
+          .from("user_locale_preferences").select("strict_halal")
+          .eq("user_id", userId).maybeSingle();
+        strictHalal = (shPref as { strict_halal?: boolean } | null)?.strict_halal !== false;
+      }
+      filteredHits = filteredHits.filter((h: Record<string, unknown>) =>
+        assessStrict(
+          { title: h.title as string | null, channel_title: (h.channel_title ?? h.channelTitle) as string | null },
+          strictHalal,
+        ).allowed,
+      );
+    }
+
 
     const [trendingRes, relatedRes] = await Promise.allSettled([
       admin.rpc("get_trending_searches", { _limit: 10, _window_hours: 168 }),
