@@ -51,6 +51,24 @@
       href="https://fonts.gstatic.com/s/amiriquran/v18/_Xmo-Hk0rD6DbUL4_vH8Zp5v5H1RKrBRXxeVGA.woff2"
       crossorigin="anonymous"
     />
+    <!-- LCP: the homepage hero headline is text, so its paint is gated on the
+         display face. Preload the latin subsets of Fraunces (headings) and
+         Inter (body) so the real font is in cache before first paint instead
+         of arriving after the swap. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxC9TeA.woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2"
+      crossorigin="anonymous"
+    />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap"
