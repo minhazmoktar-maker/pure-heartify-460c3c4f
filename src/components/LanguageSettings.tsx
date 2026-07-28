@@ -31,6 +31,12 @@ interface RegionalMix {
 export function LanguageSettings() {
   const { t, preferences, updatePreferences } = useLocale();
   const [regions, setRegions] = useState<RegionalMix[]>([]);
+  // Local mirror so the slider thumb tracks the drag; committed on release.
+  const [diversity, setDiversity] = useState(preferences.diversity_level);
+
+  useEffect(() => {
+    setDiversity(preferences.diversity_level);
+  }, [preferences.diversity_level]);
 
   useEffect(() => {
     supabase
