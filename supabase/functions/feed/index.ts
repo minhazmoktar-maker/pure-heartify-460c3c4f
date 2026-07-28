@@ -6,6 +6,8 @@
  */
 
 import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
+import { assessStrict } from "../_shared/halalGuard.ts";
+
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { readThrough } from "../_shared/cache.ts";
 import { gatherSignals } from "../_shared/recommendations/signals.ts";
