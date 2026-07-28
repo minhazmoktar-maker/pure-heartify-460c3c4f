@@ -239,8 +239,10 @@ Deno.serve(async (req) => {
     let variant = config.sliderEnabled ? `slider_${config.version}` : "legacy_killswitch";
     if (userId) {
       try {
+        // Service-role calls have no auth.uid(), so the user id is passed as
+        // the sticky bucketing key.
         const { data: v } = await service.rpc("assign_experiment_variant", {
-          _experiment_key: "feed_slider_v3", _user_id: userId,
+          _experiment_key: "feed_slider_v3", _anon_key: userId,
         });
         if (typeof v === "string" && v) variant = v;
       } catch { /* experiment not running — keep config variant */ }
