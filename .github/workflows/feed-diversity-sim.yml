@@ -1,0 +1,45 @@
+name: Feed Diversity Simulation
+
+# Runs the 100-user diversity regression suite whenever anything that can
+# cause a feed collapse changes: retrievers, contracts, runtime weights,
+# diversity enforcement, the surfaces dispatcher, or the simulation itself.
+on:
+  push:
+    paths:
+      - "supabase/functions/_shared/surfaces/**"
+      - "supabase/functions/surfaces/**"
+      - "src/test/feedSimulation.ts"
+      - "src/test/feed-diversity-simulation.test.ts"
+      - "src/contexts/FeedDiversityContext.tsx"
+      - ".github/workflows/feed-diversity-sim.yml"
+  pull_request:
+    paths:
+      - "supabase/functions/_shared/surfaces/**"
+      - "supabase/functions/surfaces/**"
+      - "src/test/feedSimulation.ts"
+      - "src/test/feed-diversity-simulation.test.ts"
+      - "src/contexts/FeedDiversityContext.tsx"
+      - ".github/workflows/feed-diversity-sim.yml"
+  workflow_dispatch: {}
+
+jobs:
+  simulation:
+    name: 100-user diversity regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run diversity simulation + cross-rail dedup suites
+        run: |
+          bunx vitest run \
+            src/test/feed-diversity-simulation.test.ts \
+            src/contexts/FeedDiversityContext.test.tsx \
+            --reporter=default
