@@ -89,6 +89,77 @@ async function loadHiddenVideos(service: any, userId: string | null): Promise<Se
   }
 }
 
+/**
+ * Writes one row per assembled surface into `feed_diversity_metrics`,
+ * including the full retrieval trace the admin per-user trace view reads.
+ * Fire-and-forget: never blocks or fails the response.
+ */
+function logMetrics(service: any, m: {
+  userId: string | null; sessionId: string; surface: string; variant: string;
+  picked: SurfaceVideo[]; stats: any; guarantees: any; poolSize: number; tookMs: number;
+  diversityLevel: number; uiLanguage: string | null; deviceClass: string; browser: string;
+  coldStartStrategy: string | null; configVersion: string; trace: Record<string, unknown>;
+}) {
+  (async () => {
+    try {
+      const ids = m.picked.map((v) => v.video_id);
+      const perChannel = new Map<string, number>();
+      for (const v of m.picked) {
+        const c = v.channel_id ?? `_${v.channel_title ?? "u"}`;
+        perChannel.set(c, (perChannel.get(c) ?? 0) + 1);
+      }
+      const duplicates = ids.length - new Set(ids).size;
+
+      // Self-overlap vs this user's previous assembly of the same surface.
+      let selfOverlap: number | null = null;
+      if (m.userId && ids.length) {
+        const { data: prev } = await service
+          .from("feed_diversity_metrics")
+          .select("item_ids")
+          .eq("user_id", m.userId).eq("surface", m.surface)
+          .order("created_at", { ascending: false }).limit(1).maybeSingle();
+        const prevIds: string[] = (prev as { item_ids?: string[] } | null)?.item_ids ?? [];
+        if (prevIds.length) {
+          const prevSet = new Set(prevIds);
+          const shared = ids.filter((id) => prevSet.has(id)).length;
+          selfOverlap = Number((shared / ids.length).toFixed(4));
+        }
+      }
+
+      await service.from("feed_diversity_metrics").insert({
+        user_id: m.userId,
+        session_id: m.sessionId,
+        surface: m.surface,
+        variant: m.variant,
+        cold_start: Boolean(m.coldStartStrategy),
+        cold_start_strategy: m.coldStartStrategy,
+        diversity_level: m.diversityLevel,
+        ui_language: m.uiLanguage,
+        device_class: m.deviceClass,
+        browser: m.browser,
+        config_version: m.configVersion,
+        item_count: ids.length,
+        item_ids: ids,
+        pool_size: m.poolSize,
+        distinct_channels: m.stats.distinctChannels,
+        distinct_categories: m.stats.distinctCategories,
+        distinct_languages: m.stats.distinctLanguages,
+        top_language_share: m.stats.topLanguageShare,
+        fresh_share: m.stats.freshShare,
+        max_per_channel: Math.max(0, ...Array.from(perChannel.values())),
+        duplicate_count: duplicates,
+        self_overlap: selfOverlap,
+        took_ms: m.tookMs,
+        guarantees: m.guarantees,
+        trace: m.trace,
+      });
+    } catch (e) {
+      console.warn("[surfaces] metrics log failed", (e as Error).message);
+    }
+  })();
+}
+
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
