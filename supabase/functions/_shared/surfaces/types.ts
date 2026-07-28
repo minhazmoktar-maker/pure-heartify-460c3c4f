@@ -98,5 +98,7 @@ export interface SurfaceResponse {
       freshShare: number;
     };
     source: string;
+    /** Per-request diversity parameters + retrieval decisions (admin trace). */
+    trace?: Record<string, unknown>;
   };
 }
