@@ -106,11 +106,11 @@ export function runUniversalFilters(
   ctx: SurfaceContext,
   impressions: Map<string, number>,
 ): SurfaceVideo[] {
-  return applyImpressionFilter(
-    applyKidsMode(
-      applyHiddenVideos(applyUserBlocks(applyPremiumGate(applyBlocklist(items), ctx), ctx), ctx),
-      ctx,
-    ),
-    impressions,
+  const safe = applyStrictHalal(items, ctx);
+  const base = applyKidsMode(
+    applyHiddenVideos(applyUserBlocks(applyPremiumGate(applyBlocklist(safe), ctx), ctx), ctx),
+    ctx,
   );
+  return applyImpressionFilter(applyLanguagePreference(base, ctx), impressions);
 }
+
