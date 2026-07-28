@@ -3,7 +3,26 @@
 // impressions, kids-mode, premium gate) are applied by the dispatcher.
 
 import type { SurfaceVideo, SurfaceContext } from "./types.ts";
+import { traceStep } from "./types.ts";
 import { shuffleWithSeed, sessionSeed } from "./diversity.ts";
+import { DEFAULT_FEED_CONFIG, type FeedRuntimeConfig } from "./config.ts";
+
+/**
+ * Personalization seed. Mixes session + user + slider + device/browser so
+ * two users on the same session-shaped device never get the same shuffle,
+ * and moving the slider visibly reshapes the feed. When the runtime flag is
+ * killed the slider and device terms drop out (legacy behaviour).
+ */
+export function personalSeed(ctx: SurfaceContext, salt: string): number {
+  const cfg: FeedRuntimeConfig = (ctx.config as FeedRuntimeConfig) ?? DEFAULT_FEED_CONFIG;
+  if (!cfg.sliderEnabled) return sessionSeed(ctx.sessionId + salt);
+  const div = Math.round((ctx.diversityLevel ?? 50) * cfg.weights.diversity_slider);
+  const device = `${ctx.deviceClass ?? "?"}:${ctx.browser ?? "?"}`;
+  return sessionSeed(
+    `${ctx.sessionId}|${ctx.userId ?? "anon"}|d${div}|${device}|${salt}`,
+  );
+}
+
 
 async function callPool(
   ctx: SurfaceContext,
