@@ -2161,6 +2161,78 @@ export type Database = {
           },
         ]
       }
+      feed_diversity_metrics: {
+        Row: {
+          cold_start: boolean
+          created_at: string
+          distinct_categories: number
+          distinct_channels: number
+          distinct_languages: number
+          diversity_level: number | null
+          duplicate_count: number
+          fresh_share: number
+          guarantees: Json
+          id: number
+          item_count: number
+          item_ids: string[]
+          max_per_channel: number
+          pool_size: number
+          self_overlap: number | null
+          session_id: string | null
+          surface: string
+          took_ms: number
+          top_language_share: number
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          cold_start?: boolean
+          created_at?: string
+          distinct_categories?: number
+          distinct_channels?: number
+          distinct_languages?: number
+          diversity_level?: number | null
+          duplicate_count?: number
+          fresh_share?: number
+          guarantees?: Json
+          id?: number
+          item_count?: number
+          item_ids?: string[]
+          max_per_channel?: number
+          pool_size?: number
+          self_overlap?: number | null
+          session_id?: string | null
+          surface: string
+          took_ms?: number
+          top_language_share?: number
+          user_id?: string | null
+          variant?: string
+        }
+        Update: {
+          cold_start?: boolean
+          created_at?: string
+          distinct_categories?: number
+          distinct_channels?: number
+          distinct_languages?: number
+          diversity_level?: number | null
+          duplicate_count?: number
+          fresh_share?: number
+          guarantees?: Json
+          id?: number
+          item_count?: number
+          item_ids?: string[]
+          max_per_channel?: number
+          pool_size?: number
+          self_overlap?: number | null
+          session_id?: string | null
+          surface?: string
+          took_ms?: number
+          top_language_share?: number
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: []
+      }
       feed_impressions: {
         Row: {
           first_seen_at: string
@@ -5257,6 +5329,7 @@ export type Database = {
       }
       export_user_data: { Args: { _uid: string }; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
+      feed_diversity_dashboard: { Args: { _hours?: number }; Returns: Json }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
       get_beneficial_sources_directory: {
         Args: { _domain?: string; _limit?: number }
@@ -5547,6 +5620,13 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      list_active_categories: {
+        Args: never
+        Returns: {
+          category: string
+          video_count: number
+        }[]
       }
       list_dua_wall: {
         Args: { _limit?: number }
