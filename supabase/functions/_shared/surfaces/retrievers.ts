@@ -197,6 +197,24 @@ export async function retrieveColdStart(
   for (let i = 0; i < perTopic; i++) {
     for (const b of buckets) if (b?.[i]) out.push(b[i]);
   }
+
+  // Interest keys don't always map to a category — if the topic buckets came
+  // back thin, top up with fresh high-trust content so cold users never see
+  // an empty feed.
+  if (out.length < 8) {
+    const { data } = await ctx.service
+      .from("curated_videos").select(CURATED_COLS)
+      .in("moderation_state", ["approved", "auto_approved"])
+      .eq("is_hidden", false).eq("is_archived", false)
+      .gte("halal_score", 85)
+      .order("ingested_at", { ascending: false })
+      .limit(120);
+    const topUp = shuffleWithSeed(((data ?? []) as SurfaceVideo[]), personalSeed(ctx, "coldtopup"));
+    const have = new Set(out.map((v) => v.video_id));
+    for (const v of topUp) if (!have.has(v.video_id)) out.push(v);
+    strategies.push("fresh_topup");
+  }
+
   return { items: out, strategy: strategies.join("+") || "broad_discovery", topics: chosen };
 }
 
