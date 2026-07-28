@@ -320,12 +320,24 @@ Deno.serve(async (req) => {
     // Post-fetch blocklist filter (see BLOCKED_TOKENS above) + cross-rail
     // exclude filter — guarantees no duplicate video id ever reaches the
     // client across rails, surfaces, and infinite-grid pagination.
+    // Strict Halal — stored preference wins for signed-in users; anonymous
+    // callers default to ON and may only opt out explicitly.
+    let strictHalal = body?.strict_halal !== false;
+    if (callerId) {
+      const { data: shPref } = await admin
+        .from("user_locale_preferences").select("strict_halal")
+        .eq("user_id", callerId).maybeSingle();
+      strictHalal = (shPref as { strict_halal?: boolean } | null)?.strict_halal !== false;
+    }
+
     let filtered = (payload.items as Array<Record<string, unknown>>).filter((v) => {
       const id = (v.video_id as string) ?? "";
       if (excludeIds.has(id)) return false;
+      if (!assessStrict(v as never, strictHalal).allowed) return false;
       const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
       return !BLOCKED_TOKENS.some((tok) => t.includes(tok));
     });
+
 
     // Empty-section fallback cascade: a section should NEVER disappear.
     // If the primary retrieval returns fewer than half of `limit`, broaden
