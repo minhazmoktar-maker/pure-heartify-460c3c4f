@@ -2,6 +2,8 @@ import { useMemo, useRef } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocale } from "@/contexts/LocaleContext";
+import { getRecentTopics } from "@/lib/recentTopics";
+import { getDeviceClass } from "@/lib/deviceSignals";
 import type { YouTubeVideo, HalalCategory } from "@/services/youtube";
 
 export type SurfaceName =
@@ -102,11 +104,13 @@ export function useSurface(
 ): UseSurfaceResult {
   const { preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
+  const diversityLevel = preferences.diversity_level ?? 50;
+  const uiLanguage = preferences.ui_language;
   const sessionId = getSessionId();
   const enabled = opts.enabled !== false;
 
   const q = useQuery<SurfaceResponse>({
-    queryKey: ["surface", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false],
+    queryKey: ["surface", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false, diversityLevel, uiLanguage],
     enabled,
     // Signed-in rails need to feel fresh across visits but not thrash on
     // each mount — 3 min stale is the sweet spot.
@@ -123,6 +127,11 @@ export function useSurface(
           content_languages: contentLanguages,
           kids_mode: opts.kidsMode ?? false,
           exclude_ids: excludeIds,
+          // Personalization + cold-start signals.
+          diversity_level: diversityLevel,
+          ui_language: uiLanguage,
+          device_class: getDeviceClass(),
+          recent_topics: getRecentTopics(),
         },
       });
       if (error) throw new Error(error.message || `surface:${surface} failed`);
@@ -170,6 +179,8 @@ export function useSurfaceInfinite(
 ): UseSurfaceInfiniteResult {
   const { preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
+  const diversityLevel = preferences.diversity_level ?? 50;
+  const uiLanguage = preferences.ui_language;
   const sessionId = getSessionId();
   const enabled = opts.enabled !== false;
   // Ids this rail itself has already rendered. Not part of the query key —
@@ -177,7 +188,7 @@ export function useSurfaceInfinite(
   const railSeen = useRef<Set<string>>(new Set());
 
   const q = useInfiniteQuery<SurfaceResponse>({
-    queryKey: ["surface-infinite", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false],
+    queryKey: ["surface-infinite", surface, contentLanguages.join(","), sessionId, opts.kidsMode ?? false, diversityLevel, uiLanguage],
     enabled,
     staleTime: 3 * 60_000,
     gcTime: 15 * 60_000,
@@ -200,6 +211,10 @@ export function useSurfaceInfinite(
           kids_mode: opts.kidsMode ?? false,
           exclude_ids: excludeIds,
           page: pageParam,
+          diversity_level: diversityLevel,
+          ui_language: uiLanguage,
+          device_class: getDeviceClass(),
+          recent_topics: getRecentTopics(),
         },
       });
       if (error) throw new Error(error.message || `surface:${surface} failed`);
