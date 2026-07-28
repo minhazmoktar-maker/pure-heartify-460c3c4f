@@ -677,6 +677,32 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/reciter/minsh"/>
   </url>
   <url>
+    <loc>https://pure-heartify.lovable.app/reciter/minsh-muallim</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pure-heartify.lovable.app/reciter/minsh-muallim?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://pure-heartify.lovable.app/reciter/minsh-muallim?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://pure-heartify.lovable.app/reciter/minsh-muallim?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pure-heartify.lovable.app/reciter/minsh-muallim?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pure-heartify.lovable.app/reciter/minsh-muallim?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://pure-heartify.lovable.app/reciter/minsh-muallim?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pure-heartify.lovable.app/reciter/minsh-muallim?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/reciter/minsh-muallim"/>
+  </url>
+  <url>
+    <loc>https://pure-heartify.lovable.app/reciter/minsh-mujawwad</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pure-heartify.lovable.app/reciter/minsh-mujawwad"/>
+  </url>
+  <url>
     <loc>https://pure-heartify.lovable.app/reciter/basit</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
