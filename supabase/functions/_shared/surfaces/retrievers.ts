@@ -129,15 +129,21 @@ export async function retrieveColdStart(
 
   if (ctx.userId) {
     const [{ data: interests }, { data: hist }] = await Promise.all([
-      ctx.service.from("user_interests").select("interest").eq("user_id", ctx.userId).limit(12),
+      ctx.service.from("user_interests")
+        .select("primary_interest,secondary_interest,exploration_interest")
+        .eq("user_id", ctx.userId).limit(1),
       ctx.service.from("watch_history").select("video_id").eq("user_id", ctx.userId)
         .gte("watched_at", new Date(Date.now() - 30 * 86400 * 1000).toISOString()).limit(50),
     ]);
-    for (const r of interests ?? []) {
-      const v = (r as { interest: string | null }).interest;
-      if (v) topics.set(v, (topics.get(v) ?? 0) + 0.5);
+    const row = (interests ?? [])[0] as
+      | { primary_interest?: string | null; secondary_interest?: string | null; exploration_interest?: string | null }
+      | undefined;
+    for (const [v, w] of [
+      [row?.primary_interest, 0.6], [row?.secondary_interest, 0.45], [row?.exploration_interest, 0.35],
+    ] as [string | null | undefined, number][]) {
+      if (v) topics.set(v, (topics.get(v) ?? 0) + w);
     }
-    if ((interests ?? []).length) strategies.push("interests");
+    if (row?.primary_interest) strategies.push("interests");
 
     const seedIds = (hist ?? []).map((r: { video_id: string }) => r.video_id);
     if (seedIds.length) {
