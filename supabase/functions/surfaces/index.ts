@@ -294,6 +294,7 @@ Deno.serve(async (req) => {
         pool: poolSize, after_universal: universal.length,
         excluded_by_client: universal.length - filtered.length,
         picked: picked.length, max_per_channel: effectiveContract.maxPerChannel,
+        strict_halal: strictHalal, content_languages: effectiveLanguages,
       },
     });
 
@@ -306,11 +307,14 @@ Deno.serve(async (req) => {
       device_class: deviceClass,
       browser,
       ui_language: uiLanguage ?? prefs?.ui_language ?? null,
+      strict_halal: strictHalal,
+      content_languages: effectiveLanguages,
       recent_topics: recentTopics,
       weights: config.weights,
       cold_start_strategy: (ctx as any).coldStartStrategy ?? null,
       steps: trace,
     };
+
 
     const resp: SurfaceResponse = {
       surface,
