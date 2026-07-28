@@ -31,6 +31,12 @@ interface RegionalMix {
 export function LanguageSettings() {
   const { t, preferences, updatePreferences } = useLocale();
   const [regions, setRegions] = useState<RegionalMix[]>([]);
+  // Local mirror so the slider thumb tracks the drag; committed on release.
+  const [diversity, setDiversity] = useState(preferences.diversity_level);
+
+  useEffect(() => {
+    setDiversity(preferences.diversity_level);
+  }, [preferences.diversity_level]);
 
   useEffect(() => {
     supabase
@@ -163,12 +169,13 @@ export function LanguageSettings() {
 
         {/* Diversity */}
         <div className="space-y-2">
-          <Label>{t("language.diversity")} · {preferences.diversity_level}</Label>
+          <Label>{t("language.diversity")} · {diversity}</Label>
           <Slider
-            value={[preferences.diversity_level]}
+            value={[diversity]}
             min={0}
             max={100}
             step={5}
+            onValueChange={(v) => setDiversity(v[0])}
             onValueCommit={(v) => save({ diversity_level: v[0] })}
           />
           <p className="text-micro text-muted-foreground">{t("language.diversityHint")}</p>
