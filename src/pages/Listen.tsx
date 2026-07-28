@@ -52,6 +52,22 @@ export default function Listen() {
     return SPEAKERS.filter((s) => s.name.toLowerCase().includes(q));
   }, [speakerQuery]);
 
+  /**
+   * Opening a reciter must always land on Al-Fatihah. Without resetting the
+   * scroll position the browser keeps the offset from the reciter grid, so the
+   * surah list appears to open mid-way down (e.g. at surah 60+).
+   */
+  const openReciter = (reciterId: string) => {
+    setSelectedReciterId(reciterId);
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+  const closeReciter = () => {
+    setSelectedReciterId(null);
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+
   const playWholeQuran = (reciterId: string) => {
     const tracks = reciterQuranTracks(reciterId);
     if (tracks.length === 0) {
@@ -97,7 +113,7 @@ export default function Listen() {
             reciter={selectedReciter}
             tracks={surahTracks}
             currentId={currentTrack?.id ?? null}
-            onBack={() => setSelectedReciterId(null)}
+            onBack={closeReciter}
             onPlayAll={() => playWholeQuran(selectedReciter.id)}
             onPlaySurah={(idx) => playSurah(selectedReciter.id, idx)}
           />
@@ -143,7 +159,7 @@ export default function Listen() {
             {tab === "reciters" ? (
               <RecitersSection
                 reciters={filteredReciters}
-                onSelect={setSelectedReciterId}
+                onSelect={openReciter}
                 query={reciterQuery}
                 onQueryChange={setReciterQuery}
               />
