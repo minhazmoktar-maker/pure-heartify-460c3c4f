@@ -113,7 +113,7 @@ export default function Listen() {
             reciter={selectedReciter}
             tracks={surahTracks}
             currentId={currentTrack?.id ?? null}
-            onBack={() => setSelectedReciterId(null)}
+            onBack={closeReciter}
             onPlayAll={() => playWholeQuran(selectedReciter.id)}
             onPlaySurah={(idx) => playSurah(selectedReciter.id, idx)}
           />
@@ -159,7 +159,7 @@ export default function Listen() {
             {tab === "reciters" ? (
               <RecitersSection
                 reciters={filteredReciters}
-                onSelect={setSelectedReciterId}
+                onSelect={openReciter}
                 query={reciterQuery}
                 onQueryChange={setReciterQuery}
               />
