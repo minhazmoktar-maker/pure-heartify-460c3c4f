@@ -110,6 +110,10 @@ const MP3QURAN: ReciterRecord[] = [
   // Egyptian classical / Mujawwad tradition
   { id: "husr",          name: "Mahmoud Khalil Al-Husary",       location: "Tanta",        server: 13, mp3quranSlug: "husr" },
   { id: "minsh",         name: "Muhammad Siddiq Al-Minshawi",    location: "Cairo",        server: 10, mp3quranSlug: "minsh" },
+  // Al-Mus'haf Al-Mu'allim — the beloved teaching mus'haf where Minshawi
+  // recites and a child repeats after him. Full 114 surahs, verified 200.
+  { id: "minsh-muallim", name: "Al-Minshawi — Al-Mus'haf Al-Mu'allim (child repeats)", location: "Cairo", server: 10, mp3quranSlug: "minsh/Almusshaf-Al-Mo-lim" },
+  { id: "minsh-mujawwad", name: "Al-Minshawi — Mujawwad",         location: "Cairo",        server: 10, mp3quranSlug: "minsh/Almusshaf-Al-Mojawwad" },
   { id: "basit",         name: "AbdulBasit AbdusSamad",          location: "Cairo",        server: 7,  mp3quranSlug: "basit" },
   { id: "banna",         name: "Mahmoud Ali Al-Banna",           location: "Cairo",        server: 8,  mp3quranSlug: "bna" },
   { id: "mustafa",       name: "Mustafa Ismail",                 location: "Cairo",        server: 8,  mp3quranSlug: "mustafa" },
