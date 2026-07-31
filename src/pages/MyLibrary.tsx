@@ -49,6 +49,14 @@ export default function MyLibrary() {
           </div>
         )}
 
+        {user && (
+          <div className="mb-6">
+            <BenefitLabelPrompt />
+          </div>
+        )}
+
+
+
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
           {TILES.map(({ to, label, hint, icon: Icon }) => (
             <li key={to}>
