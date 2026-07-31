@@ -6,6 +6,7 @@ import type { SurfaceVideo, SurfaceContext } from "./types.ts";
 import { traceStep } from "./types.ts";
 import { shuffleWithSeed, sessionSeed } from "./diversity.ts";
 import { DEFAULT_FEED_CONFIG, type FeedRuntimeConfig } from "./config.ts";
+import { applyBenefitRanking } from "./benefit.ts";
 
 /**
  * Personalization seed. Mixes session + user + slider + device/browser so
