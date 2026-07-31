@@ -82,7 +82,7 @@ export default function PublicStreak() {
                 <div className="space-y-1">
                   <p className="text-micro uppercase tracking-widest text-muted-foreground">{label}</p>
                   <h1 className="text-display font-black tabular-nums">{nDays}</h1>
-                  <p className="text-heading font-semibold">day{nDays === 1 ? "" : "s"} of consistent worship</p>
+                  <p className="text-heading font-semibold">day{nDays === 1 ? "" : "s"} of beneficial habits</p>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   by{" "}
