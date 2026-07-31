@@ -93,6 +93,51 @@ export function benefitPrior(v: SurfaceVideo, p: BenefitPriors): { score: number
 }
 
 /**
+ * MVP-6 — Benefit surfaces.
+ *
+ * Turns a measured benefit prior into an honest, human reason chip so the
+ * ranking is legible to the person reading the feed instead of being a silent
+ * reorder. Only annotates where the evidence is real (enough answered labels
+ * AND a prior meaningfully above the platform baseline), and never overwrites
+ * a reason a retriever already produced.
+ */
+export const BENEFIT_CHIP_MIN_LABELS = 4;
+export const BENEFIT_CHIP_MIN_LIFT = 0.05;
+
+export function annotateBenefit(
+  items: SurfaceVideo[],
+  priors: BenefitPriors,
+): { items: SurfaceVideo[]; annotated: number } {
+  let annotated = 0;
+  const out = items.map((v) => {
+    const ch = v.channel_id ? priors.channels[v.channel_id] : undefined;
+    const cat = v.category ? priors.categories[v.category] : undefined;
+    const evidence = ch && ch[1] >= BENEFIT_CHIP_MIN_LABELS
+      ? { score: ch[0], n: ch[1], scope: "channel" as const }
+      : cat && cat[1] >= BENEFIT_CHIP_MIN_LABELS
+      ? { score: cat[0], n: cat[1], scope: "category" as const }
+      : null;
+
+    const score = evidence ? evidence.score : benefitPrior(v, priors).score;
+    const withScore = { ...v, benefit_score: score };
+    if (!evidence || evidence.score < priors.global + BENEFIT_CHIP_MIN_LIFT) return withScore;
+    if (v.reason) return withScore; // retriever reason wins — don't stack chips
+
+    const pct = Math.round(evidence.score * 100);
+    annotated++;
+    return {
+      ...withScore,
+      reason: evidence.scope === "channel"
+        ? `${pct}% said this source was worth their time`
+        : `${pct}% said ${v.category} was worth their time`,
+    };
+  });
+  return { items: out, annotated };
+}
+
+
+
+/**
  * Re-rank a retrieved pool by measured benefit while preserving most of the
  * original retrieval order (rank blending, not a hard sort): final position
  * score = 0.7 * inverse-rank + 0.3 * benefit prior delta.
@@ -146,6 +191,8 @@ export async function applyBenefitRanking(
   const before = items.slice(0, 10).map((v) => v.video_id);
   const ranked = rerankByBenefit(items, priors);
   const moved = ranked.slice(0, 10).filter((v) => !before.includes(v.video_id)).length;
+  // MVP-6 — make the ranking legible on the card itself.
+  const { items: labelled, annotated } = annotateBenefit(ranked, priors);
   traceStep(ctx, "benefit_rank", {
     arm: "treatment",
     bucket,
@@ -153,6 +200,8 @@ export async function applyBenefitRanking(
     labels: priors.sample_size,
     global: priors.global,
     top10_changed: moved,
+    benefit_chips: annotated,
   });
-  return { items: ranked, arm: "treatment", reason: "ranked" };
+  return { items: labelled, arm: "treatment", reason: "ranked" };
 }
+
