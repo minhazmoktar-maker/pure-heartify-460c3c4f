@@ -3,6 +3,7 @@ import { ListMusic, Clock, Heart, Download, ShieldCheck, Bookmark, PlayCircle, C
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
+import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
 
 type Tile = {
   to: string;
