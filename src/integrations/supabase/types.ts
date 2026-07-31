@@ -5585,6 +5585,7 @@ export type Database = {
       attestation_payload: { Args: { _video_id: string }; Returns: Json }
       backfill_reciter_alias_variants: { Args: never; Returns: number }
       backfill_video_attestations: { Args: { _limit?: number }; Returns: Json }
+      benefit_arm_readout: { Args: { _days?: number }; Returns: Json }
       benefit_label_stats: { Args: never; Returns: Json }
       benefit_priors_v1: { Args: never; Returns: Json }
       check_channel_duplicate: {
