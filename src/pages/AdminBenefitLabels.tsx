@@ -143,7 +143,58 @@ export default function AdminBenefitLabels() {
                 </tbody>
               </table>
             </div>
+
+            {arms?.arms?.length ? (
+              <section className="mt-10">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Benefit ranker — arm readout
+                </h2>
+                <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                  Guardrail for the ranker rollout over the last{" "}
+                  {arms.window_days} days. Ramp only when treatment's worth-it
+                  rate holds at or above control on comparable volume.
+                </p>
+                <div className="mt-4 overflow-hidden rounded-xl border border-border">
+                  <table className="w-full text-sm">
+                    <caption className="sr-only">
+                      Benefit labels by ranker arm
+                    </caption>
+                    <thead className="bg-muted/50 text-left text-micro text-muted-foreground">
+                      <tr>
+                        <th scope="col" className="px-4 py-2">Arm</th>
+                        <th scope="col" className="px-4 py-2">Users</th>
+                        <th scope="col" className="px-4 py-2">Answered</th>
+                        <th scope="col" className="px-4 py-2">Response rate</th>
+                        <th scope="col" className="px-4 py-2">Worth it</th>
+                        <th scope="col" className="px-4 py-2">Acted on</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {arms.arms.map((a) => (
+                        <tr key={a.arm} className="border-t border-border">
+                          <td className="px-4 py-2 font-medium capitalize text-foreground">
+                            {a.arm}
+                          </td>
+                          <td className="px-4 py-2">{a.users}</td>
+                          <td className="px-4 py-2">
+                            {a.answered} / {a.scheduled}
+                          </td>
+                          <td className="px-4 py-2">
+                            {Math.round((a.response_rate ?? 0) * 100)}%
+                          </td>
+                          <td className="px-4 py-2">
+                            {Math.round((a.worth_it_rate ?? 0) * 100)}%
+                          </td>
+                          <td className="px-4 py-2">{a.acted_on}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            ) : null}
           </>
+
         ) : null}
       </main>
     </div>
