@@ -5,6 +5,8 @@ import SEO from "@/components/SEO";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConceptCatalog, groupByDomain } from "@/hooks/useConcepts";
+import { useLearningPaths } from "@/hooks/useLearningPaths";
+import { ChevronRight } from "lucide-react";
 
 /**
  * MVP-3 — Knowledge graph browse surface.
