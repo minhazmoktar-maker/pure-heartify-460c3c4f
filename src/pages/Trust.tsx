@@ -11,8 +11,13 @@ type TrustStats = {
   reviewed_videos: number;
   removed_videos: number;
   languages_covered: number;
+  surfaced_videos?: number;
+  attested_videos?: number;
+  ledger_records?: number;
+  ledger_chain_head?: string | null;
   generated_at: string;
 };
+
 
 function useTrustStats() {
   return useQuery({
