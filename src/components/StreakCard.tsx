@@ -94,7 +94,7 @@ export function StreakCard() {
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             {s.current > 0
-              ? `${s.current} day${s.current === 1 ? "" : "s"} of consistent worship`
+              ? `${s.current} day${s.current === 1 ? "" : "s"} of beneficial habits`
               : "Start today and build a habit"}
           </p>
         </div>
