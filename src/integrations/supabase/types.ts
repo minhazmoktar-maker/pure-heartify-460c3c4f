@@ -1173,6 +1173,143 @@ export type Database = {
           },
         ]
       }
+      concept_prerequisites: {
+        Row: {
+          concept_id: string
+          created_at: string
+          id: string
+          note: string | null
+          prerequisite_id: string
+          strength: number
+        }
+        Insert: {
+          concept_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          prerequisite_id: string
+          strength?: number
+        }
+        Update: {
+          concept_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          prerequisite_id?: string
+          strength?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concept_prerequisites_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concept_prerequisites_prerequisite_id_fkey"
+            columns: ["prerequisite_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concept_video_segments: {
+        Row: {
+          annotated_by: string
+          annotator_user_id: string | null
+          concept_id: string
+          confidence: number
+          created_at: string
+          end_seconds: number | null
+          id: string
+          role: string
+          start_seconds: number | null
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          annotated_by?: string
+          annotator_user_id?: string | null
+          concept_id: string
+          confidence?: number
+          created_at?: string
+          end_seconds?: number | null
+          id?: string
+          role?: string
+          start_seconds?: number | null
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          annotated_by?: string
+          annotator_user_id?: string | null
+          concept_id?: string
+          confidence?: number
+          created_at?: string
+          end_seconds?: number | null
+          id?: string
+          role?: string
+          start_seconds?: number | null
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concept_video_segments_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concepts: {
+        Row: {
+          aliases: string[]
+          arabic_term: string | null
+          created_at: string
+          domain: string
+          id: string
+          is_published: boolean
+          level: number
+          slug: string
+          sort_order: number
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          aliases?: string[]
+          arabic_term?: string | null
+          created_at?: string
+          domain: string
+          id?: string
+          is_published?: boolean
+          level?: number
+          slug: string
+          sort_order?: number
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          aliases?: string[]
+          arabic_term?: string | null
+          created_at?: string
+          domain?: string
+          id?: string
+          is_published?: boolean
+          level?: number
+          slug?: string
+          sort_order?: number
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -5375,6 +5512,14 @@ export type Database = {
         Args: { _from: string; _to: string }
         Returns: Json
       }
+      annotate_concept_segments: {
+        Args: {
+          _concept_limit?: number
+          _min_rank?: number
+          _videos_per_concept?: number
+        }
+        Returns: Json
+      }
       assign_experiment_variant: {
         Args: { _anon_key: string; _experiment_key: string }
         Returns: string
@@ -5435,6 +5580,15 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      concept_coverage_gaps: {
+        Args: { _limit?: number }
+        Returns: {
+          domain: string
+          level: number
+          slug: string
+          title: string
+        }[]
       }
       contribute_to_dhikr_circle: {
         Args: { _circle_id: string; _count: number }
@@ -5517,6 +5671,8 @@ export type Database = {
           source: Database["public"]["Enums"]["trust_event_source"]
         }[]
       }
+      get_concept: { Args: { _slug: string }; Returns: Json }
+      get_concept_graph_stats: { Args: never; Returns: Json }
       get_feed_candidates_diversified: {
         Args: {
           _category?: string
