@@ -58,7 +58,7 @@ export default function Trust() {
   const surfaced = stats?.surfaced_videos ?? 0;
   const coveragePct =
     surfaced > 0
-      ? `${Math.min(100, Math.round(((stats?.attested_videos ?? 0) / surfaced) * 1000) / 10}%`
+      ? `${Math.min(100, Math.round(((stats?.attested_videos ?? 0) / surfaced) * 1000) / 10)}%`
       : "—";
 
 
