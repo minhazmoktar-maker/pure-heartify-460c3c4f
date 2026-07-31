@@ -57,7 +57,7 @@ export function StreakCard() {
       kind: "streak_milestone",
       refId: String(s.current),
       title: "My Heartify streak",
-      text: `I'm on a ${s.current}-day Heartify streak 🔥 — building consistent worship, in shaa Allah.`,
+      text: `I'm on a ${s.current}-day Heartify streak 🔥 — building beneficial habits, in shaa Allah.`,
       url: handle ? `${window.location.origin}/s/${handle}/${s.current}` : undefined,
     });
 
