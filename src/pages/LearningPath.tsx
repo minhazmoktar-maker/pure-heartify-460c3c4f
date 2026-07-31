@@ -227,14 +227,11 @@ export default function LearningPath() {
                           {locked ? (
                             <>
                               <Lock className="h-3.5 w-3.5" aria-hidden />
-                              Best after step {step.step_order - 1}
+                              Best after step {step.step_order - 1} ·{" "}
                             </>
-                          ) : (
-                            <>
-                              {step.lesson_count} reviewed{" "}
-                              {step.lesson_count === 1 ? "lesson" : "lessons"}
-                            </>
-                          )}
+                          ) : null}
+                          {step.lesson_count} reviewed{" "}
+                          {step.lesson_count === 1 ? "lesson" : "lessons"}
                         </span>
                       </div>
                     </div>
