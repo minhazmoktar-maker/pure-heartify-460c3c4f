@@ -2,6 +2,8 @@
 
 *A timeless strategy document. Written to guide Heartify for the next decade, not the next quarter.*
 
+> **Governing document:** `docs/FIRST_PRINCIPLES_2046.md` — the founding-team, first-principles company blueprint (mission, moats, Top 100 opportunities, dependency graph, 10/3/1-year roadmaps, MVP sequence). Where this thesis and the blueprint conflict, the blueprint governs.
+
 ---
 
 ## 0. Why Heartify exists
