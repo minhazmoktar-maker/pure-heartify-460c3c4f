@@ -854,9 +854,9 @@ MVP-8  Pay one scholar more than YouTube would.                [proves the econo
 | MVP-0 | Shipped | No-ads constitution in `mem://strategy/invariants.md`; revenue = membership / waqf / licensing. |
 | MVP-1 | Shipped | Append-only hash-chained ledger `public.attestations` (per-video digest, `prev_digest` → `chain_digest`, supersede-only corrections, no client write path). `get_public_attestation` is ledger-backed and `/verify/:videoId` renders the record, chain digest, and live re-verification. |
 | MVP-2 | Shipped | 103,140 / 103,140 surfaced videos attested (100.0%). Coverage published on `/trust` with the ledger chain head. `attestation-backfill-10min` cron re-attests new and re-reviewed videos; staleness is detected by recomputing the canonical payload. |
-| MVP-3 | Next | Concept graph: 500 concepts with segments + prerequisites. |
-| MVP-4 | Pending | T+90 benefit label collection. |
-| MVP-5 | Pending | Benefit-ranked feed for 10% of users. |
+| MVP-3 | Shipped | Knowledge graph live: 500 concepts across 10 domains, 400 prerequisite edges (DAG-guarded), 2,741 reviewed video segments, **500/500 concepts covered (100%)**. Public surfaces `/learn` (domain browse + search) and `/learn/:slug` (prerequisite ladder → reviewed lessons → next in ladder) with `LearningResource` JSON-LD. Auto-linking via `annotate_concept_segments` (alias-aware, rank-ranked, confidence ≤ 0.75 for machine links); gaps tracked by `concept_coverage_gaps`. |
+| MVP-4 | Shipped (collecting) | `public.benefit_labels` schedules "was this worth your time?" at **T+7 / T+30 / T+90** after every completed watch (`enqueue_benefit_labels`, daily cron `benefit-labels-daily` 03:10 UTC). Answers are write-once and guarded (`benefit_labels_guard`); one question at a time via `get_due_benefit_label`, answered through `submit_benefit_label` (dismiss defers 3 days, max 3 deferrals). Surface: `BenefitLabelPrompt` on Home. Admin readout: `/admin/benefit-labels` (`benefit_label_stats` — response rate, worth-it rate, clearly-yes rate per horizon). Never used as an engagement nudge. |
+| MVP-5 | Next | Benefit-ranked feed for 10% of users, once T+30 labels reach volume. |
 
 If MVP-1 through MVP-8 all succeed, the company is defensible for twenty years. If MVP-7 and MVP-8 fail, nothing else matters — the graph and the ledger only compound if institutions and creators bring their reputations into it.
 

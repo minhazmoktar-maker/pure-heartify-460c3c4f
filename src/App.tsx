@@ -51,6 +51,7 @@ const AdminApprovedChannels = lazy(() => import("./pages/AdminApprovedChannels.t
 const AdminOps = lazy(() => import("./pages/AdminOps.tsx"));
 const AdminRecHealth = lazy(() => import("./pages/AdminRecHealth.tsx"));
 const AdminFeedDiversity = lazy(() => import("./pages/AdminFeedDiversity.tsx"));
+const AdminBenefitLabels = lazy(() => import("./pages/AdminBenefitLabels.tsx"));
 const AdminDedup = lazy(() => import("./pages/AdminDedup.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
 const AdminReview = lazy(() => import("./pages/AdminReview.tsx"));
@@ -494,6 +495,7 @@ const App = () => (
                 <Route path="/admin/ops" element={<AdminRoute><AdminOps /></AdminRoute>} />
                 <Route path="/admin/rec-health" element={<AdminRoute><AdminRecHealth /></AdminRoute>} />
                 <Route path="/admin/feed-diversity" element={<AdminRoute><AdminFeedDiversity /></AdminRoute>} />
+                <Route path="/admin/benefit-labels" element={<AdminRoute><AdminBenefitLabels /></AdminRoute>} />
                 <Route path="/admin/dedup" element={<AdminRoute><AdminDedup /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
                 <Route path="/review/:token" element={<ReviewMagic />} />
