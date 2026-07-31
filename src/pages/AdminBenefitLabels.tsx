@@ -22,6 +22,23 @@ interface Stats {
   by_horizon: HorizonRow[];
 }
 
+interface ArmRow {
+  arm: string;
+  users: number;
+  scheduled: number;
+  answered: number;
+  worth_it: number;
+  acted_on: number;
+  response_rate: number;
+  worth_it_rate: number;
+}
+
+interface ArmReadout {
+  computed_at: string;
+  window_days: number;
+  arms: ArmRow[];
+}
+
 /** MVP-4 — admin readout for the T+90 benefit label programme. */
 export default function AdminBenefitLabels() {
   const { data, isLoading, error } = useQuery({
@@ -33,6 +50,18 @@ export default function AdminBenefitLabels() {
       return data as unknown as Stats;
     },
   });
+
+  // MVP-8 — ranker guardrail: treatment vs control on the benefit objective.
+  const { data: arms } = useQuery({
+    queryKey: ["benefit-arm-readout"],
+    staleTime: 60 * 1000,
+    queryFn: async (): Promise<ArmReadout> => {
+      const { data, error } = await supabase.rpc("benefit_arm_readout", { _days: 30 });
+      if (error) throw error;
+      return data as unknown as ArmReadout;
+    },
+  });
+
 
   return (
     <div className="min-h-dvh bg-background">
