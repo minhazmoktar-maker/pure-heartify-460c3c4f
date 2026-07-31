@@ -847,7 +847,19 @@ MVP-7  Get one university to co-sign.                          [proves the netwo
 MVP-8  Pay one scholar more than YouTube would.                [proves the economics]
 ```
 
+### Execution log
+
+| Step | Status | Evidence (2026-07-31) |
+| --- | --- | --- |
+| MVP-0 | Shipped | No-ads constitution in `mem://strategy/invariants.md`; revenue = membership / waqf / licensing. |
+| MVP-1 | Shipped | Append-only hash-chained ledger `public.attestations` (per-video digest, `prev_digest` → `chain_digest`, supersede-only corrections, no client write path). `get_public_attestation` is ledger-backed and `/verify/:videoId` renders the record, chain digest, and live re-verification. |
+| MVP-2 | Shipped | 103,140 / 103,140 surfaced videos attested (100.0%). Coverage published on `/trust` with the ledger chain head. `attestation-backfill-10min` cron re-attests new and re-reviewed videos; staleness is detected by recomputing the canonical payload. |
+| MVP-3 | Next | Concept graph: 500 concepts with segments + prerequisites. |
+| MVP-4 | Pending | T+90 benefit label collection. |
+| MVP-5 | Pending | Benefit-ranked feed for 10% of users. |
+
 If MVP-1 through MVP-8 all succeed, the company is defensible for twenty years. If MVP-7 and MVP-8 fail, nothing else matters — the graph and the ledger only compound if institutions and creators bring their reputations into it.
+
 
 **Sequencing rule:** never start step N+1 before step N has a published proof metric. We have historically shipped surface before substrate; this document exists to reverse that ordering permanently.
 
