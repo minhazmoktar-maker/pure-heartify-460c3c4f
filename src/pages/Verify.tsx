@@ -39,13 +39,29 @@ type Attestation = {
     rule_hits?: unknown;
     created_at: string;
   }>;
+  ledger?: {
+    record_id: string;
+    sequence: number;
+    ledger_version: string;
+    issuer: string;
+    issued_at: string;
+    digest: string;
+    prev_digest?: string | null;
+    chain_digest: string;
+    claims?: Record<string, unknown>;
+    verified: boolean;
+    stale: boolean;
+  } | null;
   attestation?: {
     algorithm: string;
     digest: string;
     issued_at: string;
     issuer: string;
+    canonical_form?: string;
+    ledger_backed?: boolean;
   };
 };
+
 
 const TIER_LABEL: Record<string, { name: string; tone: string; desc: string }> = {
   A: {
