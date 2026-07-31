@@ -220,6 +220,78 @@ export type Database = {
         }
         Relationships: []
       }
+      attestations: {
+        Row: {
+          chain_digest: string
+          channel_id: string | null
+          channel_title: string | null
+          claims: Json
+          created_at: string
+          digest: string
+          id: string
+          issued_at: string
+          issuer: string
+          ledger_version: string
+          payload: string
+          prev_digest: string | null
+          reviewer_chain: string
+          revocation_reason: string | null
+          revoked_at: string | null
+          seq: number
+          subject_kind: string
+          superseded_at: string | null
+          tier: string
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          chain_digest: string
+          channel_id?: string | null
+          channel_title?: string | null
+          claims?: Json
+          created_at?: string
+          digest: string
+          id?: string
+          issued_at?: string
+          issuer?: string
+          ledger_version?: string
+          payload: string
+          prev_digest?: string | null
+          reviewer_chain: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          seq?: number
+          subject_kind?: string
+          superseded_at?: string | null
+          tier: string
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          chain_digest?: string
+          channel_id?: string | null
+          channel_title?: string | null
+          claims?: Json
+          created_at?: string
+          digest?: string
+          id?: string
+          issued_at?: string
+          issuer?: string
+          ledger_version?: string
+          payload?: string
+          prev_digest?: string | null
+          reviewer_chain?: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          seq?: number
+          subject_kind?: string
+          superseded_at?: string | null
+          tier?: string
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       attributions: {
         Row: {
           created_at: string
@@ -5307,7 +5379,10 @@ export type Database = {
         Args: { _anon_key: string; _experiment_key: string }
         Returns: string
       }
+      attestation_coverage: { Args: never; Returns: Json }
+      attestation_payload: { Args: { _video_id: string }; Returns: Json }
       backfill_reciter_alias_variants: { Args: never; Returns: number }
+      backfill_video_attestations: { Args: { _limit?: number }; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
         Returns: {
@@ -5692,6 +5767,7 @@ export type Database = {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
       }
+      issue_video_attestation: { Args: { _video_id: string }; Returns: string }
       join_khatm_group: {
         Args: { _group_id: string; _invite_code?: string }
         Returns: undefined
