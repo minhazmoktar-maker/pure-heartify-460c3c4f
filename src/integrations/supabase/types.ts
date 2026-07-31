@@ -5706,6 +5706,10 @@ export type Database = {
         }
         Returns: Json
       }
+      apply_video_embeddings: {
+        Args: { _model: string; _rows: Json }
+        Returns: number
+      }
       assign_experiment_variant: {
         Args: { _anon_key: string; _experiment_key: string }
         Returns: string
@@ -5713,6 +5717,7 @@ export type Database = {
       attestation_coverage: { Args: never; Returns: Json }
       attestation_payload: { Args: { _video_id: string }; Returns: Json }
       backfill_reciter_alias_variants: { Args: never; Returns: number }
+      backfill_search_tsv: { Args: { _limit?: number }; Returns: number }
       backfill_video_attestations: { Args: { _limit?: number }; Returns: Json }
       benefit_arm_readout: { Args: { _days?: number }; Returns: Json }
       benefit_label_stats: { Args: never; Returns: Json }
