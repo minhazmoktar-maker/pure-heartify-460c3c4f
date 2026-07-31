@@ -324,24 +324,82 @@ export default function Verify() {
               )}
             </Card>
 
-            {/* Attestation digest */}
+            {/* Attestation ledger record */}
             <Card className="p-5">
               <h3 className="text-micro font-semibold uppercase tracking-wider text-muted-foreground">
-                Public attestation digest
+                Attestation ledger record
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                A deterministic SHA-256 fingerprint of this attestation. Anyone can recompute it from the fields above
-                — if the digest changes, the attestation changed.
+                Heartify keeps an append-only ledger of every review. Each record commits to the one before it, so a
+                past attestation cannot be quietly rewritten. The digest below is a deterministic SHA-256 fingerprint
+                you can recompute from the fields on this page.
               </p>
-              <div className="mt-3 flex items-start gap-2 rounded-card border border-border bg-muted/30 p-3 font-mono text-micro">
-                <Hash className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                <code className="break-all text-foreground">{data?.attestation?.digest}</code>
+
+              {data?.ledger ? (
+                <>
+                  <div
+                    className={`mt-3 inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-micro font-semibold ${
+                      data.ledger.stale
+                        ? "bg-muted text-muted-foreground"
+                        : "bg-emerald-500/15 text-emerald-600"
+                    }`}
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    {data.ledger.stale
+                      ? "Re-review pending — new record queued"
+                      : "Ledger record matches current review"}
+                  </div>
+                  <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div>
+                      <dt className="text-micro uppercase tracking-wider text-muted-foreground">Record</dt>
+                      <dd className="font-medium tabular-nums text-foreground">#{data.ledger.sequence}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-micro uppercase tracking-wider text-muted-foreground">Ledger version</dt>
+                      <dd className="font-medium text-foreground">{data.ledger.ledger_version}</dd>
+                    </div>
+                    <div className="col-span-2">
+                      <dt className="text-micro uppercase tracking-wider text-muted-foreground">Issued</dt>
+                      <dd className="font-medium text-foreground">{fmt(data.ledger.issued_at)}</dd>
+                    </div>
+                  </dl>
+                </>
+              ) : (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  No ledger record has been issued for this video yet — the digest below is computed live from the
+                  current review.
+                </p>
+              )}
+
+              <div className="mt-3 space-y-2">
+                <div className="flex items-start gap-2 rounded-card border border-border bg-muted/30 p-3 font-mono text-micro">
+                  <Hash className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <p className="mb-0.5 font-sans text-micro uppercase tracking-wider text-muted-foreground">
+                      Record digest
+                    </p>
+                    <code className="break-all text-foreground">{data?.attestation?.digest}</code>
+                  </div>
+                </div>
+                {data?.ledger ? (
+                  <div className="flex items-start gap-2 rounded-card border border-border bg-muted/30 p-3 font-mono text-micro">
+                    <Hash className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    <div className="min-w-0">
+                      <p className="mb-0.5 font-sans text-micro uppercase tracking-wider text-muted-foreground">
+                        Chain digest
+                      </p>
+                      <code className="break-all text-foreground">{data.ledger.chain_digest}</code>
+                    </div>
+                  </div>
+                ) : null}
               </div>
+
               <p className="mt-2 text-micro text-muted-foreground">
-                Algorithm: {data?.attestation?.algorithm} · Issued {fmt(data?.attestation?.issued_at)} ·{" "}
+                Algorithm: {data?.attestation?.algorithm} · {data?.attestation?.canonical_form ?? "heartify.attestation.v1"} ·{" "}
                 {data?.attestation?.issuer}
               </p>
             </Card>
+
 
             {/* Report SLA */}
             <Card className="p-5">
