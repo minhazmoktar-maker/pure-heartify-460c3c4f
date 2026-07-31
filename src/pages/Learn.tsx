@@ -15,6 +15,7 @@ import { ChevronRight } from "lucide-react";
  */
 export default function Learn() {
   const { data, isLoading } = useConceptCatalog();
+  const { data: paths, isLoading: pathsLoading } = useLearningPaths();
   const [q, setQ] = useState("");
 
   const domains = useMemo(() => {
