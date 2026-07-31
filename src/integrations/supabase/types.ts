@@ -5586,6 +5586,7 @@ export type Database = {
       backfill_reciter_alias_variants: { Args: never; Returns: number }
       backfill_video_attestations: { Args: { _limit?: number }; Returns: Json }
       benefit_label_stats: { Args: never; Returns: Json }
+      benefit_priors_v1: { Args: never; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
         Returns: {
