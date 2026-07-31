@@ -286,7 +286,11 @@ export async function retrieveForYou(ctx: SurfaceContext) {
   for (const v of merged) if (!dedup.has(v.video_id)) dedup.set(v.video_id, v);
   // Preserve ranked order for the personalized head; only jitter the tail.
   // A high diversity slider shrinks the pinned head so more of the pool moves.
-  const arr = Array.from(dedup.values());
+  // MVP-5: benefit-ranked arm (10% of signed-in users by default). Re-orders
+  // the pool by measured T+7/30/90 "worth it" outcomes before head/tail split.
+  const benefit = await applyBenefitRanking(ctx, Array.from(dedup.values()));
+  const arr = benefit.items;
+  (ctx as any).benefitArm = benefit.arm;
   const level = cfg.sliderEnabled ? (ctx.diversityLevel ?? 50) : 50;
   const headSize = Math.max(4, Math.round(24 - (level / 100) * 20));
   const head = arr.slice(0, headSize);
