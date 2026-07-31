@@ -78,9 +78,39 @@ export default function Trust() {
             <StatTile label="Videos removed" value={stats?.removed_videos} loading={isLoading} />
             <StatTile label="Languages covered" value={stats?.languages_covered} loading={isLoading} />
           </div>
+
+          <div className="mt-3 rounded-card border border-border bg-card p-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div>
+                <div className="text-micro uppercase tracking-wider text-muted-foreground">
+                  Attestation coverage
+                </div>
+                <p className="mt-1 text-sm text-foreground">
+                  Every video we surface carries a signed, append-only attestation record you can look up.
+                </p>
+              </div>
+              {isLoading || stats?.attested_videos === undefined ? (
+                <Skeleton className="h-7 w-24" />
+              ) : (
+                <div className="text-heading font-semibold tabular-nums text-foreground">
+                  {coveragePct}
+                  <span className="ml-1 text-micro font-normal text-muted-foreground">
+                    ({stats.attested_videos.toLocaleString()} of {(stats.surfaced_videos ?? 0).toLocaleString()})
+                  </span>
+                </div>
+              )}
+            </div>
+            {stats?.ledger_chain_head ? (
+              <p className="mt-3 break-all font-mono text-micro text-muted-foreground">
+                Ledger chain head: {stats.ledger_chain_head}
+              </p>
+            ) : null}
+          </div>
+
           <p className="mt-2 text-micro text-muted-foreground">
             Counts are aggregated from the live moderation ledger and refresh hourly. We never publish individual moderator names or per-decision details.
           </p>
+
         </section>
 
         <div className="mt-8 grid gap-4">
