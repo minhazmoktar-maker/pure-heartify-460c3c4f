@@ -2876,6 +2876,135 @@ export type Database = {
           },
         ]
       }
+      learning_path_progress: {
+        Row: {
+          completed_at: string
+          concept_id: string
+          created_at: string
+          id: string
+          path_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          concept_id: string
+          created_at?: string
+          id?: string
+          path_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          concept_id?: string
+          created_at?: string
+          id?: string
+          path_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_path_progress_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_path_progress_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_path_steps: {
+        Row: {
+          concept_id: string
+          created_at: string
+          id: string
+          note: string | null
+          path_id: string
+          step_order: number
+          updated_at: string
+        }
+        Insert: {
+          concept_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          path_id: string
+          step_order: number
+          updated_at?: string
+        }
+        Update: {
+          concept_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          path_id?: string
+          step_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_path_steps_concept_id_fkey"
+            columns: ["concept_id"]
+            isOneToOne: false
+            referencedRelation: "concepts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_path_steps_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_paths: {
+        Row: {
+          created_at: string
+          description: string | null
+          domain: string
+          id: string
+          published: boolean
+          slug: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          domain: string
+          id?: string
+          published?: boolean
+          slug: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          domain?: string
+          id?: string
+          published?: boolean
+          slug?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       moderation_clusters: {
         Row: {
           candidate_count: number
@@ -5789,6 +5918,19 @@ export type Database = {
         }[]
       }
       get_internal_config: { Args: { _key: string }; Returns: string }
+      get_learning_path: { Args: { _slug: string }; Returns: Json }
+      get_learning_paths: {
+        Args: never
+        Returns: {
+          completed_count: number
+          description: string
+          domain: string
+          slug: string
+          step_count: number
+          subtitle: string
+          title: string
+        }[]
+      }
       get_moderation_config: { Args: { _key: string }; Returns: Json }
       get_ops_dashboard: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
@@ -6385,6 +6527,10 @@ export type Database = {
       send_nudge_by_handle: {
         Args: { _handle: string; _kind: string; _message: string }
         Returns: Json
+      }
+      set_learning_step_progress: {
+        Args: { _completed: boolean; _concept_slug: string; _path_slug: string }
+        Returns: boolean
       }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
