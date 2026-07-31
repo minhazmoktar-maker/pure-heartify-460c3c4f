@@ -520,6 +520,63 @@ export type Database = {
         }
         Relationships: []
       }
+      benefit_labels: {
+        Row: {
+          acted_on: boolean | null
+          asked_at: string | null
+          created_at: string
+          dismissed_count: number
+          due_at: string
+          horizon_days: number
+          id: string
+          note: string | null
+          remembered: boolean | null
+          responded_at: string | null
+          updated_at: string
+          user_id: string
+          video_id: string
+          video_title: string | null
+          watched_at: string
+          worth_it: string | null
+        }
+        Insert: {
+          acted_on?: boolean | null
+          asked_at?: string | null
+          created_at?: string
+          dismissed_count?: number
+          due_at: string
+          horizon_days: number
+          id?: string
+          note?: string | null
+          remembered?: boolean | null
+          responded_at?: string | null
+          updated_at?: string
+          user_id: string
+          video_id: string
+          video_title?: string | null
+          watched_at: string
+          worth_it?: string | null
+        }
+        Update: {
+          acted_on?: boolean | null
+          asked_at?: string | null
+          created_at?: string
+          dismissed_count?: number
+          due_at?: string
+          horizon_days?: number
+          id?: string
+          note?: string | null
+          remembered?: boolean | null
+          responded_at?: string | null
+          updated_at?: string
+          user_id?: string
+          video_id?: string
+          video_title?: string | null
+          watched_at?: string
+          worth_it?: string | null
+        }
+        Relationships: []
+      }
       blocked_creators: {
         Row: {
           created_at: string
@@ -5528,6 +5585,7 @@ export type Database = {
       attestation_payload: { Args: { _video_id: string }; Returns: Json }
       backfill_reciter_alias_variants: { Args: never; Returns: number }
       backfill_video_attestations: { Args: { _limit?: number }; Returns: Json }
+      benefit_label_stats: { Args: never; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
         Returns: {
@@ -5622,6 +5680,7 @@ export type Database = {
       }
       end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
+      enqueue_benefit_labels: { Args: { _limit?: number }; Returns: Json }
       evaluate_feature_flag: {
         Args: { _key: string; _user_id: string }
         Returns: boolean
@@ -5673,6 +5732,7 @@ export type Database = {
       }
       get_concept: { Args: { _slug: string }; Returns: Json }
       get_concept_graph_stats: { Args: never; Returns: Json }
+      get_due_benefit_label: { Args: never; Returns: Json }
       get_feed_candidates_diversified: {
         Args: {
           _category?: string
@@ -6326,6 +6386,17 @@ export type Database = {
       }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
+      submit_benefit_label: {
+        Args: {
+          _acted_on?: boolean
+          _dismiss?: boolean
+          _id: string
+          _note?: string
+          _remembered?: boolean
+          _worth_it?: string
+        }
+        Returns: boolean
+      }
       sweep_inappropriate_content: { Args: never; Returns: Json }
       unaccent: { Args: { "": string }; Returns: string }
       unread_notification_count: { Args: never; Returns: number }
