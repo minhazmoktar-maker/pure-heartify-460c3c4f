@@ -495,6 +495,7 @@ const App = () => (
                 <Route path="/admin/ops" element={<AdminRoute><AdminOps /></AdminRoute>} />
                 <Route path="/admin/rec-health" element={<AdminRoute><AdminRecHealth /></AdminRoute>} />
                 <Route path="/admin/feed-diversity" element={<AdminRoute><AdminFeedDiversity /></AdminRoute>} />
+                <Route path="/admin/benefit-labels" element={<AdminRoute><AdminBenefitLabels /></AdminRoute>} />
                 <Route path="/admin/dedup" element={<AdminRoute><AdminDedup /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
                 <Route path="/review/:token" element={<ReviewMagic />} />
