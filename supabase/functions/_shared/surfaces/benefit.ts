@@ -64,12 +64,12 @@ export async function loadBenefitFlag(service: any): Promise<BenefitRolloutFlag>
   try {
     const { data, error } = await service
       .from("feature_flags")
-      .select("enabled, kill_switch, rollout_percentage, targeting_rules")
+      .select("enabled, kill_switch, rollout_percent, targeting_rules")
       .eq("key", "feed.benefit_ranked")
       .maybeSingle();
     if (error || !data) return fallback;
     const rules = (data.targeting_rules ?? {}) as Record<string, unknown>;
-    const pctRaw = data.rollout_percentage ?? rules.rollout_percentage ?? 10;
+    const pctRaw = data.rollout_percent ?? rules.rollout_percentage ?? 10;
     const pct = Number(pctRaw);
     const flag: BenefitRolloutFlag = {
       enabled: data.kill_switch !== true && data.enabled !== false,
