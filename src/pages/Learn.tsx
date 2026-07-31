@@ -60,6 +60,73 @@ export default function Learn() {
           />
         </div>
 
+        <section aria-labelledby="paths-heading" className="mt-10">
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2 id="paths-heading" className="text-lg font-semibold text-foreground">
+              Guided paths
+            </h2>
+            <span className="text-micro text-muted-foreground">
+              Ordered by prerequisites
+            </span>
+          </div>
+          {pathsLoading ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-28 w-full rounded-2xl" />
+              ))}
+            </div>
+          ) : (paths?.length ?? 0) === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Guided paths are being prepared.
+            </p>
+          ) : (
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {paths!.map((p) => {
+                const pct = p.step_count
+                  ? Math.round((p.completed_count / p.step_count) * 100)
+                  : 0;
+                return (
+                  <li key={p.slug}>
+                    <Link
+                      to={`/learn/path/${p.slug}`}
+                      className="flex min-h-[112px] flex-col justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
+                    >
+                      <div>
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="text-base font-semibold text-foreground">
+                            {p.title}
+                          </span>
+                          <ChevronRight
+                            className="h-4 w-4 shrink-0 text-muted-foreground"
+                            aria-hidden
+                          />
+                        </span>
+                        {p.subtitle ? (
+                          <span className="mt-1 block text-xs text-muted-foreground">
+                            {p.subtitle}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-3">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-primary"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="mt-1.5 block text-micro text-muted-foreground">
+                          {p.completed_count} of {p.step_count} steps · {p.domain}
+                        </span>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+
         {isLoading ? (
           <div className="mt-10 space-y-8">
             {Array.from({ length: 3 }).map((_, i) => (
