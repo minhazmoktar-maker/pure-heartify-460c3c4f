@@ -312,6 +312,7 @@ Deno.serve(async (req) => {
       recent_topics: recentTopics,
       weights: config.weights,
       cold_start_strategy: (ctx as any).coldStartStrategy ?? null,
+      benefit_arm: (ctx as any).benefitArm ?? null,
       steps: trace,
     };
 
