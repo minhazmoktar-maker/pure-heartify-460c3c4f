@@ -3,6 +3,7 @@ import { ListMusic, Clock, Heart, Download, ShieldCheck, Bookmark, PlayCircle, C
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
+import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
 
 type Tile = {
   to: string;
@@ -48,6 +49,14 @@ export default function MyLibrary() {
             </p>
           </div>
         )}
+
+        {user && (
+          <div className="mb-6">
+            <BenefitLabelPrompt />
+          </div>
+        )}
+
+
 
         <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
           {TILES.map(({ to, label, hint, icon: Icon }) => (
