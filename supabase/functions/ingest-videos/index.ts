@@ -637,23 +637,24 @@ async function embedNewVideos(rows: Record<string, unknown>[]) {
   if (!items.length) return;
 
   // OpenAI text-embedding-3-small caps at 300k tokens/req; batch of 100 is safe.
+  // Writes go through apply_video_embeddings() so a batch of 100 vectors costs ONE
+  // set-based UPDATE instead of 100 single-row PATCHes (each of which previously
+  // re-ran the whole-row moderation triggers — the top DB cost in the project).
   for (let i = 0; i < items.length; i += 100) {
     const slice = items.slice(i, i + 100);
     const vecs = await embedTexts(slice.map((s) => s.text));
     if (!vecs) continue;
-    await Promise.all(
-      slice.map((s, idx) =>
-        sbFetch(`curated_videos?video_id=eq.${encodeURIComponent(s.video_id)}`, {
-          method: "PATCH",
-          headers: { "Prefer": "return=headers-only" },
-          body: JSON.stringify({
-            embedding: toPgVector(vecs[idx]),
-            embedding_model: "openai/text-embedding-3-small",
-            embedding_updated_at: new Date().toISOString(),
-          }),
-        }).catch(() => {}),
-      ),
-    );
+    await sbFetch("rpc/apply_video_embeddings", {
+      method: "POST",
+      headers: { "Prefer": "return=minimal" },
+      body: JSON.stringify({
+        _rows: slice.map((s, idx) => ({
+          video_id: s.video_id,
+          embedding: toPgVector(vecs[idx]),
+        })),
+        _model: "openai/text-embedding-3-small",
+      }),
+    }).catch((e) => console.warn("[embed] apply_video_embeddings failed:", e));
   }
 }
 

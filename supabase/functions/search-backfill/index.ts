@@ -26,35 +26,20 @@ Deno.serve(async (req) => {
   const batchSize = Math.min(Math.max(Number(body.batch_size ?? 500), 50), 2000);
   const maxBatches = Math.min(Math.max(Number(body.max_batches ?? 10), 1), 100);
 
+  // One set-based UPDATE per batch via backfill_search_tsv() — replaces the old
+  // per-row "touch" loop (batchSize round-trips + trigger re-runs per batch).
   let updated = 0;
   for (let i = 0; i < maxBatches; i++) {
-    const { data: slice, error: selErr } = await admin
-      .from("curated_videos")
-      .select("id,title,channel_title,category")
-      .is("search_tsv", null)
-      .limit(batchSize);
-    if (selErr) return new Response(JSON.stringify({ error: selErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    if (!slice || slice.length === 0) break;
-
-    // "Touch" each row so the BEFORE UPDATE trigger recomputes the tsv column.
-    // Update by primary key one row at a time via bulk RPC isn't available, so do a
-    // narrow batched update using the .in() filter, setting each field to itself.
-    const ids = slice.map((r) => r.id);
-    const { error: upErr } = await admin
-      .from("curated_videos")
-      .update({ title: null as unknown as string }) // placeholder overwritten below
-      .in("id", []); // no-op guard
-    void upErr;
-
-    // Per-row update to make sure the trigger fires cleanly.
-    for (const row of slice) {
-      await admin
-        .from("curated_videos")
-        .update({ title: row.title })
-        .eq("id", row.id);
+    const { data: n, error: rpcErr } = await admin.rpc("backfill_search_tsv", { _limit: batchSize });
+    if (rpcErr) {
+      return new Response(JSON.stringify({ error: rpcErr.message }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
-    updated += slice.length;
-    void ids;
+    const count = Number(n ?? 0);
+    updated += count;
+    if (count === 0) break;
   }
 
   const { count } = await admin
