@@ -191,6 +191,8 @@ export async function applyBenefitRanking(
   const before = items.slice(0, 10).map((v) => v.video_id);
   const ranked = rerankByBenefit(items, priors);
   const moved = ranked.slice(0, 10).filter((v) => !before.includes(v.video_id)).length;
+  // MVP-6 — make the ranking legible on the card itself.
+  const { items: labelled, annotated } = annotateBenefit(ranked, priors);
   traceStep(ctx, "benefit_rank", {
     arm: "treatment",
     bucket,
@@ -198,6 +200,8 @@ export async function applyBenefitRanking(
     labels: priors.sample_size,
     global: priors.global,
     top10_changed: moved,
+    benefit_chips: annotated,
   });
-  return { items: ranked, arm: "treatment", reason: "ranked" };
+  return { items: labelled, arm: "treatment", reason: "ranked" };
 }
+
