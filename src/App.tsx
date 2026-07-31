@@ -94,6 +94,8 @@ const Invite = lazy(() => import("./pages/Invite.tsx"));
 const OfflineLibrary = lazy(() => import("./pages/OfflineLibrary.tsx"));
 const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const HalalTopic = lazy(() => import("./pages/HalalTopic.tsx"));
+const Learn = lazy(() => import("./pages/Learn.tsx"));
+const Concept = lazy(() => import("./pages/Concept.tsx"));
 
 const Hifz = lazy(() => import("./pages/Hifz.tsx"));
 const HijriCalendar = lazy(() => import("./pages/HijriCalendar.tsx"));
