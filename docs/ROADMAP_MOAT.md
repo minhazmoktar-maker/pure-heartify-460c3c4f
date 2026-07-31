@@ -1,6 +1,6 @@
 # Heartify — Long-Range Roadmap
 
-Companion to `docs/STRATEGY_MOAT.md`. This roadmap sequences the *compound moat* into buildable waves. It is written to still make sense a decade from now: the principles are permanent, the waves are the current best implementation of those principles.
+Companion to `docs/STRATEGY_MOAT.md`, governed by `docs/FIRST_PRINCIPLES_2046.md` (company blueprint, MVP sequence, dependency graph). This roadmap sequences the *compound moat* into buildable waves. It is written to still make sense a decade from now: the principles are permanent, the waves are the current best implementation of those principles.
 
 Every wave is filtered by three tests, in order:
 
