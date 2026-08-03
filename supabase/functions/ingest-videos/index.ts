@@ -854,80 +854,99 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
     }
   }
 
-  const params = new URLSearchParams({
-    part: "snippet,contentDetails",
-    playlistId: uploadsId,
-    maxResults: "50",
-  });
-  if (state.next_page_token) params.set("pageToken", state.next_page_token);
+  // Deep pagination: playlistItems.list costs only 1 quota unit per 50 videos,
+  // so walking several pages per channel per run multiplies catalog growth at
+  // negligible quota cost. We stop early when the channel has no more pages.
+  let pageToken: string | null = state.next_page_token ?? null;
+  let totalAdded = 0;
+  let totalSeen = 0;
 
-  const r = await ytFetch("playlistItems", params);
-  quota += 1;
-  if (!r.ok) {
-    const reason = `playlistItems_${r.status}:${String((r.data as any)?.error ?? "").slice(0, 200)}`;
-    console.error(`playlistItems failed for ${state.channel_name}: ${r.status}`);
-    await markChannelFailure(state, reason);
-    return { added: 0, quota };
-  }
-  const data = r.data as { items?: Array<Record<string, unknown>>; nextPageToken?: string };
-  const items = data.items ?? [];
-  const nextToken = data.nextPageToken ?? null;
-
-  const rows: Record<string, unknown>[] = [];
-  for (const item of items) {
-    const snippet = item.snippet;
-    const videoId = item.contentDetails?.videoId;
-    if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) continue;
-    const title = decodeHtml(snippet?.title ?? "");
-    if (title === "Private video" || title === "Deleted video") continue;
-    const desc = snippet?.description ?? "";
-    const channel = snippet?.videoOwnerChannelTitle ?? snippet?.channelTitle ?? state.channel_name;
-    const thumb =
-      snippet?.thumbnails?.high?.url ??
-      snippet?.thumbnails?.medium?.url ??
-      snippet?.thumbnails?.default?.url ?? "";
-
-    const verdict = evaluateText(title, desc, channel, true);
-    if (!verdict.ok) {
-      queueRejection({
-        video_id: videoId, title, channel_title: channel, thumbnail_url: thumb,
-        reject_reason: verdict.reason!, matched_rule: verdict.rule, halal_score: 0,
-        source: `channel:${state.channel_name}`,
-      });
-      continue;
-    }
-    if (verdict.score < 75) {
-      queueRejection({
-        video_id: videoId, title, channel_title: channel, thumbnail_url: thumb,
-        reject_reason: "low_score", matched_rule: `score=${verdict.score}<75`, halal_score: verdict.score,
-        source: `channel:${state.channel_name}`,
-      });
-      continue;
-    }
-
-    rows.push({
-      video_id: videoId,
-      title,
-      channel_id: channelId, // canonical YouTube channel id — never trust title
-      channel_title: channel,
-      thumbnail_url: thumb,
-      published_at: snippet?.publishedAt ?? null,
-      category: classifyCategory(title, desc, channel),
-      halal_score: verdict.score,
-      section_id: inferSectionFromChannel(channel),
-      is_trusted_channel: true,
-      moderation_state: "approved",
+  for (let page = 0; page < PAGES_PER_CHANNEL; page++) {
+    const params = new URLSearchParams({
+      part: "snippet,contentDetails",
+      playlistId: uploadsId,
+      maxResults: "50",
     });
+    if (pageToken) params.set("pageToken", pageToken);
+
+    const r = await ytFetch("playlistItems", params);
+    quota += 1;
+    if (!r.ok) {
+      const reason = `playlistItems_${r.status}:${String((r.data as any)?.error ?? "").slice(0, 200)}`;
+      console.error(`playlistItems failed for ${state.channel_name}: ${r.status}`);
+      if (page === 0) {
+        await markChannelFailure(state, reason);
+        return { added: 0, quota };
+      }
+      break;
+    }
+    const data = r.data as { items?: Array<Record<string, unknown>>; nextPageToken?: string };
+    const items = data.items ?? [];
+    const nextToken = data.nextPageToken ?? null;
+    totalSeen += items.length;
+
+    const rows: Record<string, unknown>[] = [];
+    for (const item of items) {
+      const snippet = item.snippet;
+      const videoId = item.contentDetails?.videoId;
+      if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) continue;
+      const title = decodeHtml(snippet?.title ?? "");
+      if (title === "Private video" || title === "Deleted video") continue;
+      const desc = snippet?.description ?? "";
+      const channel = snippet?.videoOwnerChannelTitle ?? snippet?.channelTitle ?? state.channel_name;
+      const thumb =
+        snippet?.thumbnails?.high?.url ??
+        snippet?.thumbnails?.medium?.url ??
+        snippet?.thumbnails?.default?.url ?? "";
+
+      const verdict = evaluateText(title, desc, channel, true);
+      if (!verdict.ok) {
+        queueRejection({
+          video_id: videoId, title, channel_title: channel, thumbnail_url: thumb,
+          reject_reason: verdict.reason!, matched_rule: verdict.rule, halal_score: 0,
+          source: `channel:${state.channel_name}`,
+        });
+        continue;
+      }
+      if (verdict.score < 75) {
+        queueRejection({
+          video_id: videoId, title, channel_title: channel, thumbnail_url: thumb,
+          reject_reason: "low_score", matched_rule: `score=${verdict.score}<75`, halal_score: verdict.score,
+          source: `channel:${state.channel_name}`,
+        });
+        continue;
+      }
+
+      rows.push({
+        video_id: videoId,
+        title,
+        channel_id: channelId, // canonical YouTube channel id — never trust title
+        channel_title: channel,
+        thumbnail_url: thumb,
+        published_at: snippet?.publishedAt ?? null,
+        category: classifyCategory(title, desc, channel),
+        halal_score: verdict.score,
+        section_id: inferSectionFromChannel(channel),
+        is_trusted_channel: true,
+        moderation_state: "approved",
+      });
+    }
+
+    const added = await upsertVideos(rows);
+    totalAdded += added;
+    pageToken = nextToken;
+    // Persist cursor after every page so a timeout never loses progress.
+    await markChannelSuccess(state.id, {
+      next_page_token: nextToken,
+      total_pulled: state.total_pulled + totalAdded,
+    });
+    if (!nextToken) break;
   }
 
-  const added = await upsertVideos(rows);
-  await markChannelSuccess(state.id, {
-    next_page_token: nextToken,
-    total_pulled: state.total_pulled + added,
-  });
-  await logIngestion(`channel:${state.channel_name}`, null, items.length, added, quota);
-  return { added, quota };
+  await logIngestion(`channel:${state.channel_name}`, null, totalSeen, totalAdded, quota);
+  return { added: totalAdded, quota };
 }
+
 
 // === DISCOVERY TRACK: keyword search ===
 async function ingestDiscoveryQuery(sectionId: string, query: string): Promise<{ added: number; quota: number }> {
