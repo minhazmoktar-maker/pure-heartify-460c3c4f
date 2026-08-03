@@ -33,6 +33,11 @@ const BASE_URL = "https://www.googleapis.com/youtube/v3";
 // Round-robin across configured keys, auto-skip exhausted keys for the remainder of the run.
 const exhaustedKeys = new Set<string>();
 let keyCursor = 0;
+// How many 50-video pages to walk per channel per run. Each page costs 1 quota
+// unit, so deep pagination is the cheapest way to grow the catalog. Overridable
+// per request via body.pages_per_channel (1-40).
+let PAGES_PER_CHANNEL = 10;
+
 function activeKeys(): string[] {
   return YOUTUBE_API_KEYS.filter((k) => !exhaustedKeys.has(k));
 }
