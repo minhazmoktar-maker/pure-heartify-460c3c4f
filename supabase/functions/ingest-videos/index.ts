@@ -1070,7 +1070,10 @@ Deno.serve(async (req) => {
     //   - discovery track: 100 units per query
     // With 2 keys ⇒ 20k/day budget, target ~2,500/run.
     const keyMultiplier = Math.max(activeKeys().length, 1);
-    const channelsPerRun = Math.min(body?.channels_per_run ?? 80 * keyMultiplier, 300);
+    const channelsPerRun = Math.min(body?.channels_per_run ?? 120 * keyMultiplier, 400);
+    // Deep pagination per channel — 1 quota unit per 50 videos.
+    PAGES_PER_CHANNEL = Math.min(Math.max(Number(body?.pages_per_channel ?? 10), 1), 40);
+
     // Discovery uses search.list (100 units/call) — the primary cause of
     // "Quota exceeded" 429s. Default down from 10→4 per key and cap at 20
     // so a cron run can't drain the daily budget on its own; approved
