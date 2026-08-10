@@ -114,6 +114,7 @@ export const MORE_NAV_ITEMS: readonly NavItem[] = [
   { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
   { to: "/profile?tab=streak", label: "Streak", icon: Flame },
+  { to: "/connections", label: "Your Circle", icon: Users },
   { to: "/family", label: "Family & teams", icon: Users },
   { to: "/offline", label: "Offline downloads", icon: Download },
 ];

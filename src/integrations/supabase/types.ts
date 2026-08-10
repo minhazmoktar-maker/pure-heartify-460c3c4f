@@ -598,6 +598,92 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_members: {
+        Row: {
+          challenge_id: string
+          completed: boolean
+          created_at: string
+          id: string
+          joined_at: string | null
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed?: boolean
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed?: boolean
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_members_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string | null
+          end_at: string
+          goal: number
+          id: string
+          start_at: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          end_at: string
+          goal: number
+          id?: string
+          start_at?: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          end_at?: string
+          goal?: number
+          id?: string
+          start_at?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       channel_audit_log: {
         Row: {
           action: string
@@ -3740,11 +3826,13 @@ export type Database = {
       }
       profiles: {
         Row: {
+          activity_visibility: Database["public"]["Enums"]["visibility_level"]
           avatar_url: string | null
           bio: string | null
           country_code: string | null
           created_at: string
           daily_reminder_hour: number | null
+          discoverable: boolean
           display_name: string | null
           handle: string | null
           id: string
@@ -3752,16 +3840,21 @@ export type Database = {
           preferences: Json | null
           preferred_locale: string | null
           preferred_reciter: string | null
+          profile_visibility: Database["public"]["Enums"]["visibility_level"]
+          progress_visibility: Database["public"]["Enums"]["visibility_level"]
+          streak_visibility: Database["public"]["Enums"]["visibility_level"]
           timezone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          activity_visibility?: Database["public"]["Enums"]["visibility_level"]
           avatar_url?: string | null
           bio?: string | null
           country_code?: string | null
           created_at?: string
           daily_reminder_hour?: number | null
+          discoverable?: boolean
           display_name?: string | null
           handle?: string | null
           id?: string
@@ -3769,16 +3862,21 @@ export type Database = {
           preferences?: Json | null
           preferred_locale?: string | null
           preferred_reciter?: string | null
+          profile_visibility?: Database["public"]["Enums"]["visibility_level"]
+          progress_visibility?: Database["public"]["Enums"]["visibility_level"]
+          streak_visibility?: Database["public"]["Enums"]["visibility_level"]
           timezone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          activity_visibility?: Database["public"]["Enums"]["visibility_level"]
           avatar_url?: string | null
           bio?: string | null
           country_code?: string | null
           created_at?: string
           daily_reminder_hour?: number | null
+          discoverable?: boolean
           display_name?: string | null
           handle?: string | null
           id?: string
@@ -3786,6 +3884,9 @@ export type Database = {
           preferences?: Json | null
           preferred_locale?: string | null
           preferred_reciter?: string | null
+          profile_visibility?: Database["public"]["Enums"]["visibility_level"]
+          progress_visibility?: Database["public"]["Enums"]["visibility_level"]
+          streak_visibility?: Database["public"]["Enums"]["visibility_level"]
           timezone?: string | null
           updated_at?: string
           user_id?: string
@@ -4796,6 +4897,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_connections: {
+        Row: {
+          accepted_at: string | null
+          addressee_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          addressee_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          addressee_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_hidden_videos: {
         Row: {
           created_at: string
@@ -4955,6 +5086,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           value?: Json
+        }
+        Relationships: []
+      }
+      user_reports: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reported_user_id?: string
+          reporter_id?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -5710,6 +5874,7 @@ export type Database = {
         Args: { _model: string; _rows: Json }
         Returns: number
       }
+      are_connected: { Args: { _a: string; _b: string }; Returns: boolean }
       assign_experiment_variant: {
         Args: { _anon_key: string; _experiment_key: string }
         Returns: string
@@ -5722,6 +5887,7 @@ export type Database = {
       benefit_arm_readout: { Args: { _days?: number }; Returns: Json }
       benefit_label_stats: { Args: never; Returns: Json }
       benefit_priors_v1: { Args: never; Returns: Json }
+      block_heartify_user: { Args: { _handle: string }; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
         Returns: {
@@ -5793,6 +5959,17 @@ export type Database = {
           target_count: number
         }[]
       }
+      create_challenge: {
+        Args: {
+          _days: number
+          _description?: string
+          _goal: number
+          _handles: string[]
+          _title: string
+          _type: string
+        }
+        Returns: Json
+      }
       create_team_streak: {
         Args: { _name: string }
         Returns: {
@@ -5836,6 +6013,16 @@ export type Database = {
           _variant?: string
         }
         Returns: Json
+      }
+      friends_leaderboard: {
+        Args: { _metric?: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          is_me: boolean
+          score: number
+          user_handle: string
+        }[]
       }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
       get_beneficial_sources_directory: {
@@ -5939,6 +6126,7 @@ export type Database = {
       get_moderation_config: { Args: { _key: string }; Returns: Json }
       get_ops_dashboard: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
+      get_profile_progress: { Args: { _handle: string }; Returns: Json }
       get_public_attestation: { Args: { _video_id: string }; Returns: Json }
       get_public_dhikr_circle: {
         Args: { _circle_id: string }
@@ -6111,6 +6299,10 @@ export type Database = {
         Args: { _channel: string; _title: string }
         Returns: string
       }
+      is_challenge_member: {
+        Args: { _challenge_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_dhikr_circle_member: {
         Args: { _circle_id: string; _user_id: string }
         Returns: boolean
@@ -6158,6 +6350,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      leave_challenge: { Args: { _challenge_id: string }; Returns: Json }
       list_active_categories: {
         Args: never
         Returns: {
@@ -6174,6 +6367,34 @@ export type Database = {
           id: string
           is_anonymous: boolean
           user_id: string
+        }[]
+      }
+      list_my_challenges: { Args: never; Returns: Json }
+      list_my_connection_requests: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          bio: string
+          connection_id: string
+          created_at: string
+          direction: string
+          display_name: string
+          user_handle: string
+        }[]
+      }
+      list_my_connections: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          connected_at: string
+          connection_id: string
+          current_streak: number
+          display_name: string
+          progress_shared: boolean
+          user_handle: string
+          week_doses: number
+          week_minutes: number
+          week_videos: number
         }[]
       }
       list_my_nudges_sent: {
@@ -6251,6 +6472,7 @@ export type Database = {
           token: string
         }[]
       }
+      my_progress_summary: { Args: never; Returns: Json }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
       pool_because_you_watched: {
         Args: { _exclude_premium?: boolean; _limit?: number; _user_id: string }
@@ -6465,6 +6687,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      report_heartify_user: {
+        Args: { _description?: string; _handle: string; _reason: string }
+        Returns: Json
+      }
+      respond_challenge_invite: {
+        Args: { _accept: boolean; _challenge_id: string }
+        Returns: Json
+      }
+      respond_connection_request: {
+        Args: { _accept: boolean; _connection_id: string }
+        Returns: Json
+      }
       revoke_auto_approval: {
         Args: { _reason?: string; _video_id: string }
         Returns: undefined
@@ -6480,6 +6714,19 @@ export type Database = {
           kind: string
           score: number
           suggestion: string
+        }[]
+      }
+      search_heartify_users: {
+        Args: { _limit?: number; _q: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          connection_id: string
+          connection_status: string
+          current_streak: number
+          display_name: string
+          handle: string
+          primary_interest: string
         }[]
       }
       search_reciters: {
@@ -6529,6 +6776,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      send_connection_request: { Args: { _handle: string }; Returns: Json }
       send_nudge_by_handle: {
         Args: { _handle: string; _kind: string; _message: string }
         Returns: Json
@@ -6539,6 +6787,16 @@ export type Database = {
       }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
+      social_admin_stats: { Args: never; Returns: Json }
+      social_can_view: {
+        Args: {
+          _level: Database["public"]["Enums"]["visibility_level"]
+          _owner: string
+          _viewer: string
+        }
+        Returns: boolean
+      }
+      social_is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
       submit_benefit_label: {
         Args: {
           _acted_on?: boolean
@@ -6570,6 +6828,15 @@ export type Database = {
           _voice_style?: string
         }
         Returns: string
+      }
+      user_activity_stats: {
+        Args: { _since: string; _user_id: string }
+        Returns: {
+          days: number
+          doses: number
+          minutes: number
+          videos: number
+        }[]
       }
       user_household_id: { Args: { _user_id: string }; Returns: string }
       verify_admin_review_token: {
@@ -6628,6 +6895,7 @@ export type Database = {
         | "strike"
         | "decay"
         | "note"
+      visibility_level: "everyone" | "connections" | "nobody"
     }
     CompositeTypes: {
       beneficial_video: {
@@ -6830,6 +7098,7 @@ export const Constants = {
         "decay",
         "note",
       ],
+      visibility_level: ["everyone", "connections", "nobody"],
     },
   },
 } as const

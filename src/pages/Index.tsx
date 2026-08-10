@@ -14,6 +14,7 @@ import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
 import HomeHero from "@/components/HomeHero";
+import CircleWidget from "@/components/social/CircleWidget";
 import TopPickHero from "@/components/TopPickHero";
 import ScholarsRail from "@/components/ScholarsRail";
 
@@ -156,6 +157,8 @@ const Index = () => {
               <BenefitLabelPrompt />
               <FirstSessionCard />
               <WeeklyRecapCard />
+              <CircleWidget />
+
             </div>
 
             {signedInPrimary}

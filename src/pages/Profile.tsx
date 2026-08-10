@@ -6,6 +6,7 @@ import EmptyState from "@/components/EmptyState";
 import PageSkeleton from "@/components/PageSkeleton";
 import ReferralCard from "@/components/ReferralCard";
 import HandleClaimCard from "@/components/HandleClaimCard";
+import PrivacySettingsCard from "@/components/social/PrivacySettingsCard";
 import LanguageSettings from "@/components/LanguageSettings";
 import AppIconPicker from "@/components/AppIconPicker";
 import ThemeModeSetting from "@/components/ThemeModeSetting";
@@ -325,6 +326,11 @@ const Profile = () => {
             <div className="pt-4">
               <HandleClaimCard />
             </div>
+
+            <div className="pt-4">
+              <PrivacySettingsCard />
+            </div>
+
 
             <div className="pt-4">
               <ReferralCard />
