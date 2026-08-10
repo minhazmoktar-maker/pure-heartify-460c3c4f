@@ -118,6 +118,7 @@ export const SPINES: readonly SpineDefinition[] = [
     path: "/profile",
     owns: [
       "/profile", "/achievements", "/recap", "/onboarding",
+      "/connections",
       "/appeals", "/transparency", "/plus", "/plus/join",
       "/redeem", "/changelog", "/salah", "/salah-tracker",
       "/settings/notifications", "/account/export-data",

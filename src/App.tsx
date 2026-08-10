@@ -37,6 +37,7 @@ const Contact = lazy(() => import("./pages/Contact.tsx"));
 const ExportData = lazy(() => import("./pages/ExportData.tsx"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
+const Connections = lazy(() => import("./pages/Connections.tsx"));
 const AdabPage = lazy(() => import("./pages/AdabPage.tsx"));
 const AdhanIqamah = lazy(() => import("./pages/AdhanIqamah.tsx"));
 const Adhkar = lazy(() => import("./pages/Adhkar.tsx"));
@@ -355,6 +356,7 @@ const App = () => (
                 <Route path="/salah" element={<SalahTracker />} />
                 <Route path="/achievements" element={<Achievements />} />
                 <Route path="/challenges" element={<Challenges />} />
+                <Route path="/connections" element={<Connections />} />
                 <Route path="/today" element={<Today />} />
                 <Route path="/reminders" element={<Reminders />} />
                 <Route path="/recap" element={<Recap />} />
