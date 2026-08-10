@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Search, Swords, UserPlus, Users, Trophy, Loader2, Flame } from "lucide-react";
+import { Search, Swords, UserPlus, Users, Trophy, Loader2, Flame, AlertTriangle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import EmptyState from "@/components/EmptyState";
@@ -52,9 +52,32 @@ export default function Connections() {
     return next;
   }, { replace: true });
 
-  const { connections, loadingConnections, incoming, outgoing, loadingRequests, sendRequest, respond, remove, blockUser } =
-    useConnections();
-  const { invites, active, finished, loading: loadingChallenges, respond: respondChallenge, leave } = useChallenges();
+  const {
+    connections,
+    loadingConnections,
+    connectionsError,
+    refetchConnections,
+    incoming,
+    outgoing,
+    loadingRequests,
+    requestsError,
+    refetchRequests,
+    sendRequest,
+    respond,
+    remove,
+    blockUser,
+  } = useConnections();
+  const {
+    invites,
+    active,
+    finished,
+    loading: loadingChallenges,
+    error: challengesError,
+    refetch: refetchChallenges,
+    respond: respondChallenge,
+    leave,
+  } = useChallenges();
+
   const { data: progress } = useMyProgress();
 
   const [query, setQuery] = useState("");
@@ -135,7 +158,16 @@ export default function Connections() {
           <TabsContent value="circle" className="mt-4 space-y-4">
             {loadingConnections ? (
               <ListSkeleton />
+            ) : connectionsError ? (
+              <EmptyState
+                icon={AlertTriangle}
+                title="Couldn't load your circle"
+                description="Check your connection and try again."
+                actionLabel="Retry"
+                onAction={() => void refetchConnections()}
+              />
             ) : connections.length === 0 ? (
+
               <EmptyState
                 icon={UserPlus}
                 title="No connections yet"
@@ -219,7 +251,16 @@ export default function Connections() {
           <TabsContent value="requests" className="mt-4 space-y-5">
             {loadingRequests ? (
               <ListSkeleton />
+            ) : requestsError ? (
+              <EmptyState
+                icon={AlertTriangle}
+                title="Couldn't load requests"
+                description="Check your connection and try again."
+                actionLabel="Retry"
+                onAction={() => void refetchRequests()}
+              />
             ) : incoming.length === 0 && outgoing.length === 0 && invites.length === 0 ? (
+
               <EmptyState
                 icon={UserPlus}
                 title="No pending requests"
@@ -322,7 +363,16 @@ export default function Connections() {
 
             {loadingChallenges ? (
               <ListSkeleton />
+            ) : challengesError ? (
+              <EmptyState
+                icon={AlertTriangle}
+                title="Couldn't load challenges"
+                description="Check your connection and try again."
+                actionLabel="Retry"
+                onAction={() => void refetchChallenges()}
+              />
             ) : activeChallenges.length === 0 && finished.length === 0 ? (
+
               <EmptyState
                 icon={Swords}
                 title="No challenges yet"
@@ -371,7 +421,18 @@ export default function Connections() {
               <p className="py-6 text-center text-sm text-muted-foreground">
                 Type at least 2 characters. Members who opted out of discovery won't appear.
               </p>
-            ) : (search.data ?? []).length === 0 && !search.isLoading ? (
+            ) : search.isError ? (
+              <EmptyState
+                icon={AlertTriangle}
+                title="Search unavailable"
+                description="Check your connection and try again."
+                actionLabel="Retry"
+                onAction={() => void search.refetch()}
+              />
+            ) : search.isLoading ? (
+              <ListSkeleton />
+            ) : (search.data ?? []).length === 0 ? (
+
               <EmptyState icon={Search} title="No members found" description="Try their exact username instead." />
             ) : (
               <div className="space-y-3">
