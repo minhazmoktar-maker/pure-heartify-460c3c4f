@@ -1,5 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { isViteCacheError, recoverFromViteCache } from "@/lib/viteRecovery";
+
 
 interface Props {
   children: ReactNode;
