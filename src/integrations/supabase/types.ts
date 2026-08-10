@@ -5905,6 +5905,7 @@ export type Database = {
         }[]
       }
       check_ops_alerts: { Args: never; Returns: undefined }
+      check_pipeline_watchdog: { Args: never; Returns: Json }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       complete_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       compute_candidate_tier: {
@@ -6475,6 +6476,7 @@ export type Database = {
       }
       my_progress_summary: { Args: never; Returns: Json }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
+      pipeline_health: { Args: never; Returns: Json }
       pool_because_you_watched: {
         Args: { _exclude_premium?: boolean; _limit?: number; _user_id: string }
         Returns: Database["public"]["CompositeTypes"]["surface_video"][]
@@ -6591,6 +6593,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      promote_trusted_pending_videos: {
+        Args: { _limit?: number }
+        Returns: Json
       }
       purge_feed_impressions: { Args: never; Returns: number }
       rate_limit_cleanup: {

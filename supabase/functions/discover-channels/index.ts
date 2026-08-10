@@ -708,7 +708,10 @@ Deno.serve(async (req) => {
     );
 
     const cronSecret = req.headers.get('X-Cron-Secret');
-    const isCron = cronSecret && cronSecret === Deno.env.get('CRON_SECRET');
+    const cronToken = req.headers.get('x-cron-token');
+    const isCron =
+      (!!cronSecret && cronSecret === Deno.env.get('CRON_SECRET')) ||
+      (!!cronToken && cronToken === Deno.env.get('INGEST_CRON_TOKEN'));
     let requestedBy: string | null = null;
 
     if (!isCron) {
