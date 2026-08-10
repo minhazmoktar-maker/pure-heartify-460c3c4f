@@ -6,6 +6,9 @@
   "scripts": {
     "predev": "bunx tsx scripts/generate-sitemap.ts",
     "dev": "vite",
+    "clean:vite": "rm -rf node_modules/.vite",
+    "dev:clean": "npm run clean:vite && vite --force",
+
     "prebuild": "bunx tsx scripts/generate-sitemap.ts",
     "build": "vite build",
     "build:dev": "bunx tsx scripts/generate-sitemap.ts && vite build --mode development",
