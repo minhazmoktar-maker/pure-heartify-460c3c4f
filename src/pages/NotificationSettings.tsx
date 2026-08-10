@@ -23,7 +23,7 @@ const KINDS: { key: string; title: string; description: string }[] = [
   { key: "prayer_time", title: "Prayer times", description: "Adhan and iqāmah reminders." },
   { key: "khatm", title: "Khatm group", description: "Group Qurʾān completion progress." },
   { key: "dua_ameen", title: "Duʿā ameens", description: "When someone says ameen to your duʿā." },
-  { key: "social", title: "Social & mentions", description: "Follows, likes, mentions." },
+  { key: "social", title: "Circle & accountability", description: "Connection requests, accepts, pokes and challenge updates." },
   { key: "weekly_recap", title: "Weekly recap", description: "Your progress summary each Friday." },
 ];
 

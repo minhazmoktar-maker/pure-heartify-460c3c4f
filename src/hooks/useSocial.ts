@@ -260,9 +260,13 @@ export function useConnections() {
   return {
     connections: connections.data ?? [],
     loadingConnections: connections.isLoading,
+    connectionsError: connections.isError,
+    refetchConnections: connections.refetch,
     incoming,
     outgoing,
     loadingRequests: requests.isLoading,
+    requestsError: requests.isError,
+    refetchRequests: requests.refetch,
     sendRequest,
     respond,
     remove,
@@ -270,6 +274,7 @@ export function useConnections() {
     reportUser,
   };
 }
+
 
 export function useChallenges() {
   const { user } = useAuth();
@@ -353,7 +358,19 @@ export function useChallenges() {
   const active = challenges.filter((c) => c.my_state === "joined" && new Date(c.end_at) > new Date());
   const finished = challenges.filter((c) => c.my_state === "joined" && new Date(c.end_at) <= new Date());
 
-  return { challenges, invites, active, finished, loading: list.isLoading, create, respond, leave };
+  return {
+    challenges,
+    invites,
+    active,
+    finished,
+    loading: list.isLoading,
+    error: list.isError,
+    refetch: list.refetch,
+    create,
+    respond,
+    leave,
+  };
+
 }
 
 export function useFriendsLeaderboard(metric: "minutes" | "doses" | "days" | "streak") {

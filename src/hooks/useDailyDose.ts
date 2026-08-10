@@ -81,6 +81,15 @@ export function useCompleteDoseVideo() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["daily-dose", user?.id] });
+      // Dose completions feed verified social progress: refresh the viewer's own
+      // summary plus the circle / challenge / leaderboard reads that derive from
+      // it. Friends' dashboards update server-side, gated by their privacy
+      // settings — nothing extra is shared from here.
+      qc.invalidateQueries({ queryKey: ["my-progress"] });
+      qc.invalidateQueries({ queryKey: ["connections"] });
+      qc.invalidateQueries({ queryKey: ["challenges"] });
+      qc.invalidateQueries({ queryKey: ["friends-leaderboard"] });
+
     },
   });
 }

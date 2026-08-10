@@ -6127,6 +6127,7 @@ export type Database = {
       get_ops_dashboard: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
       get_profile_progress: { Args: { _handle: string }; Returns: Json }
+      get_profile_showcase: { Args: { _handle: string }; Returns: Json }
       get_public_attestation: { Args: { _video_id: string }; Returns: Json }
       get_public_dhikr_circle: {
         Args: { _circle_id: string }
@@ -6788,6 +6789,7 @@ export type Database = {
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
       social_admin_stats: { Args: never; Returns: Json }
+      social_analytics_series: { Args: { _days?: number }; Returns: Json }
       social_can_view: {
         Args: {
           _level: Database["public"]["Enums"]["visibility_level"]
@@ -6796,7 +6798,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      social_display_name: { Args: { _user_id: string }; Returns: string }
       social_is_blocked: { Args: { _a: string; _b: string }; Returns: boolean }
+      social_notify: {
+        Args: {
+          _body: string
+          _data?: Json
+          _kind: string
+          _max_per_day?: number
+          _title: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      social_sync_challenge_progress: {
+        Args: { _user_id: string }
+        Returns: number
+      }
       submit_benefit_label: {
         Args: {
           _acted_on?: boolean

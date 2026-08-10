@@ -115,6 +115,8 @@ const GroupKhatm = lazy(() => import("./pages/GroupKhatm.tsx"));
 const GroupKhatmDetail = lazy(() => import("./pages/GroupKhatmDetail.tsx"));
 const GroupKhatmJoin = lazy(() => import("./pages/GroupKhatmJoin.tsx"));
 const AdminViral = lazy(() => import("./pages/AdminViral.tsx"));
+const AdminSocial = lazy(() => import("./pages/AdminSocial.tsx"));
+
 const Leaderboards = lazy(() => import("./pages/Leaderboards.tsx"));
 const TeamStreaks = lazy(() => import("./pages/TeamStreaks.tsx"));
 const Family = lazy(() => import("./pages/Family.tsx"));
@@ -502,6 +504,8 @@ const App = () => (
                 <Route path="/admin/benefit-labels" element={<AdminRoute><AdminBenefitLabels /></AdminRoute>} />
                 <Route path="/admin/dedup" element={<AdminRoute><AdminDedup /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
+                <Route path="/admin/social" element={<AdminRoute><AdminSocial /></AdminRoute>} />
+
                 <Route path="/review/:token" element={<ReviewMagic />} />
                 <Route path="/admin/mint-review-token" element={<AdminRoute><AdminMintReviewToken /></AdminRoute>} />
 
