@@ -1,5 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { isViteCacheError, recoverFromViteCache } from "@/lib/viteRecovery";
+
 
 interface Props {
   children: ReactNode;
@@ -29,11 +31,17 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, info: ErrorInfo): void {
     // eslint-disable-next-line no-console
     console.error("[ErrorBoundary]", error, info.componentStack);
+    // Stale Vite dep cache (duplicate React → null hooks dispatcher): purge
+    // module caches and hard-reload once instead of showing a dead screen.
+    if (isViteCacheError(error.message, error.stack)) {
+      void recoverFromViteCache(error.message);
+    }
     const reporter = (window as unknown as { __errorReporter?: (e: Error, i: ErrorInfo) => void }).__errorReporter;
     if (typeof reporter === "function") {
       try { reporter(error, info); } catch { /* swallow */ }
     }
   }
+
 
   private handleReset = () => {
     this.setState({ hasError: false, error: undefined });
