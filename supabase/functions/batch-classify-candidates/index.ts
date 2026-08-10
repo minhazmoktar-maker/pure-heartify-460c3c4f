@@ -107,7 +107,10 @@ Deno.serve(async (req) => {
 
     // Auth: admin JWT OR cron secret
     const cronSecret = req.headers.get("x-cron-secret");
-    const isCron = cronSecret && cronSecret === Deno.env.get("CRON_SECRET");
+    const cronToken = req.headers.get("x-cron-token");
+    const isCron =
+      (!!cronSecret && cronSecret === Deno.env.get("CRON_SECRET")) ||
+      (!!cronToken && cronToken === Deno.env.get("INGEST_CRON_TOKEN"));
     let actorId: string | null = null;
     if (!isCron) {
       const supabase = createClient(
