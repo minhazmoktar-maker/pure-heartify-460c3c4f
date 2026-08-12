@@ -227,9 +227,12 @@ export default function Connections() {
                                 {i + 1}
                               </span>
                               <MemberAvatar url={r.avatar_url} name={r.display_name || r.user_handle} size="sm" />
-                              <span className={`min-w-0 flex-1 truncate text-sm ${r.is_me ? "font-semibold" : ""}`}>
+                              <Link
+                                to={r.is_me ? "/profile" : `/u/${r.user_handle}`}
+                                className={`min-w-0 flex-1 truncate text-sm hover:underline ${r.is_me ? "font-semibold" : ""}`}
+                              >
                                 {r.is_me ? "You" : r.display_name || `@${r.user_handle}`}
-                              </span>
+                              </Link>
                               <span className="shrink-0 font-mono text-micro">
                                 {r.score.toLocaleString()} {metricMeta.unit}
                               </span>
@@ -442,6 +445,8 @@ export default function Connections() {
                     row={row}
                     pending={sendRequest.isPending}
                     onConnect={() => sendRequest.mutate(row.handle)}
+                    onReport={() => setReportHandle(row.handle)}
+                    onBlock={() => blockUser.mutate(row.handle)}
                   />
                 ))}
               </div>

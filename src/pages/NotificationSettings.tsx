@@ -24,6 +24,7 @@ const KINDS: { key: string; title: string; description: string }[] = [
   { key: "khatm", title: "Khatm group", description: "Group Qurʾān completion progress." },
   { key: "dua_ameen", title: "Duʿā ameens", description: "When someone says ameen to your duʿā." },
   { key: "social", title: "Circle & accountability", description: "Connection requests, accepts, pokes and challenge updates." },
+  { key: "sadaqah_challenge", title: "Sadaqah challenge", description: "One gentle nudge on days you haven't logged an act of giving. Never mentions amounts." },
   { key: "weekly_recap", title: "Weekly recap", description: "Your progress summary each Friday." },
 ];
 
@@ -40,6 +41,7 @@ const RECOMMENDED_DEFAULTS: Record<string, { push: boolean; email: boolean; inAp
   khatm:        { push: false, email: false, inApp: true },
   dua_ameen:    { push: false, email: false, inApp: true },
   social:       { push: false, email: false, inApp: true },
+  sadaqah_challenge: { push: false, email: false, inApp: true },
   weekly_recap: { push: false, email: true,  inApp: true },
 };
 
