@@ -224,8 +224,9 @@ export async function retrieveColdStart(
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
       .gte("halal_score", 85)
+      .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
       .order("ingested_at", { ascending: false })
-      .limit(120);
+      .limit(120), ctx);
     const topUp = shuffleWithSeed(((data ?? []) as SurfaceVideo[]), personalSeed(ctx, "coldtopup"));
     const have = new Set(out.map((v) => v.video_id));
     for (const v of topUp) if (!have.has(v.video_id)) out.push(v);

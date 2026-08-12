@@ -117,7 +117,7 @@ export function runUniversalFilters(
   ctx: SurfaceContext,
   impressions: Map<string, number>,
 ): SurfaceVideo[] {
-  const safe = applyStrictHalal(items, ctx);
+  const safe = applyVisualGate(applyStrictHalal(items, ctx));
   const base = applyKidsMode(
     applyHiddenVideos(applyUserBlocks(applyPremiumGate(applyBlocklist(safe), ctx), ctx), ctx),
     ctx,
