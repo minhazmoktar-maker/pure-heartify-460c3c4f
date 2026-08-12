@@ -36,7 +36,12 @@ export const BLOCKED_CHANNELS = new Set([
   "kitsuna", "zayan my", "amma", "academy of knowledge", "stanford online",
   "stanford graduate school of business", "deeplearningai", "andrew huberman",
   "huberman lab", "huberman lab clips", "faithful finance", "ted", "tedx",
+  "islam on demand", "iqra tv", "iqraa tv",
 ]);
+
+/** Named female presenters/speakers excluded platform-wide. */
+export const FEMALE_NAMES_RE =
+  /(^|[^a-z])(yvonne ridl[ae]y|haleh banani|mehreen|mia yilin|leila hormozi|layla hormozi|lauren booth|na[ai]ma b\.? robert|yasmin mogahed|nouran hussein)($|[^a-z])/;
 
 export const TIER2_RE =
   /(^|[^a-z])(lady|ladies|sister|sisters|aunty|song|songs|music|musical|musician|musicians|band|concert|album|lyrics|remix|soundtrack|nasheed|nasheeds|anasheed|qaseeda|dance|fashion|beauty|makeup|hairstyle|outfit|jewellery|jewelry|drama|anime|manga|cartoon|movie|movies|trailer|romance|romantic|kiss|kissing|crush|prank|vlog|vlogs|vlogger|funny|comedy|standup|meme|memes|gaming|gameplay|fortnite|pubg|minecraft|reaction video|talk show)($|[^a-z])/;
@@ -75,6 +80,7 @@ export function assessStrict(v: HalalAssessInput, strict = true): HalalVerdict {
   }
 
   if (TIER1_RE.test(text)) return { allowed: false, tier: 1, reason: "tier1_text" };
+  if (FEMALE_NAMES_RE.test(text)) return { allowed: false, tier: 1, reason: "tier1_female_name" };
 
   // Arabic female/music indicators. Kept as its own pattern because the
   // Latin word-boundary classes in TIER1_RE can never match Arabic script.
