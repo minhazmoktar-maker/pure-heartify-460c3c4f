@@ -355,11 +355,12 @@ Deno.serve(async (req) => {
     // are preserved on their higher-ranked positions.
     if (sectionId && filtered.length < Math.ceil(limit / 2)) {
       const seen = new Set(filtered.map((v) => v.video_id as string));
-      const cascade = async (extra: string) => {
+      const cascade = async (extra: string, withLang = true) => {
         const u = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}` +
           `&moderation_state=in.(approved,auto_approved)` +
           `&is_hidden=eq.false&is_archived=eq.false` +
           (isPremium ? "" : "&is_premium_only=eq.false") +
+          (withLang ? langClause : "") +
           `&${extra}&limit=${fetchLimit}`;
         const r = await fetch(u, {
           headers: {
@@ -382,7 +383,7 @@ Deno.serve(async (req) => {
           if (filtered.length >= fetchLimit) return;
         }
       };
-      // Stage 1: recently-approved
+      // Stage 1: recently-approved (still on-language)
       await cascade("order=ingested_at.desc.nullslast,halal_score.desc");
       // Stage 2: trending fallback if still short
       if (filtered.length < Math.ceil(limit / 2)) {
@@ -392,11 +393,16 @@ Deno.serve(async (req) => {
       if (filtered.length < Math.ceil(limit / 2)) {
         await cascade("halal_score=gte.85&order=published_at.desc.nullslast,halal_score.desc");
       }
+      // Stage 4: ONLY if the requested language genuinely cannot fill the row,
+      // drop the language gate so a section never renders empty.
+      if (langClause && filtered.length < Math.ceil(limit / 2)) {
+        await cascade("order=published_at.desc.nullslast,halal_score.desc", false);
+      }
     }
 
-    // Locale-aware soft re-rank: matching content_language items surface first
-    // (and un-tagged items are treated as neutral so we never starve pages
-    // in markets whose curation hasn't been language-tagged yet).
+    // Language ordering. The pool is already hard-filtered to the caller's
+    // languages; this only keeps on-language rows ahead of any off-language
+    // filler pulled in by the last-resort cascade stage.
     let ordered = filtered;
     if (contentLanguages.length) {
       const langSet = new Set(contentLanguages);
@@ -409,8 +415,11 @@ Deno.serve(async (req) => {
         else if (langSet.has(cl)) matches.push(v);
         else others.push(v);
       }
-      ordered = [...matches, ...untagged, ...others];
+      // Off-language rows are only ever used as starvation filler.
+      const needFiller = matches.length + untagged.length < limit;
+      ordered = needFiller ? [...matches, ...untagged, ...others] : [...matches, ...untagged];
     }
+
 
     // Personalization: for signed-in users, apply a real signal-based
     // re-rank (category/channel affinity, long-term taste, novelty,
