@@ -336,7 +336,7 @@ export default function Connections() {
                             size="sm"
                             variant="ghost"
                             className="min-h-11 text-muted-foreground"
-                            onClick={() => respond.mutate({ id: r.connection_id, accept: false })}
+                            onClick={() => remove.mutate(r.connection_id)}
                           >
                             Cancel
                           </Button>
