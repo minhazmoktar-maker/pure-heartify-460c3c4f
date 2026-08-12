@@ -178,10 +178,12 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Locale-aware soft re-rank: hydrate content_language for the current
-    // page and float caller-preferred languages to the top. Untagged videos
-    // are treated as neutral to avoid starving markets whose catalog isn't
-    // fully tagged yet. If lookup fails we silently keep lexical order.
+    // Locale-aware HARD language gate: hydrate content_language for the
+    // current page and drop off-language rows entirely. A user who picked
+    // English must never be served Indonesian/Arabic/Malay results. Untagged
+    // rows are treated as neutral (kept after on-language matches) and
+    // off-language rows are only ever used when nothing else can fill the
+    // page, so results never render empty.
     if (contentLanguages.length && filteredHits.length > 0) {
       try {
         const ids = filteredHits
@@ -205,11 +207,15 @@ Deno.serve(async (req) => {
           else if (langSet.has(cl)) matches.push(h);
           else others.push(h);
         }
-        filteredHits = [...matches, ...untagged, ...others];
+        const onLanguage = [...matches, ...untagged];
+        // Only fall back to off-language rows when the gate would otherwise
+        // leave the searcher with nothing at all.
+        filteredHits = onLanguage.length > 0 ? onLanguage : others;
       } catch (err) {
-        console.error("locale re-rank failed:", (err as Error).message);
+        console.error("locale gate failed:", (err as Error).message);
       }
     }
+
 
     // Strict Halal last-mile gate on search results. Stored preference wins
     // for signed-in users; anonymous callers default to ON.

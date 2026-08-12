@@ -20,6 +20,24 @@ export const TIER1_RE =
 export const ARABIC_FEMALE_RE =
   /(المتسابقة|متسابقة|المتسابقات|القارئة|قارئة|القارئات|المقرئة|مقرئة|الطالبة|طالبة|الطفلة|طفلة|الشيخة|شيخة|الأستاذة|أستاذة|الاستاذة|الدكتورة|دكتورة|الفتاة|فتاة|فتيات|البنت|بنات|امرأة|المرأة|نساء|النساء|سيدة|السيدة|سيدات|الأخت|الاخت|أخواتي|اخواتي|مغنية|راقصة|ممثلة|أغنية|اغنية|أغاني|اغاني|موسيقى|موسيقية)/;
 
+/**
+ * Multilingual female / music / entertainment indicators. Mirrors the SQL
+ * helpers `halal_deny_female_intl_latin_pattern()` and
+ * `halal_deny_female_intl_script_pattern()`.
+ */
+export const INTL_FEMALE_RE =
+  /(^|[^a-z])(feminism|feminist|feminista|hermana|hermanas|mujer|mujeres|chica|chicas|cantante|cantora|femme|femmes|fille|filles|soeur|chanson|chanteuse|musique|wanita|perempuan|muslimah|ustazah|ustadzah|penyanyi|nyanyian|nasyid|lagu|kadin|kiz|sarki|muzik|hanim|frau|frauen|maedchen|saengerin|lied|mulher|mulheres|menina|mwanamke|wanawake|wimbo|khawateen|aurat|aurton|larki|larkiyan|mahila|naari|ladki|gaana|sangeet|ashram|bhajan|kirtan|satsang|gurupurnima|bhagavad|mandir|diwali)($|[^a-z])/;
+
+export const INTL_FEMALE_SCRIPT_RE =
+  /(মহিলা|নারী|মেয়ে|মেয়েদের|গায়িকা|গান|সঙ্গীত|خواتین|عورت|عورتیں|لڑکی|لڑکیاں|گانا|گانے|موسیقی|نغمہ|महिला|नारी|लड़की|लड़कियों|गायिका|गाना|संगीत|गुरुपूर्णिमा)/;
+
+/** Channels excluded platform-wide regardless of individual video titles. */
+export const BLOCKED_CHANNELS = new Set([
+  "kitsuna", "zayan my", "amma", "academy of knowledge", "stanford online",
+  "stanford graduate school of business", "deeplearningai", "andrew huberman",
+  "huberman lab", "huberman lab clips", "faithful finance", "ted", "tedx",
+]);
+
 export const TIER2_RE =
   /(^|[^a-z])(lady|ladies|sister|sisters|aunty|song|songs|music|musical|musician|musicians|band|concert|album|lyrics|remix|soundtrack|nasheed|nasheeds|anasheed|qaseeda|dance|fashion|beauty|makeup|hairstyle|outfit|jewellery|jewelry|drama|anime|manga|cartoon|movie|movies|trailer|romance|romantic|kiss|kissing|crush|prank|vlog|vlogs|vlogger|funny|comedy|standup|meme|memes|gaming|gameplay|fortnite|pubg|minecraft|reaction video|talk show)($|[^a-z])/;
 
@@ -51,12 +69,19 @@ const BAD_VISUAL = new Set(["female_detected", "music", "flagged", "rejected", "
 export function assessStrict(v: HalalAssessInput, strict = true): HalalVerdict {
   const text = `${v.title ?? ""} ${v.channel_title ?? ""}`.toLowerCase();
 
+  const channel = (v.channel_title ?? "").trim().toLowerCase();
+  if (channel && BLOCKED_CHANNELS.has(channel)) {
+    return { allowed: false, tier: 1, reason: "blocked_channel" };
+  }
+
   if (TIER1_RE.test(text)) return { allowed: false, tier: 1, reason: "tier1_text" };
 
   // Arabic female/music indicators. Kept as its own pattern because the
   // Latin word-boundary classes in TIER1_RE can never match Arabic script.
   const raw = `${v.title ?? ""} ${v.channel_title ?? ""}`;
   if (ARABIC_FEMALE_RE.test(raw)) return { allowed: false, tier: 1, reason: "tier1_arabic" };
+  if (INTL_FEMALE_RE.test(text)) return { allowed: false, tier: 1, reason: "tier1_intl" };
+  if (INTL_FEMALE_SCRIPT_RE.test(raw)) return { allowed: false, tier: 1, reason: "tier1_intl_script" };
 
   const vs = (v.visual_state ?? "unchecked").toLowerCase();
   if (BAD_VISUAL.has(vs)) return { allowed: false, tier: 3, reason: `visual:${vs}` };
