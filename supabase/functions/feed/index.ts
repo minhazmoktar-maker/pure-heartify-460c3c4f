@@ -288,6 +288,7 @@ Deno.serve(async (req) => {
           _cursor: cursor ?? null,
           _exclude_premium: !isPremium,
           _order: sort === "recent" ? "recent" : "fresh",
+          _languages: contentLanguages.length ? contentLanguages : null,
         });
         const tFetch = Date.now() - t0;
         if (error) {
