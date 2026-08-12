@@ -62,7 +62,7 @@ export interface ChallengeMember {
 
 export interface Challenge {
   id: string;
-  type: "minutes" | "doses" | "videos" | "sessions";
+  type: "minutes" | "doses" | "videos" | "sessions" | "sadaqah_days" | "sadaqah_acts";
   title: string;
   description: string | null;
   goal: number;
