@@ -6745,6 +6745,7 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: boolean
       }
+      sadaqah_challenge_reminders: { Args: never; Returns: Json }
       scrub_user_data: { Args: { _uid: string }; Returns: Json }
       search_autocomplete: {
         Args: { _limit?: number; _prefix: string }
