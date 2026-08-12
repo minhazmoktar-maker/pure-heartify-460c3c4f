@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,11 @@ export default function ChallengeCard({
       </CardHeader>
 
       <CardContent className="space-y-3">
+        {challenge.type.startsWith("sadaqah") && (
+          <p className="rounded-card border bg-muted/20 p-2 text-micro text-muted-foreground">
+            Counts only — nobody can see how much anyone gave.
+          </p>
+        )}
         {isInvite ? (
           <p className="text-sm text-muted-foreground">
             You've been invited to this accountability challenge.
@@ -79,7 +85,9 @@ export default function ChallengeCard({
                 <li key={m.handle} className="space-y-1">
                   <div className="flex items-center justify-between gap-2 text-sm">
                     <span className={m.is_me ? "font-semibold" : ""}>
-                      {m.is_me ? "You" : m.display_name || `@${m.handle}`}
+                      <Link to={m.is_me ? "/profile" : `/u/${m.handle}`} className="hover:underline">
+                        {m.is_me ? "You" : m.display_name || `@${m.handle}`}
+                      </Link>
                       {m.state === "invited" && (
                         <span className="ml-1 text-micro text-muted-foreground">(invited)</span>
                       )}
