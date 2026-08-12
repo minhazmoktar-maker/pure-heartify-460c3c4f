@@ -6,6 +6,7 @@ import SEO from "@/components/SEO";
 import CurrencyPicker from "@/components/CurrencyPicker";
 import { formatCurrency } from "@/lib/currencies";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Entry = {
   id: string;
@@ -77,6 +78,11 @@ const Sadaqah = () => {
     setAmount("");
     setNote("");
     toast.success("Sadaqah logged — jazakAllahu khayran");
+    // Challenge signal only: the day and that you gave. No amount, category or note leaves this device.
+    void supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) return;
+      return supabase.rpc("log_sadaqah_act", { _day: date, _delta: 1 });
+    }).catch(() => {});
   };
 
   const remove = (id: string) => setEntries((es) => es.filter((e) => e.id !== id));
