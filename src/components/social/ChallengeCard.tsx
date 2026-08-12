@@ -10,6 +10,8 @@ const UNITS: Record<Challenge["type"], string> = {
   doses: "Daily Doses",
   videos: "videos completed",
   sessions: "learning days",
+  sadaqah_days: "days with sadaqah",
+  sadaqah_acts: "sadaqah acts",
 };
 
 function daysLeft(endAt: string) {

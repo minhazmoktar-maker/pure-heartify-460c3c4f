@@ -6,6 +6,7 @@ import SEO from "@/components/SEO";
 import CurrencyPicker from "@/components/CurrencyPicker";
 import { formatCurrency } from "@/lib/currencies";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Entry = {
   id: string;
@@ -77,6 +78,11 @@ const Sadaqah = () => {
     setAmount("");
     setNote("");
     toast.success("Sadaqah logged — jazakAllahu khayran");
+    // Challenge signal only: the day and that you gave. No amount, category or note leaves this device.
+    void supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) return;
+      return supabase.rpc("log_sadaqah_act", { _day: date, _delta: 1 });
+    }).catch(() => {});
   };
 
   const remove = (id: string) => setEntries((es) => es.filter((e) => e.id !== id));
@@ -169,7 +175,11 @@ const Sadaqah = () => {
         <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
           {/* Add entry */}
           <section className="rounded-card border border-border bg-card p-5">
-            <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Log sadaqah</h2>
+            <h2 className="mb-1 font-heading text-heading font-semibold text-foreground">Log sadaqah</h2>
+            <p className="mb-3 text-micro text-muted-foreground">
+              Amounts, categories and notes never leave your device. Sadaqah challenges count only how
+              often you gave.
+            </p>
             <div className="grid grid-cols-[1fr_120px] gap-2">
               <input
                 type="number"

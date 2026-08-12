@@ -4459,6 +4459,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sadaqah_acts: {
+        Row: {
+          acts: number
+          created_at: string
+          day: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          acts?: number
+          created_at?: string
+          day: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          acts?: number
+          created_at?: string
+          day?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       salah_log: {
         Row: {
           created_at: string
@@ -6444,6 +6471,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      log_sadaqah_act: {
+        Args: { _day?: string; _delta?: number }
+        Returns: Json
+      }
       mark_feed_action: {
         Args: { _action: string; _video_id: string }
         Returns: undefined
@@ -6863,6 +6894,13 @@ export type Database = {
         }[]
       }
       user_household_id: { Args: { _user_id: string }; Returns: string }
+      user_sadaqah_stats: {
+        Args: { _since: string; _user_id: string }
+        Returns: {
+          acts: number
+          days: number
+        }[]
+      }
       verify_admin_review_token: {
         Args: { _token: string }
         Returns: {
