@@ -12,7 +12,7 @@ import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
 import NudgeButton from "@/components/NudgeButton";
 import ReportUserDialog from "@/components/social/ReportUserDialog";
-import { useSocial } from "@/hooks/useSocial";
+import { useConnections } from "@/hooks/useSocial";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,7 +70,7 @@ export default function PublicProfile() {
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<"ok" | "not_found" | "private" | "error">("ok");
   const [reportOpen, setReportOpen] = useState(false);
-  const { blockUser } = useSocial();
+  const { blockUser } = useConnections();
 
   useEffect(() => {
     let mounted = true;
