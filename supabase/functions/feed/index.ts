@@ -200,7 +200,13 @@ Deno.serve(async (req) => {
       url += `&ingested_at=lt.${encodeURIComponent(cursor)}`;
     }
     if (search) {
-      url += `&or=(title.ilike.*${encodeURIComponent(search)}*,channel_title.ilike.*${encodeURIComponent(search)}*)`;
+      // Substring match alone is far too narrow ("podcasts" matched 1 row while
+      // full-text matched 479), which made "More related" return a single page
+      // and infinite scroll appear broken. Combine ILIKE with the indexed
+      // `search_tsv` full-text column so deep pagination has real depth.
+      const enc = encodeURIComponent(search);
+      const ftsTerm = encodeURIComponent(search.replace(/[()]/g, " ").trim());
+      url += `&or=(title.ilike.*${enc}*,channel_title.ilike.*${enc}*,search_tsv.wfts(english).${ftsTerm})`;
     }
 
 
