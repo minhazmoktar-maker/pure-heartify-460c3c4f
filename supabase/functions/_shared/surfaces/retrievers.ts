@@ -100,8 +100,23 @@ export async function retrieveBecauseYouWatched(ctx: SurfaceContext) {
   });
 }
 
+
+/**
+ * Hard language gate applied at the DB layer so an English-only viewer never
+ * has other-language rows in their candidate pool (they used to survive as
+ * "tail" rows and leak into deeper pages).
+ */
+function langFilter<T>(q: T, ctx: SurfaceContext): T {
+  const langs = (ctx.contentLanguages ?? [])
+    .filter((l): l is string => typeof l === "string" && !!l)
+    .map((l) => l.toLowerCase());
+  if (!langs.length) return q;
+  // deno-lint-ignore no-explicit-any
+  return (q as any).in("content_language", langs) as T;
+}
+
 const CURATED_COLS =
-  "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language";
+  "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state";
 
 /**
  * Cold-start heuristics — used when personalization is sparse (few or no
@@ -186,6 +201,7 @@ export async function retrieveColdStart(
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
       .eq("category", c)
+      .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
       .gte("halal_score", 85)
       .order("ingested_at", { ascending: false })
       .limit(perTopic * 6);
@@ -323,10 +339,11 @@ export async function retrieveBrowse(ctx: SurfaceContext) {
   await Promise.all(chosen.map(async (c, idx) => {
     const { data } = await ctx.service
       .from("curated_videos")
-      .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language")
+      .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state")
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
       .eq("category", c)
+      .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
       .order("halal_score", { ascending: false, nullsFirst: false })
       .limit(perCat * 3);
     buckets[idx] = shuffleWithSeed(((data ?? []) as SurfaceVideo[]), sessionSeed(ctx.sessionId + c)).slice(0, perCat);
@@ -343,7 +360,7 @@ export async function retrieveListen(ctx: SurfaceContext) {
   const AUDIO_CATS = ["Quran", "Adhan", "Nasheeds", "Lectures", "Duas"];
   const { data } = await ctx.service
     .from("curated_videos")
-    .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language")
+    .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state")
     .in("moderation_state", ["approved", "auto_approved"])
     .eq("is_hidden", false).eq("is_archived", false)
     .in("category", AUDIO_CATS)
