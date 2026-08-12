@@ -595,22 +595,45 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
   // hundred rows were timing out under load; 50-row chunks are safe.
   const CHUNK = 50;
   let inserted = 0;
-  for (let i = 0; i < rows.length; i += CHUNK) {
-    const chunk = rows.slice(i, i + CHUNK);
-    const res = await sbFetch("curated_videos?on_conflict=video_id", {
+
+  const post = (batch: Record<string, unknown>[]) =>
+    sbFetch("curated_videos?on_conflict=video_id", {
       method: "POST",
       headers: { "Prefer": "resolution=ignore-duplicates,return=headers-only" },
-      body: JSON.stringify(chunk),
+      body: JSON.stringify(batch),
     });
-    if (!res.ok) {
-      console.error(`upsert failed ${res.status} (chunk ${i}-${i + chunk.length}): ${await res.text()}`);
-      continue; // skip the bad chunk, keep going with the rest
+
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const chunk = rows.slice(i, i + CHUNK);
+    const res = await post(chunk);
+    if (res.ok) {
+      inserted += chunk.length;
+      embedNewVideos(chunk).catch((e) => console.warn("[embed] batch failed:", e));
+      continue;
     }
-    inserted += chunk.length;
-    // Fire-and-forget embedding for this chunk.
-    embedNewVideos(chunk).catch((e) => console.warn("[embed] batch failed:", e));
+    const body = await res.text();
+    // A single row tripping the moderation trigger (P0001) aborts the whole
+    // statement. Retry the chunk row-by-row so only the offending rows are
+    // dropped instead of losing 50 good videos from trusted channels.
+    if (body.includes("P0001")) {
+      const accepted: Record<string, unknown>[] = [];
+      for (const row of chunk) {
+        const one = await post([row]);
+        if (one.ok) {
+          accepted.push(row);
+        } else {
+          const detail = await one.text();
+          console.warn(`[ingest] row rejected (${row.video_id}): ${detail.slice(0, 200)}`);
+        }
+      }
+      inserted += accepted.length;
+      if (accepted.length) embedNewVideos(accepted).catch((e) => console.warn("[embed] batch failed:", e));
+      continue;
+    }
+    console.error(`upsert failed ${res.status} (chunk ${i}-${i + chunk.length}): ${body}`);
   }
   return inserted;
+
 }
 
 // Embed a batch of newly ingested rows and store the vectors on curated_videos.
