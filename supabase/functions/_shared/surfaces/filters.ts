@@ -40,6 +40,17 @@ export function applyLanguagePreference(items: SurfaceVideo[], ctx: SurfaceConte
   return [...matched, ...items.filter((v) => !have.has(v.video_id))];
 }
 
+const BAD_VISUAL = new Set(["female_detected", "music", "flagged", "rejected", "haram"]);
+
+/**
+ * Visual gate — anything the autonomous thumbnail sweep flagged (women,
+ * musical imagery, other prohibited visuals) can never render, on any
+ * surface, regardless of how clean its title is.
+ */
+export function applyVisualGate(items: SurfaceVideo[]): SurfaceVideo[] {
+  return items.filter((v) => !BAD_VISUAL.has((v.visual_state ?? "unchecked").toLowerCase()));
+}
+
 export function applyBlocklist(items: SurfaceVideo[]): SurfaceVideo[] {
   return items.filter((v) => {
     const t = (v.title ?? "").toLowerCase();
@@ -106,7 +117,7 @@ export function runUniversalFilters(
   ctx: SurfaceContext,
   impressions: Map<string, number>,
 ): SurfaceVideo[] {
-  const safe = applyStrictHalal(items, ctx);
+  const safe = applyVisualGate(applyStrictHalal(items, ctx));
   const base = applyKidsMode(
     applyHiddenVideos(applyUserBlocks(applyPremiumGate(applyBlocklist(safe), ctx), ctx), ctx),
     ctx,

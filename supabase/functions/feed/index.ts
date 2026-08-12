@@ -132,8 +132,15 @@ Deno.serve(async (req) => {
     // `moderation_signals`) that inflate the row payload 50-200x and are
     // never read by feed rendering. Cuts internal PostgREST payload from
     // ~5-15 MB per request to ~50-150 KB.
-    const FEED_COLS = "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language";
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false&order=${orderClause}&limit=${fetchLimit}`;
+    const FEED_COLS = "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state";
+    // Hard language gate. The catalog is 100% language-tagged, so a user who
+    // picked English must never be served Urdu/Indonesian/Arabic rows — the
+    // previous soft re-rank left them in the tail and they surfaced on deeper
+    // pages. Applied at the DB level so the whole candidate pool is on-language.
+    const langClause = contentLanguages.length
+      ? `&content_language=in.(${contentLanguages.map((l) => encodeURIComponent(l)).join(",")})`
+      : "";
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false${langClause}&order=${orderClause}&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
@@ -281,6 +288,7 @@ Deno.serve(async (req) => {
           _cursor: cursor ?? null,
           _exclude_premium: !isPremium,
           _order: sort === "recent" ? "recent" : "fresh",
+          _languages: contentLanguages.length ? contentLanguages : null,
         });
         const tFetch = Date.now() - t0;
         if (error) {
@@ -348,11 +356,12 @@ Deno.serve(async (req) => {
     // are preserved on their higher-ranked positions.
     if (sectionId && filtered.length < Math.ceil(limit / 2)) {
       const seen = new Set(filtered.map((v) => v.video_id as string));
-      const cascade = async (extra: string) => {
+      const cascade = async (extra: string, withLang = true) => {
         const u = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}` +
           `&moderation_state=in.(approved,auto_approved)` +
           `&is_hidden=eq.false&is_archived=eq.false` +
           (isPremium ? "" : "&is_premium_only=eq.false") +
+          (withLang ? langClause : "") +
           `&${extra}&limit=${fetchLimit}`;
         const r = await fetch(u, {
           headers: {
@@ -375,7 +384,7 @@ Deno.serve(async (req) => {
           if (filtered.length >= fetchLimit) return;
         }
       };
-      // Stage 1: recently-approved
+      // Stage 1: recently-approved (still on-language)
       await cascade("order=ingested_at.desc.nullslast,halal_score.desc");
       // Stage 2: trending fallback if still short
       if (filtered.length < Math.ceil(limit / 2)) {
@@ -385,11 +394,16 @@ Deno.serve(async (req) => {
       if (filtered.length < Math.ceil(limit / 2)) {
         await cascade("halal_score=gte.85&order=published_at.desc.nullslast,halal_score.desc");
       }
+      // Stage 4: ONLY if the requested language genuinely cannot fill the row,
+      // drop the language gate so a section never renders empty.
+      if (langClause && filtered.length < Math.ceil(limit / 2)) {
+        await cascade("order=published_at.desc.nullslast,halal_score.desc", false);
+      }
     }
 
-    // Locale-aware soft re-rank: matching content_language items surface first
-    // (and un-tagged items are treated as neutral so we never starve pages
-    // in markets whose curation hasn't been language-tagged yet).
+    // Language ordering. The pool is already hard-filtered to the caller's
+    // languages; this only keeps on-language rows ahead of any off-language
+    // filler pulled in by the last-resort cascade stage.
     let ordered = filtered;
     if (contentLanguages.length) {
       const langSet = new Set(contentLanguages);
@@ -402,8 +416,11 @@ Deno.serve(async (req) => {
         else if (langSet.has(cl)) matches.push(v);
         else others.push(v);
       }
-      ordered = [...matches, ...untagged, ...others];
+      // Off-language rows are only ever used as starvation filler.
+      const needFiller = matches.length + untagged.length < limit;
+      ordered = needFiller ? [...matches, ...untagged, ...others] : [...matches, ...untagged];
     }
+
 
     // Personalization: for signed-in users, apply a real signal-based
     // re-rank (category/channel affinity, long-term taste, novelty,

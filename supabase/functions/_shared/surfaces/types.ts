@@ -17,6 +17,7 @@ export interface SurfaceVideo {
   is_trusted_channel: boolean | null;
   is_premium_only: boolean | null;
   content_language: string | null;
+  visual_state?: string | null;
   // Wave M2 — Beneficial Intelligence Engine.
   // Present on rows returned by pool_beneficial_v1 so the UI can explain
   // WHY a video was recommended ("Because you learn Fiqh", "Trusted source"…).
