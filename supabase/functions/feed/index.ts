@@ -200,7 +200,21 @@ Deno.serve(async (req) => {
       url += `&ingested_at=lt.${encodeURIComponent(cursor)}`;
     }
     if (search) {
-      url += `&or=(title.ilike.*${encodeURIComponent(search)}*,channel_title.ilike.*${encodeURIComponent(search)}*)`;
+      // Substring match alone is far too narrow ("podcasts" matched 1 row while
+      // full-text matched 479), which made "More related" return a single page
+      // and infinite scroll appear broken. Combine ILIKE with the indexed
+      // `search_tsv` full-text column so deep pagination has real depth.
+      const enc = encodeURIComponent(search);
+      // Multi-word queries are OR-joined: websearch_to_tsquery ANDs terms by
+      // default, so "seerah tafsir" returned nothing. OR keeps recall high,
+      // and the smart-ranked block above still supplies precision.
+      const tokens = search
+        .replace(/[()"]/g, " ")
+        .split(/\s+/)
+        .filter((t) => t.length > 1)
+        .slice(0, 6);
+      const ftsTerm = encodeURIComponent(tokens.length ? tokens.join(" OR ") : search);
+      url += `&or=(title.ilike.*${enc}*,channel_title.ilike.*${enc}*,search_tsv.wfts(english).${ftsTerm})`;
     }
 
 
