@@ -6103,6 +6103,7 @@ export type Database = {
           _category?: string
           _cursor?: string
           _exclude_premium?: boolean
+          _languages?: string[]
           _limit?: number
           _order?: string
           _per_channel?: number
@@ -6124,6 +6125,7 @@ export type Database = {
           title: string
           video_id: string
           view_count: number
+          visual_state: string
         }[]
       }
       get_global_discovery_stats: {
