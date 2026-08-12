@@ -6032,6 +6032,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      detect_content_language: {
+        Args: { _fallback?: string; _title: string }
+        Returns: string
+      }
       end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
       enqueue_benefit_labels: { Args: { _limit?: number }; Returns: Json }
@@ -6319,6 +6323,8 @@ export type Database = {
       }
       grant_referral_tier_rewards: { Args: never; Returns: Json }
       halal_deny_female_ar_pattern: { Args: never; Returns: string }
+      halal_deny_female_intl_latin_pattern: { Args: never; Returns: string }
+      halal_deny_female_intl_script_pattern: { Args: never; Returns: string }
       halal_deny_tier1_pattern: { Args: never; Returns: string }
       halal_deny_tier2_pattern: { Args: never; Returns: string }
       halal_text_flags: {

@@ -9,6 +9,35 @@ export const TIER1_RE =
 export const ARABIC_FEMALE_RE =
   /(المتسابقة|متسابقة|المتسابقات|القارئة|قارئة|القارئات|المقرئة|مقرئة|الطالبة|طالبة|الطفلة|طفلة|الشيخة|شيخة|الأستاذة|أستاذة|الاستاذة|الدكتورة|دكتورة|الفتاة|فتاة|فتيات|البنت|بنات|امرأة|المرأة|نساء|النساء|سيدة|السيدة|سيدات|الأخت|الاخت|أخواتي|اخواتي|مغنية|راقصة|ممثلة|أغنية|اغنية|أغاني|اغاني|موسيقى|موسيقية)/;
 
+/**
+ * Multilingual female / music / entertainment indicators. Mirrors the SQL
+ * helpers `halal_deny_female_intl_latin_pattern()` and
+ * `halal_deny_female_intl_script_pattern()`.
+ */
+export const INTL_FEMALE_RE =
+  /(^|[^a-z])(feminism|feminist|feminista|hermana|hermanas|mujer|mujeres|chica|chicas|cantante|cantora|femme|femmes|fille|filles|soeur|chanson|chanteuse|musique|wanita|perempuan|muslimah|ustazah|ustadzah|penyanyi|nyanyian|nasyid|lagu|kadin|kiz|sarki|muzik|hanim|frau|frauen|maedchen|saengerin|lied|mulher|mulheres|menina|mwanamke|wanawake|wimbo|khawateen|aurat|aurton|larki|larkiyan|mahila|naari|ladki|gaana|sangeet|ashram|bhajan|kirtan|satsang|gurupurnima|bhagavad|mandir|diwali)($|[^a-z])/;
+
+export const INTL_FEMALE_SCRIPT_RE =
+  /(মহিলা|নারী|মেয়ে|মেয়েদের|গায়িকা|গান|সঙ্গীত|خواتین|عورت|عورتیں|لڑکی|لڑکیاں|گانا|گانے|موسیقی|نغمہ|महिला|नारी|लड़की|लड़कियों|गायिका|गाना|संगीत|गुरुपूर्णिमा)/;
+
+/** Channels excluded platform-wide regardless of individual video titles. */
+export const BLOCKED_CHANNELS = [
+  "kitsuna",
+  "zayan my",
+  "amma",
+  "academy of knowledge",
+  "stanford online",
+  "stanford graduate school of business",
+  "deeplearningai",
+  "andrew huberman",
+  "huberman lab",
+  "huberman lab clips",
+  "faithful finance",
+  "ted",
+  "tedx",
+];
+
+
 export const TIER2_RE =
   /(^|[^a-z])(lady|ladies|sister|sisters|aunty|song|songs|music|musical|musician|musicians|band|concert|album|lyrics|remix|soundtrack|nasheed|nasheeds|anasheed|qaseeda|dance|fashion|beauty|makeup|hairstyle|outfit|jewellery|jewelry|drama|anime|manga|cartoon|movie|movies|trailer|romance|romantic|kiss|kissing|crush|prank|vlog|vlogs|vlogger|funny|comedy|standup|meme|memes|gaming|gameplay|fortnite|pubg|minecraft|reaction video|talk show)($|[^a-z])/;
 
@@ -21,10 +50,15 @@ export function isHalalAllowed(
 ): boolean {
   const raw = `${input.title ?? ""} ${input.channelTitle ?? input.channel_title ?? ""}`;
   const text = raw.toLowerCase();
+  const channel = (input.channelTitle ?? input.channel_title ?? "").trim().toLowerCase();
+  if (channel && BLOCKED_CHANNELS.includes(channel)) return false;
   if (TIER1_RE.test(text)) return false;
   if (ARABIC_FEMALE_RE.test(raw)) return false;
+  if (INTL_FEMALE_RE.test(text)) return false;
+  if (INTL_FEMALE_SCRIPT_RE.test(raw)) return false;
   if (strict && !TIER2_FALSE_POSITIVE_RE.test(text) && TIER2_RE.test(text)) return false;
   return true;
+
 }
 
 export function filterHalal<T extends { title?: string | null; channelTitle?: string | null }>(

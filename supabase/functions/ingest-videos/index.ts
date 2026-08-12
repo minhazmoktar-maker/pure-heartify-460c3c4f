@@ -161,8 +161,12 @@ const FEMALE_PRESENTER_PATTERNS: Array<{ re: RegExp; label: string }> = [
   { re: /\bsisters?\s+(vlog|diary|haul|tag)\b/i, label: "presenter:sister-vlog" },
 ];
 
-const BAD_EMOJIS_RE = /[💃🍺🍷🎰💋👙🩱🕺💄👯👩‍🦰💅]/;
-const FEMALE_EMOJIS_RE = /[👩💃👯💄💅🤰👧]/;
+// NOTE: the /u flag is REQUIRED. Without it these classes are split into lone
+// surrogates and match ANY emoji (e.g. 🔥, 😊), which wrongly rejected whole
+// beneficial channels.
+const BAD_EMOJIS_RE =
+  /(💃|🍺|🍷|🍸|🍹|🎰|💋|👙|🩱|🕺|💄|👯|👩‍🦰|💅)/u;
+const FEMALE_EMOJIS_RE = /(👩|💃|👯|💄|💅|🤰|👧|👩‍🦰|🙋‍♀️|💁‍♀️)/u;
 
 // Trusted channels — keep in sync with src/data/trustedChannels.ts
 const TRUSTED_CHANNELS: string[] = [

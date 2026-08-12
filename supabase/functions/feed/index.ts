@@ -122,11 +122,19 @@ Deno.serve(async (req) => {
     // what allows the session-seeded rotation below to feel genuinely
     // different across sessions instead of re-sorting the same 400 rows.
     const fetchLimit = Math.min(limit * (contentLanguages.length ? 12 : 10), 800);
-    const orderClause = sort === "trending"
+    // Keyset pagination is done on `ingested_at` (see the cursor clause
+    // below), so any path that must paginate has to be *ordered* by
+    // ingested_at too. Search ("More related" on the results page) previously
+    // ordered by published_at while cursoring on ingested_at, which made the
+    // second page collapse and infinite scroll stop after one page.
+    const orderClause = search
+      ? "ingested_at.desc,halal_score.desc,published_at.desc.nullslast"
+      : sort === "trending"
       ? "view_count.desc.nullslast,published_at.desc.nullslast,halal_score.desc"
       : sort === "recent"
       ? "ingested_at.desc,published_at.desc.nullslast,halal_score.desc"
       : "published_at.desc.nullslast,halal_score.desc,ingested_at.desc";
+
     // Slim column projection — avoids pulling the 1536-dim `embedding`
     // vector, `search_tsv`, and moderation blobs (`moderation_reasoning`,
     // `moderation_signals`) that inflate the row payload 50-200x and are
