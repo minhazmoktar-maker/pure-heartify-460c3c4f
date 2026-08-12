@@ -196,7 +196,7 @@ export async function retrieveColdStart(
 
   const buckets: SurfaceVideo[][] = [];
   await Promise.all(chosen.map(async (c, idx) => {
-    const { data } = await ctx.service
+    const { data } = await langFilter(ctx.service
       .from("curated_videos").select(CURATED_COLS)
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
@@ -204,7 +204,7 @@ export async function retrieveColdStart(
       .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
       .gte("halal_score", 85)
       .order("ingested_at", { ascending: false })
-      .limit(perTopic * 6);
+      .limit(perTopic * 6), ctx);
     // Device/browser jitter keeps identical-topic cold users apart.
     const jitter = personalSeed(ctx, `cold:${c}:${cfg.weights.cold_start_device_jitter}`);
     buckets[idx] = shuffleWithSeed(((data ?? []) as SurfaceVideo[]), jitter).slice(0, perTopic);
@@ -219,7 +219,7 @@ export async function retrieveColdStart(
   // back thin, top up with fresh high-trust content so cold users never see
   // an empty feed.
   if (out.length < 8) {
-    const { data } = await ctx.service
+    const { data } = await langFilter(ctx.service
       .from("curated_videos").select(CURATED_COLS)
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
@@ -337,7 +337,7 @@ export async function retrieveBrowse(ctx: SurfaceContext) {
   const perCat = 4;
   const buckets: SurfaceVideo[][] = [];
   await Promise.all(chosen.map(async (c, idx) => {
-    const { data } = await ctx.service
+    const { data } = await langFilter(ctx.service
       .from("curated_videos")
       .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state")
       .in("moderation_state", ["approved", "auto_approved"])
@@ -345,7 +345,7 @@ export async function retrieveBrowse(ctx: SurfaceContext) {
       .eq("category", c)
       .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
       .order("halal_score", { ascending: false, nullsFirst: false })
-      .limit(perCat * 3);
+      .limit(perCat * 3), ctx);
     buckets[idx] = shuffleWithSeed(((data ?? []) as SurfaceVideo[]), sessionSeed(ctx.sessionId + c)).slice(0, perCat);
   }));
   const out: SurfaceVideo[] = [];
@@ -358,15 +358,16 @@ export async function retrieveBrowse(ctx: SurfaceContext) {
 // Listen: audio-first categories.
 export async function retrieveListen(ctx: SurfaceContext) {
   const AUDIO_CATS = ["Quran", "Adhan", "Nasheeds", "Lectures", "Duas"];
-  const { data } = await ctx.service
+  const { data } = await langFilter(ctx.service
     .from("curated_videos")
     .select("video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state")
     .in("moderation_state", ["approved", "auto_approved"])
     .eq("is_hidden", false).eq("is_archived", false)
     .in("category", AUDIO_CATS)
+    .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
     .order("halal_score", { ascending: false, nullsFirst: false })
     .order("ingested_at", { ascending: false })
-    .limit(240);
+    .limit(240), ctx);
   return shuffleWithSeed((data ?? []) as SurfaceVideo[], sessionSeed(ctx.sessionId + "lis"));
 }
 
