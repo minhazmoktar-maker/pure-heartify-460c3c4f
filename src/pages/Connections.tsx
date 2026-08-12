@@ -442,6 +442,8 @@ export default function Connections() {
                     row={row}
                     pending={sendRequest.isPending}
                     onConnect={() => sendRequest.mutate(row.handle)}
+                    onReport={() => setReportHandle(row.handle)}
+                    onBlock={() => blockUser.mutate(row.handle)}
                   />
                 ))}
               </div>
