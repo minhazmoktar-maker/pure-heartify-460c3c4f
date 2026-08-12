@@ -119,12 +119,37 @@ async function writeMeta(id: string, plan: "free" | "premium"): Promise<void> {
   });
 }
 
+/**
+ * Many recitation CDNs allow <audio> playback but send no CORS headers, so a
+ * direct `fetch()` for the bytes fails. `audio-proxy` re-streams allowlisted
+ * hosts with CORS so downloads succeed on every platform (notably iOS Safari).
+ */
+function proxiedUrl(url: string): string | null {
+  const base = import.meta.env.VITE_SUPABASE_URL;
+  if (!base) return null;
+  return `${base}/functions/v1/audio-proxy?url=${encodeURIComponent(url)}`;
+}
+
+async function fetchAudio(url: string): Promise<Response> {
+  try {
+    const direct = await fetch(url, { mode: "cors" });
+    if (direct.ok) return direct;
+  } catch {
+    /* CORS / network failure — fall through to the proxy */
+  }
+  const proxy = proxiedUrl(url);
+  if (!proxy) throw new Error("Download failed (network)");
+  const res = await fetch(proxy);
+  if (!res.ok) throw new Error(`Download failed (${res.status})`);
+  return res;
+}
+
 export async function saveOfflineTrack(
   id: string,
   url: string,
   onProgress?: (pct: number) => void,
 ): Promise<void> {
-  const res = await fetch(url);
+  const res = await fetchAudio(url);
   if (!res.ok) throw new Error(`Download failed (${res.status})`);
   const total = Number(res.headers.get("content-length") || 0);
   const reader = res.body?.getReader();
