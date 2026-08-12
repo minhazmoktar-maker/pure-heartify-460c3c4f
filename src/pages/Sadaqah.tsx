@@ -175,7 +175,11 @@ const Sadaqah = () => {
         <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
           {/* Add entry */}
           <section className="rounded-card border border-border bg-card p-5">
-            <h2 className="mb-3 font-heading text-heading font-semibold text-foreground">Log sadaqah</h2>
+            <h2 className="mb-1 font-heading text-heading font-semibold text-foreground">Log sadaqah</h2>
+            <p className="mb-3 text-micro text-muted-foreground">
+              Amounts, categories and notes never leave your device. Sadaqah challenges count only how
+              often you gave.
+            </p>
             <div className="grid grid-cols-[1fr_120px] gap-2">
               <input
                 type="number"
