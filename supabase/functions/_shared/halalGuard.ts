@@ -17,6 +17,9 @@
 export const TIER1_RE =
   /(^|[^a-z])(female|females|woman|women|womens|girl|girls|actress|actresses|ustadha|shaykha|singer|singers|karaoke|rapper|hiphop|kpop|k-pop|kdrama|k-drama|twerk|belly ?dance|dancer|dancing|choreography|makeup artist|grwm|ootd|skincare|lookbook|cosmetics|celebrity|celebrities|gossip|dating|boyfriend|girlfriend|flirt|nude|nudity|sexy|porn|pornstar|onlyfans|bikini|lingerie|swimsuit|escort|stripper|casino|gambling|betting|lottery|tiktok|netflix|hollywood|bollywood|lollywood|music video|official music|official audio|official video|lyric video)($|[^a-z])/;
 
+export const ARABIC_FEMALE_RE =
+  /(المتسابقة|متسابقة|المتسابقات|القارئة|قارئة|القارئات|المقرئة|مقرئة|الطالبة|طالبة|الطفلة|طفلة|الشيخة|شيخة|الأستاذة|أستاذة|الاستاذة|الدكتورة|دكتورة|الفتاة|فتاة|فتيات|البنت|بنات|امرأة|المرأة|نساء|النساء|سيدة|السيدة|سيدات|الأخت|الاخت|أخواتي|اخواتي|مغنية|راقصة|ممثلة|أغنية|اغنية|أغاني|اغاني|موسيقى|موسيقية)/;
+
 export const TIER2_RE =
   /(^|[^a-z])(lady|ladies|sister|sisters|aunty|song|songs|music|musical|musician|musicians|band|concert|album|lyrics|remix|soundtrack|nasheed|nasheeds|anasheed|qaseeda|dance|fashion|beauty|makeup|hairstyle|outfit|jewellery|jewelry|drama|anime|manga|cartoon|movie|movies|trailer|romance|romantic|kiss|kissing|crush|prank|vlog|vlogs|vlogger|funny|comedy|standup|meme|memes|gaming|gameplay|fortnite|pubg|minecraft|reaction video|talk show)($|[^a-z])/;
 
@@ -49,6 +52,11 @@ export function assessStrict(v: HalalAssessInput, strict = true): HalalVerdict {
   const text = `${v.title ?? ""} ${v.channel_title ?? ""}`.toLowerCase();
 
   if (TIER1_RE.test(text)) return { allowed: false, tier: 1, reason: "tier1_text" };
+
+  // Arabic female/music indicators. Kept as its own pattern because the
+  // Latin word-boundary classes in TIER1_RE can never match Arabic script.
+  const raw = `${v.title ?? ""} ${v.channel_title ?? ""}`;
+  if (ARABIC_FEMALE_RE.test(raw)) return { allowed: false, tier: 1, reason: "tier1_arabic" };
 
   const vs = (v.visual_state ?? "unchecked").toLowerCase();
   if (BAD_VISUAL.has(vs)) return { allowed: false, tier: 3, reason: `visual:${vs}` };

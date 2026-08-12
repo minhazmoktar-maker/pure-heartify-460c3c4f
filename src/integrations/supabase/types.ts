@@ -6318,6 +6318,7 @@ export type Database = {
         }
       }
       grant_referral_tier_rewards: { Args: never; Returns: Json }
+      halal_deny_female_ar_pattern: { Args: never; Returns: string }
       halal_deny_tier1_pattern: { Args: never; Returns: string }
       halal_deny_tier2_pattern: { Args: never; Returns: string }
       halal_text_flags: {
