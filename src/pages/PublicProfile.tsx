@@ -11,6 +11,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
 import NudgeButton from "@/components/NudgeButton";
+import ReportUserDialog from "@/components/social/ReportUserDialog";
+import { useSocial } from "@/hooks/useSocial";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical, ShieldOff, Flag } from "lucide-react";
 
 interface Badge {
   key: string;
@@ -60,6 +69,8 @@ export default function PublicProfile() {
   const [profile, setProfile] = useState<Showcase | null>(null);
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<"ok" | "not_found" | "private" | "error">("ok");
+  const [reportOpen, setReportOpen] = useState(false);
+  const { blockUser } = useSocial();
 
   useEffect(() => {
     let mounted = true;
@@ -162,6 +173,23 @@ export default function PublicProfile() {
                     <Button size="sm" variant="outline" onClick={onShare} aria-label="Share profile">
                       <Share2 className="h-4 w-4" />
                     </Button>
+                    {!profile.is_me && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost" className="h-11 w-11" aria-label={`Safety options for ${displayName}`}>
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => blockUser.mutate(profile.handle)}>
+                            <ShieldOff className="mr-2 h-4 w-4" /> Block member
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setReportOpen(true)}>
+                            <Flag className="mr-2 h-4 w-4" /> Report member
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
                 </div>
 
@@ -253,6 +281,11 @@ export default function PublicProfile() {
           </>
         )}
       </main>
+      <ReportUserDialog
+        handle={profile ? profile.handle : handle}
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+      />
     </div>
   );
 }
