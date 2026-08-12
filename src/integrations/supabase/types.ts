@@ -6325,6 +6325,7 @@ export type Database = {
       halal_deny_female_ar_pattern: { Args: never; Returns: string }
       halal_deny_female_intl_latin_pattern: { Args: never; Returns: string }
       halal_deny_female_intl_script_pattern: { Args: never; Returns: string }
+      halal_deny_female_names_pattern: { Args: never; Returns: string }
       halal_deny_tier1_pattern: { Args: never; Returns: string }
       halal_deny_tier2_pattern: { Args: never; Returns: string }
       halal_text_flags: {

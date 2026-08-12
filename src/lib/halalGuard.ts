@@ -35,8 +35,15 @@ export const BLOCKED_CHANNELS = [
   "faithful finance",
   "ted",
   "tedx",
+  "islam on demand",
+  "iqra tv",
+  "iqraa tv",
 ];
 
+
+/** Named female presenters/speakers excluded platform-wide. */
+export const FEMALE_NAMES_RE =
+  /(^|[^a-z])(yvonne ridl[ae]y|haleh banani|mehreen|mia yilin|leila hormozi|layla hormozi|lauren booth|na[ai]ma b\.? robert|yasmin mogahed|nouran hussein)($|[^a-z])/;
 
 export const TIER2_RE =
   /(^|[^a-z])(lady|ladies|sister|sisters|aunty|song|songs|music|musical|musician|musicians|band|concert|album|lyrics|remix|soundtrack|nasheed|nasheeds|anasheed|qaseeda|dance|fashion|beauty|makeup|hairstyle|outfit|jewellery|jewelry|drama|anime|manga|cartoon|movie|movies|trailer|romance|romantic|kiss|kissing|crush|prank|vlog|vlogs|vlogger|funny|comedy|standup|meme|memes|gaming|gameplay|fortnite|pubg|minecraft|reaction video|talk show)($|[^a-z])/;
@@ -53,6 +60,7 @@ export function isHalalAllowed(
   const channel = (input.channelTitle ?? input.channel_title ?? "").trim().toLowerCase();
   if (channel && BLOCKED_CHANNELS.includes(channel)) return false;
   if (TIER1_RE.test(text)) return false;
+  if (FEMALE_NAMES_RE.test(text)) return false;
   if (ARABIC_FEMALE_RE.test(raw)) return false;
   if (INTL_FEMALE_RE.test(text)) return false;
   if (INTL_FEMALE_SCRIPT_RE.test(raw)) return false;
