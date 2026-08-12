@@ -581,18 +581,21 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          match_mode: string
           pattern: string
           reason: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          match_mode?: string
           pattern: string
           reason?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          match_mode?: string
           pattern?: string
           reason?: string | null
         }
@@ -5901,6 +5904,7 @@ export type Database = {
         Args: { _model: string; _rows: Json }
         Returns: number
       }
+      apply_visual_verdicts: { Args: { p_verdicts: Json }; Returns: Json }
       are_connected: { Args: { _a: string; _b: string }; Returns: boolean }
       assign_experiment_variant: {
         Args: { _anon_key: string; _experiment_key: string }
@@ -5934,6 +5938,15 @@ export type Database = {
       check_ops_alerts: { Args: never; Returns: undefined }
       check_pipeline_watchdog: { Args: never; Returns: Json }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
+      claim_visual_scan_batch: {
+        Args: { p_limit?: number }
+        Returns: {
+          channel_title: string
+          thumbnail_url: string
+          title: string
+          video_id: string
+        }[]
+      }
       complete_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       compute_candidate_tier: {
         Args: {
@@ -6022,6 +6035,7 @@ export type Database = {
       end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
       enqueue_benefit_labels: { Args: { _limit?: number }; Returns: Json }
+      escalate_visually_unsafe_channels: { Args: never; Returns: Json }
       evaluate_feature_flag: {
         Args: { _key: string; _user_id: string }
         Returns: boolean
