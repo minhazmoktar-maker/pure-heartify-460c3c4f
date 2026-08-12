@@ -20,6 +20,8 @@ const TYPES: { id: Challenge["type"]; label: string; unit: string; defaultGoal: 
   { id: "minutes", label: "Learning minutes", unit: "minutes", defaultGoal: 120 },
   { id: "videos", label: "Videos completed", unit: "videos", defaultGoal: 10 },
   { id: "sessions", label: "Learning days", unit: "days", defaultGoal: 7 },
+  { id: "sadaqah_days", label: "Sadaqah days", unit: "days with sadaqah", defaultGoal: 7 },
+  { id: "sadaqah_acts", label: "Sadaqah acts", unit: "sadaqah acts", defaultGoal: 10 },
 ];
 
 const DURATIONS = [3, 7, 14, 30];
@@ -68,6 +70,7 @@ export default function CreateChallengeDialog({
           </ResponsiveModalTitle>
           <ResponsiveModalDescription>
             Invite-only and private to your circle. Progress is measured from your real Heartify activity.
+            Sadaqah challenges count acts and days only — amounts always stay private on your device.
           </ResponsiveModalDescription>
         </ResponsiveModalHeader>
 
@@ -93,6 +96,11 @@ export default function CreateChallengeDialog({
                 </button>
               ))}
             </div>
+            {type.startsWith("sadaqah") && (
+              <p className="text-micro text-muted-foreground">
+                Only how often you gave is shared — never how much.
+              </p>
+            )}
           </fieldset>
 
           <fieldset className="space-y-2">
