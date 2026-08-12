@@ -132,8 +132,15 @@ Deno.serve(async (req) => {
     // `moderation_signals`) that inflate the row payload 50-200x and are
     // never read by feed rendering. Cuts internal PostgREST payload from
     // ~5-15 MB per request to ~50-150 KB.
-    const FEED_COLS = "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language";
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false&order=${orderClause}&limit=${fetchLimit}`;
+    const FEED_COLS = "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state";
+    // Hard language gate. The catalog is 100% language-tagged, so a user who
+    // picked English must never be served Urdu/Indonesian/Arabic rows — the
+    // previous soft re-rank left them in the tail and they surfaced on deeper
+    // pages. Applied at the DB level so the whole candidate pool is on-language.
+    const langClause = contentLanguages.length
+      ? `&content_language=in.(${contentLanguages.map((l) => encodeURIComponent(l)).join(",")})`
+      : "";
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false${langClause}&order=${orderClause}&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
