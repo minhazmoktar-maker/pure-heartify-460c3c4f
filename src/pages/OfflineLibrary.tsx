@@ -7,6 +7,9 @@ import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/EmptyState";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useOfflineQueue } from "@/hooks/useOfflineQueue";
+import OfflineQueuePanel from "@/components/offline/OfflineQueuePanel";
+import OfflineDownloadSettingsCard from "@/components/offline/OfflineDownloadSettingsCard";
 import {
   listOfflineMeta,
   removeOfflineTrack,
@@ -26,6 +29,7 @@ function formatRemaining(expiresAt: number | null): string {
 
 export default function OfflineLibrary() {
   const { isPremium, loading } = useEntitlement();
+  const queue = useOfflineQueue();
   const [items, setItems] = useState<OfflineMeta[]>([]);
   const [busy, setBusy] = useState(false);
 
@@ -36,6 +40,10 @@ export default function OfflineLibrary() {
   }
 
   useEffect(() => { void refresh(); }, []);
+
+  // Keep the saved list in sync as queue downloads finish.
+  const completedCount = queue.items.filter((i) => i.status === "completed").length;
+  useEffect(() => { void refresh(); }, [completedCount]);
 
   async function handleRemove(id: string) {
     setBusy(true);
@@ -120,6 +128,10 @@ export default function OfflineLibrary() {
             ))}
           </ul>
         )}
+
+        <OfflineQueuePanel />
+        <OfflineDownloadSettingsCard className="mt-6" />
+
       </div>
     </div>
   );
