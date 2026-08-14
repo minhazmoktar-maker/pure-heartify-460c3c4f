@@ -65,7 +65,48 @@ async function loadEligibleUsers(): Promise<UserPrefs[]> {
     if (qe != null && cur.quiet_hours_end == null) cur.quiet_hours_end = qe;
     byUser.set(uid, cur);
   }
+  // Fall back to the timezone the client synced onto the profile, so users who
+  // never opened notification settings still get local-time-correct pushes.
+  const missingTz = [...byUser.values()].filter((u) => !u.timezone).map((u) => u.user_id);
+  for (let i = 0; i < missingTz.length; i += 500) {
+    const chunk = missingTz.slice(i, i + 500);
+    const { data: profs } = await admin
+      .from("profiles")
+      .select("user_id,timezone")
+      .in("user_id", chunk);
+    for (const row of profs ?? []) {
+      const u = byUser.get((row as any).user_id);
+      if (u && (row as any).timezone) u.timezone = (row as any).timezone;
+    }
+  }
   return [...byUser.values()];
+}
+
+/** YYYY-MM-DD in the given IANA timezone (falls back to UTC). */
+function localDayKey(at: Date, timeZone: string): string {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(at);
+  } catch {
+    return at.toISOString().slice(0, 10);
+  }
+}
+
+/** Hour 0-23 in the given IANA timezone (falls back to UTC). */
+function localHour(at: Date, timeZone: string): number {
+  try {
+    const h = parseInt(
+      new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone }).format(at),
+      10,
+    );
+    return Number.isNaN(h) ? at.getUTCHours() : h % 24;
+  } catch {
+    return at.getUTCHours();
+  }
 }
 
 /**
@@ -119,16 +160,22 @@ async function pickCandidate(p: UserPrefs): Promise<Candidate | null> {
   const userId = p.user_id;
   if (!(await within7dayCap(userId))) return null;
 
-  // 1) Streak at risk
+  // 1) Streak at risk — evaluated against the user's LOCAL calendar date, so
+  // a UTC±12 user is never told their streak is at risk on the wrong day.
   const { data: streak } = await admin
     .from("streaks")
     .select("current_streak,last_completed_date")
     .eq("user_id", userId)
     .maybeSingle();
   if (streak?.last_completed_date) {
-    const last = new Date(streak.last_completed_date + "T00:00:00Z").getTime();
-    const hoursSince = (Date.now() - last) / 3_600_000;
-    if (hoursSince > 16 && hoursSince < 36 && !(await alreadySent(userId, "streak_risk", 20))) {
+    const tz = p.timezone ?? "UTC";
+    const localToday = localDayKey(new Date(), tz);
+    const hour = localHour(new Date(), tz);
+    const missedToday = streak.last_completed_date < localToday;
+    // Only in the user's own late afternoon/evening — never at their midday
+    // just because it happens to be evening in UTC.
+    const inEvening = hour >= 17 && hour <= 22;
+    if (missedToday && inEvening && !(await alreadySent(userId, "streak_risk", 20))) {
       return {
         user_id: userId,
         kind: "streak_risk",

@@ -6944,6 +6944,7 @@ export type Database = {
         Args: { _completed: boolean; _concept_slug: string; _path_slug: string }
         Returns: boolean
       }
+      set_my_timezone: { Args: { _tz: string }; Returns: string }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
       social_admin_stats: { Args: never; Returns: Json }
@@ -6972,6 +6973,17 @@ export type Database = {
       social_sync_challenge_progress: {
         Args: { _user_id: string }
         Returns: number
+      }
+      streak_risk_candidates: {
+        Args: { _limit?: number; _max_hour?: number; _min_hour?: number }
+        Returns: {
+          current_streak: number
+          last_completed_date: string
+          local_date: string
+          local_hour: number
+          timezone: string
+          user_id: string
+        }[]
       }
       submit_benefit_label: {
         Args: {
@@ -7015,6 +7027,8 @@ export type Database = {
         }[]
       }
       user_household_id: { Args: { _user_id: string }; Returns: string }
+      user_local_date: { Args: { _at?: string; _uid: string }; Returns: string }
+      user_local_hour: { Args: { _at?: string; _uid: string }; Returns: number }
       user_sadaqah_stats: {
         Args: { _since: string; _user_id: string }
         Returns: {
@@ -7022,6 +7036,7 @@ export type Database = {
           days: number
         }[]
       }
+      user_timezone: { Args: { _uid: string }; Returns: string }
       verify_admin_review_token: {
         Args: { _token: string }
         Returns: {

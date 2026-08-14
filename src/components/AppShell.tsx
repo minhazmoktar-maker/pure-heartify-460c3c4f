@@ -3,6 +3,7 @@ import PageSkeleton from "./PageSkeleton";
 import { MobileBridge } from "./MobileBridge";
 import ReferralBridge from "./ReferralBridge";
 import AdhanNotifier from "./AdhanNotifier";
+import TimezoneSync from "./TimezoneSync";
 import OfflineSweeper from "./OfflineSweeper";
 import GatedPreviewGuard from "./premium/GatedPreviewGuard";
 import RouteTransition from "./RouteTransition";
@@ -51,6 +52,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <MobileBridge />
       <ReferralBridge />
       <AdhanNotifier />
+      <TimezoneSync />
       <GatedPreviewGuard />
       <OfflineSweeper />
       <BackToTop />
