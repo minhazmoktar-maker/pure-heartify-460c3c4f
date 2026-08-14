@@ -456,8 +456,9 @@ const Watch = () => {
 
           <div className="mt-4 space-y-2">
             <h1 className="text-heading font-bold text-foreground md:text-heading">
-              {currentVideo?.title ?? "Loading…"}
+              {currentVideo?.title ?? (metaResolved ? "Video unavailable" : "Loading…")}
             </h1>
+
             <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               {currentVideo && (
                 <>
