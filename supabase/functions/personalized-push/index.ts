@@ -82,6 +82,33 @@ async function loadEligibleUsers(): Promise<UserPrefs[]> {
   return [...byUser.values()];
 }
 
+/** YYYY-MM-DD in the given IANA timezone (falls back to UTC). */
+function localDayKey(at: Date, timeZone: string): string {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(at);
+  } catch {
+    return at.toISOString().slice(0, 10);
+  }
+}
+
+/** Hour 0-23 in the given IANA timezone (falls back to UTC). */
+function localHour(at: Date, timeZone: string): number {
+  try {
+    const h = parseInt(
+      new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone }).format(at),
+      10,
+    );
+    return Number.isNaN(h) ? at.getUTCHours() : h % 24;
+  } catch {
+    return at.getUTCHours();
+  }
+}
+
 /**
  * Returns true if the current time (in the user's tz, defaulting to UTC)
  * falls inside their quiet-hours window. Handles wrap-around windows like
