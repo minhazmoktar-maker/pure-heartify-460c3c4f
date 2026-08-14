@@ -91,7 +91,14 @@ Deno.serve(async (req) => {
   let inAppOnly = 0;
   let skipped = alreadySet.size;
 
-  for (const row of atRisk) {
+  for (const row of atRisk as Array<{
+    user_id: string;
+    current_streak: number;
+    last_completed_date: string | null;
+    local_date: string;
+    local_hour: number;
+    timezone: string;
+  }>) {
     if (alreadySet.has(row.user_id)) continue;
 
     const title = "Keep your streak alive 🔥";
