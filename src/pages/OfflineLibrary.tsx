@@ -122,6 +122,10 @@ export default function OfflineLibrary() {
             ))}
           </ul>
         )}
+
+        <OfflineQueuePanel />
+        <OfflineDownloadSettingsCard className="mt-6" />
+
       </div>
     </div>
   );
