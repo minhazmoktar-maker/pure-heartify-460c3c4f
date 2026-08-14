@@ -122,7 +122,13 @@ export default function Challenges() {
             <Progress value={pct} className="h-2" />
             <p className="text-right text-micro font-mono">{cur.toLocaleString()} / {c.target.toLocaleString()}</p>
           </Link>
-          {done && <ChallengeAward title={c.title} points={c.points} category={c.category} />}
+          {done && (
+            <ChallengeAward
+              title={c.title}
+              tier={medalTierForPoints(c.points)}
+              note={`${c.category === "daily" ? "Daily" : "Weekly"} challenge — ${c.points} points`}
+            />
+          )}
         </CardContent>
       </Card>
     );
