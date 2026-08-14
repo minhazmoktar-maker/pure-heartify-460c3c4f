@@ -20,6 +20,11 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/contexts/LocaleContext";
 import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  formatCount,
+  THIN_LANGUAGE_THRESHOLD,
+  useLanguageCoverage,
+} from "@/hooks/useLanguageCoverage";
 
 interface RegionalMix {
   country_code: string;
@@ -31,6 +36,8 @@ interface RegionalMix {
 export function LanguageSettings() {
   const { t, preferences, updatePreferences } = useLocale();
   const [regions, setRegions] = useState<RegionalMix[]>([]);
+  const { videosFor, supplyFor, isLoading: coverageLoading } = useLanguageCoverage();
+  const selectedSupply = supplyFor(preferences.content_languages);
   // Local mirror so the slider thumb tracks the drag; committed on release.
   const [diversity, setDiversity] = useState(preferences.diversity_level);
 
@@ -143,29 +150,47 @@ export function LanguageSettings() {
           )}
         </div>
 
-        {/* Content languages */}
+        {/* Content languages — with live coverage so users can see depth
+            before committing, instead of picking a language and landing on
+            an almost-empty feed. */}
         <div className="space-y-2">
           <Label>{t("language.content")}</Label>
           <div className="flex flex-wrap gap-2">
             {SUPPORTED_LANGUAGES.map((l) => {
               const active = preferences.content_languages.includes(l.code);
+              const count = videosFor(l.code);
+              const thin = count < THIN_LANGUAGE_THRESHOLD;
               return (
                 <button
                   key={l.code}
                   type="button"
                   onClick={() => toggleContentLanguage(l.code)}
-                  className={`rounded-pill border px-3 py-1 text-micro font-medium transition-colors ${
+                  aria-pressed={active}
+                  className={`flex min-h-[36px] items-center gap-1.5 rounded-pill border px-3 py-1 text-micro font-medium transition-colors ${
                     active
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {l.native}
+                  <span>{l.native}</span>
+                  <span className={active ? "text-primary/70" : "text-muted-foreground/70"}>
+                    {coverageLoading ? "·" : thin ? t("language.growing", undefined, "growing") : formatCount(count)}
+                  </span>
                 </button>
               );
             })}
           </div>
+          {!coverageLoading && selectedSupply < THIN_LANGUAGE_THRESHOLD * 4 && (
+            <p className="text-micro text-muted-foreground">
+              {t(
+                "language.thinSupply",
+                undefined,
+                "Your selection has limited content today. Add another language you understand so your feed stays full — we are actively growing every language.",
+              )}
+            </p>
+          )}
         </div>
+
 
         {/* Auto-personalize */}
         <div className="flex items-start justify-between gap-4">

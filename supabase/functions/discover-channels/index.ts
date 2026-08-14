@@ -462,6 +462,20 @@ async function crawlDescriptionMention(
 // ─────────────────────────── Seed selection ─────────────────────────────────
 
 async function loadTopicQueries(admin: Admin): Promise<Array<{ id: string; query: string; language: string }>> {
+  // Language-equity scheduling: `next_topic_queries` round-robins across
+  // languages and puts the neediest corpus (deficit × real audience demand)
+  // first, so English/Arabic can no longer monopolise every run while a user
+  // who picked Bengali/Malay/Hindi/Persian lands on a near-empty feed.
+  const { data: fair, error } = await admin.rpc('next_topic_queries', {
+    p_limit: MAX_TOPIC_QUERIES_PER_RUN,
+    p_target: Number(Deno.env.get('DISCOVERY_LANG_TARGET') ?? 20000),
+  });
+  if (!error && Array.isArray(fair) && fair.length > 0) {
+    return (fair as Array<{ id: string; query: string; language: string }>).map((r) => ({
+      id: r.id, query: r.query, language: r.language,
+    }));
+  }
+  // Fallback: legacy priority/staleness ordering if the RPC is unavailable.
   const { data } = await admin
     .from('discovery_topic_queries')
     .select('id, query, language')
