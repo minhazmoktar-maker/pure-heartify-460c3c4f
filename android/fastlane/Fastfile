@@ -25,7 +25,28 @@ platform :android do
       skip_upload_changelogs: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      release_status: "draft",
+      # "completed" is required for internal testers to actually receive the
+      # build — a draft release sits in the console and installs for nobody.
+      # Set PLAY_RELEASE_STATUS=draft to stage a build without distributing it.
+      release_status: ENV["PLAY_RELEASE_STATUS"] || "completed",
+      # First upload of a brand-new package must be done manually in the
+      # console; after that these API uploads succeed.
+      validate_only: ENV["PLAY_VALIDATE_ONLY"] == "true",
+    )
+  end
+
+  desc "Build a signed AAB locally without uploading"
+  lane :build_only do
+    gradle(task: "clean")
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file"     => ENV["ANDROID_KEYSTORE_PATH"],
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias"      => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password"   => ENV["ANDROID_KEY_PASSWORD"],
+      },
     )
   end
 end
