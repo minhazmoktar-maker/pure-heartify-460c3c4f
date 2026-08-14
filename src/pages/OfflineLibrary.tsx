@@ -7,6 +7,8 @@ import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/EmptyState";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import OfflineQueuePanel from "@/components/offline/OfflineQueuePanel";
+import OfflineDownloadSettingsCard from "@/components/offline/OfflineDownloadSettingsCard";
 import {
   listOfflineMeta,
   removeOfflineTrack,
