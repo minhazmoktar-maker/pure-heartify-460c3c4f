@@ -4,9 +4,12 @@ import { useMyHandle } from "@/hooks/useMyHandle";
 import type { MedalTier } from "@/lib/shareImage";
 
 interface Props {
+  /** Challenge title shown on the medal and certificate. */
   title: string;
-  points: number;
-  category: "daily" | "weekly";
+  /** Metal tier of the earned e-medal. */
+  tier: MedalTier;
+  /** Small line under the title, e.g. "Daily challenge — 50 points". */
+  note?: string;
 }
 
 export function medalTierForPoints(points: number): MedalTier {
@@ -25,11 +28,10 @@ const TIER_STYLE: Record<MedalTier, string> = {
  * Award row shown on a completed challenge: an e-medal chip plus one-tap
  * medal and certificate image shares.
  */
-export default function ChallengeAward({ title, points, category }: Props) {
+export default function ChallengeAward({ title, tier, note }: Props) {
   const { handle, displayName } = useMyHandle();
-  const tier = medalTierForPoints(points);
   const recipient = displayName || (handle ? `@${handle}` : "A Heartify believer");
-  const note = `${category === "daily" ? "Daily" : "Weekly"} challenge — ${points} points`;
+  const text = `Alhamdulillah — completed the "${title}" challenge on Heartify.`;
 
   return (
     <div className="mt-3 space-y-2 rounded-card border border-dashed border-border/70 p-3">
@@ -47,24 +49,13 @@ export default function ChallengeAward({ title, points, category }: Props) {
           variant="solid"
           className="text-xs"
           input={{ variant: "medal", achievement: title, achievementNote: note, tier, recipient }}
-          meta={{
-            title: `${title} — medal`,
-            text: `Alhamdulillah — completed the "${title}" challenge on Heartify.`,
-          }}
+          meta={{ title: `${title} — medal`, text }}
         />
         <ShareImageButton
           label="Certificate"
           className="text-xs"
-          input={{
-            variant: "certificate",
-            achievement: title,
-            achievementNote: note,
-            recipient,
-          }}
-          meta={{
-            title: `${title} — certificate`,
-            text: `Alhamdulillah — completed the "${title}" challenge on Heartify.`,
-          }}
+          input={{ variant: "certificate", achievement: title, achievementNote: note, recipient }}
+          meta={{ title: `${title} — certificate`, text }}
         />
       </div>
     </div>
