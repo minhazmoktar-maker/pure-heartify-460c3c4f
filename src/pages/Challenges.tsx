@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle2, RefreshCw, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import ChallengeAward from "@/components/ChallengeAward";
+import ChallengeAward, { medalTierForPoints } from "@/components/ChallengeAward";
 
 type Challenge = {
   id: string;
