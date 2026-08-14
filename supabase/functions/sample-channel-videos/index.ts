@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
 
     // Auth: cron secret / cron token OR admin JWT.
     const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
-    const cronToken = Deno.env.get("AUDIT_CRON_TOKEN") ?? "";
+    const cronToken = Deno.env.get("INGEST_CRON_TOKEN") ?? "";
     const isCron =
       (!!cronSecret && req.headers.get("x-cron-secret") === cronSecret) ||
       (!!cronToken && req.headers.get("x-cron-token") === cronToken);
