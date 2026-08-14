@@ -1,9 +1,12 @@
 /**
  * IndexedDB-backed offline audio cache.
  *
- * Two object stores:
- * - `tracks`: the audio Blob keyed by Track.id
- * - `meta`:   { id, savedAt, expiresAt, plan } keyed by Track.id
+ * Object stores:
+ * - `tracks`:   the completed audio Blob keyed by Track.id
+ * - `meta`:     { id, savedAt, expiresAt, plan } keyed by Track.id
+ * - `partials`: { id, blob, received, total, validator } — bytes already
+ *               fetched for an in-flight download so an interrupted transfer
+ *               can resume with an HTTP Range request instead of restarting.
  *
  * Entitlement rules (enforced by helpers below — callers should always use
  * `saveOfflineTrackGated` / `getOfflineBlobUrlGated` when the caller may not
@@ -12,11 +15,16 @@
  * - Plus users: unlimited tracks, no client-side expiry.
  * The server is still the source of truth for who is Plus — this layer only
  * mirrors that so free users can't hoard downloads indefinitely.
+ *
+ * Retry/backoff/resume behaviour is user-tunable via `offlineSettings`.
  */
+import { getOfflineSettings } from "@/lib/offlineSettings";
+
 const DB_NAME = "heartify-audio";
 const STORE = "tracks";
 const META_STORE = "meta";
-const VERSION = 2;
+const PARTIAL_STORE = "partials";
+const VERSION = 3;
 
 const FREE_LIMIT = 5;
 const FREE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -28,6 +36,16 @@ export interface OfflineMeta {
   plan: "free" | "premium";
 }
 
+interface PartialRecord {
+  id: string;
+  blob: Blob;
+  received: number;
+  total: number | null;
+  /** ETag / Last-Modified so we never stitch bytes from two different files. */
+  validator: string | null;
+  updatedAt: number;
+}
+
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, VERSION);
@@ -35,6 +53,7 @@ function openDb(): Promise<IDBDatabase> {
       const db = req.result;
       if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
       if (!db.objectStoreNames.contains(META_STORE)) db.createObjectStore(META_STORE);
+      if (!db.objectStoreNames.contains(PARTIAL_STORE)) db.createObjectStore(PARTIAL_STORE);
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -56,6 +75,15 @@ async function withStores<T>(
   const db = await openDb();
   const tx = db.transaction([STORE, META_STORE], mode);
   return fn(tx.objectStore(STORE), tx.objectStore(META_STORE));
+}
+
+async function withPartials<T>(
+  mode: IDBTransactionMode,
+  fn: (partials: IDBObjectStore) => Promise<T>,
+): Promise<T> {
+  const db = await openDb();
+  const tx = db.transaction([PARTIAL_STORE], mode);
+  return fn(tx.objectStore(PARTIAL_STORE));
 }
 
 export async function hasOfflineTrack(id: string): Promise<boolean> {
@@ -119,6 +147,43 @@ async function writeMeta(id: string, plan: "free" | "premium"): Promise<void> {
   });
 }
 
+/* ------------------------------------------------------------------ partials */
+
+async function getPartial(id: string): Promise<PartialRecord | null> {
+  try {
+    return await withPartials("readonly", async (p) => {
+      const rec = await req(p, p.get(id) as IDBRequest<PartialRecord | undefined>);
+      return rec ?? null;
+    });
+  } catch { return null; }
+}
+
+async function putPartial(rec: PartialRecord): Promise<void> {
+  try {
+    await withPartials("readwrite", async (p) => {
+      await req(p, p.put(rec, rec.id) as IDBRequest<IDBValidKey>);
+    });
+  } catch { /* best-effort: resume is an optimisation, not a requirement */ }
+}
+
+export async function clearPartial(id: string): Promise<void> {
+  try {
+    await withPartials("readwrite", async (p) => {
+      await req(p, p.delete(id) as IDBRequest<undefined>);
+    });
+  } catch { /* ignore */ }
+}
+
+/** Bytes already buffered for a not-yet-finished download (for UI display). */
+export async function getPartialProgress(
+  id: string,
+): Promise<{ received: number; total: number | null } | null> {
+  const rec = await getPartial(id);
+  return rec ? { received: rec.received, total: rec.total } : null;
+}
+
+/* ------------------------------------------------------------------ download */
+
 /**
  * Many recitation CDNs allow <audio> playback but send no CORS headers, so a
  * direct `fetch()` for the bytes fails. `audio-proxy` re-streams allowlisted
@@ -133,11 +198,9 @@ function proxiedUrl(url: string): string | null {
 /** Transient statuses worth retrying (timeouts, rate limits, gateway blips). */
 const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 
-const RETRY_ATTEMPTS = 4;
 const RETRY_BASE_MS = 600;
-const RETRY_MAX_MS = 8_000;
 
-class DownloadError extends Error {
+export class DownloadError extends Error {
   status?: number;
   retryable: boolean;
   constructor(message: string, opts: { status?: number; retryable: boolean }) {
@@ -148,19 +211,53 @@ class DownloadError extends Error {
   }
 }
 
-function backoffDelay(attempt: number): number {
-  const expo = Math.min(RETRY_MAX_MS, RETRY_BASE_MS * 2 ** attempt);
+function backoffDelay(attempt: number, maxBackoffMs: number): number {
+  const expo = Math.min(maxBackoffMs, RETRY_BASE_MS * 2 ** attempt);
   // Full jitter avoids thundering herds when many tracks retry at once.
   return Math.round(expo * (0.5 + Math.random() * 0.5));
 }
 
-const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const wait = (ms: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    const t = setTimeout(resolve, ms);
+    signal?.addEventListener("abort", () => { clearTimeout(t); reject(abortError()); }, { once: true });
+  });
 
-async function fetchAudio(url: string): Promise<Response> {
+function abortError(): Error {
+  const e = new Error("Download cancelled");
+  e.name = "AbortError";
+  return e;
+}
+
+function validatorOf(res: Response): string | null {
+  return res.headers.get("etag") || res.headers.get("last-modified") || null;
+}
+
+/** Total size of the resource from either Content-Length or Content-Range. */
+function totalSizeOf(res: Response, offset: number): number | null {
+  const cr = res.headers.get("content-range"); // bytes 100-999/1000
+  const slash = cr?.lastIndexOf("/") ?? -1;
+  if (cr && slash > -1) {
+    const n = Number(cr.slice(slash + 1));
+    if (Number.isFinite(n) && n > 0) return n;
+  }
+  const len = Number(res.headers.get("content-length") || 0);
+  if (len > 0) return res.status === 206 ? offset + len : len;
+  return null;
+}
+
+/**
+ * Fetch bytes, preferring a direct CORS request and falling back to the
+ * CORS-safe proxy. When `offset > 0` a Range request is issued so an
+ * interrupted download resumes where it stopped.
+ */
+async function fetchAudio(url: string, offset: number, signal?: AbortSignal): Promise<Response> {
+  const rangeHeaders = offset > 0 ? { Range: `bytes=${offset}-` } : undefined;
   try {
-    const direct = await fetch(url, { mode: "cors" });
+    const direct = await fetch(url, { mode: "cors", headers: rangeHeaders, signal });
     if (direct.ok) return direct;
-  } catch {
+  } catch (e) {
+    if ((e as Error)?.name === "AbortError") throw e;
     /* CORS / network failure — fall through to the proxy */
   }
   const proxy = proxiedUrl(url);
@@ -169,13 +266,17 @@ async function fetchAudio(url: string): Promise<Response> {
   let res: Response;
   try {
     res = await fetch(proxy, {
-      headers: anon ? { apikey: anon, Authorization: `Bearer ${anon}` } : undefined,
+      headers: {
+        ...(rangeHeaders ?? {}),
+        ...(anon ? { apikey: anon, Authorization: `Bearer ${anon}` } : {}),
+      },
+      signal,
     });
   } catch (e) {
-    throw new DownloadError(
-      e instanceof Error ? e.message : "Download failed (network)",
-      { retryable: true },
-    );
+    if ((e as Error)?.name === "AbortError") throw e;
+    throw new DownloadError(e instanceof Error ? e.message : "Download failed (network)", {
+      retryable: true,
+    });
   }
   if (!res.ok) {
     throw new DownloadError(`Download failed (${res.status})`, {
@@ -186,65 +287,149 @@ async function fetchAudio(url: string): Promise<Response> {
   return res;
 }
 
-async function downloadBlob(url: string, onProgress?: (pct: number) => void): Promise<Blob> {
-  const res = await fetchAudio(url);
-  const total = Number(res.headers.get("content-length") || 0);
-  const reader = res.body?.getReader();
-  const chunks: Uint8Array[] = [];
+export interface SaveOptions {
+  onProgress?: (pct: number) => void;
+  /** Fired before each retry so the UI can show "retrying (2/4)". */
+  onRetry?: (info: { attempt: number; maxAttempts: number; delayMs: number; error: Error }) => void;
+  signal?: AbortSignal;
+}
+
+/**
+ * One transfer attempt. Resumes from any buffered partial (when enabled) and
+ * persists progress so the next attempt can pick up mid-file.
+ */
+async function downloadAttempt(
+  id: string,
+  url: string,
+  opts: SaveOptions,
+): Promise<Blob> {
+  const { resume } = getOfflineSettings();
+  let partial = resume ? await getPartial(id) : null;
+  if (!resume && (await getPartial(id))) await clearPartial(id);
+
+  let offset = partial?.received ?? 0;
+  const res = await fetchAudio(url, offset, opts.signal);
+
+  // Server ignored the Range request (200 instead of 206) or the file changed:
+  // discard the buffer and start over.
+  const serverValidator = validatorOf(res);
+  const changed =
+    partial && partial.validator && serverValidator && partial.validator !== serverValidator;
+  if (offset > 0 && (res.status !== 206 || changed)) {
+    await clearPartial(id);
+    partial = null;
+    offset = 0;
+  }
+
+  const total = totalSizeOf(res, offset) ?? partial?.total ?? null;
+  const chunks: BlobPart[] = [];
   let received = 0;
+  let lastPersist = Date.now();
+
+  const emit = () => {
+    if (total && opts.onProgress) {
+      opts.onProgress(Math.min(100, Math.round(((offset + received) / total) * 100)));
+    }
+  };
+  emit();
+
+  const persist = async () => {
+    if (!resume || chunks.length === 0) return;
+    const base = partial?.blob ? [partial.blob, ...chunks] : chunks;
+    const blob = new Blob(base, { type: res.headers.get("content-type") || "audio/mpeg" });
+    partial = {
+      id,
+      blob,
+      received: offset + received,
+      total,
+      validator: serverValidator ?? partial?.validator ?? null,
+      updatedAt: Date.now(),
+    };
+    await putPartial(partial);
+    // Buffer is now folded into `partial.blob`; reset local state so we never
+    // write the same bytes twice.
+    offset = partial.received;
+    received = 0;
+    chunks.length = 0;
+  };
+
+  const reader = res.body?.getReader();
   try {
     if (reader) {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         if (value) {
-          chunks.push(value);
+          chunks.push(value as BlobPart);
           received += value.byteLength;
-          if (total && onProgress) onProgress(Math.min(100, Math.round((received / total) * 100)));
+          emit();
+          // Checkpoint every ~2s so a mid-file failure keeps most of the work.
+          if (Date.now() - lastPersist > 2_000) {
+            await persist();
+            lastPersist = Date.now();
+          }
         }
       }
     } else {
-      chunks.push(new Uint8Array(await res.arrayBuffer()));
+      const buf = new Uint8Array(await res.arrayBuffer());
+      chunks.push(buf as BlobPart);
+      received += buf.byteLength;
     }
   } catch (e) {
-    // A stream that dies mid-transfer is transient — allow a retry.
-    throw new DownloadError(
-      e instanceof Error ? e.message : "Download interrupted",
-      { retryable: true },
-    );
+    if ((e as Error)?.name === "AbortError") throw e;
+    await persist(); // keep what we got so the retry can resume
+    throw new DownloadError(e instanceof Error ? e.message : "Download interrupted", {
+      retryable: true,
+    });
   }
-  if (total && received < total) {
-    throw new DownloadError("Download incomplete", { retryable: true });
-  }
-  return new Blob(chunks as BlobPart[], {
+
+  const finalBlob = new Blob(partial?.blob ? [partial.blob, ...chunks] : chunks, {
     type: res.headers.get("content-type") || "audio/mpeg",
   });
+
+  if (total && finalBlob.size < total) {
+    await persist();
+    throw new DownloadError("Download incomplete", { retryable: true });
+  }
+  return finalBlob;
 }
 
 export async function saveOfflineTrack(
   id: string,
   url: string,
-  onProgress?: (pct: number) => void,
+  onProgressOrOpts?: ((pct: number) => void) | SaveOptions,
 ): Promise<void> {
-  let lastErr: unknown;
+  const opts: SaveOptions =
+    typeof onProgressOrOpts === "function" ? { onProgress: onProgressOrOpts } : onProgressOrOpts ?? {};
+  const { maxAttempts, maxTotalMs, maxBackoffMs } = getOfflineSettings();
+  const startedAt = Date.now();
+
   let blob: Blob | null = null;
-  for (let attempt = 0; attempt < RETRY_ATTEMPTS; attempt++) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (opts.signal?.aborted) throw abortError();
     try {
-      if (attempt > 0) onProgress?.(0);
-      blob = await downloadBlob(url, onProgress);
+      blob = await downloadAttempt(id, url, opts);
       break;
     } catch (e) {
-      lastErr = e;
+      const err = e instanceof Error ? e : new Error(String(e));
+      if (err.name === "AbortError") throw err;
       const retryable = e instanceof DownloadError ? e.retryable : false;
-      if (!retryable || attempt === RETRY_ATTEMPTS - 1) throw e;
-      await wait(backoffDelay(attempt));
+      const lastAttempt = attempt === maxAttempts - 1;
+      const delay = backoffDelay(attempt, maxBackoffMs);
+      const outOfTime = Date.now() - startedAt + delay > maxTotalMs;
+      if (!retryable || lastAttempt || outOfTime) throw err;
+      opts.onRetry?.({ attempt: attempt + 1, maxAttempts, delayMs: delay, error: err });
+      await wait(delay, opts.signal);
     }
   }
-  if (!blob) throw lastErr instanceof Error ? lastErr : new Error("Download failed");
+  if (!blob) throw new Error("Download failed");
+
+  const finished = blob;
   await withStores("readwrite", async (tracks) => {
-    await req(tracks, tracks.put(blob as Blob, id) as IDBRequest<IDBValidKey>);
+    await req(tracks, tracks.put(finished, id) as IDBRequest<IDBValidKey>);
   });
-  onProgress?.(100);
+  await clearPartial(id);
+  opts.onProgress?.(100);
 }
 
 /**
@@ -261,8 +446,7 @@ export async function saveOfflineTrackGated(
   opts: {
     isPremium: boolean;
     trackIsPremium?: boolean;
-    onProgress?: (pct: number) => void;
-  },
+  } & SaveOptions,
 ): Promise<void> {
   if (opts.trackIsPremium && !opts.isPremium) {
     const e = new Error("This track requires Heartify+.");
@@ -279,7 +463,11 @@ export async function saveOfflineTrackGated(
       throw e;
     }
   }
-  await saveOfflineTrack(id, url, opts.onProgress);
+  await saveOfflineTrack(id, url, {
+    onProgress: opts.onProgress,
+    onRetry: opts.onRetry,
+    signal: opts.signal,
+  });
   await writeMeta(id, opts.isPremium ? "premium" : "free");
 }
 
@@ -290,6 +478,7 @@ export async function removeOfflineTrack(id: string): Promise<void> {
       await req(meta, meta.delete(id) as IDBRequest<undefined>);
     });
   } catch { /* ignore */ }
+  await clearPartial(id);
 }
 
 export async function getOfflineBlobUrl(id: string): Promise<string | null> {
