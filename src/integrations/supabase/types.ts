@@ -6546,6 +6546,7 @@ export type Database = {
           id: string
           language: string
           query: string
+          score: number
         }[]
       }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
