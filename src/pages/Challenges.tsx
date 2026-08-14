@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Target, CheckCircle2, RefreshCw, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import ChallengeAward, { medalTierForPoints } from "@/components/ChallengeAward";
 
 type Challenge = {
   id: string;
@@ -105,8 +106,8 @@ export default function Challenges() {
     const done = cur >= c.target;
     const pct = Math.min(100, Math.round((cur / c.target) * 100));
     return (
-      <Link to={c.link} key={c.id} aria-label={`${c.title} — open related page`}>
-        <Card className={`h-full transition ${done ? "border-emerald-500/50 bg-emerald-500/5" : "hover:border-primary/60"}`}>
+      <Card key={c.id} className={`h-full transition ${done ? "border-emerald-500/50 bg-emerald-500/5" : "hover:border-primary/60"}`}>
+        <Link to={c.link} aria-label={`${c.title} — open related page`} className="block">
           <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
             <div className="flex items-center gap-2">
               {done ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <Target className="h-5 w-5 text-primary" />}
@@ -114,15 +115,25 @@ export default function Challenges() {
             </div>
             <Badge variant="secondary" className="text-[10px]">+{c.points} pts</Badge>
           </CardHeader>
-          <CardContent className="space-y-2">
+        </Link>
+        <CardContent className="space-y-2">
+          <Link to={c.link} className="block space-y-2" aria-label={`${c.title} — open related page`}>
             <p className="text-micro text-muted-foreground">{c.description}</p>
             <Progress value={pct} className="h-2" />
             <p className="text-right text-micro font-mono">{cur.toLocaleString()} / {c.target.toLocaleString()}</p>
-          </CardContent>
-        </Card>
-      </Link>
+          </Link>
+          {done && (
+            <ChallengeAward
+              title={c.title}
+              tier={medalTierForPoints(c.points)}
+              note={`${c.category === "daily" ? "Daily" : "Weekly"} challenge — ${c.points} points`}
+            />
+          )}
+        </CardContent>
+      </Card>
     );
   };
+
 
   return (
     <div className="min-h-dvh bg-background">

@@ -3,12 +3,14 @@
 // graceful fallback to download. No external deps; renders synchronously on
 // an OffscreenCanvas when available, otherwise a detached DOM canvas.
 //
-// Variants: "ayah", "dhikr", "video", "dua", "quote", "certificate"
+// Variants: "ayah", "dhikr", "video", "dua", "quote", "certificate", "medal"
 // Every card carries the Heartify mark so shared images become a growth loop.
 
 import heartifyMark from "@/assets/heartify-mark.png";
 
-export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote" | "certificate";
+export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote" | "certificate" | "medal";
+
+export type MedalTier = "bronze" | "silver" | "gold";
 
 export interface ShareImageInput {
   variant: ShareImageVariant;
@@ -16,12 +18,16 @@ export interface ShareImageInput {
   arabic?: string;         // Arabic line (drawn in Amiri if loaded)
   translation?: string;    // Latin translation / caption
   attribution?: string;    // e.g. "— Surah Al-Fatihah 1:1", "Sahih Muslim"
-  // Certificate-only fields
+  // Certificate + medal fields
   recipient?: string;      // user's name / handle
   days?: number;           // streak days
+  achievement?: string;    // challenge title, e.g. "Pray all 5 today"
+  achievementNote?: string;// small line, e.g. "Daily challenge — 50 points"
+  tier?: MedalTier;        // medal metal
   citation?: string;       // small line under the seal (e.g. hadith)
   dateLabel?: string;      // issue date, defaults to today
 }
+
 
 
 const W = 1080;
@@ -173,7 +179,11 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.textAlign = "center";
   ctx.fillStyle = INK;
   ctx.font = "400 84px 'Inter', system-ui, -apple-system, sans-serif";
-  ctx.fillText("Certificate of Recognition", CW / 2, 470);
+  ctx.fillText(
+    input.achievement ? "Certificate of Achievement" : "Certificate of Recognition",
+    CW / 2,
+    470,
+  );
 
   ctx.strokeStyle = "rgba(201,162,62,0.55)";
   ctx.lineWidth = 2;
@@ -209,20 +219,42 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.stroke();
 
   // --- Achievement description ---
-  const days = Math.max(0, Math.round(input.days ?? 0));
   ctx.fillStyle = MUTED;
   ctx.font = "500 30px 'Inter', system-ui, sans-serif";
   ctx.fillText("in appreciation of", CW / 2, 826);
 
-  ctx.fillStyle = GOLD_SOFT;
-  ctx.font = "800 150px 'Inter', system-ui, sans-serif";
-  ctx.fillText(String(days), CW / 2, 970);
+  if (input.achievement) {
+    ctx.fillStyle = INK;
+    let aSize = 88;
+    const aFont = (s: number) => `600 ${s}px 'Inter', system-ui, sans-serif`;
+    ctx.font = aFont(aSize);
+    while (ctx.measureText(input.achievement).width > CW - 620 && aSize > 40) {
+      aSize -= 4;
+      ctx.font = aFont(aSize);
+    }
+    ctx.fillText(input.achievement, CW / 2, 950);
 
-  ctx.fillStyle = GOLD;
-  ctx.font = "700 34px 'Inter', system-ui, sans-serif";
-  setTracking(ctx, "5px");
-  ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF BENEFICIAL HABITS`, CW / 2, 1024);
-  setTracking(ctx, "0px");
+    ctx.fillStyle = GOLD;
+    ctx.font = "700 32px 'Inter', system-ui, sans-serif";
+    setTracking(ctx, "5px");
+    ctx.fillText(
+      (input.achievementNote ?? "CHALLENGE COMPLETED ON HEARTIFY").toUpperCase(),
+      CW / 2,
+      1020,
+    );
+    setTracking(ctx, "0px");
+  } else {
+    const days = Math.max(0, Math.round(input.days ?? 0));
+    ctx.fillStyle = GOLD_SOFT;
+    ctx.font = "800 150px 'Inter', system-ui, sans-serif";
+    ctx.fillText(String(days), CW / 2, 970);
+
+    ctx.fillStyle = GOLD;
+    ctx.font = "700 34px 'Inter', system-ui, sans-serif";
+    setTracking(ctx, "5px");
+    ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF BENEFICIAL HABITS`, CW / 2, 1024);
+    setTracking(ctx, "0px");
+  }
 
   const citation =
     input.citation ??
@@ -310,8 +342,143 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
 }
 
 
+/**
+ * E-medal — a square, shareable award badge for a completed challenge.
+ */
+async function renderMedal(input: ShareImageInput): Promise<Blob> {
+  const canvas = document.createElement("canvas");
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas 2D unavailable");
+
+  const metals: Record<MedalTier, { a: string; b: string; rim: string; label: string }> = {
+    bronze: { a: "#e0a56b", b: "#8c5524", rim: "#c07a3c", label: "BRONZE MEDAL" },
+    silver: { a: "#e9edf2", b: "#8b98a8", rim: "#b9c3cf", label: "SILVER MEDAL" },
+    gold:   { a: "#f6dd8a", b: "#b98b1f", rim: "#e3c876", label: "GOLD MEDAL" },
+  };
+  const tier = input.tier ?? "gold";
+  const m = metals[tier];
+
+  // Backdrop
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, "#0b1220");
+  bg.addColorStop(1, "#0f3b2a");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const glow = ctx.createRadialGradient(W / 2, 430, 40, W / 2, 430, 460);
+  glow.addColorStop(0, "rgba(255,255,255,0.14)");
+  glow.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(46, 46, W - 92, H - 92);
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+
+  // Ribbons
+  ctx.fillStyle = "#1f7a5a";
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 120, 150);
+  ctx.lineTo(W / 2 - 30, 150);
+  ctx.lineTo(W / 2 - 10, 360);
+  ctx.lineTo(W / 2 - 90, 360);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#175f47";
+  ctx.beginPath();
+  ctx.moveTo(W / 2 + 30, 150);
+  ctx.lineTo(W / 2 + 120, 150);
+  ctx.lineTo(W / 2 + 90, 360);
+  ctx.lineTo(W / 2 + 10, 360);
+  ctx.closePath();
+  ctx.fill();
+
+  // Disc
+  const cx = W / 2;
+  const cy = 430;
+  const r = 150;
+  const disc = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  disc.addColorStop(0, m.a);
+  disc.addColorStop(1, m.b);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = disc;
+  ctx.fill();
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = m.rim;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r - 26, 0, Math.PI * 2);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "rgba(255,255,255,0.45)";
+  ctx.stroke();
+
+  const mark = await loadImage(heartifyMark);
+  if (mark) {
+    ctx.drawImage(mark, cx - 62, cy - 62, 124, 124);
+  } else {
+    ctx.fillStyle = "rgba(0,0,0,0.6)";
+    ctx.font = "800 96px 'Fraunces', Georgia, serif";
+    ctx.fillText("✦", cx, cy + 34);
+  }
+
+  // Tier label
+  ctx.fillStyle = m.a;
+  ctx.font = "700 30px 'Inter', system-ui, sans-serif";
+  setTracking(ctx, "6px");
+  ctx.fillText(m.label, cx, 660);
+  setTracking(ctx, "0px");
+
+  // Achievement title
+  ctx.fillStyle = "#ffffff";
+  let tSize = 66;
+  const tFont = (s: number) => `700 ${s}px 'Inter', system-ui, sans-serif`;
+  ctx.font = tFont(tSize);
+  const title = input.achievement || "Challenge complete";
+  while (ctx.measureText(title).width > W - 200 && tSize > 34) {
+    tSize -= 3;
+    ctx.font = tFont(tSize);
+  }
+  const tLines = wrapText(ctx, title, W - 200, 2);
+  let ty = 750;
+  for (const line of tLines) {
+    ctx.fillText(line, cx, ty);
+    ty += tSize + 12;
+  }
+
+  // Recipient + note
+  ctx.fillStyle = "rgba(255,255,255,0.78)";
+  ctx.font = "500 34px 'Inter', system-ui, sans-serif";
+  ctx.fillText(`Awarded to ${input.recipient || "a Heartify believer"}`, cx, ty + 24);
+
+  if (input.achievementNote) {
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.font = "500 28px 'Inter', system-ui, sans-serif";
+    ctx.fillText(input.achievementNote, cx, ty + 72);
+  }
+
+  // Footer
+  const date =
+    input.dateLabel ??
+    new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+  ctx.fillStyle = "rgba(255,255,255,0.5)";
+  ctx.font = "600 24px 'Inter', system-ui, sans-serif";
+  setTracking(ctx, "3px");
+  ctx.fillText(`${date.toUpperCase()}  ·  HEARTIFY`, cx, H - 90);
+  setTracking(ctx, "0px");
+
+  return await toBlob(canvas);
+}
+
 export async function generateShareImage(input: ShareImageInput): Promise<Blob> {
   if (input.variant === "certificate") return renderCertificate(input);
+  if (input.variant === "medal") return renderMedal(input);
+
 
   const canvas = document.createElement("canvas");
   canvas.width = W;
