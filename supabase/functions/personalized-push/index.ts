@@ -168,9 +168,14 @@ async function pickCandidate(p: UserPrefs): Promise<Candidate | null> {
     .eq("user_id", userId)
     .maybeSingle();
   if (streak?.last_completed_date) {
-    const localToday = localDayKey(new Date(), p.timezone ?? "UTC");
+    const tz = p.timezone ?? "UTC";
+    const localToday = localDayKey(new Date(), tz);
+    const hour = localHour(new Date(), tz);
     const missedToday = streak.last_completed_date < localToday;
-    if (missedToday && !(await alreadySent(userId, "streak_risk", 20))) {
+    // Only in the user's own late afternoon/evening — never at their midday
+    // just because it happens to be evening in UTC.
+    const inEvening = hour >= 17 && hour <= 22;
+    if (missedToday && inEvening && !(await alreadySent(userId, "streak_risk", 20))) {
       return {
         user_id: userId,
         kind: "streak_risk",
