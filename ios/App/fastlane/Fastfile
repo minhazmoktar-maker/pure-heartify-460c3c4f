@@ -6,6 +6,12 @@ def beta_changelog
   ENV["BETA_CHANGELOG"] || "Internal build #{ENV['GITHUB_RUN_NUMBER'] || Time.now.strftime('%Y-%m-%d %H:%M')} — see CHANGELOG for details."
 end
 
+# Optional comma-separated TestFlight internal group names.
+def beta_groups
+  groups = (ENV["TESTFLIGHT_GROUPS"] || "").split(",").map(&:strip).reject(&:empty?)
+  groups.empty? ? nil : groups
+end
+
 platform :ios do
   desc "Build and upload to TestFlight (Internal Testing)"
   lane :beta do
@@ -49,7 +55,7 @@ platform :ios do
       # Internal testers only — external groups require App Review of the beta.
       distribute_external: false,
       changelog: beta_changelog,
-      groups: (ENV["TESTFLIGHT_GROUPS"] || "").split(",").map(&:strip).reject(&:empty?).presence,
+      groups: beta_groups,
     )
   end
 
