@@ -107,7 +107,10 @@ Deno.serve(async (req) => {
         .eq("user_id", userId)
         .maybeSingle();
 
-      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      // "Yesterday" relative to the user's LOCAL today, not to UTC now.
+      const yesterday = new Date(new Date(`${today}T00:00:00Z`).getTime() - 86400000)
+        .toISOString()
+        .slice(0, 10);
       let current = 1;
       let longest = 1;
       let total_doses = 1;
