@@ -4,8 +4,14 @@
  * A single module-level queue (survives route changes) that runs downloads with
  * user-tunable concurrency and exposes observable per-item status so the UI can
  * show queued / downloading / retrying / completed / failed / cancelled.
+ *
+ * Queue state is mirrored to localStorage so a tab reload (or a crash) does not
+ * lose in-flight work: anything that was queued/downloading/retrying is
+ * restored as `queued` and automatically resumed — combined with the `partials`
+ * store in `audioOffline`, the transfer continues from the bytes already
+ * fetched instead of restarting.
  */
-import { saveOfflineTrackGated, clearPartial, DownloadError } from "@/lib/audioOffline";
+import { saveOfflineTrackGated, clearPartial, DownloadError, hasOfflineTrack } from "@/lib/audioOffline";
 import { getOfflineSettings } from "@/lib/offlineSettings";
 import { diag } from "@/lib/diagnostics";
 
@@ -33,6 +39,8 @@ export interface QueueItem {
   errorCode?: string;
   queuedAt: number;
   finishedAt?: number;
+  /** True when this item was restored from a previous session and resumed. */
+  resumedFromReload?: boolean;
 }
 
 type Listener = (items: QueueItem[]) => void;
@@ -42,14 +50,33 @@ const controllers = new Map<string, AbortController>();
 const listeners = new Set<Listener>();
 let running = 0;
 
+const STORAGE_KEY = "heartify.offlineDownload.queue";
+const ACTIVE: QueueStatus[] = ["queued", "downloading", "retrying"];
+/** Finished items older than this are dropped when rehydrating. */
+const FINISHED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 function snapshot(): QueueItem[] {
   return [...items.values()].sort((a, b) => a.queuedAt - b.queuedAt);
 }
 
+function persist() {
+  try {
+    const payload = snapshot().map((i) =>
+      // Never persist a mid-flight status: on restore it must look interrupted.
+      ACTIVE.includes(i.status)
+        ? { ...i, status: "queued" as QueueStatus, nextAttemptAt: undefined, resumedFromReload: true }
+        : i,
+    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch { /* storage full / unavailable — persistence is best-effort */ }
+}
+
 function emit() {
   const snap = snapshot();
+  persist();
   listeners.forEach((fn) => fn(snap));
 }
+
 
 function update(id: string, patch: Partial<QueueItem>) {
   const cur = items.get(id);
