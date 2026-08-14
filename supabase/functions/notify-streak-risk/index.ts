@@ -48,24 +48,25 @@ Deno.serve(async (req) => {
   }
 
   const now = new Date();
-  const utcHour = now.getUTCHours();
-  // Only nudge in the global "evening" band (20:00-03:00 UTC covers EU/ME/Asia evenings).
-  const inWindow = utcHour >= 20 || utcHour < 3;
   const force = new URL(req.url).searchParams.get("force") === "1";
-  if (!inWindow && !force) {
-    return new Response(JSON.stringify({ skipped: "outside_window", utcHour }), {
+
+  // Timezone-aware: the DB decides who is at risk *on their own local date*
+  // and whose local clock is currently in the evening band (19:00-23:00).
+  // This function is safe to run every hour — users in UTC±12 are nudged in
+  // their evening, not at a global UTC hour, and never lose a streak to a
+  // UTC calendar rollover.
+  const { data: atRisk, error: candErr } = await supabase.rpc("streak_risk_candidates", {
+    _min_hour: force ? 0 : 19,
+    _max_hour: force ? 23 : 23,
+    _limit: 5000,
+  });
+
+  if (candErr) {
+    return new Response(JSON.stringify({ error: candErr.message }), {
+      status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-
-  const isoToday = now.toISOString().slice(0, 10);
-
-  const { data: atRisk } = await supabase
-    .from("streaks")
-    .select("user_id, current_streak, last_completed_date")
-    .gte("current_streak", 1)
-    .or(`last_completed_date.is.null,last_completed_date.lt.${isoToday}`)
-    .limit(5000);
 
   if (!atRisk?.length) {
     return new Response(JSON.stringify({ candidates: 0 }), {
@@ -73,15 +74,16 @@ Deno.serve(async (req) => {
     });
   }
 
-  const userIds = atRisk.map((r) => r.user_id);
+  const userIds = atRisk.map((r: { user_id: string }) => r.user_id);
 
-  // Dedupe: skip users already nudged today.
-  const dayStart = `${isoToday}T00:00:00Z`;
+  // Dedupe on a rolling 20h window rather than a UTC day boundary, so a
+  // second nudge can never land twice inside one user's local day.
+  const since = new Date(now.getTime() - 20 * 3_600_000).toISOString();
   const { data: already } = await supabase
     .from("user_notifications")
     .select("user_id")
     .eq("kind", "streak_risk")
-    .gte("created_at", dayStart)
+    .gte("created_at", since)
     .in("user_id", userIds);
   const alreadySet = new Set((already ?? []).map((n) => n.user_id));
 
