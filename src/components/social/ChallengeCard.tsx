@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CalendarClock, CheckCircle2, Swords } from "lucide-react";
 import type { Challenge } from "@/hooks/useSocial";
-import ChallengeAward from "@/components/ChallengeAward";
+import ChallengeAward, { medalTierForRank } from "@/components/ChallengeAward";
 
 const UNITS: Record<Challenge["type"], string> = {
   minutes: "beneficial minutes",
@@ -47,6 +47,10 @@ export default function ChallengeCard({
   const me = roster.find((m) => m.is_me);
   const leader = roster[0];
   const isInvite = challenge.my_state === "invited";
+  // Apple-Watch-style placement: rank among finishers who actually progressed.
+  const finishers = roster.filter((m) => m.progress > 0);
+  const myIndex = finishers.findIndex((m) => m.is_me);
+  const myRank = myIndex >= 0 ? myIndex + 1 : null;
 
   return (
     <Card>
@@ -120,13 +124,21 @@ export default function ChallengeCard({
           </p>
         )}
 
-        {!isInvite && me?.completed && (
+        {!isInvite && ended && myRank && me && me.progress > 0 && roster.length > 1 ? (
+          <ChallengeAward
+            title={challenge.title}
+            tier={medalTierForRank(myRank)}
+            rank={myRank}
+            participants={finishers.length}
+            note={`${me.progress.toLocaleString()} ${UNITS[challenge.type]}`}
+          />
+        ) : !isInvite && me?.completed ? (
           <ChallengeAward
             title={challenge.title}
             tier={ended ? "gold" : "silver"}
             note={`Goal reached — ${challenge.goal.toLocaleString()} ${UNITS[challenge.type]}`}
           />
-        )}
+        ) : null}
 
         {isInvite && onRespond && (
           <div className="flex gap-2">
