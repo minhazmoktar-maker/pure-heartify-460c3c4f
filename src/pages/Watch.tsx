@@ -1,5 +1,7 @@
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
 import { recordRecentTopic } from "@/lib/recentTopics";
 import { ArrowLeft, ChevronRight, Heart, Play, ShieldCheck } from "lucide-react";
 import TrustBadges from "@/components/TrustBadges";
