@@ -3,12 +3,14 @@
 // graceful fallback to download. No external deps; renders synchronously on
 // an OffscreenCanvas when available, otherwise a detached DOM canvas.
 //
-// Variants: "ayah", "dhikr", "video", "dua", "quote", "certificate"
+// Variants: "ayah", "dhikr", "video", "dua", "quote", "certificate", "medal"
 // Every card carries the Heartify mark so shared images become a growth loop.
 
 import heartifyMark from "@/assets/heartify-mark.png";
 
-export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote" | "certificate";
+export type ShareImageVariant = "ayah" | "dhikr" | "video" | "dua" | "quote" | "certificate" | "medal";
+
+export type MedalTier = "bronze" | "silver" | "gold";
 
 export interface ShareImageInput {
   variant: ShareImageVariant;
@@ -16,12 +18,16 @@ export interface ShareImageInput {
   arabic?: string;         // Arabic line (drawn in Amiri if loaded)
   translation?: string;    // Latin translation / caption
   attribution?: string;    // e.g. "— Surah Al-Fatihah 1:1", "Sahih Muslim"
-  // Certificate-only fields
+  // Certificate + medal fields
   recipient?: string;      // user's name / handle
   days?: number;           // streak days
+  achievement?: string;    // challenge title, e.g. "Pray all 5 today"
+  achievementNote?: string;// small line, e.g. "Daily challenge — 50 points"
+  tier?: MedalTier;        // medal metal
   citation?: string;       // small line under the seal (e.g. hadith)
   dateLabel?: string;      // issue date, defaults to today
 }
+
 
 
 const W = 1080;
