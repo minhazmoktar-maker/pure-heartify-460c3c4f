@@ -1,13 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
-import { Download, Check, Loader2, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Download, Check, Loader2, Trash2, RotateCw } from "lucide-react";
 import type { Track } from "@/data/audio";
 import { toast } from "sonner";
-import {
-  hasOfflineTrack,
-  saveOfflineTrackGated,
-  removeOfflineTrack,
-} from "@/lib/audioOffline";
+import { hasOfflineTrack, removeOfflineTrack } from "@/lib/audioOffline";
 import { useEntitlement } from "@/hooks/useEntitlement";
+import { useOfflineQueue } from "@/hooks/useOfflineQueue";
 import UpgradeSheet from "@/components/premium/UpgradeSheet";
 import { cn } from "@/lib/utils";
 import { diag } from "@/lib/diagnostics";
@@ -16,25 +13,49 @@ type Props = { track: Track & { isPremium?: boolean }; className?: string };
 
 export default function DownloadTrackButton({ track, className }: Props) {
   const { isPremium } = useEntitlement();
-  const [status, setStatus] = useState<"idle" | "saved" | "downloading">("idle");
-  const [pct, setPct] = useState(0);
+  const { items, enqueue, cancel } = useOfflineQueue();
+  const [saved, setSaved] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState<string | undefined>();
 
+  const queued = useMemo(() => items.find((i) => i.id === track.id), [items, track.id]);
+
   useEffect(() => {
     let live = true;
-    hasOfflineTrack(track.id).then((v) => {
-      if (live) setStatus(v ? "saved" : "idle");
-    });
+    hasOfflineTrack(track.id).then((v) => { if (live) setSaved(v); });
     return () => { live = false; };
   }, [track.id]);
 
+  // React to queue outcomes: success marks saved, gated failures upsell.
+  useEffect(() => {
+    if (!queued) return;
+    if (queued.status === "completed") {
+      setSaved(true);
+      return;
+    }
+    if (queued.status === "failed") {
+      if (queued.errorCode === "OFFLINE_TRACK_PREMIUM") {
+        setUpgradeFeature("Downloading premium reciters");
+        setUpgradeOpen(true);
+      } else if (queued.errorCode === "OFFLINE_FREE_LIMIT") {
+        setUpgradeFeature("Unlimited offline downloads");
+        setUpgradeOpen(true);
+      }
+    }
+  }, [queued]);
+
+  const inFlight = queued?.status === "downloading" || queued?.status === "retrying" || queued?.status === "queued";
+
   const onClick = useCallback(async () => {
-    if (status === "downloading") return;
-    if (status === "saved") {
+    if (inFlight) {
+      cancel(track.id);
+      toast.info("Download cancelled — progress is kept for resuming");
+      return;
+    }
+    if (saved) {
       await removeOfflineTrack(track.id);
       diag("download", "removed", { trackId: track.id });
-      setStatus("idle");
+      setSaved(false);
       toast.success("Removed from downloads");
       return;
     }
@@ -42,73 +63,28 @@ export default function DownloadTrackButton({ track, className }: Props) {
       toast.error("This track isn't available yet");
       return;
     }
-    const startedAt = Date.now();
-    try {
-      setStatus("downloading");
-      setPct(0);
-      diag("download", "start", {
-        trackId: track.id,
-        host: (() => { try { return new URL(track.url!).host; } catch { return "invalid-url"; } })(),
-        isPremium,
-        trackIsPremium: !!track.isPremium,
-      });
-      await saveOfflineTrackGated(track.id, track.url, {
-        isPremium,
-        trackIsPremium: track.isPremium,
-        onProgress: setPct,
-      });
-      setStatus("saved");
-      diag("download", "cached_ok", { trackId: track.id, ms: Date.now() - startedAt });
-      toast.success(
-        isPremium
-          ? "Saved for offline listening"
-          : "Saved · free downloads expire after 24h",
-      );
-    } catch (e: unknown) {
-      setStatus("idle");
-      const code = (e as { code?: string })?.code;
-      diag("download", "cache_failed", {
-        trackId: track.id,
-        ms: Date.now() - startedAt,
-        code: code ?? null,
-        message: e instanceof Error ? e.message : String(e),
-      });
-      if (code === "OFFLINE_TRACK_PREMIUM") {
-        setUpgradeFeature("Downloading premium reciters");
-        setUpgradeOpen(true);
-      } else if (code === "OFFLINE_FREE_LIMIT") {
-        setUpgradeFeature("Unlimited offline downloads");
-        setUpgradeOpen(true);
-      } else {
-        // Most external audio hosts (e.g. mp3quran.net CDN) don't allow
-        // cross-origin fetch, so offline caching via IndexedDB fails. Fall
-        // back to a native browser download so the user still gets the file.
-        try {
-          const a = document.createElement("a");
-          a.href = track.url!;
-          a.download = `${track.title || track.id}.mp3`;
-          a.rel = "noopener";
-          a.target = "_blank";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          diag("download", "native_fallback_ok", { trackId: track.id });
-          toast.success("Downloading via your browser");
-        } catch (fallbackErr) {
-          diag("download", "native_fallback_failed", {
-            trackId: track.id,
-            message: fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr),
-          });
-          toast.error(e instanceof Error ? e.message : "Download failed");
-        }
-      }
-    }
-  }, [status, track.id, track.url, track.isPremium, isPremium]);
+    enqueue({
+      id: track.id,
+      title: track.title || track.id,
+      url: track.url,
+      isPremium,
+      trackIsPremium: track.isPremium,
+    });
+    toast.success(
+      isPremium
+        ? "Added to your download queue"
+        : "Added to queue · free downloads expire after 24h",
+    );
+  }, [inFlight, saved, track.id, track.url, track.title, track.isPremium, isPremium, enqueue, cancel]);
 
   const label =
-    status === "saved" ? "Remove download"
-    : status === "downloading" ? `Downloading ${pct}%`
-    : "Download for offline";
+    inFlight
+      ? queued?.status === "retrying"
+        ? `Retrying ${queued.attempt}/${queued.maxAttempts} — tap to cancel`
+        : `Downloading ${queued?.pct ?? 0}% — tap to cancel`
+      : saved
+        ? "Remove download"
+        : "Download for offline";
 
   return (
     <>
@@ -118,13 +94,15 @@ export default function DownloadTrackButton({ track, className }: Props) {
         title={label}
         className={cn(
           "inline-flex h-8 w-8 items-center justify-center rounded-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
-          status === "saved" && "text-primary",
+          saved && !inFlight && "text-primary",
           className,
         )}
       >
-        {status === "downloading" ? (
+        {queued?.status === "retrying" ? (
+          <RotateCw className="h-4 w-4 animate-spin" />
+        ) : inFlight ? (
           <Loader2 className="h-4 w-4 animate-spin" />
-        ) : status === "saved" ? (
+        ) : saved ? (
           <span className="relative inline-flex">
             <Check className="h-4 w-4" />
             <Trash2 className="absolute inset-0 h-4 w-4 opacity-0 transition-opacity hover:opacity-100" />
