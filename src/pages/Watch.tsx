@@ -93,35 +93,8 @@ const Watch = () => {
   // router state and the video is usually absent from the first feed page, so
   // fall back to a direct lookup — otherwise the title stays "Loading…" and no
   // SEO/JSON-LD metadata is ever emitted for the page.
-  const { data: fetchedVideo } = useQuery<YouTubeVideo | null>({
-    queryKey: ["watch-video", videoId],
-    enabled: !!videoId && !feedVideo,
-    staleTime: 30 * 60 * 1000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("curated_videos")
-        .select("video_id,title,channel_title,thumbnail_url,category,halal_score,published_at")
-        .eq("video_id", videoId!)
-        .eq("moderation_state", "approved")
-        .eq("is_archived", false)
-        .eq("is_hidden", false)
-        .maybeSingle();
-      if (error || !data) return null;
-      return {
-        id: data.video_id,
-        title: data.title,
-        videoUrl: `https://www.youtube.com/watch?v=${data.video_id}`,
-        thumbnailUrl: data.thumbnail_url,
-        channelTitle: data.channel_title,
-        category: data.category as YouTubeVideo["category"],
-        halalScore: data.halal_score,
-        publishedAt: data.published_at ?? "",
-      };
-    },
-  });
+  const { data: fetchedVideo, isFetched: metaFetched } = useQuery<YouTubeVideo | null>({
 
-  const currentVideo = feedVideo ?? fetchedVideo ?? undefined;
-  const currentCategory = (currentVideo as any)?.category;
 
   // Cold-start signal: remember the topics played this session so the feed
   // can diversify before any server-side taste profile exists.
