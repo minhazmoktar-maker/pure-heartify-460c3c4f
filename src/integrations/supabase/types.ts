@@ -6942,6 +6942,7 @@ export type Database = {
           total: number
         }[]
       }
+      viewer_has_active_entitlement: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
