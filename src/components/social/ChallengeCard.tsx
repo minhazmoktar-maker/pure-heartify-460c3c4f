@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CalendarClock, CheckCircle2, Swords } from "lucide-react";
 import type { Challenge } from "@/hooks/useSocial";
+import ChallengeAward from "@/components/ChallengeAward";
 
 const UNITS: Record<Challenge["type"], string> = {
   minutes: "beneficial minutes",
@@ -117,6 +118,14 @@ export default function ChallengeCard({
                   : `${leader.display_name || "@" + leader.handle} is ahead by ${(leader.progress - me.progress).toLocaleString()}. A little more and you can catch up.`}
             {!ended && ` · ${left} day${left === 1 ? "" : "s"} remaining`}
           </p>
+        )}
+
+        {!isInvite && me?.completed && (
+          <ChallengeAward
+            title={challenge.title}
+            tier={ended ? "gold" : "silver"}
+            note={`Goal reached — ${challenge.goal.toLocaleString()} ${UNITS[challenge.type]}`}
+          />
         )}
 
         {isInvite && onRespond && (
