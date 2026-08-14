@@ -490,6 +490,48 @@ export type Database = {
         }
         Relationships: []
       }
+      autonomy_config: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      autonomy_log: {
+        Row: {
+          created_at: string
+          detail: Json
+          id: string
+          kind: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: Json
+          id?: string
+          kind: string
+        }
+        Update: {
+          created_at?: string
+          detail?: Json
+          id?: string
+          kind?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           category: string
@@ -2036,35 +2078,50 @@ export type Database = {
       }
       discovery_topic_queries: {
         Row: {
+          approved_found: number
+          candidates_found: number
           created_at: string
           enabled: boolean
           id: string
           language: string
           last_run_at: string | null
+          last_yield_at: string | null
+          origin: string
           priority: number
           query: string
+          runs: number
           topic: string
           updated_at: string
         }
         Insert: {
+          approved_found?: number
+          candidates_found?: number
           created_at?: string
           enabled?: boolean
           id?: string
           language: string
           last_run_at?: string | null
+          last_yield_at?: string | null
+          origin?: string
           priority?: number
           query: string
+          runs?: number
           topic: string
           updated_at?: string
         }
         Update: {
+          approved_found?: number
+          candidates_found?: number
           created_at?: string
           enabled?: boolean
           id?: string
           language?: string
           last_run_at?: string | null
+          last_yield_at?: string | null
+          origin?: string
           priority?: number
           query?: string
+          runs?: number
           topic?: string
           updated_at?: string
         }
@@ -5637,6 +5694,18 @@ export type Database = {
         }
         Relationships: []
       }
+      autonomy_health: {
+        Row: {
+          channels_24h: number | null
+          enabled_queries: number | null
+          last_controller_tick: string | null
+          pruned_queries: number | null
+          self_generated_queries: number | null
+          unexplored_queries: number | null
+          videos_24h: number | null
+        }
+        Relationships: []
+      }
       channel_discovery_progress: {
         Row: {
           approved_30d: number | null
@@ -6331,6 +6400,8 @@ export type Database = {
         }
       }
       grant_referral_tier_rewards: { Args: never; Returns: Json }
+      grow_topic_queries: { Args: { p_limit?: number }; Returns: number }
+      growth_controller_tick: { Args: never; Returns: Json }
       halal_deny_female_ar_pattern: { Args: never; Returns: string }
       halal_deny_female_intl_latin_pattern: { Args: never; Returns: string }
       halal_deny_female_intl_script_pattern: { Args: never; Returns: string }
@@ -6672,6 +6743,7 @@ export type Database = {
         Args: { _limit?: number }
         Returns: Json
       }
+      prune_topic_queries: { Args: never; Returns: number }
       purge_feed_impressions: { Args: never; Returns: number }
       rate_limit_cleanup: {
         Args: { _older_than_minutes?: number }
@@ -6739,6 +6811,10 @@ export type Database = {
       }
       record_listen_seconds: { Args: { _seconds: number }; Returns: number }
       record_streak_activity: { Args: { _client_date?: string }; Returns: Json }
+      record_topic_query_yield: {
+        Args: { p_approved?: number; p_candidates?: number; p_query_id: string }
+        Returns: undefined
+      }
       redeem_gift_code: { Args: { p_code: string }; Returns: Json }
       redeem_referral: { Args: { _code: string }; Returns: Json }
       refresh_active_taste_profiles: {
