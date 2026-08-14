@@ -36,19 +36,29 @@ export function useAdhanLocalNotifications(settings: PrayerSettings, slots: Pray
         const nameToId: Record<PrayerSlot["name"], number> = {
           fajr: 8101, sunrise: 8102, dhuhr: 8103, asr: 8104, maghrib: 8105, isha: 8106,
         };
+        const today = new Date();
+        const isSameLocalDay = (d: Date) =>
+          d.getFullYear() === today.getFullYear() &&
+          d.getMonth() === today.getMonth() &&
+          d.getDate() === today.getDate();
+
         const toSchedule = slots
           .filter((s) => settings.enabledPrayers[s.name])
           .map((s) => {
             const at = s.time.getTime() - settings.minutesBefore * 60_000;
-            return { slot: s, at };
+            // Today and tomorrow share prayer names, so offset tomorrow's ids
+            // by 10 to keep both scheduled (Fajr fires even after an overnight
+            // app close). Still inside the reserved 8100-8199 band.
+            const id = nameToId[s.name] + (isSameLocalDay(s.time) ? 0 : 10);
+            return { slot: s, at, id };
           })
           .filter((x) => x.at > now + 5_000);
 
         if (!toSchedule.length) return;
 
         await LocalNotifications.schedule({
-          notifications: toSchedule.map(({ slot, at }) => ({
-            id: nameToId[slot.name],
+          notifications: toSchedule.map(({ slot, at, id }) => ({
+            id,
             title: `${slot.label} — Adhan reminder`,
             body: settings.minutesBefore > 0
               ? `${slot.label} in ${settings.minutesBefore} minutes`
