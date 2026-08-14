@@ -39,6 +39,10 @@ export default function OfflineLibrary() {
 
   useEffect(() => { void refresh(); }, []);
 
+  // Keep the saved list in sync as queue downloads finish.
+  const completedCount = queue.items.filter((i) => i.status === "completed").length;
+  useEffect(() => { void refresh(); }, [completedCount]);
+
   async function handleRemove(id: string) {
     setBusy(true);
     try {
