@@ -1,0 +1,67 @@
+name: Web E2E
+
+# Runs the full Playwright web E2E suite on every build, including the
+# deep-link / share scenarios. Any "Loading…" regression on a shared
+# /watch/:id link fails the pipeline.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: web-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Full web E2E (incl. deep links & shares)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Typecheck
+        run: bunx tsc -p tsconfig.app.json --noEmit
+
+      - name: Unit tests
+        run: bunx vitest run --reporter=dot
+
+      - name: Build app
+        run: bun run build
+
+      - name: Deep-link / share regression suite
+        # Gate first on the highest-signal spec so a Loading… regression
+        # fails fast and unmistakably.
+        run: bunx playwright test tests/e2e/deep-link-watch.spec.ts --reporter=list
+
+      - name: Full web E2E suite
+        run: bunx playwright test --reporter=list
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-e2e-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 14
