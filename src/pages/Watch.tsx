@@ -93,7 +93,7 @@ const Watch = () => {
   // router state and the video is usually absent from the first feed page, so
   // fall back to a direct lookup — otherwise the title stays "Loading…" and no
   // SEO/JSON-LD metadata is ever emitted for the page.
-  const { data: fetchedVideo } = useQuery<YouTubeVideo | null>({
+  const { data: fetchedVideo, isFetched: metaFetched } = useQuery<YouTubeVideo | null>({
     queryKey: ["watch-video", videoId],
     enabled: !!videoId && !feedVideo,
     staleTime: 30 * 60 * 1000,
@@ -122,6 +122,12 @@ const Watch = () => {
 
   const currentVideo = feedVideo ?? fetchedVideo ?? undefined;
   const currentCategory = (currentVideo as any)?.category;
+  // Once the lookup has settled with nothing, stop showing a loading
+  // placeholder — a bad/removed id must degrade to an explicit empty state.
+  const metaResolved = !!currentVideo || metaFetched;
+
+
+
 
   // Cold-start signal: remember the topics played this session so the feed
   // can diversify before any server-side taste profile exists.
@@ -456,8 +462,9 @@ const Watch = () => {
 
           <div className="mt-4 space-y-2">
             <h1 className="text-heading font-bold text-foreground md:text-heading">
-              {currentVideo?.title ?? "Loading…"}
+              {currentVideo?.title ?? (metaResolved ? "Video unavailable" : "Loading…")}
             </h1>
+
             <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               {currentVideo && (
                 <>
