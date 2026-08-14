@@ -179,7 +179,11 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.textAlign = "center";
   ctx.fillStyle = INK;
   ctx.font = "400 84px 'Inter', system-ui, -apple-system, sans-serif";
-  ctx.fillText("Certificate of Recognition", CW / 2, 470);
+  ctx.fillText(
+    input.achievement ? "Certificate of Achievement" : "Certificate of Recognition",
+    CW / 2,
+    470,
+  );
 
   ctx.strokeStyle = "rgba(201,162,62,0.55)";
   ctx.lineWidth = 2;
