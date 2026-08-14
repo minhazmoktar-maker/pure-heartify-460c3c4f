@@ -36,6 +36,8 @@ interface RegionalMix {
 export function LanguageSettings() {
   const { t, preferences, updatePreferences } = useLocale();
   const [regions, setRegions] = useState<RegionalMix[]>([]);
+  const { videosFor, supplyFor, isLoading: coverageLoading } = useLanguageCoverage();
+  const selectedSupply = supplyFor(preferences.content_languages);
   // Local mirror so the slider thumb tracks the drag; committed on release.
   const [diversity, setDiversity] = useState(preferences.diversity_level);
 
