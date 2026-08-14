@@ -65,6 +65,20 @@ async function loadEligibleUsers(): Promise<UserPrefs[]> {
     if (qe != null && cur.quiet_hours_end == null) cur.quiet_hours_end = qe;
     byUser.set(uid, cur);
   }
+  // Fall back to the timezone the client synced onto the profile, so users who
+  // never opened notification settings still get local-time-correct pushes.
+  const missingTz = [...byUser.values()].filter((u) => !u.timezone).map((u) => u.user_id);
+  for (let i = 0; i < missingTz.length; i += 500) {
+    const chunk = missingTz.slice(i, i + 500);
+    const { data: profs } = await admin
+      .from("profiles")
+      .select("user_id,timezone")
+      .in("user_id", chunk);
+    for (const row of profs ?? []) {
+      const u = byUser.get((row as any).user_id);
+      if (u && (row as any).timezone) u.timezone = (row as any).timezone;
+    }
+  }
   return [...byUser.values()];
 }
 
