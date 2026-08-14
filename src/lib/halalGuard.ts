@@ -59,6 +59,12 @@ export const BLOCKED_CHANNELS = [
   "maher zain",
   "pacific ghanaian adventist fellowship pagaf tv",
   "devour power tv",
+  "touba tv officiel",
+  "touba tv",
+  "islaminspanishtv",
+  "islaminspanish",
+  "eman channel",
+  "halal media japan",
 ];
 
 

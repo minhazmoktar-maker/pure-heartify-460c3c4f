@@ -58,6 +58,12 @@ export const BLOCKED_CHANNELS = new Set([
   "maher zain",
   "pacific ghanaian adventist fellowship pagaf tv",
   "devour power tv",
+  "touba tv officiel",
+  "touba tv",
+  "islaminspanishtv",
+  "islaminspanish",
+  "eman channel",
+  "halal media japan",
 ]);
 
 /** Named female presenters/speakers excluded platform-wide. */
