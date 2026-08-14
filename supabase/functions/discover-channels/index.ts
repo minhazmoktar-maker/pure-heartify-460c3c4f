@@ -604,7 +604,14 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
           track('topic_search', ctx.usedThisRun - before);
           totalEnqueued += r.enqueued; totalSkipped += r.skipped; record(`topic_search:${q.language}`, r);
           seedsProcessed++;
-          await admin.from('discovery_topic_queries').update({ last_run_at: new Date().toISOString() }).eq('id', q.id);
+          // Close the learning loop: the scheduler boosts queries that
+          // actually produce candidates and the nightly prune retires the
+          // ones that never do, so the query bank improves on its own.
+          await admin.rpc('record_topic_query_yield', {
+            p_query_id: q.id,
+            p_candidates: r.enqueued + r.skipped,
+            p_approved: r.enqueued,
+          });
           if (seedsProcessed % 5 === 0) {
             await updateJob(admin, jobId, {
               quota_used: ctx.usedThisRun, enqueued_count: totalEnqueued, skipped_count: totalSkipped,
