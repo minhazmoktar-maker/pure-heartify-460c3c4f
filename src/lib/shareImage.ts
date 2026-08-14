@@ -256,6 +256,9 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
     setTracking(ctx, "0px");
   }
 
+  const citation =
+    input.citation ??
+    "\u201cThe most beloved deeds to Allah are those done regularly.\u201d — Bukhari";
   ctx.fillStyle = "#6b7280";
   ctx.font = "italic 26px 'Inter', system-ui, sans-serif";
   const cLines = wrapText(ctx, citation, CW - 700, 2);
