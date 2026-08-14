@@ -5997,6 +5997,7 @@ export type Database = {
       benefit_label_stats: { Args: never; Returns: Json }
       benefit_priors_v1: { Args: never; Returns: Json }
       block_heartify_user: { Args: { _handle: string }; Returns: Json }
+      channel_pipeline_tick: { Args: never; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
         Returns: {

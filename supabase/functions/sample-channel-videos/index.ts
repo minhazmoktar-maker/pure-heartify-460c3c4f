@@ -100,8 +100,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Auth: cron secret OR admin JWT.
-    const isCron = req.headers.get("x-cron-secret") === Deno.env.get("CRON_SECRET");
+    // Auth: cron secret / cron token OR admin JWT.
+    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
+    const cronToken = Deno.env.get("INGEST_CRON_TOKEN") ?? "";
+    const isCron =
+      (!!cronSecret && req.headers.get("x-cron-secret") === cronSecret) ||
+      (!!cronToken && req.headers.get("x-cron-token") === cronToken);
     if (!isCron) {
       const authHeader = req.headers.get("Authorization") ?? "";
       if (!authHeader) return json({ error: "unauthorized" }, 401);
