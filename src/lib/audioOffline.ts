@@ -139,7 +139,10 @@ async function fetchAudio(url: string): Promise<Response> {
   }
   const proxy = proxiedUrl(url);
   if (!proxy) throw new Error("Download failed (network)");
-  const res = await fetch(proxy);
+  const anon = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+  const res = await fetch(proxy, {
+    headers: anon ? { apikey: anon, Authorization: `Bearer ${anon}` } : undefined,
+  });
   if (!res.ok) throw new Error(`Download failed (${res.status})`);
   return res;
 }
