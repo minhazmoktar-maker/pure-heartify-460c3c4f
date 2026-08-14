@@ -28,6 +28,7 @@ function formatRemaining(expiresAt: number | null): string {
 
 export default function OfflineLibrary() {
   const { isPremium, loading } = useEntitlement();
+  const queue = useOfflineQueue();
   const [items, setItems] = useState<OfflineMeta[]>([]);
   const [busy, setBusy] = useState(false);
 
