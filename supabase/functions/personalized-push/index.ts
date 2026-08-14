@@ -119,16 +119,17 @@ async function pickCandidate(p: UserPrefs): Promise<Candidate | null> {
   const userId = p.user_id;
   if (!(await within7dayCap(userId))) return null;
 
-  // 1) Streak at risk
+  // 1) Streak at risk — evaluated against the user's LOCAL calendar date, so
+  // a UTC±12 user is never told their streak is at risk on the wrong day.
   const { data: streak } = await admin
     .from("streaks")
     .select("current_streak,last_completed_date")
     .eq("user_id", userId)
     .maybeSingle();
   if (streak?.last_completed_date) {
-    const last = new Date(streak.last_completed_date + "T00:00:00Z").getTime();
-    const hoursSince = (Date.now() - last) / 3_600_000;
-    if (hoursSince > 16 && hoursSince < 36 && !(await alreadySent(userId, "streak_risk", 20))) {
+    const localToday = localDayKey(new Date(), p.timezone ?? "UTC");
+    const missedToday = streak.last_completed_date < localToday;
+    if (missedToday && !(await alreadySent(userId, "streak_risk", 20))) {
       return {
         user_id: userId,
         kind: "streak_risk",
