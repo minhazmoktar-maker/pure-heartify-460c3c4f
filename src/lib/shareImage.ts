@@ -219,24 +219,43 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   ctx.stroke();
 
   // --- Achievement description ---
-  const days = Math.max(0, Math.round(input.days ?? 0));
   ctx.fillStyle = MUTED;
   ctx.font = "500 30px 'Inter', system-ui, sans-serif";
   ctx.fillText("in appreciation of", CW / 2, 826);
 
-  ctx.fillStyle = GOLD_SOFT;
-  ctx.font = "800 150px 'Inter', system-ui, sans-serif";
-  ctx.fillText(String(days), CW / 2, 970);
+  if (input.achievement) {
+    ctx.fillStyle = INK;
+    let aSize = 88;
+    const aFont = (s: number) => `600 ${s}px 'Inter', system-ui, sans-serif`;
+    ctx.font = aFont(aSize);
+    while (ctx.measureText(input.achievement).width > CW - 620 && aSize > 40) {
+      aSize -= 4;
+      ctx.font = aFont(aSize);
+    }
+    ctx.fillText(input.achievement, CW / 2, 950);
 
-  ctx.fillStyle = GOLD;
-  ctx.font = "700 34px 'Inter', system-ui, sans-serif";
-  setTracking(ctx, "5px");
-  ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF BENEFICIAL HABITS`, CW / 2, 1024);
-  setTracking(ctx, "0px");
+    ctx.fillStyle = GOLD;
+    ctx.font = "700 32px 'Inter', system-ui, sans-serif";
+    setTracking(ctx, "5px");
+    ctx.fillText(
+      (input.achievementNote ?? "CHALLENGE COMPLETED ON HEARTIFY").toUpperCase(),
+      CW / 2,
+      1020,
+    );
+    setTracking(ctx, "0px");
+  } else {
+    const days = Math.max(0, Math.round(input.days ?? 0));
+    ctx.fillStyle = GOLD_SOFT;
+    ctx.font = "800 150px 'Inter', system-ui, sans-serif";
+    ctx.fillText(String(days), CW / 2, 970);
 
-  const citation =
-    input.citation ??
-    "\u201cThe most beloved deeds to Allah are those done regularly.\u201d — Bukhari";
+    ctx.fillStyle = GOLD;
+    ctx.font = "700 34px 'Inter', system-ui, sans-serif";
+    setTracking(ctx, "5px");
+    ctx.fillText(`CONSECUTIVE ${days === 1 ? "DAY" : "DAYS"} OF BENEFICIAL HABITS`, CW / 2, 1024);
+    setTracking(ctx, "0px");
+  }
+
   ctx.fillStyle = "#6b7280";
   ctx.font = "italic 26px 'Inter', system-ui, sans-serif";
   const cLines = wrapText(ctx, citation, CW - 700, 2);
