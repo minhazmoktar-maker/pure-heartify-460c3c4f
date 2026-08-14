@@ -92,6 +92,8 @@ jobs:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+          TESTFLIGHT_GROUPS: ${{ vars.TESTFLIGHT_GROUPS }}
+          BETA_CHANGELOG: ${{ github.event_name == 'push' && format('Heartify {0}', github.ref_name) || format('Internal build {0}', github.run_number) }}
         run: bundle exec fastlane beta
       - name: Upload iOS IPA artifact
         if: always()
