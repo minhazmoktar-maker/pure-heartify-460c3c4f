@@ -166,7 +166,7 @@ export function LanguageSettings() {
                   type="button"
                   onClick={() => toggleContentLanguage(l.code)}
                   aria-pressed={active}
-                  className={`flex min-h-touch items-center gap-1.5 rounded-pill border px-3 py-1 text-micro font-medium transition-colors ${
+                  className={`flex min-h-[36px] items-center gap-1.5 rounded-pill border px-3 py-1 text-micro font-medium transition-colors ${
                     active
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:text-foreground"
