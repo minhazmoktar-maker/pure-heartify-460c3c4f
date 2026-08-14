@@ -20,6 +20,11 @@ import { Badge } from "@/components/ui/badge";
 import { useLocale } from "@/contexts/LocaleContext";
 import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  formatCount,
+  THIN_LANGUAGE_THRESHOLD,
+  useLanguageCoverage,
+} from "@/hooks/useLanguageCoverage";
 
 interface RegionalMix {
   country_code: string;
