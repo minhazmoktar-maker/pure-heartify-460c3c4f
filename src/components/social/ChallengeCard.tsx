@@ -120,13 +120,21 @@ export default function ChallengeCard({
           </p>
         )}
 
-        {!isInvite && me?.completed && (
+        {!isInvite && ended && myRank && me && me.progress > 0 && roster.length > 1 ? (
+          <ChallengeAward
+            title={challenge.title}
+            tier={medalTierForRank(myRank)}
+            rank={myRank}
+            participants={roster.length}
+            note={`${me.progress.toLocaleString()} ${UNITS[challenge.type]}`}
+          />
+        ) : !isInvite && me?.completed ? (
           <ChallengeAward
             title={challenge.title}
             tier={ended ? "gold" : "silver"}
             note={`Goal reached — ${challenge.goal.toLocaleString()} ${UNITS[challenge.type]}`}
           />
-        )}
+        ) : null}
 
         {isInvite && onRespond && (
           <div className="flex gap-2">
