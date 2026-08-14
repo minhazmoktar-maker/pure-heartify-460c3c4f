@@ -130,6 +130,32 @@ function proxiedUrl(url: string): string | null {
   return `${base}/functions/v1/audio-proxy?url=${encodeURIComponent(url)}`;
 }
 
+/** Transient statuses worth retrying (timeouts, rate limits, gateway blips). */
+const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+
+const RETRY_ATTEMPTS = 4;
+const RETRY_BASE_MS = 600;
+const RETRY_MAX_MS = 8_000;
+
+class DownloadError extends Error {
+  status?: number;
+  retryable: boolean;
+  constructor(message: string, opts: { status?: number; retryable: boolean }) {
+    super(message);
+    this.name = "DownloadError";
+    this.status = opts.status;
+    this.retryable = opts.retryable;
+  }
+}
+
+function backoffDelay(attempt: number): number {
+  const expo = Math.min(RETRY_MAX_MS, RETRY_BASE_MS * 2 ** attempt);
+  // Full jitter avoids thundering herds when many tracks retry at once.
+  return Math.round(expo * (0.5 + Math.random() * 0.5));
+}
+
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
 async function fetchAudio(url: string): Promise<Response> {
   try {
     const direct = await fetch(url, { mode: "cors" });
@@ -138,13 +164,61 @@ async function fetchAudio(url: string): Promise<Response> {
     /* CORS / network failure — fall through to the proxy */
   }
   const proxy = proxiedUrl(url);
-  if (!proxy) throw new Error("Download failed (network)");
+  if (!proxy) throw new DownloadError("Download failed (network)", { retryable: true });
   const anon = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
-  const res = await fetch(proxy, {
-    headers: anon ? { apikey: anon, Authorization: `Bearer ${anon}` } : undefined,
-  });
-  if (!res.ok) throw new Error(`Download failed (${res.status})`);
+  let res: Response;
+  try {
+    res = await fetch(proxy, {
+      headers: anon ? { apikey: anon, Authorization: `Bearer ${anon}` } : undefined,
+    });
+  } catch (e) {
+    throw new DownloadError(
+      e instanceof Error ? e.message : "Download failed (network)",
+      { retryable: true },
+    );
+  }
+  if (!res.ok) {
+    throw new DownloadError(`Download failed (${res.status})`, {
+      status: res.status,
+      retryable: RETRYABLE_STATUS.has(res.status),
+    });
+  }
   return res;
+}
+
+async function downloadBlob(url: string, onProgress?: (pct: number) => void): Promise<Blob> {
+  const res = await fetchAudio(url);
+  const total = Number(res.headers.get("content-length") || 0);
+  const reader = res.body?.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  try {
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (value) {
+          chunks.push(value);
+          received += value.byteLength;
+          if (total && onProgress) onProgress(Math.min(100, Math.round((received / total) * 100)));
+        }
+      }
+    } else {
+      chunks.push(new Uint8Array(await res.arrayBuffer()));
+    }
+  } catch (e) {
+    // A stream that dies mid-transfer is transient — allow a retry.
+    throw new DownloadError(
+      e instanceof Error ? e.message : "Download interrupted",
+      { retryable: true },
+    );
+  }
+  if (total && received < total) {
+    throw new DownloadError("Download incomplete", { retryable: true });
+  }
+  return new Blob(chunks as BlobPart[], {
+    type: res.headers.get("content-type") || "audio/mpeg",
+  });
 }
 
 export async function saveOfflineTrack(
@@ -152,28 +226,23 @@ export async function saveOfflineTrack(
   url: string,
   onProgress?: (pct: number) => void,
 ): Promise<void> {
-  const res = await fetchAudio(url);
-  if (!res.ok) throw new Error(`Download failed (${res.status})`);
-  const total = Number(res.headers.get("content-length") || 0);
-  const reader = res.body?.getReader();
-  const chunks: Uint8Array[] = [];
-  let received = 0;
-  if (reader) {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (value) {
-        chunks.push(value);
-        received += value.byteLength;
-        if (total && onProgress) onProgress(Math.min(100, Math.round((received / total) * 100)));
-      }
+  let lastErr: unknown;
+  let blob: Blob | null = null;
+  for (let attempt = 0; attempt < RETRY_ATTEMPTS; attempt++) {
+    try {
+      if (attempt > 0) onProgress?.(0);
+      blob = await downloadBlob(url, onProgress);
+      break;
+    } catch (e) {
+      lastErr = e;
+      const retryable = e instanceof DownloadError ? e.retryable : false;
+      if (!retryable || attempt === RETRY_ATTEMPTS - 1) throw e;
+      await wait(backoffDelay(attempt));
     }
-  } else {
-    chunks.push(new Uint8Array(await res.arrayBuffer()));
   }
-  const blob = new Blob(chunks as BlobPart[], { type: res.headers.get("content-type") || "audio/mpeg" });
+  if (!blob) throw lastErr instanceof Error ? lastErr : new Error("Download failed");
   await withStores("readwrite", async (tracks) => {
-    await req(tracks, tracks.put(blob, id) as IDBRequest<IDBValidKey>);
+    await req(tracks, tracks.put(blob as Blob, id) as IDBRequest<IDBValidKey>);
   });
   onProgress?.(100);
 }
