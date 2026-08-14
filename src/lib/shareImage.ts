@@ -24,6 +24,8 @@ export interface ShareImageInput {
   achievement?: string;    // challenge title, e.g. "Pray all 5 today"
   achievementNote?: string;// small line, e.g. "Daily challenge — 50 points"
   tier?: MedalTier;        // medal metal
+  rank?: number;           // finishing place in a competition (1 = winner)
+  participants?: number;    // total finishers, used for "1st of 4"
   citation?: string;       // small line under the seal (e.g. hadith)
   dateLabel?: string;      // issue date, defaults to today
 }
@@ -345,6 +347,12 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
 /**
  * E-medal — a square, shareable award badge for a completed challenge.
  */
+function ordinal(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
+}
+
 async function renderMedal(input: ShareImageInput): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -427,11 +435,30 @@ async function renderMedal(input: ShareImageInput): Promise<Blob> {
     ctx.fillText("✦", cx, cy + 34);
   }
 
+  // Rank chip on the disc (Apple-Watch competition style)
+  if (input.rank && input.rank > 0) {
+    const rx = cx + r - 18;
+    const ry = cy - r + 18;
+    ctx.beginPath();
+    ctx.arc(rx, ry, 52, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(11,18,32,0.92)";
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = m.a;
+    ctx.stroke();
+    ctx.fillStyle = m.a;
+    ctx.font = "800 40px 'Inter', system-ui, sans-serif";
+    ctx.fillText(ordinal(input.rank), rx, ry + 14);
+  }
+
   // Tier label
   ctx.fillStyle = m.a;
   ctx.font = "700 30px 'Inter', system-ui, sans-serif";
   setTracking(ctx, "6px");
-  ctx.fillText(m.label, cx, 660);
+  const label = input.rank
+    ? `${ordinal(input.rank).toUpperCase()} PLACE${input.participants ? ` OF ${input.participants}` : ""}`
+    : m.label;
+  ctx.fillText(label, cx, 660);
   setTracking(ctx, "0px");
 
   // Achievement title
