@@ -4,8 +4,14 @@
  * A single module-level queue (survives route changes) that runs downloads with
  * user-tunable concurrency and exposes observable per-item status so the UI can
  * show queued / downloading / retrying / completed / failed / cancelled.
+ *
+ * Queue state is mirrored to localStorage so a tab reload (or a crash) does not
+ * lose in-flight work: anything that was queued/downloading/retrying is
+ * restored as `queued` and automatically resumed — combined with the `partials`
+ * store in `audioOffline`, the transfer continues from the bytes already
+ * fetched instead of restarting.
  */
-import { saveOfflineTrackGated, clearPartial, DownloadError } from "@/lib/audioOffline";
+import { saveOfflineTrackGated, clearPartial, DownloadError, hasOfflineTrack } from "@/lib/audioOffline";
 import { getOfflineSettings } from "@/lib/offlineSettings";
 import { diag } from "@/lib/diagnostics";
 
@@ -33,6 +39,8 @@ export interface QueueItem {
   errorCode?: string;
   queuedAt: number;
   finishedAt?: number;
+  /** True when this item was restored from a previous session and resumed. */
+  resumedFromReload?: boolean;
 }
 
 type Listener = (items: QueueItem[]) => void;
@@ -42,14 +50,33 @@ const controllers = new Map<string, AbortController>();
 const listeners = new Set<Listener>();
 let running = 0;
 
+const STORAGE_KEY = "heartify.offlineDownload.queue";
+const ACTIVE: QueueStatus[] = ["queued", "downloading", "retrying"];
+/** Finished items older than this are dropped when rehydrating. */
+const FINISHED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 function snapshot(): QueueItem[] {
   return [...items.values()].sort((a, b) => a.queuedAt - b.queuedAt);
 }
 
+function persist() {
+  try {
+    const payload = snapshot().map((i) =>
+      // Never persist a mid-flight status: on restore it must look interrupted.
+      ACTIVE.includes(i.status)
+        ? { ...i, status: "queued" as QueueStatus, nextAttemptAt: undefined, resumedFromReload: true }
+        : i,
+    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  } catch { /* storage full / unavailable — persistence is best-effort */ }
+}
+
 function emit() {
   const snap = snapshot();
+  persist();
   listeners.forEach((fn) => fn(snap));
 }
+
 
 function update(id: string, patch: Partial<QueueItem>) {
   const cur = items.get(id);
@@ -223,3 +250,88 @@ async function run(id: string): Promise<void> {
 }
 
 export const QUEUE_ACTIVE_STATUSES: QueueStatus[] = ["queued", "downloading", "retrying"];
+
+/* -------------------------------------------------------- reload continuation */
+
+let hydrated = false;
+
+/**
+ * Restores the queue from localStorage. Items that were mid-flight when the tab
+ * went away come back as `queued`; already-cached tracks are marked completed
+ * and stale finished rows are dropped.
+ */
+export function hydrateQueue(): QueueItem[] {
+  if (hydrated) return snapshot();
+  hydrated = true;
+  let raw: string | null = null;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch { return snapshot(); }
+  if (!raw) return snapshot();
+
+  let parsed: unknown;
+  try { parsed = JSON.parse(raw); } catch { return snapshot(); }
+  if (!Array.isArray(parsed)) return snapshot();
+
+  const now = Date.now();
+  for (const entry of parsed as Partial<QueueItem>[]) {
+    if (!entry || typeof entry.id !== "string" || typeof entry.url !== "string") continue;
+    const wasActive = ACTIVE.includes(entry.status as QueueStatus);
+    if (!wasActive && entry.finishedAt && now - entry.finishedAt > FINISHED_TTL_MS) continue;
+    items.set(entry.id, {
+      id: entry.id,
+      title: entry.title ?? "Track",
+      url: entry.url,
+      isPremium: Boolean(entry.isPremium),
+      trackIsPremium: entry.trackIsPremium,
+      status: wasActive ? "queued" : ((entry.status as QueueStatus) ?? "failed"),
+      pct: wasActive ? Math.min(99, Number(entry.pct) || 0) : Number(entry.pct) || 0,
+      attempt: 0,
+      maxAttempts: getOfflineSettings().maxAttempts,
+      error: wasActive ? undefined : entry.error,
+      errorCode: wasActive ? undefined : entry.errorCode,
+      queuedAt: Number(entry.queuedAt) || now,
+      finishedAt: wasActive ? undefined : entry.finishedAt,
+      resumedFromReload: wasActive || undefined,
+    });
+  }
+  emit();
+  return snapshot();
+}
+
+/**
+ * Kicks off any restored/queued downloads. Completed-on-disk tracks are
+ * reconciled first so we never re-download something already cached.
+ */
+export async function resumeInterruptedDownloads(): Promise<number> {
+  hydrateQueue();
+  const pending = snapshot().filter((i) => i.status === "queued");
+  if (pending.length === 0) return 0;
+
+  let resumable = 0;
+  for (const item of pending) {
+    if (await hasOfflineTrack(item.id)) {
+      update(item.id, { status: "completed", pct: 100, finishedAt: Date.now() });
+      await clearPartial(item.id);
+      continue;
+    }
+    resumable++;
+  }
+  if (resumable > 0) {
+    diag("download", "resumed_after_reload", { count: resumable });
+    void pump();
+  }
+  return resumable;
+}
+
+if (typeof window !== "undefined") {
+  hydrateQueue();
+  // Defer the actual transfers so app boot (and first paint) isn't competing
+  // with resumed downloads.
+  const kick = () => { void resumeInterruptedDownloads(); };
+  if (navigator.onLine === false) {
+    window.addEventListener("online", kick, { once: true });
+  } else {
+    setTimeout(kick, 1_500);
+  }
+  // Retry stalled/failed-by-network items whenever connectivity returns.
+  window.addEventListener("online", () => { void pump(); });
+}
