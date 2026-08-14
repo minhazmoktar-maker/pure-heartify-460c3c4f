@@ -52,6 +52,7 @@ function Row({
             {item.status === "retrying" &&
               ` · attempt ${item.attempt}/${item.maxAttempts}${secondsToRetry ? ` in ${secondsToRetry}s` : ""}`}
             {item.status === "failed" && item.error ? ` · ${item.error}` : ""}
+            {item.resumedFromReload && item.status !== "completed" ? " · resumed" : ""}
           </p>
           {inFlight && <Progress value={item.pct} className="h-1 mt-2" />}
         </div>
