@@ -129,7 +129,7 @@ export default function ChallengeCard({
             title={challenge.title}
             tier={medalTierForRank(myRank)}
             rank={myRank}
-            participants={roster.length}
+            participants={finishers.length}
             note={`${me.progress.toLocaleString()} ${UNITS[challenge.type]}`}
           />
         ) : !isInvite && me?.completed ? (
