@@ -250,3 +250,88 @@ async function run(id: string): Promise<void> {
 }
 
 export const QUEUE_ACTIVE_STATUSES: QueueStatus[] = ["queued", "downloading", "retrying"];
+
+/* -------------------------------------------------------- reload continuation */
+
+let hydrated = false;
+
+/**
+ * Restores the queue from localStorage. Items that were mid-flight when the tab
+ * went away come back as `queued`; already-cached tracks are marked completed
+ * and stale finished rows are dropped.
+ */
+export function hydrateQueue(): QueueItem[] {
+  if (hydrated) return snapshot();
+  hydrated = true;
+  let raw: string | null = null;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch { return snapshot(); }
+  if (!raw) return snapshot();
+
+  let parsed: unknown;
+  try { parsed = JSON.parse(raw); } catch { return snapshot(); }
+  if (!Array.isArray(parsed)) return snapshot();
+
+  const now = Date.now();
+  for (const entry of parsed as Partial<QueueItem>[]) {
+    if (!entry || typeof entry.id !== "string" || typeof entry.url !== "string") continue;
+    const wasActive = ACTIVE.includes(entry.status as QueueStatus);
+    if (!wasActive && entry.finishedAt && now - entry.finishedAt > FINISHED_TTL_MS) continue;
+    items.set(entry.id, {
+      id: entry.id,
+      title: entry.title ?? "Track",
+      url: entry.url,
+      isPremium: Boolean(entry.isPremium),
+      trackIsPremium: entry.trackIsPremium,
+      status: wasActive ? "queued" : ((entry.status as QueueStatus) ?? "failed"),
+      pct: wasActive ? Math.min(99, Number(entry.pct) || 0) : Number(entry.pct) || 0,
+      attempt: 0,
+      maxAttempts: getOfflineSettings().maxAttempts,
+      error: wasActive ? undefined : entry.error,
+      errorCode: wasActive ? undefined : entry.errorCode,
+      queuedAt: Number(entry.queuedAt) || now,
+      finishedAt: wasActive ? undefined : entry.finishedAt,
+      resumedFromReload: wasActive || undefined,
+    });
+  }
+  emit();
+  return snapshot();
+}
+
+/**
+ * Kicks off any restored/queued downloads. Completed-on-disk tracks are
+ * reconciled first so we never re-download something already cached.
+ */
+export async function resumeInterruptedDownloads(): Promise<number> {
+  hydrateQueue();
+  const pending = snapshot().filter((i) => i.status === "queued");
+  if (pending.length === 0) return 0;
+
+  let resumable = 0;
+  for (const item of pending) {
+    if (await hasOfflineTrack(item.id)) {
+      update(item.id, { status: "completed", pct: 100, finishedAt: Date.now() });
+      await clearPartial(item.id);
+      continue;
+    }
+    resumable++;
+  }
+  if (resumable > 0) {
+    diag("download", "resumed_after_reload", { count: resumable });
+    void pump();
+  }
+  return resumable;
+}
+
+if (typeof window !== "undefined") {
+  hydrateQueue();
+  // Defer the actual transfers so app boot (and first paint) isn't competing
+  // with resumed downloads.
+  const kick = () => { void resumeInterruptedDownloads(); };
+  if (navigator.onLine === false) {
+    window.addEventListener("online", kick, { once: true });
+  } else {
+    setTimeout(kick, 1_500);
+  }
+  // Retry stalled/failed-by-network items whenever connectivity returns.
+  window.addEventListener("online", () => { void pump(); });
+}
