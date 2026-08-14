@@ -1,0 +1,1 @@
+GRANT SELECT ON public.language_corpus_health TO anon;
