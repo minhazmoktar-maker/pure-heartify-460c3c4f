@@ -5646,6 +5646,15 @@ export type Database = {
         }
         Relationships: []
       }
+      language_corpus_health: {
+        Row: {
+          language: string | null
+          live_channels: number | null
+          live_videos: number | null
+          total_videos: number | null
+        }
+        Relationships: []
+      }
       leaderboard_public: {
         Row: {
           computed_at: string | null
@@ -6530,6 +6539,15 @@ export type Database = {
         }[]
       }
       my_progress_summary: { Args: never; Returns: Json }
+      next_topic_queries: {
+        Args: { p_limit?: number; p_target?: number }
+        Returns: {
+          deficit: number
+          id: string
+          language: string
+          query: string
+        }[]
+      }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
       pipeline_health: { Args: never; Returns: Json }
       pool_because_you_watched: {
