@@ -5990,6 +5990,7 @@ export type Database = {
       }
       attestation_coverage: { Args: never; Returns: Json }
       attestation_payload: { Args: { _video_id: string }; Returns: Json }
+      autonomous_moderation_tick: { Args: never; Returns: Json }
       backfill_reciter_alias_variants: { Args: never; Returns: number }
       backfill_search_tsv: { Args: { _limit?: number }; Returns: number }
       backfill_video_attestations: { Args: { _limit?: number }; Returns: Json }
@@ -6484,6 +6485,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      learn_from_owner_block: { Args: { _pattern: string }; Returns: number }
       leave_challenge: { Args: { _challenge_id: string }; Returns: Json }
       list_active_categories: {
         Args: never

@@ -65,6 +65,10 @@ export const BLOCKED_CHANNELS = [
   "islaminspanish",
   "eman channel",
   "halal media japan",
+  "dr. tareq al-suwaidan",
+  "safina society",
+  "ilmfeed",
+  "ilmfeed podcast",
 ];
 
 
