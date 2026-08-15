@@ -40,9 +40,33 @@ export default function DownloadTrackButton({ track, className }: Props) {
       } else if (queued.errorCode === "OFFLINE_FREE_LIMIT") {
         setUpgradeFeature("Unlimited offline downloads");
         setUpgradeOpen(true);
+      } else if (!fellBackRef.current) {
+        // Offline caching failed for a non-gating reason (host blocks CORS and
+        // isn't proxy-allowlisted, HTTP error, network loss). Fall back to a
+        // native browser download so the user still gets the MP3.
+        fellBackRef.current = true;
+        const url = queued.url || track.url;
+        if (url) {
+          try {
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${track.title || track.id}.mp3`;
+            a.rel = "noopener";
+            a.target = "_blank";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            diag("download", "fallback_browser", { trackId: track.id, code: queued.errorCode });
+            toast.success("Couldn't save offline — downloading in your browser instead");
+          } catch {
+            toast.error("Download failed — please try again");
+          }
+        } else {
+          toast.error("Download failed — please try again");
+        }
       }
     }
-  }, [queued]);
+  }, [queued, track.url, track.title, track.id]);
 
   const inFlight = queued?.status === "downloading" || queued?.status === "retrying" || queued?.status === "queued";
 

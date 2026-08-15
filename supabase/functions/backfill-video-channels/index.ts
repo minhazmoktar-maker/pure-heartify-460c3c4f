@@ -145,8 +145,10 @@ Deno.serve(async (req) => {
           youtube_channel_id: id,
           title: channelMeta.get(id) ?? id,
           status: 'pending',
-          source: 'orphan_backfill',
-          discovery_method: 'video_snippet',
+          // Must be one of the channel_candidates_source_check values.
+          // The orphan-backfill origin is recorded in discovery_method.
+          source: 'discovery',
+          discovery_method: 'orphan_backfill:video_snippet',
         }));
       if (toInsert.length > 0) {
         const { error: insErr, count } = await admin
