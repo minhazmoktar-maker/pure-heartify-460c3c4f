@@ -64,6 +64,10 @@ export const BLOCKED_CHANNELS = new Set([
   "islaminspanish",
   "eman channel",
   "halal media japan",
+  "dr. tareq al-suwaidan",
+  "safina society",
+  "ilmfeed",
+  "ilmfeed podcast",
 ]);
 
 /** Named female presenters/speakers excluded platform-wide. */
