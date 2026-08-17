@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Download, Check, Loader2, Trash2, RotateCw } from "lucide-react";
 import type { Track } from "@/data/audio";
 import { toast } from "sonner";
@@ -17,6 +17,8 @@ export default function DownloadTrackButton({ track, className }: Props) {
   const [saved, setSaved] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState<string | undefined>();
+  // Guards against firing repeated browser downloads if the failed queue item re-renders.
+  const fellBackRef = useRef(false);
 
   const queued = useMemo(() => items.find((i) => i.id === track.id), [items, track.id]);
 

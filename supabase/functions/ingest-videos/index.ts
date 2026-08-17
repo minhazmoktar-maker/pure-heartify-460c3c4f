@@ -597,7 +597,7 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
   // Chunk to keep each INSERT small enough that Postgres statement_timeout
   // doesn't cancel it (error 57014). Large single-shot upserts of a few
   // hundred rows were timing out under load; 50-row chunks are safe.
-  const CHUNK = 50;
+  const CHUNK = 25;
   let inserted = 0;
 
   const post = (batch: Record<string, unknown>[]) =>
@@ -632,6 +632,15 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
       }
       inserted += accepted.length;
       if (accepted.length) embedNewVideos(accepted).catch((e) => console.warn("[embed] batch failed:", e));
+      continue;
+    }
+    // Statement timeout (57014): the batch was too heavy for one statement
+    // (moderation triggers run per row). Split it down instead of dropping the
+    // whole chunk, which is what previously starved newly approved channels.
+    if (body.includes("57014") && chunk.length > 1) {
+      const mid = Math.ceil(chunk.length / 2);
+      inserted += await upsertVideos(chunk.slice(0, mid));
+      inserted += await upsertVideos(chunk.slice(mid));
       continue;
     }
     console.error(`upsert failed ${res.status} (chunk ${i}-${i + chunk.length}): ${body}`);
