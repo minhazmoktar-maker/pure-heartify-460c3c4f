@@ -582,9 +582,10 @@ export default function HeartifyPlus() {
                     onChange={(e) => setTier(e.target.value as PreferredTier)}
                     className="flex h-10 w-full rounded-card border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
-                    <option value="plus">Heartify+ ($4.99 / month)</option>
-                    <option value="family">Heartify+ Family ($8.99 / month)</option>
-                    <option value="lifetime">Heartify+ Lifetime ($149 one‑time)</option>
+                   <option value="plus">Heartify+ ({formatPrice("plus")} / month)</option>
+                   <option value="family">Heartify+ Family ({formatPrice("family")} / month)</option>
+                   <option value="lifetime">Heartify+ Lifetime ({formatPrice("lifetime")} one‑time)</option>
+
                   </select>
                 </div>
                 <Button
