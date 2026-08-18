@@ -8,10 +8,16 @@ import { growth } from "./lib/growthEvents";
 import { applyIconToDocument, getSelectedIconId } from "./lib/appIcon";
 import { installDiagConsole } from "./lib/diagnostics";
 import { installViteRecovery } from "./lib/viteRecovery";
+import { installBackendFetchInterceptor } from "./lib/backendFetchInterceptor";
 
 // Self-heal a stale Vite dep cache (null hooks dispatcher → blank screen).
 // Installed before anything else so the first crash is caught.
 installViteRecovery();
+
+// Backend circuit breaker: fail fast during an outage instead of letting every
+// surface retry independently (thundering herd on recovery).
+installBackendFetchInterceptor();
+
 
 // Bootstrap error reporting FIRST so early crashes are captured.
 initSentry();
