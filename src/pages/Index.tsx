@@ -154,7 +154,6 @@ const Index = () => {
               <StreakAtRiskBanner />
               <RamadanBanner />
               <JumuahBanner />
-              <BenefitLabelPrompt />
               <FirstSessionCard />
               <WeeklyRecapCard />
               <CircleWidget />

@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { Loader2, AlertTriangle, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from "@/components/EmptyState";
+import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
 import { useInfiniteFeed, type FeedSort } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
