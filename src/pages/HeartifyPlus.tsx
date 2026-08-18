@@ -33,6 +33,13 @@ import { usePlusWaitlist, type PreferredTier } from "@/hooks/usePlusWaitlist";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/contexts/LocaleContext";
 import { formatCurrency } from "@/lib/intl";
+import {
+  PRICING_REGIONS,
+  detectRegionKey,
+  formatPlanPrice,
+  setRegionOverride,
+} from "@/lib/pricing";
+
 
 
 interface Tier {
