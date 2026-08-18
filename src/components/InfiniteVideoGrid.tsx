@@ -126,9 +126,19 @@ const InfiniteVideoGrid = ({
     <>
       <div ref={gridRef} className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {allVideos.map((video, i) => (
-          <div key={video.id} data-video-id={video.id}>
-            <YouTubeVideoCard video={video} index={i} />
-          </div>
+          <Fragment key={video.id}>
+            {/* One-tap benefit label, in-feed after the first row. This is the
+                ground-truth signal for the benefit ranker — placing it where
+                attention already is lifts the response rate. */}
+            {i === 4 && (
+              <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
+                <BenefitLabelPrompt />
+              </div>
+            )}
+            <div data-video-id={video.id}>
+              <YouTubeVideoCard video={video} index={i} />
+            </div>
+          </Fragment>
         ))}
       </div>
 

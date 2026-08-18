@@ -5,6 +5,7 @@ import SEO from "@/components/SEO";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import CoSignatures from "@/components/CoSignatures";
 
 type Attestation = {
   found: boolean;
@@ -323,6 +324,8 @@ export default function Verify() {
                 </p>
               )}
             </Card>
+
+            <CoSignatures videoId={data?.video_id} />
 
             {/* Attestation ledger record */}
             <Card className="p-5">
