@@ -4815,6 +4815,75 @@ export type Database = {
         }
         Relationships: []
       }
+      transcript_jobs: {
+        Row: {
+          attempts: number
+          created_at: string
+          error: string | null
+          language_hint: string | null
+          next_attempt_at: string
+          priority: number
+          requested_by: string | null
+          status: string
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          language_hint?: string | null
+          next_attempt_at?: string
+          priority?: number
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          error?: string | null
+          language_hint?: string | null
+          next_attempt_at?: string
+          priority?: number
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
+      transcript_segments: {
+        Row: {
+          end_ms: number | null
+          id: number
+          language: string
+          start_ms: number
+          text: string
+          tsv: unknown
+          video_id: string
+        }
+        Insert: {
+          end_ms?: number | null
+          id?: number
+          language?: string
+          start_ms: number
+          text: string
+          tsv?: unknown
+          video_id: string
+        }
+        Update: {
+          end_ms?: number | null
+          id?: number
+          language?: string
+          start_ms?: number
+          text?: string
+          tsv?: unknown
+          video_id?: string
+        }
+        Relationships: []
+      }
       trusted_institutions: {
         Row: {
           country: string | null
@@ -5573,6 +5642,42 @@ export type Database = {
         }
         Relationships: []
       }
+      video_transcripts: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          full_text: string | null
+          language: string
+          model: string | null
+          segment_count: number
+          source: string
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          full_text?: string | null
+          language?: string
+          model?: string | null
+          segment_count?: number
+          source: string
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          full_text?: string | null
+          language?: string
+          model?: string | null
+          segment_count?: number
+          source?: string
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       watch_history: {
         Row: {
           completed: boolean
@@ -6119,6 +6224,11 @@ export type Database = {
       end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
       enqueue_benefit_labels: { Args: { _limit?: number }; Returns: Json }
+      enqueue_transcript_backlog: { Args: { _limit?: number }; Returns: number }
+      enqueue_transcript_job: {
+        Args: { _language_hint?: string; _video_id: string }
+        Returns: string
+      }
       escalate_visually_unsafe_channels: { Args: never; Returns: Json }
       evaluate_feature_flag: {
         Args: { _key: string; _user_id: string }
@@ -6903,6 +7013,17 @@ export type Database = {
           popularity_score: number
           primary_riwayah: string
           rank: number
+        }[]
+      }
+      search_transcript_moments: {
+        Args: { _limit?: number; _q: string; _video_id?: string }
+        Returns: {
+          end_ms: number
+          language: string
+          rank: number
+          start_ms: number
+          text: string
+          video_id: string
         }[]
       }
       search_trending: {

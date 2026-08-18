@@ -8,6 +8,7 @@ import InfiniteVideoGrid from "@/components/InfiniteVideoGrid";
 import SearchSuggestions from "@/components/SearchSuggestions";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
 import ReciterResults from "@/components/ReciterResults";
+import MomentResults from "@/components/MomentResults";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
 import { growth } from "@/lib/growthEvents";
@@ -149,6 +150,8 @@ const SearchResults = () => {
             )}
 
             <ReciterResults query={query} />
+
+            <MomentResults query={query} />
 
             {smartVideos.length > 0 ? (
               <>

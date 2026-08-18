@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { recordRecentTopic } from "@/lib/recentTopics";
@@ -16,6 +16,7 @@ import NotInterestedMenu from "@/components/NotInterestedMenu";
 import { WatchLaterButton, ShareAtTimeButton } from "@/components/WatchExtras";
 import ShareImageButton from "@/components/ShareImageButton";
 import SeriesRail from "@/components/SeriesRail";
+import TranscriptPanel from "@/components/TranscriptPanel";
 
 import { useSeriesEpisodes } from "@/hooks/useSeriesEpisodes";
 
@@ -86,6 +87,28 @@ const Watch = () => {
   const [autoNextIn, setAutoNextIn] = useState<number | null>(null);
   const [playerActivated, setPlayerActivated] = useState(false);
   const completedRef = useRef<string | null>(null);
+
+  /**
+   * Jump the embedded player to a transcript moment. The facade is activated
+   * first when needed, and the seek is retried briefly because the iframe's
+   * JS API only accepts commands once the player has booted.
+   */
+  const seekTo = useCallback(
+    (seconds: number) => {
+      setPlayerActivated(true);
+      const send = () =>
+        iframeRef.current?.contentWindow?.postMessage(
+          JSON.stringify({ event: "command", func: "seekTo", args: [seconds, true] }),
+          "*",
+        );
+      send();
+      const timers = [300, 900, 1800].map((d) => window.setTimeout(send, d));
+      return () => timers.forEach((t) => window.clearTimeout(t));
+    },
+    [],
+  );
+
+
 
   const feedVideo = videos?.find((v) => v.id === videoId) ?? (stateVideo?.id === videoId ? stateVideo : undefined);
 
@@ -541,6 +564,7 @@ const Watch = () => {
             </button>
           )}
           {series && <SeriesRail series={series} className="mt-4" />}
+          {videoId && <TranscriptPanel videoId={videoId} onSeek={seekTo} />}
           {videoId && <CommentThread videoId={videoId} />}
         </div>
 
