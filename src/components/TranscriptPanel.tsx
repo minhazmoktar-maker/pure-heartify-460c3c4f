@@ -1,11 +1,14 @@
 import { useMemo, useState } from "react";
-import { FileText, Loader2, Search } from "lucide-react";
+import { FileText, Languages, Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
 import {
+  TRANSCRIPT_LANGUAGES,
   formatTimestamp,
   useRequestTranscript,
   useTranscript,
   useTranscriptJob,
+  useTranscriptTranslation,
+  useTranslateTranscript,
 } from "@/hooks/useTranscript";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -25,18 +28,42 @@ type Props = {
 export default function TranscriptPanel({ videoId, onSeek }: Props) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
+  const [target, setTarget] = useState("");
   const { user } = useAuth();
   const { data: transcript, isLoading } = useTranscript(videoId);
   const missing = !isLoading && !transcript;
   const { data: jobStatus } = useTranscriptJob(videoId, missing);
   const request = useRequestTranscript(videoId);
+  const sourceLanguage = (transcript?.language ?? "").split("-")[0];
+  const { data: translated, isFetching: translationLoading } = useTranscriptTranslation(
+    videoId,
+    target || null,
+  );
+  const translate = useTranslateTranscript(videoId);
+
+  const onPickLanguage = (code: string) => {
+    setTarget(code);
+    if (!code || code === sourceLanguage) return;
+    if (!user) {
+      toast.error("Sign in to translate this transcript");
+      setTarget("");
+      return;
+    }
+    translate.mutate(code, {
+      onError: (err) => {
+        toast.error((err as Error).message || "Couldn't translate this transcript");
+        setTarget("");
+      },
+    });
+  };
 
   const segments = useMemo(() => {
-    const all = transcript?.segments ?? [];
+    const all = (target && translated?.length ? translated : transcript?.segments) ?? [];
     const q = filter.trim().toLowerCase();
     if (!q) return all;
     return all.filter((s) => s.text.toLowerCase().includes(q));
-  }, [transcript, filter]);
+  }, [transcript, translated, target, filter]);
+
 
   return (
     <section className="mt-6 overflow-hidden rounded-card border border-border bg-card">
@@ -109,6 +136,36 @@ export default function TranscriptPanel({ videoId, onSeek }: Props) {
                   className="min-h-[44px] w-full rounded-pill border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground"
                 />
               </label>
+
+              <div className="mb-3 flex items-center gap-2">
+                <Languages className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                <select
+                  value={target}
+                  onChange={(e) => onPickLanguage(e.target.value)}
+                  aria-label="Transcript language"
+                  className="min-h-[44px] flex-1 rounded-pill border border-border bg-background px-3 text-sm text-foreground"
+                >
+                  <option value="">
+                    Original{transcript.language ? ` (${transcript.language.toUpperCase()})` : ""}
+                  </option>
+                  {TRANSCRIPT_LANGUAGES.filter((l) => l.code !== sourceLanguage).map((l) => (
+                    <option key={l.code} value={l.code}>
+                      {l.label}
+                    </option>
+                  ))}
+                </select>
+                {(translate.isPending || translationLoading) && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden />
+                )}
+              </div>
+
+              {target && translate.isPending && (
+                <p className="mb-2 text-micro text-muted-foreground">
+                  Translating — this takes a few seconds the first time, then it's instant for everyone.
+                </p>
+              )}
+
+
 
               {segments.length === 0 ? (
                 <p className="py-3 text-sm text-muted-foreground">No lines match "{filter}".</p>

@@ -5001,6 +5001,39 @@ export type Database = {
         }
         Relationships: []
       }
+      transcript_translations: {
+        Row: {
+          created_at: string
+          language: string
+          model: string | null
+          segment_count: number
+          segments: Json
+          source_language: string
+          updated_at: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          language: string
+          model?: string | null
+          segment_count?: number
+          segments?: Json
+          source_language: string
+          updated_at?: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          language?: string
+          model?: string | null
+          segment_count?: number
+          segments?: Json
+          source_language?: string
+          updated_at?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       trusted_institutions: {
         Row: {
           country: string | null
@@ -6580,6 +6613,7 @@ export type Database = {
           d7: number
         }[]
       }
+      get_transcript_coverage: { Args: never; Returns: Json }
       get_transparency_appeals: {
         Args: never
         Returns: {
@@ -6817,6 +6851,20 @@ export type Database = {
           member_count: number
           member_limit: number
           name: string
+        }[]
+      }
+      list_signing_institutions: {
+        Args: never
+        Returns: {
+          cosign_count: number
+          country: string
+          logo_url: string
+          name: string
+          org_type: string
+          public_statement: string
+          since: string
+          slug: string
+          website: string
         }[]
       }
       log_admin_review_use: {
