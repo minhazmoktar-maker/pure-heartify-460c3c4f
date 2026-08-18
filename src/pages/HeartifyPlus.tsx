@@ -344,6 +344,39 @@ export default function HeartifyPlus() {
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Free stays free — forever. Heartify+ adds depth for those who want more.
           </p>
+
+          {/* Region picker: prices are PPP-adjusted and charged in the local
+              currency, so members must be able to correct a wrong guess. */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <label htmlFor="pricing-region" className="text-micro text-muted-foreground">
+              Prices for
+            </label>
+            <select
+              id="pricing-region"
+              value={regionKey}
+              onChange={(e) => {
+                setRegionKey(e.target.value);
+                setRegionOverride(e.target.value);
+              }}
+              className="min-h-[44px] rounded-pill border border-border bg-card px-3 text-sm text-foreground"
+            >
+              {Object.entries(PRICING_REGIONS).map(([key, r]) => (
+                <option key={key} value={key}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+            {region.discountPct ? (
+              <span className="rounded-pill bg-primary/10 px-2.5 py-1 text-micro font-semibold text-primary">
+                Fair-price region · ~{region.discountPct}% below global pricing
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-2 text-micro text-muted-foreground">
+            You are charged in {region.currency} by our merchant of record, including any local tax. No
+            currency conversion fees.
+          </p>
+
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {TIERS.map((t) => {
               const Icon = t.icon;
