@@ -220,6 +220,63 @@ export type Database = {
         }
         Relationships: []
       }
+      attestation_cosignatures: {
+        Row: {
+          algorithm: string
+          attestation_id: string | null
+          chain_digest: string
+          id: string
+          institution_id: string
+          revoke_reason: string | null
+          revoked_at: string | null
+          signature: string
+          signed_at: string
+          statement: string | null
+          video_id: string
+        }
+        Insert: {
+          algorithm?: string
+          attestation_id?: string | null
+          chain_digest: string
+          id?: string
+          institution_id: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          signature: string
+          signed_at?: string
+          statement?: string | null
+          video_id: string
+        }
+        Update: {
+          algorithm?: string
+          attestation_id?: string | null
+          chain_digest?: string
+          id?: string
+          institution_id?: string
+          revoke_reason?: string | null
+          revoked_at?: string | null
+          signature?: string
+          signed_at?: string
+          statement?: string | null
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attestation_cosignatures_attestation_id_fkey"
+            columns: ["attestation_id"]
+            isOneToOne: false
+            referencedRelation: "attestations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attestation_cosignatures_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "signing_institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attestations: {
         Row: {
           chain_digest: string
@@ -4672,6 +4729,66 @@ export type Database = {
         }
         Relationships: []
       }
+      signing_institutions: {
+        Row: {
+          contact_email: string | null
+          cosign_count: number
+          country: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          key_hash: string | null
+          key_issued_at: string | null
+          key_prefix: string | null
+          logo_url: string | null
+          name: string
+          org_type: string | null
+          public_statement: string | null
+          slug: string
+          status: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          cosign_count?: number
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_hash?: string | null
+          key_issued_at?: string | null
+          key_prefix?: string | null
+          logo_url?: string | null
+          name: string
+          org_type?: string | null
+          public_statement?: string | null
+          slug: string
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          cosign_count?: number
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          key_hash?: string | null
+          key_issued_at?: string | null
+          key_prefix?: string | null
+          logo_url?: string | null
+          name?: string
+          org_type?: string | null
+          public_statement?: string | null
+          slug?: string
+          status?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       streak_freezes: {
         Row: {
           granted_at: string
@@ -5965,6 +6082,19 @@ export type Database = {
         }[]
       }
       admin_moderation_sla: { Args: never; Returns: Json }
+      admin_register_institution: {
+        Args: {
+          _contact_email?: string
+          _country?: string
+          _logo_url?: string
+          _name: string
+          _org_type?: string
+          _public_statement?: string
+          _slug: string
+          _website?: string
+        }
+        Returns: Json
+      }
       admin_retention_cohorts: {
         Args: never
         Returns: {
@@ -5974,6 +6104,10 @@ export type Database = {
           d30: number
           d7: number
         }[]
+      }
+      admin_set_institution_status: {
+        Args: { _slug: string; _status: string }
+        Returns: undefined
       }
       analytics_active_users: {
         Args: { _from: string; _to: string }
@@ -6100,8 +6234,13 @@ export type Database = {
       backfill_search_tsv: { Args: { _limit?: number }; Returns: number }
       backfill_video_attestations: { Args: { _limit?: number }; Returns: Json }
       benefit_arm_readout: { Args: { _days?: number }; Returns: Json }
+      benefit_arm_stats: { Args: { _days?: number }; Returns: Json }
       benefit_label_stats: { Args: never; Returns: Json }
       benefit_priors_v1: { Args: never; Returns: Json }
+      benefit_ranker_autoramp: {
+        Args: { _min_answered?: number }
+        Returns: Json
+      }
       block_heartify_user: { Args: { _handle: string }; Returns: Json }
       channel_pipeline_tick: { Args: never; Returns: Json }
       check_channel_duplicate: {
@@ -6479,6 +6618,7 @@ export type Database = {
           video_id: string
         }[]
       }
+      get_video_cosignatures: { Args: { _video_id: string }; Returns: Json }
       gift_premium_month: {
         Args: { _months?: number; _note?: string; _recipient: string }
         Returns: Json
@@ -6544,6 +6684,15 @@ export type Database = {
         Args: { _channel: string; _title: string }
         Returns: string
       }
+      institution_cosign: {
+        Args: {
+          _api_key: string
+          _slug: string
+          _statement?: string
+          _video_id: string
+        }
+        Returns: Json
+      }
       is_challenge_member: {
         Args: { _challenge_id: string; _user_id: string }
         Returns: boolean
@@ -6604,6 +6753,7 @@ export type Database = {
           video_count: number
         }[]
       }
+      list_cosigning_institutions: { Args: never; Returns: Json }
       list_dua_wall: {
         Args: { _limit?: number }
         Returns: {
@@ -6960,6 +7110,10 @@ export type Database = {
       report_heartify_user: {
         Args: { _description?: string; _handle: string; _reason: string }
         Returns: Json
+      }
+      requeue_stale_transcript_jobs: {
+        Args: { _minutes?: number }
+        Returns: number
       }
       respond_challenge_invite: {
         Args: { _accept: boolean; _challenge_id: string }

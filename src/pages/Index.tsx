@@ -10,7 +10,6 @@ import StreakAtRiskBanner from "@/components/StreakAtRiskBanner";
 import RamadanBanner from "@/components/RamadanBanner";
 import JumuahBanner from "@/components/JumuahBanner";
 import FirstSessionCard from "@/components/FirstSessionCard";
-import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
 import { useAuth } from "@/contexts/AuthContext";
 import SurfaceRail from "@/components/SurfaceRail";
 import HomeHero from "@/components/HomeHero";
@@ -154,7 +153,6 @@ const Index = () => {
               <StreakAtRiskBanner />
               <RamadanBanner />
               <JumuahBanner />
-              <BenefitLabelPrompt />
               <FirstSessionCard />
               <WeeklyRecapCard />
               <CircleWidget />

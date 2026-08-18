@@ -237,6 +237,7 @@ const Transparency = lazy(() => import("./pages/Transparency.tsx"));
 const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
 const AdminAppeals = lazy(() => import("./pages/AdminAppeals.tsx"));
 const AdminExperiments = lazy(() => import("./pages/AdminExperiments.tsx"));
+const AdminInstitutions = lazy(() => import("./pages/AdminInstitutions.tsx"));
 const AdminFeatureFlags = lazy(() => import("./pages/AdminFeatureFlags.tsx"));
 const AdminRetention = lazy(() => import("./pages/AdminRetention.tsx"));
 
@@ -340,6 +341,7 @@ const App = () => (
                 <Route path="/creators/dashboard" element={<CreatorDashboard />} />
                 <Route path="/admin/appeals" element={<AdminRoute><AdminAppeals /></AdminRoute>} />
                 <Route path="/admin/experiments" element={<AdminRoute><AdminExperiments /></AdminRoute>} />
+                <Route path="/admin/institutions" element={<AdminRoute><AdminInstitutions /></AdminRoute>} />
                 <Route path="/admin/feature-flags" element={<AdminRoute><AdminFeatureFlags /></AdminRoute>} />
                 <Route path="/admin/retention" element={<AdminRoute><AdminRetention /></AdminRoute>} />
                 <Route path="/channels" element={<Channels />} />
