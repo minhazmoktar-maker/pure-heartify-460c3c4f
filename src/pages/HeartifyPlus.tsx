@@ -209,13 +209,16 @@ export default function HeartifyPlus() {
   const { isPremium, entitlement, loading: entLoading } = useEntitlement();
   const { alreadyOnList, join } = usePlusWaitlist();
   const { locale } = useLocale();
-  // Prices are billed in USD. We display USD explicitly (localized formatting
-  // only) rather than swapping the currency symbol, because we do not apply
-  // FX conversion — showing "₹4.99" for a $4.99 tier misleads users.
-  const formatPrice = (usd: number) =>
-    usd === 0
-      ? formatCurrency(0, locale, "USD", { maximumFractionDigits: 0 })
-      : formatCurrency(usd, locale, "USD");
+  // Prices are purchasing-power adjusted per region and charged in that
+  // region's own currency by our merchant of record — not an FX conversion of
+  // the USD price. Region is inferred from the browser locale and overridable.
+  const [regionKey, setRegionKey] = useState(() => detectRegionKey());
+  const region = PRICING_REGIONS[regionKey] ?? PRICING_REGIONS.global;
+  const formatPrice = (planId: Tier["id"]) =>
+    planId === "free"
+      ? formatCurrency(0, locale, region.currency, { maximumFractionDigits: 0 })
+      : formatPlanPrice(region, planId);
+
 
 
   const [email, setEmail] = useState(user?.email ?? "");
