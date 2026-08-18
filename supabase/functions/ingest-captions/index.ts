@@ -258,12 +258,21 @@ Deno.serve(async (req) => {
     .update({ status: "running", updated_at: new Date().toISOString() })
     .in("video_id", targets.map((t) => t.video_id));
 
-  // Sequential on purpose: Gemini video transcription is heavy, and serial work
-  // keeps this worker inside its CPU/wall budget at any queue depth.
-  const results = [];
-  for (const t of targets) {
-    results.push(await processVideo(admin, t.video_id, t.language_hint));
-  }
+  // Gemini video transcription regularly exceeds the 150s *request* idle limit,
+  // so the work runs in the background task budget and the caller gets an
+  // immediate 202. Job rows carry the real status; stalled `running` rows are
+  // recovered by the requeue_stale_transcript_jobs cron.
+  const work = (async () => {
+    for (const t of targets) {
+      const r = await processVideo(admin, t.video_id, t.language_hint);
+      console.log("transcript result", JSON.stringify(r));
+    }
+  })();
 
-  return json({ processed: results.length, results });
+  // @ts-expect-error EdgeRuntime is provided by the Supabase Deno runtime.
+  if (typeof EdgeRuntime !== "undefined") EdgeRuntime.waitUntil(work);
+  else await work;
+
+  return json({ accepted: targets.length, video_ids: targets.map((t) => t.video_id) }, 202);
 });
+
