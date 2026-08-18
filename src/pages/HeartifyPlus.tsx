@@ -380,10 +380,11 @@ export default function HeartifyPlus() {
                   <p className="mt-2 text-micro text-muted-foreground">{t.tagline}</p>
                   <div className="mt-4 flex items-baseline gap-1">
                     <span className="font-heading text-title font-bold text-foreground">
-                      {formatPrice(t.priceUsd)}
+                      {formatPrice(t.id)}
                     </span>
                     <span className="text-micro text-muted-foreground">/ {t.period}</span>
                   </div>
+
                   <ul className="mt-4 flex-1 space-y-2">
                     {t.bullets.map((b) => (
                       <li key={b.text} className="flex items-start gap-2 text-sm">
