@@ -105,8 +105,17 @@ export function installViteRecovery() {
     const reason = event.reason as Error | string | undefined;
     const msg = typeof reason === "string" ? reason : reason?.message ?? "";
     const stack = typeof reason === "string" ? undefined : reason?.stack;
+    // Benign: supabase-js Web Lock is intentionally "stolen" when a newer
+    // token-refresh attempt supersedes a stalled one (e.g. after the network
+    // drops or a second tab wakes up). It is internal bookkeeping, not an app
+    // fault, so keep it out of the error overlay/reporting.
+    if (/Lock broken by another request with the 'steal' option/i.test(msg)) {
+      event.preventDefault();
+      return;
+    }
     if (isViteCacheError(msg, stack)) void recoverFromViteCache(msg);
   });
+
 
   // If the tree mounted and painted, the cache is fine — release the guard.
   window.addEventListener("load", () => {
