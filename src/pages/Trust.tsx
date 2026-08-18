@@ -1,10 +1,37 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server, ShieldCheck } from "lucide-react";
+import { Shield, Lock, Eye, FileCheck, Users, AlertCircle, Database, Clock, Server, ShieldCheck, Landmark } from "lucide-react";
+
+type SigningInstitution = {
+  slug: string;
+  name: string;
+  org_type: string | null;
+  country: string | null;
+  website: string | null;
+  logo_url: string | null;
+  public_statement: string | null;
+  cosign_count: number | null;
+  since: string | null;
+};
+
+function useSigningInstitutions() {
+  return useQuery({
+    queryKey: ["signing-institutions"],
+    queryFn: async (): Promise<SigningInstitution[]> => {
+      const { data, error } = await supabase.rpc("list_signing_institutions");
+      if (error) throw error;
+      return (data ?? []) as SigningInstitution[];
+    },
+    staleTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
 
 type TrustStats = {
   approved_channels: number;
@@ -55,6 +82,8 @@ function StatTile({ label, value, loading }: { label: string; value?: number; lo
  */
 export default function Trust() {
   const { data: stats, isLoading } = useTrustStats();
+  const { data: institutions, isLoading: institutionsLoading } = useSigningInstitutions();
+
   const surfaced = stats?.surfaced_videos ?? 0;
   const coveragePct =
     surfaced > 0
@@ -124,6 +153,64 @@ export default function Trust() {
           </p>
 
         </section>
+
+        {/* Institutions that independently co-sign our attestation ledger. Only
+            public directory fields are exposed — signing keys never leave the
+            backend. Empty state is honest: it invites partners instead of
+            implying endorsements we do not have. */}
+        <section aria-label="Independent co-signers" className="mt-8">
+          <div className="mb-3 flex items-center gap-2 text-micro font-semibold uppercase tracking-wider text-muted-foreground">
+            <Landmark className="h-3.5 w-3.5 text-primary" />
+            Independent co-signers
+          </div>
+          <Card className="p-6">
+            <p className="text-sm text-muted-foreground">
+              Institutions can cryptographically co-sign entries in our attestation ledger. A co-signature
+              binds their key to the exact ledger state at signing time, so anyone can verify it later on the{" "}
+              <Link to="/verify" className="text-primary underline underline-offset-2">
+                verification page
+              </Link>
+              .
+            </p>
+
+            {institutionsLoading ? (
+              <div className="mt-4 space-y-2">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            ) : institutions && institutions.length > 0 ? (
+              <ul className="mt-4 divide-y divide-border">
+                {institutions.map((i) => (
+                  <li key={i.slug} className="flex items-center justify-between gap-3 py-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold text-foreground">{i.name}</div>
+                      <div className="truncate text-micro text-muted-foreground">
+                        {[i.org_type, i.country].filter(Boolean).join(" · ")}
+                      </div>
+                    </div>
+                    <span className="shrink-0 rounded-pill bg-muted px-2.5 py-1 text-micro tabular-nums text-muted-foreground">
+                      {(i.cosign_count ?? 0).toLocaleString()} co-signatures
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 rounded-card border border-dashed border-border p-4 text-sm text-muted-foreground">
+                No institutions have co-signed yet. We publish partners here only once their signature is on
+                the ledger — never as a logo wall.
+              </p>
+            )}
+
+            <Link
+              to="/contact"
+              className="mt-4 inline-flex min-h-[44px] items-center rounded-pill bg-primary px-4 text-sm font-semibold text-primary-foreground"
+            >
+              Become a co-signing institution
+            </Link>
+          </Card>
+        </section>
+
+
 
         <div className="mt-8 grid gap-4">
           <Card className="p-6">

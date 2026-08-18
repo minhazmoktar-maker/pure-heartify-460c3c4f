@@ -178,10 +178,13 @@ async function processVideo(
   admin: SupabaseClient,
   videoId: string,
   languageHint: string | null,
+  allowAi: boolean,
 ): Promise<{ video_id: string; ok: boolean; source?: string; segments?: number; error?: string }> {
   try {
-    const t = (await fromTimedText(videoId)) ?? (await fromGemini(videoId, languageHint));
-    if (!t) throw new Error("no transcript source available");
+    // Bulk lane (allowAi = false) only uses the free caption source, so the
+    // backlog can be drained at tens of thousands per day without AI spend.
+    const t = (await fromTimedText(videoId)) ?? (allowAi ? await fromGemini(videoId, languageHint) : null);
+    if (!t) throw new Error(allowAi ? "no transcript source available" : "no free captions");
     await persist(admin, videoId, t);
     await admin
       .from("transcript_jobs")
@@ -197,21 +200,25 @@ async function processVideo(
       .maybeSingle();
     const attempts = ((job?.attempts as number | undefined) ?? 0) + 1;
     const backoffMinutes = Math.min(6 * 60, 5 * 2 ** (attempts - 1));
+    // Videos with no free captions park in `needs_ai` — a terminal state for the
+    // bulk lane that a member request (or an AI sweep) can escalate later.
+    const parked = !allowAi && message === "no free captions";
     await admin.from("transcript_jobs").upsert(
       {
         video_id: videoId,
         attempts,
-        status: attempts >= MAX_ATTEMPTS ? "failed" : "queued",
+        status: parked ? "needs_ai" : attempts >= MAX_ATTEMPTS ? "failed" : "queued",
         error: message,
         next_attempt_at: new Date(Date.now() + backoffMinutes * 60_000).toISOString(),
         updated_at: new Date().toISOString(),
       },
       { onConflict: "video_id" },
     );
-    console.error("transcript failed", videoId, message);
+    if (!parked) console.error("transcript failed", videoId, message);
     return { video_id: videoId, ok: false, error: message };
   }
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -227,10 +234,32 @@ Deno.serve(async (req) => {
   );
 
   const body = await req.json().catch(() => ({}));
-  const limit = Math.min(Math.max(Number(body.limit ?? 3), 1), 10);
+  // Bulk lane (allow_ai=false) is free-captions-only. YouTube now serves empty
+  // timedtext bodies to server IPs, so the free lane rarely lands and the AI
+  // lane does the real work under a daily budget cap.
+  const allowAi = body.allow_ai !== false;
+  const limit = Math.min(Math.max(Number(body.limit ?? (allowAi ? 3 : 40)), 1), allowAi ? 10 : 120);
+  const concurrency = Math.min(allowAi ? Math.max(1, Number(body.concurrency ?? 3)) : Math.max(1, Number(body.concurrency ?? 8)), 12);
   const explicit: string[] = Array.isArray(body.video_ids)
     ? (body.video_ids as unknown[]).filter((v): v is string => typeof v === "string" && v.length <= 32).slice(0, 10)
     : [];
+
+  // Cost guard: never transcribe more than `daily_cap` videos with AI per UTC day.
+  if (allowAi && !explicit.length) {
+    const dailyCap = Math.max(0, Number(body.daily_cap ?? 600));
+    const since = new Date();
+    since.setUTCHours(0, 0, 0, 0);
+    const { count } = await admin
+      .from("video_transcripts")
+      .select("video_id", { count: "exact", head: true })
+      .eq("source", "ai_gemini")
+      .gte("created_at", since.toISOString());
+    if ((count ?? 0) >= dailyCap) {
+      return json({ processed: 0, skipped: "daily_ai_cap_reached", transcribed_today: count ?? 0 });
+    }
+  }
+
+
 
   let targets: Array<{ video_id: string; language_hint: string | null }> = [];
   if (explicit.length) {
@@ -243,7 +272,8 @@ Deno.serve(async (req) => {
     const { data } = await admin
       .from("transcript_jobs")
       .select("video_id, language_hint")
-      .eq("status", "queued")
+      // The AI lane also picks up rows the bulk lane parked as `needs_ai`.
+      .in("status", allowAi ? ["queued", "needs_ai"] : ["queued"])
       .lte("next_attempt_at", new Date().toISOString())
       .order("priority", { ascending: false })
       .order("next_attempt_at", { ascending: true })
@@ -263,16 +293,26 @@ Deno.serve(async (req) => {
   // immediate 202. Job rows carry the real status; stalled `running` rows are
   // recovered by the requeue_stale_transcript_jobs cron.
   const work = (async () => {
-    for (const t of targets) {
-      const r = await processVideo(admin, t.video_id, t.language_hint);
-      console.log("transcript result", JSON.stringify(r));
-    }
+    const queue = [...targets];
+    let done = 0;
+    const workers = Array.from({ length: Math.min(concurrency, queue.length) }, async () => {
+      for (;;) {
+        const t = queue.shift();
+        if (!t) return;
+        const r = await processVideo(admin, t.video_id, t.language_hint, allowAi);
+        done += 1;
+        if (r.ok || allowAi) console.log("transcript result", JSON.stringify(r));
+      }
+    });
+    await Promise.all(workers);
+    console.log(`transcript batch complete: ${done}/${targets.length} allow_ai=${allowAi}`);
   })();
 
   // @ts-expect-error EdgeRuntime is provided by the Supabase Deno runtime.
   if (typeof EdgeRuntime !== "undefined") EdgeRuntime.waitUntil(work);
   else await work;
 
-  return json({ accepted: targets.length, video_ids: targets.map((t) => t.video_id) }, 202);
+  return json({ accepted: targets.length, allow_ai: allowAi, concurrency }, 202);
+
 });
 

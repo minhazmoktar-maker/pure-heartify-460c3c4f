@@ -33,6 +33,13 @@ import { usePlusWaitlist, type PreferredTier } from "@/hooks/usePlusWaitlist";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/contexts/LocaleContext";
 import { formatCurrency } from "@/lib/intl";
+import {
+  PRICING_REGIONS,
+  detectRegionKey,
+  formatPlanPrice,
+  setRegionOverride,
+} from "@/lib/pricing";
+
 
 
 interface Tier {
@@ -209,13 +216,16 @@ export default function HeartifyPlus() {
   const { isPremium, entitlement, loading: entLoading } = useEntitlement();
   const { alreadyOnList, join } = usePlusWaitlist();
   const { locale } = useLocale();
-  // Prices are billed in USD. We display USD explicitly (localized formatting
-  // only) rather than swapping the currency symbol, because we do not apply
-  // FX conversion — showing "₹4.99" for a $4.99 tier misleads users.
-  const formatPrice = (usd: number) =>
-    usd === 0
-      ? formatCurrency(0, locale, "USD", { maximumFractionDigits: 0 })
-      : formatCurrency(usd, locale, "USD");
+  // Prices are purchasing-power adjusted per region and charged in that
+  // region's own currency by our merchant of record — not an FX conversion of
+  // the USD price. Region is inferred from the browser locale and overridable.
+  const [regionKey, setRegionKey] = useState(() => detectRegionKey());
+  const region = PRICING_REGIONS[regionKey] ?? PRICING_REGIONS.global;
+  const formatPrice = (planId: Tier["id"]) =>
+    planId === "free"
+      ? formatCurrency(0, locale, region.currency, { maximumFractionDigits: 0 })
+      : formatPlanPrice(region, planId);
+
 
 
   const [email, setEmail] = useState(user?.email ?? "");
@@ -334,6 +344,39 @@ export default function HeartifyPlus() {
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Free stays free — forever. Heartify+ adds depth for those who want more.
           </p>
+
+          {/* Region picker: prices are PPP-adjusted and charged in the local
+              currency, so members must be able to correct a wrong guess. */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <label htmlFor="pricing-region" className="text-micro text-muted-foreground">
+              Prices for
+            </label>
+            <select
+              id="pricing-region"
+              value={regionKey}
+              onChange={(e) => {
+                setRegionKey(e.target.value);
+                setRegionOverride(e.target.value);
+              }}
+              className="min-h-[44px] rounded-pill border border-border bg-card px-3 text-sm text-foreground"
+            >
+              {Object.entries(PRICING_REGIONS).map(([key, r]) => (
+                <option key={key} value={key}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+            {region.discountPct ? (
+              <span className="rounded-pill bg-primary/10 px-2.5 py-1 text-micro font-semibold text-primary">
+                Fair-price region · ~{region.discountPct}% below global pricing
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-2 text-micro text-muted-foreground">
+            You are charged in {region.currency} by our merchant of record, including any local tax. No
+            currency conversion fees.
+          </p>
+
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {TIERS.map((t) => {
               const Icon = t.icon;
@@ -370,10 +413,11 @@ export default function HeartifyPlus() {
                   <p className="mt-2 text-micro text-muted-foreground">{t.tagline}</p>
                   <div className="mt-4 flex items-baseline gap-1">
                     <span className="font-heading text-title font-bold text-foreground">
-                      {formatPrice(t.priceUsd)}
+                      {formatPrice(t.id)}
                     </span>
                     <span className="text-micro text-muted-foreground">/ {t.period}</span>
                   </div>
+
                   <ul className="mt-4 flex-1 space-y-2">
                     {t.bullets.map((b) => (
                       <li key={b.text} className="flex items-start gap-2 text-sm">
@@ -538,9 +582,10 @@ export default function HeartifyPlus() {
                     onChange={(e) => setTier(e.target.value as PreferredTier)}
                     className="flex h-10 w-full rounded-card border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
-                    <option value="plus">Heartify+ ($4.99 / month)</option>
-                    <option value="family">Heartify+ Family ($8.99 / month)</option>
-                    <option value="lifetime">Heartify+ Lifetime ($149 one‑time)</option>
+                   <option value="plus">Heartify+ ({formatPrice("plus")} / month)</option>
+                   <option value="family">Heartify+ Family ({formatPrice("family")} / month)</option>
+                   <option value="lifetime">Heartify+ Lifetime ({formatPrice("lifetime")} one‑time)</option>
+
                   </select>
                 </div>
                 <Button
