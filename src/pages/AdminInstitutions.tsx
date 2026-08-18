@@ -94,8 +94,9 @@ export default function AdminInstitutions() {
       <SEO
         title="Co-signing institutions · Heartify admin"
         description="Onboard partner institutions that independently co-sign Heartify moderation attestations."
-        noindex
+        path="/admin/institutions"
       />
+
       <main className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <h1 className="flex items-center gap-2 text-title font-semibold">
           <Building2 className="h-5 w-5 text-primary" aria-hidden />
