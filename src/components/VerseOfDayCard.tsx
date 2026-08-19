@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { BookOpen, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { heartAyahForDay, ayahDayIndex } from "@/data/heartAyat";
 
 type Ayah = { arabic: string; english: string; ref: string; surah: number; ayah: number };
 
-// Deterministic daily seed so the verse is stable within a day.
+// Deterministic daily seed so the verse is stable within a day and advances
+// to a genuinely new curated ayah every day (423-long rotation).
 function dailySeed() {
-  const d = new Date();
-  return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+  return ayahDayIndex();
 }
 
 const REVEAL_KEY = "verse:last-revealed-seed";
@@ -51,27 +52,8 @@ const VerseOfDayCard = () => {
       }
     } catch { /* private mode — silently skip reveal */ }
 
-    let cancelled = false;
-    const n = (seed % 6236) + 1;
-    (async () => {
-      try {
-        const [ar, en] = await Promise.all([
-          fetch(`https://api.alquran.cloud/v1/ayah/${n}/ar.alafasy`).then((r) => r.json()),
-          fetch(`https://api.alquran.cloud/v1/ayah/${n}/en.sahih`).then((r) => r.json()),
-        ]);
-        if (cancelled) return;
-        const surah = ar?.data?.surah?.number ?? 1;
-        const ayahNo = ar?.data?.numberInSurah ?? 1;
-        setAyah({
-          arabic: ar?.data?.text ?? "",
-          english: en?.data?.text ?? "",
-          ref: `${ar?.data?.surah?.englishName ?? "Al-Fatiha"} ${surah}:${ayahNo}`,
-          surah,
-          ayah: ayahNo,
-        });
-      } catch { /* offline */ }
-    })();
-    return () => { cancelled = true; };
+    const pick = heartAyahForDay();
+    setAyah({ arabic: pick.ar, english: pick.en, ref: pick.ref, surah: pick.s, ayah: pick.a });
   }, [seed, prefersReducedMotion]);
 
 

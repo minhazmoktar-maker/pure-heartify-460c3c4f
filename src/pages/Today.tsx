@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sunrise, BookOpen, BookText, Target, Flame, Compass, ArrowRight, Sparkles, Loader2, WifiOff } from "lucide-react";
 import { ASMA_UL_HUSNA } from "@/data/asmaUlHusna";
+import { heartAyahForDay } from "@/data/heartAyat";
 
 // Cached daily payloads to avoid re-fetching
 const DAILY_CACHE_KEY = "heartify.today.cache.v1";
@@ -29,23 +30,7 @@ function dayIndex() {
 
 // Bundled offline fallback so /today is never a dead screen on a cold cache
 // with no network — the one screen the user can return to 10× a day guilt-free.
-const FALLBACK_AYAT: NonNullable<DailyCache["ayah"]>[] = [
-  {
-    arabic: "إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",
-    english: "Indeed, with hardship comes ease.",
-    ref: "Surah Ash-Sharh 94:6",
-  },
-  {
-    arabic: "وَٱذْكُر رَّبَّكَ إِذَا نَسِيتَ",
-    english: "And remember your Lord when you forget.",
-    ref: "Surah Al-Kahf 18:24",
-  },
-  {
-    arabic: "حَسْبُنَا ٱللَّهُ وَنِعْمَ ٱلْوَكِيلُ",
-    english: "Sufficient for us is Allah, and He is the best Disposer of affairs.",
-    ref: "Surah Aal-Imran 3:173",
-  },
-];
+
 const FALLBACK_HADITH: NonNullable<DailyCache["hadith"]>[] = [
   {
     text: "Actions are but by intention, and every person will have only what they intended.",
@@ -66,25 +51,15 @@ export async function loadDaily(): Promise<DailyCache> {
   } catch { /* ignore */ }
 
   const idx = dayIndex();
-  const ayahNum = (idx % 6236) + 1;
   const hadithNum = (idx % 40) + 1;
   const cache: DailyCache = { date: todayISO() };
 
-  try {
-    const [arabicRes, englishRes] = await Promise.all([
-      fetch(`https://api.alquran.cloud/v1/ayah/${ayahNum}/ar.alafasy`),
-      fetch(`https://api.alquran.cloud/v1/ayah/${ayahNum}/en.sahih`),
-    ]);
-    if (arabicRes.ok && englishRes.ok) {
-      const ar = await arabicRes.json();
-      const en = await englishRes.json();
-      cache.ayah = {
-        arabic: ar.data.text,
-        english: en.data.text,
-        ref: `Surah ${en.data.surah.englishName} ${en.data.surah.number}:${en.data.numberInSurah}`,
-      };
-    }
-  } catch { /* offline */ }
+  // Ayah of the day comes from the curated heart-touching rotation — bundled,
+  // instant, and guaranteed to be a different ayah every day for 423 days.
+  {
+    const pick = heartAyahForDay();
+    cache.ayah = { arabic: pick.ar, english: pick.en, ref: `Surah ${pick.ref}` };
+  }
 
   try {
     const r = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-nawawi/${hadithNum}.min.json`);
@@ -96,10 +71,6 @@ export async function loadDaily(): Promise<DailyCache> {
   } catch { /* offline */ }
 
   // Bundled fallback when both sources failed and no prior cache exists.
-  if (!cache.ayah) {
-    cache.ayah = FALLBACK_AYAT[idx % FALLBACK_AYAT.length];
-    cache.fallback = true;
-  }
   if (!cache.hadith) {
     cache.hadith = FALLBACK_HADITH[idx % FALLBACK_HADITH.length];
     cache.fallback = true;
