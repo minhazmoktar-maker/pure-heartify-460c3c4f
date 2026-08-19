@@ -1600,6 +1600,8 @@ export type Database = {
           channel_id: string | null
           channel_title: string
           content_language: string | null
+          embed_checked_at: string | null
+          embeddable: boolean
           embedding: string | null
           embedding_model: string | null
           embedding_updated_at: string | null
@@ -1641,6 +1643,8 @@ export type Database = {
           channel_id?: string | null
           channel_title: string
           content_language?: string | null
+          embed_checked_at?: string | null
+          embeddable?: boolean
           embedding?: string | null
           embedding_model?: string | null
           embedding_updated_at?: string | null
@@ -1682,6 +1686,8 @@ export type Database = {
           channel_id?: string | null
           channel_title?: string
           content_language?: string | null
+          embed_checked_at?: string | null
+          embeddable?: boolean
           embedding?: string | null
           embedding_model?: string | null
           embedding_updated_at?: string | null
@@ -7158,6 +7164,10 @@ export type Database = {
       report_heartify_user: {
         Args: { _description?: string; _handle: string; _reason: string }
         Returns: Json
+      }
+      report_video_unplayable: {
+        Args: { _reason?: string; _video_id: string }
+        Returns: boolean
       }
       requeue_stale_transcript_jobs: {
         Args: { _minutes?: number }
