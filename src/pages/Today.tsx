@@ -51,7 +51,6 @@ export async function loadDaily(): Promise<DailyCache> {
   } catch { /* ignore */ }
 
   const idx = dayIndex();
-  const ayahNum = (idx % 6236) + 1;
   const hadithNum = (idx % 40) + 1;
   const cache: DailyCache = { date: todayISO() };
 
