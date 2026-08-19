@@ -16,6 +16,8 @@
  *   { mode?: "channels" | "discovery" | "both", channels_per_run?: number, discovery_queries?: number }
  */
 
+import { observed } from "../_shared/observe.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -1130,7 +1132,7 @@ async function isAuthorizedCaller(req: Request): Promise<boolean> {
   } catch { return false; }
 }
 
-Deno.serve(async (req) => {
+Deno.serve(observed("ingest-videos", async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -1255,4 +1257,4 @@ Deno.serve(async (req) => {
     console.error("Ingestion error:", error);
     return json({ error: String(error) }, 500);
   }
-});
+}));

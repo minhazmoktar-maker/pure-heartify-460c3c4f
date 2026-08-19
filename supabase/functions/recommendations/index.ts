@@ -22,6 +22,7 @@ import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
 import { toPgVector } from "../_shared/embed.ts";
 import { readThrough } from "../_shared/cache.ts";
+import { observed } from "../_shared/observe.ts";
 
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -35,7 +36,7 @@ async function resolveUser(req: Request): Promise<string | null> {
   return data?.user?.id ?? null;
 }
 
-Deno.serve(async (req) => {
+Deno.serve(observed("recommendations", async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const url = new URL(req.url);
@@ -111,7 +112,7 @@ Deno.serve(async (req) => {
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
   }
-});
+}));
 
 interface ComputeArgs {
   userId: string | null;

@@ -20,6 +20,7 @@ import { runUniversalFilters, loadImpressions } from "../_shared/surfaces/filter
 import { enforceContract, computeStats, checkGuarantees } from "../_shared/surfaces/diversity.ts";
 import { loadFeedConfig } from "../_shared/surfaces/config.ts";
 import type { SurfaceContext, SurfaceResponse, SurfaceVideo } from "../_shared/surfaces/types.ts";
+import { observed } from "../_shared/observe.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -160,7 +161,7 @@ function logMetrics(service: any, m: {
 }
 
 
-Deno.serve(async (req) => {
+Deno.serve(observed("surfaces", async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
@@ -355,4 +356,4 @@ Deno.serve(async (req) => {
     console.error("[surfaces] error", e);
     return json({ error: "internal", message: (e as Error).message }, 500);
   }
-});
+}));

@@ -2768,6 +2768,39 @@ export type Database = {
         }
         Relationships: []
       }
+      function_metrics: {
+        Row: {
+          created_at: string
+          duration_ms: number
+          error_message: string | null
+          fn_name: string
+          id: number
+          ok: boolean
+          release: string | null
+          status_code: number
+        }
+        Insert: {
+          created_at?: string
+          duration_ms: number
+          error_message?: string | null
+          fn_name: string
+          id?: number
+          ok?: boolean
+          release?: string | null
+          status_code: number
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number
+          error_message?: string | null
+          fn_name?: string
+          id?: number
+          ok?: boolean
+          release?: string | null
+          status_code?: number
+        }
+        Relationships: []
+      }
       gift_codes: {
         Row: {
           code: string
@@ -6460,6 +6493,19 @@ export type Database = {
           user_handle: string
         }[]
       }
+      function_health: {
+        Args: { p_hours?: number }
+        Returns: {
+          error_rate: number
+          errors: number
+          fn_name: string
+          last_seen: string
+          max_ms: number
+          p50_ms: number
+          p95_ms: number
+          requests: number
+        }[]
+      }
       generate_alias_variants: { Args: { _name: string }; Returns: string[] }
       get_beneficial_sources_directory: {
         Args: { _domain?: string; _limit?: number }
@@ -7084,6 +7130,7 @@ export type Database = {
       }
       prune_topic_queries: { Args: never; Returns: number }
       purge_feed_impressions: { Args: never; Returns: number }
+      purge_function_metrics: { Args: never; Returns: number }
       rate_limit_cleanup: {
         Args: { _older_than_minutes?: number }
         Returns: number
