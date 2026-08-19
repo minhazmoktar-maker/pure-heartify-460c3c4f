@@ -19,6 +19,7 @@ import {
   alternateByCreatorAndCategory,
 } from "../_shared/recommendations/rerankV3.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { observed } from "../_shared/observe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -47,7 +48,7 @@ function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
   });
 }
 
-Deno.serve(async (req) => {
+Deno.serve(observed("feed", async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -650,4 +651,4 @@ Deno.serve(async (req) => {
     console.error("Feed error:", error);
     return json({ error: "Internal server error" }, 500);
   }
-});
+}));

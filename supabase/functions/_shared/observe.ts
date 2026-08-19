@@ -154,12 +154,8 @@ export function observed(fnName: string, handler: Handler): Handler {
         );
       }
 
-      // Fire-and-forget, but keep the isolate alive until they settle.
-      const settle = Promise.allSettled(tasks);
-      // deno-lint-ignore no-explicit-any
-      const wt = (globalThis as any).Deno?.core?.opAsync ? null : null;
-      void wt;
-      void settle;
+      // Fire-and-forget — never block the response on telemetry.
+      void Promise.allSettled(tasks);
     }
   };
 }
