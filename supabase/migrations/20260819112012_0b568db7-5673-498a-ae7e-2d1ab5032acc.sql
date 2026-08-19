@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.report_video_unplayable(text, text) FROM anon;

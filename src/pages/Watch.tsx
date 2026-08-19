@@ -86,7 +86,11 @@ const Watch = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [autoNextIn, setAutoNextIn] = useState<number | null>(null);
   const [playerActivated, setPlayerActivated] = useState(false);
+  // Set when YouTube refuses off-site playback (error 101/150) or the video is
+  // gone (100). The video is then flagged server-side so nobody sees it again.
+  const [playbackBlocked, setPlaybackBlocked] = useState(false);
   const completedRef = useRef<string | null>(null);
+
 
   /**
    * Jump the embedded player to a transcript moment. The facade is activated
@@ -211,8 +215,58 @@ const Watch = () => {
     setPlayerActivated(false);
     setShowOverlay(false);
     setAutoNextIn(null);
+    setPlaybackBlocked(false);
     completedRef.current = null;
   }, [videoId]);
+
+  /**
+   * Listen for YouTube IFrame API errors. 101/150 = embedding disabled by the
+   * owner, 100/5 = removed/unplayable. Any of those means the video can never
+   * play inside Heartify, so we report it (hides it from every surface for all
+   * users) and move the viewer straight to the next video.
+   */
+  useEffect(() => {
+    if (!playerActivated || !videoId) return;
+    const onMessage = (e: MessageEvent) => {
+      if (!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin)) return;
+      let payload: { event?: string; info?: unknown } | null = null;
+      try {
+        payload = typeof e.data === "string" ? JSON.parse(e.data) : (e.data as typeof payload);
+      } catch {
+        return;
+      }
+      if (!payload || payload.event !== "onError") return;
+      const code = Number(payload.info);
+      if (![2, 5, 100, 101, 150].includes(code)) return;
+      setPlaybackBlocked(true);
+      void supabase.rpc("report_video_unplayable", {
+        _video_id: videoId,
+        _reason: code === 101 || code === 150 ? "embed_disabled" : `yt_error_${code}`,
+      });
+    };
+    window.addEventListener("message", onMessage);
+    // Handshake — the player only emits events after a `listening` message.
+    const hello = () =>
+      iframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "listening", id: videoId, channel: "heartify" }),
+        "*",
+      );
+    const timers = [0, 400, 1200].map((d) => window.setTimeout(hello, d));
+    return () => {
+      window.removeEventListener("message", onMessage);
+      timers.forEach((t) => window.clearTimeout(t));
+    };
+  }, [playerActivated, videoId]);
+
+  // Auto-advance away from a blocked video so the session never dead-ends.
+  useEffect(() => {
+    if (!playbackBlocked || !nextVideo) return;
+    const t = window.setTimeout(() => {
+      navigate(`/watch/${nextVideo.id}`, { state: { video: nextVideo } });
+    }, 4000);
+    return () => window.clearTimeout(t);
+  }, [playbackBlocked, nextVideo, navigate]);
+
 
   // Autoplay countdown once overlay appears
   useEffect(() => {
@@ -397,12 +451,30 @@ const Watch = () => {
             Back
           </button>
 
-          {isEmbeddableVideo ? (
+          {playbackBlocked ? (
+            <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-card border border-border bg-card px-6 text-center">
+              <p className="text-heading font-semibold text-foreground">This video can't play inside Heartify</p>
+              <p className="max-w-md text-sm text-muted-foreground">
+                The owner disabled off-site playback. We've removed it from Heartify so it won't
+                show up again{nextVideo ? " — taking you to the next video." : "."}
+              </p>
+              {nextVideo && (
+                <button
+                  onClick={handleNext}
+                  className="mt-1 flex items-center gap-2 rounded-pill bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  <Play className="h-4 w-4 fill-current" />
+                  Play next now
+                </button>
+              )}
+            </div>
+          ) : isEmbeddableVideo ? (
             <div
               className="relative aspect-video w-full overflow-hidden rounded-card bg-black"
               style={{ viewTransitionName: `video-${videoId}` } as React.CSSProperties}
             >
               {playerActivated ? (
+
                 <iframe
                   ref={iframeRef}
                   src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1${startTimeParam ? `&start=${startTimeParam}` : ""}&origin=${window.location.origin}`}

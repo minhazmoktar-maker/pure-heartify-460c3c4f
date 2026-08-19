@@ -592,7 +592,43 @@ async function sbFetch(path: string, init: RequestInit = {}) {
   });
 }
 
+/**
+ * Keep only rows YouTube reports as embeddable + publicly playable.
+ * Non-embeddable videos show "Playback on other websites has been disabled"
+ * in our player, which is a broken experience, so we reject them at ingest.
+ * On API failure we fail open (keep the rows) — the client-side reporter and
+ * the nightly sweep will catch stragglers.
+ */
+async function filterEmbeddable(rows: Record<string, unknown>[]): Promise<Record<string, unknown>[]> {
+  if (!rows.length) return rows;
+  const out: Record<string, unknown>[] = [];
+  for (let i = 0; i < rows.length; i += 50) {
+    const slice = rows.slice(i, i + 50);
+    const ids = slice.map((r) => String(r.video_id));
+    const r = await ytFetch("videos", new URLSearchParams({ part: "status", id: ids.join(",") }));
+    if (!r.ok) {
+      out.push(...slice);
+      continue;
+    }
+    const items = (r.data as { items?: Array<{ id: string; status?: Record<string, unknown> }> }).items ?? [];
+    const good = new Set(
+      items
+        .filter((it) =>
+          it.status?.embeddable !== false &&
+          it.status?.privacyStatus === "public" &&
+          it.status?.uploadStatus !== "rejected"
+        )
+        .map((it) => it.id),
+    );
+    for (const row of slice) if (good.has(String(row.video_id))) out.push(row);
+    const dropped = slice.length - slice.filter((row) => good.has(String(row.video_id))).length;
+    if (dropped > 0) console.log(`[ingest] dropped ${dropped} non-embeddable/private videos`);
+  }
+  return out;
+}
+
 async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
+
   if (!rows.length) return 0;
   // Chunk to keep each INSERT small enough that Postgres statement_timeout
   // doesn't cancel it (error 57014). Large single-shot upserts of a few
@@ -973,8 +1009,15 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
       });
     }
 
-    const added = await upsertVideos(rows);
+    // Drop videos whose owner disabled off-site embedding — they render as
+    // "Video unavailable" inside Heartify's player, so they must never enter
+    // the corpus. videos.list?part=status costs 1 quota unit per 50 ids.
+    const playable = await filterEmbeddable(rows);
+    quota += Math.ceil(rows.length / 50);
+
+    const added = await upsertVideos(playable);
     totalAdded += added;
+
     pageToken = nextToken;
     // Persist cursor after every page so a timeout never loses progress.
     await markChannelSuccess(state.id, {
