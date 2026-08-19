@@ -75,7 +75,7 @@ const SearchResults = () => {
   );
 
   return (
-    <div className="min-h-dvh bg-background pb-12">
+    <div role="main" className="min-h-dvh bg-background pb-12">
       <SEO
         title={query ? `${query} — Heartify search` : "Search Heartify"}
         description={
