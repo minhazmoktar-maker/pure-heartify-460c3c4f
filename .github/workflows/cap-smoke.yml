@@ -21,7 +21,7 @@ jobs:
         run: npm run typecheck
       - name: Lint (ESLint — blocks PR on style / potential runtime issues)
         run: npm run lint
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium chromium-headless-shell
       - name: Run Capacitor smoke tests
         run: npm run cap:smoke
       - name: Upload Playwright HTML report on failure

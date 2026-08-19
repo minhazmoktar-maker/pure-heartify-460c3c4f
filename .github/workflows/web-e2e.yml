@@ -37,7 +37,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium chromium-headless-shell
 
       - name: Typecheck
         run: bunx tsc -p tsconfig.app.json --noEmit
