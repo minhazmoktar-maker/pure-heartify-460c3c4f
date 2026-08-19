@@ -215,8 +215,58 @@ const Watch = () => {
     setPlayerActivated(false);
     setShowOverlay(false);
     setAutoNextIn(null);
+    setPlaybackBlocked(false);
     completedRef.current = null;
   }, [videoId]);
+
+  /**
+   * Listen for YouTube IFrame API errors. 101/150 = embedding disabled by the
+   * owner, 100/5 = removed/unplayable. Any of those means the video can never
+   * play inside Heartify, so we report it (hides it from every surface for all
+   * users) and move the viewer straight to the next video.
+   */
+  useEffect(() => {
+    if (!playerActivated || !videoId) return;
+    const onMessage = (e: MessageEvent) => {
+      if (!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin)) return;
+      let payload: { event?: string; info?: unknown } | null = null;
+      try {
+        payload = typeof e.data === "string" ? JSON.parse(e.data) : (e.data as typeof payload);
+      } catch {
+        return;
+      }
+      if (!payload || payload.event !== "onError") return;
+      const code = Number(payload.info);
+      if (![2, 5, 100, 101, 150].includes(code)) return;
+      setPlaybackBlocked(true);
+      void supabase.rpc("report_video_unplayable", {
+        _video_id: videoId,
+        _reason: code === 101 || code === 150 ? "embed_disabled" : `yt_error_${code}`,
+      });
+    };
+    window.addEventListener("message", onMessage);
+    // Handshake — the player only emits events after a `listening` message.
+    const hello = () =>
+      iframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "listening", id: videoId, channel: "heartify" }),
+        "*",
+      );
+    const timers = [0, 400, 1200].map((d) => window.setTimeout(hello, d));
+    return () => {
+      window.removeEventListener("message", onMessage);
+      timers.forEach((t) => window.clearTimeout(t));
+    };
+  }, [playerActivated, videoId]);
+
+  // Auto-advance away from a blocked video so the session never dead-ends.
+  useEffect(() => {
+    if (!playbackBlocked || !nextVideo) return;
+    const t = window.setTimeout(() => {
+      navigate(`/watch/${nextVideo.id}`, { state: { video: nextVideo } });
+    }, 4000);
+    return () => window.clearTimeout(t);
+  }, [playbackBlocked, nextVideo, navigate]);
+
 
   // Autoplay countdown once overlay appears
   useEffect(() => {
