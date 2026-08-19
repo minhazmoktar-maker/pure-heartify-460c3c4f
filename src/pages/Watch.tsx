@@ -259,13 +259,15 @@ const Watch = () => {
   }, [playerActivated, videoId]);
 
   // Auto-advance away from a blocked video so the session never dead-ends.
+  // Pauses if the viewer interacts with the card (e.g. to file an appeal).
   useEffect(() => {
-    if (!playbackBlocked || !nextVideo) return;
+    if (!playbackBlocked || !nextVideo || autoAdvancePaused) return;
     const t = window.setTimeout(() => {
       navigate(`/watch/${nextVideo.id}`, { state: { video: nextVideo } });
-    }, 4000);
+    }, 8000);
     return () => window.clearTimeout(t);
-  }, [playbackBlocked, nextVideo, navigate]);
+  }, [playbackBlocked, nextVideo, navigate, autoAdvancePaused]);
+
 
 
   // Autoplay countdown once overlay appears
