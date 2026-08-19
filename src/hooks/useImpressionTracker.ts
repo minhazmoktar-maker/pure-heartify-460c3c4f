@@ -56,7 +56,7 @@ export function useImpressionTracker(enabled: boolean = true) {
 
   const track = useCallback(
     (videoId: string | undefined | null) => {
-      if (!enabled || !videoId) return;
+      if (!enabled || !videoId || !signedInRef.current) return;
       if (seenRef.current.has(videoId)) return;
       seenRef.current.add(videoId);
       queueRef.current.add(videoId);
@@ -76,7 +76,7 @@ export function useImpressionTracker(enabled: boolean = true) {
 
   const markAction = useCallback(
     async (videoId: string, action: "watch" | "complete" | "save" | "share" | "follow" | "rewatch" | "skip" | "not_interested") => {
-      if (!videoId) return;
+      if (!videoId || !signedInRef.current) return;
       try {
         await supabase.rpc("mark_feed_action", { _video_id: videoId, _action: action });
       } catch {
@@ -85,6 +85,7 @@ export function useImpressionTracker(enabled: boolean = true) {
     },
     [],
   );
+
 
   useEffect(() => {
     if (!enabled) return;
