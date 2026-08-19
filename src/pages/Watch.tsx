@@ -89,6 +89,7 @@ const Watch = () => {
   // Set when YouTube refuses off-site playback (error 101/150) or the video is
   // gone (100). The video is then flagged server-side so nobody sees it again.
   const [playbackBlocked, setPlaybackBlocked] = useState(false);
+  const [autoAdvancePaused, setAutoAdvancePaused] = useState(false);
   const completedRef = useRef<string | null>(null);
 
 
