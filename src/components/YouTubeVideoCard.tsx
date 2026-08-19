@@ -20,12 +20,15 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const timeAgo = formatTimeAgo(video.publishedAt);
   const liked = isFavorite(video.id);
   const isEmbeddableVideo = /^[a-zA-Z0-9_-]{11}$/.test(video.id);
-  // Prefer maxres (1280x720), but YouTube often returns a successful 120×90
-  // placeholder instead of firing onError. Treat that tiny placeholder like a
-  // failed source and keep walking the fallback chain so rails never reserve an
-  // empty card slot.
+  // Thumbnail chain, ordered by *availability* rather than raw resolution.
+  //
+  // `maxresdefault.jpg` only exists for uploads whose source was >=720p, so a
+  // large slice of the corpus 404s on it. Those 404s were the only console
+  // errors left on Home and they also cost a wasted round-trip per card on
+  // mobile. `hqdefault.jpg` (480x360) is guaranteed by YouTube for every video
+  // and is already larger than the rendered card on any device we target, so it
+  // leads the chain; the remaining entries stay as defensive fallbacks.
   const thumbnailCandidates = [
-    isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg` : undefined,
     isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg` : undefined,
     isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg` : undefined,
     video.thumbnailUrl,
