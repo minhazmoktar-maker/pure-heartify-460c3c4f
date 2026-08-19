@@ -29,7 +29,7 @@ test.describe("core surfaces", () => {
     await expect(page).toHaveTitle(/heartify/i);
 
     // Main landmark must exist and carry real text.
-    const main = page.locator("main").first();
+    const main = page.locator("main, [role=main]").first();
     await expect(main).toBeVisible({ timeout: 20_000 });
     await expect
       .poll(async () => ((await main.textContent()) ?? "").trim().length, { timeout: 25_000 })
@@ -47,7 +47,7 @@ test.describe("core surfaces", () => {
     const errors = collectErrors(page);
     const res = await page.goto("/today", { waitUntil: "domcontentloaded" });
     expect(res?.status()).toBeLessThan(400);
-    const main = page.locator("main").first();
+    const main = page.locator("main, [role=main]").first();
     await expect(main).toBeVisible({ timeout: 20_000 });
     const text = await expect
       .poll(async () => ((await main.textContent()) ?? "").trim(), { timeout: 25_000 })
@@ -61,7 +61,7 @@ test.describe("core surfaces", () => {
   test("/quran renders surah navigation", async ({ page }) => {
     const errors = collectErrors(page);
     await page.goto("/quran", { waitUntil: "domcontentloaded" });
-    await expect(page.locator("main").first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator("main, [role=main]").first()).toBeVisible({ timeout: 20_000 });
     // Al-Fatihah is always the first surah — bundled data, no network needed.
     await expect(page.getByText(/f[aā]ti/i).first()).toBeVisible({ timeout: 20_000 });
     expect(errors, errors.join("\n")).toEqual([]);
@@ -72,7 +72,7 @@ test.describe("core surfaces", () => {
     await page.goto("/watch/dQw4w9WgXcQ", { waitUntil: "domcontentloaded" });
 
     // Watch route must resolve past the loading state even for a cold deep link.
-    await expect(page.locator("main").first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator("main, [role=main]").first()).toBeVisible({ timeout: 20_000 });
     await expect
       .poll(
         async () => {
