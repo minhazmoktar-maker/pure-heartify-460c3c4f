@@ -30,23 +30,7 @@ function dayIndex() {
 
 // Bundled offline fallback so /today is never a dead screen on a cold cache
 // with no network — the one screen the user can return to 10× a day guilt-free.
-const FALLBACK_AYAT: NonNullable<DailyCache["ayah"]>[] = [
-  {
-    arabic: "إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",
-    english: "Indeed, with hardship comes ease.",
-    ref: "Surah Ash-Sharh 94:6",
-  },
-  {
-    arabic: "وَٱذْكُر رَّبَّكَ إِذَا نَسِيتَ",
-    english: "And remember your Lord when you forget.",
-    ref: "Surah Al-Kahf 18:24",
-  },
-  {
-    arabic: "حَسْبُنَا ٱللَّهُ وَنِعْمَ ٱلْوَكِيلُ",
-    english: "Sufficient for us is Allah, and He is the best Disposer of affairs.",
-    ref: "Surah Aal-Imran 3:173",
-  },
-];
+
 const FALLBACK_HADITH: NonNullable<DailyCache["hadith"]>[] = [
   {
     text: "Actions are but by intention, and every person will have only what they intended.",
