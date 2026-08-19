@@ -86,7 +86,11 @@ const Watch = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [autoNextIn, setAutoNextIn] = useState<number | null>(null);
   const [playerActivated, setPlayerActivated] = useState(false);
+  // Set when YouTube refuses off-site playback (error 101/150) or the video is
+  // gone (100). The video is then flagged server-side so nobody sees it again.
+  const [playbackBlocked, setPlaybackBlocked] = useState(false);
   const completedRef = useRef<string | null>(null);
+
 
   /**
    * Jump the embedded player to a transcript moment. The facade is activated
