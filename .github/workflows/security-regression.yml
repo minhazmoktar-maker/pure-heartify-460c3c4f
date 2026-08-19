@@ -1,0 +1,80 @@
+name: Security Regression
+
+# Re-verifies the P0 security fixes on every change: privileged RPCs, gated
+# edge functions, RLS on sensitive tables, and admin route gating — with
+# anonymous and cross-user cases.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Daily at 05:00 UTC
+    - cron: "0 5 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: security-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    name: RLS + RPC + edge-function gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+      # Optional — enables cross-user coverage ("email:password")
+      SUPABASE_TEST_USER_A: ${{ secrets.SUPABASE_TEST_USER_A }}
+      SUPABASE_TEST_USER_B: ${{ secrets.SUPABASE_TEST_USER_B }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Build app (production)
+        run: bun run build
+
+      - name: Serve production build
+        run: |
+          bunx vite preview --port 8080 --strictPort &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:8080/ && break
+            sleep 1
+          done
+
+      - name: Security regression suite
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:8080
+        run: bunx playwright test tests/e2e/security-regression.spec.ts --reporter=github,list
+
+      - name: Core surfaces against production build
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:8080
+        run: bunx playwright test tests/e2e/core-surfaces.spec.ts --reporter=github,list
+
+      - name: Existing RLS + role suites
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:8080
+        run: bunx playwright test tests/e2e/rls-cross-user.spec.ts tests/e2e/roles.spec.ts --reporter=list
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-regression-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
