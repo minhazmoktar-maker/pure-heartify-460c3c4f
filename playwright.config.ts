@@ -15,8 +15,17 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
+    // `chrome-headless-shell` is the default headless binary since Playwright
+    // 1.49 and must be installed explicitly in CI alongside `chromium`
+    // (see .github/workflows/*: `playwright install --with-deps chromium
+    // chromium-headless-shell`). Set PLAYWRIGHT_CHANNEL=chromium to force the
+    // full browser build on hosts where the shell's system libraries are
+    // unavailable — scripts/playwright.sh does this automatically.
+    channel: process.env.PLAYWRIGHT_CHANNEL || undefined,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+
+
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {

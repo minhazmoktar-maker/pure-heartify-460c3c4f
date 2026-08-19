@@ -36,7 +36,7 @@ jobs:
         continue-on-error: true
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium chromium-headless-shell
 
       - name: Build (production)
         run: bun run build

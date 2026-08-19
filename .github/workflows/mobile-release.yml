@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20, cache: npm }
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium chromium-headless-shell
       - run: npm run cap:smoke
 
   # ─────────────────────────────────────────────
