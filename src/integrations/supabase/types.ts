@@ -5834,6 +5834,27 @@ export type Database = {
         }
         Relationships: []
       }
+      video_unplayable_reports: {
+        Row: {
+          created_at: string
+          reason: string | null
+          reporter_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          reason?: string | null
+          reporter_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          reason?: string | null
+          reporter_id?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
       watch_history: {
         Row: {
           completed: boolean
@@ -6262,6 +6283,7 @@ export type Database = {
       }
       apply_visual_verdicts: { Args: { p_verdicts: Json }; Returns: Json }
       are_connected: { Args: { _a: string; _b: string }; Returns: boolean }
+      assert_self_or_admin: { Args: { _user_id: string }; Returns: undefined }
       assign_experiment_variant: {
         Args: { _anon_key: string; _experiment_key: string }
         Returns: string
