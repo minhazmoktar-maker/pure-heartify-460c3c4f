@@ -75,7 +75,12 @@ export function useComments(videoId: string | undefined) {
   const listQuery = useQuery({
     queryKey: ["video_comments", videoId, user?.id ?? "anon"],
     queryFn: () => fetchComments(videoId!, user?.id),
-    enabled: !!videoId,
+    // `video_comments` has no anon SELECT grant, so querying it while signed
+    // out returned 401s on every watch page (visible in the console as
+    // "Failed to load resource: 401"). The thread already renders a
+    // "Sign in to join the conversation" state for anonymous visitors, so skip
+    // the request entirely instead of failing it.
+    enabled: !!videoId && !!user?.id,
     staleTime: 30_000,
   });
 
