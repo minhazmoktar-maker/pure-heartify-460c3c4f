@@ -89,6 +89,7 @@ const Watch = () => {
   // Set when YouTube refuses off-site playback (error 101/150) or the video is
   // gone (100). The video is then flagged server-side so nobody sees it again.
   const [playbackBlocked, setPlaybackBlocked] = useState(false);
+  const [autoAdvancePaused, setAutoAdvancePaused] = useState(false);
   const completedRef = useRef<string | null>(null);
 
 
@@ -259,13 +260,15 @@ const Watch = () => {
   }, [playerActivated, videoId]);
 
   // Auto-advance away from a blocked video so the session never dead-ends.
+  // Pauses if the viewer interacts with the card (e.g. to file an appeal).
   useEffect(() => {
-    if (!playbackBlocked || !nextVideo) return;
+    if (!playbackBlocked || !nextVideo || autoAdvancePaused) return;
     const t = window.setTimeout(() => {
       navigate(`/watch/${nextVideo.id}`, { state: { video: nextVideo } });
-    }, 4000);
+    }, 8000);
     return () => window.clearTimeout(t);
-  }, [playbackBlocked, nextVideo, navigate]);
+  }, [playbackBlocked, nextVideo, navigate, autoAdvancePaused]);
+
 
 
   // Autoplay countdown once overlay appears
@@ -452,21 +455,33 @@ const Watch = () => {
           </button>
 
           {playbackBlocked ? (
-            <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-card border border-border bg-card px-6 text-center">
+            <div
+              className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-card border border-border bg-card px-6 text-center"
+              onPointerDown={() => setAutoAdvancePaused(true)}
+            >
               <p className="text-heading font-semibold text-foreground">This video can't play inside Heartify</p>
               <p className="max-w-md text-sm text-muted-foreground">
                 The owner disabled off-site playback. We've removed it from Heartify so it won't
-                show up again{nextVideo ? " — taking you to the next video." : "."}
+                show up again{nextVideo && !autoAdvancePaused ? " — taking you to the next video." : "."}
               </p>
-              {nextVideo && (
-                <button
-                  onClick={handleNext}
-                  className="mt-1 flex items-center gap-2 rounded-pill bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+                {nextVideo && (
+                  <button
+                    onClick={handleNext}
+                    className="flex items-center gap-2 rounded-pill bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    <Play className="h-4 w-4 fill-current" />
+                    Play next now
+                  </button>
+                )}
+                <Link
+                  to={`/appeals?kind=video&ref=${encodeURIComponent(videoId ?? "")}&context=unplayable`}
+                  onClick={() => setAutoAdvancePaused(true)}
+                  className="rounded-pill border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
-                  <Play className="h-4 w-4 fill-current" />
-                  Play next now
-                </button>
-              )}
+                  It plays fine — request review
+                </Link>
+              </div>
             </div>
           ) : isEmbeddableVideo ? (
             <div

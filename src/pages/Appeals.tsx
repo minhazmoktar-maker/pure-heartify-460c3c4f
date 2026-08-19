@@ -28,7 +28,11 @@ export default function Appeals() {
     (params.get("kind") as Appeal["subject_kind"]) || "video"
   );
   const [subjectRef, setSubjectRef] = useState(params.get("ref") ?? "");
-  const [reason, setReason] = useState("");
+  const [reason, setReason] = useState(
+    params.get("context") === "unplayable"
+      ? "This video was hidden as unplayable, but it plays correctly for me. Please review and restore it."
+      : ""
+  );
 
   if (!user) {
     return (
