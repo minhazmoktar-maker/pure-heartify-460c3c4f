@@ -82,7 +82,12 @@ export default function AdminOpsHealth() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 pb-24 pt-6">
-      <SEO title="Ops health — Heartify admin" description="Edge function traffic, latency and error rates." noindex />
+      <SEO
+        title="Ops health — Heartify admin"
+        description="Edge function traffic, latency and error rates."
+        path="/admin/ops-health"
+        noBreadcrumbs
+      />
 
       <header className="mb-5 flex items-center justify-between gap-3">
         <div>
