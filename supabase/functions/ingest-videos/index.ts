@@ -973,8 +973,15 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
       });
     }
 
-    const added = await upsertVideos(rows);
+    // Drop videos whose owner disabled off-site embedding — they render as
+    // "Video unavailable" inside Heartify's player, so they must never enter
+    // the corpus. videos.list?part=status costs 1 quota unit per 50 ids.
+    const playable = await filterEmbeddable(rows);
+    quota += Math.ceil(rows.length / 50);
+
+    const added = await upsertVideos(playable);
     totalAdded += added;
+
     pageToken = nextToken;
     // Persist cursor after every page so a timeout never loses progress.
     await markChannelSuccess(state.id, {
