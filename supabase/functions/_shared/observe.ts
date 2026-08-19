@@ -214,29 +214,75 @@ export function observed(fnName: string, handler: Handler): Handler {
         ? `http_${status}`
         : null;
 
-      if (ok) log.info("request", { status, durationMs: Math.round(duration) });
-      else log.error("request_failed", { status, durationMs: Math.round(duration), err: errMsg });
+      const slow = duration > budget;
+      const transient =
+        !ok && (TRANSIENT_STATUS.has(status) || (!!errMsg && TRANSIENT_MESSAGE.test(errMsg)));
 
-      const tasks: Promise<unknown>[] = [
-        recordMetric({ fn: fnName, status, duration_ms: duration, ok, error: errMsg }),
-      ];
+      if (ok) {
+        // Successful-but-slow requests stay at warn level in the logs so log
+        // dashboards can filter them without them counting as failures.
+        if (slow) log.warn("request_slow", { status, durationMs: Math.round(duration), budgetMs: budget });
+        else log.info("request", { status, durationMs: Math.round(duration) });
+      } else {
+        const fields = { status, durationMs: Math.round(duration), err: errMsg, transient };
+        if (transient) log.warn("request_transient", fields);
+        else log.error("request_failed", fields);
+      }
 
-      if (!ok && shouldAlert(`${fnName}:error`)) {
+      const window = track(fnName, ok, ok && slow);
+      const samples = window.outcomes.length;
+      const errorRatio = samples ? window.outcomes.filter((o) => !o).length / samples : 0;
+      const slowRatio = samples ? window.slow.filter(Boolean).length / samples : 0;
+      const domain = FN_DOMAIN[fnName] ?? "edge";
+
+      // Sample successful metric rows on chatty interactive functions; always
+      // persist failures and budget breaches so regressions stay visible.
+      const sampleRate = SUCCESS_SAMPLE_RATE[fnName] ?? 1;
+      const persistMetric = !ok || slow || sampleRate >= 1 || Math.random() < sampleRate;
+
+      const tasks: Promise<unknown>[] = [];
+      if (persistMetric) {
+        tasks.push(recordMetric({ fn: fnName, status, duration_ms: duration, ok, error: errMsg }));
+      }
+
+      // ── Error alerting: sustained failures only ─────────────────────────
+      const errorBurst =
+        !ok &&
+        !transient &&
+        (window.consecutiveErrors >= SUSTAINED.consecutiveErrors ||
+          (samples >= SUSTAINED.minSamples && errorRatio >= SUSTAINED.errorRatio));
+
+      // ── Latency alerting: sustained breach, or one pathological request ──
+      const latencyBreach =
+        ok &&
+        slow &&
+        ((samples >= SUSTAINED.minSamples && slowRatio >= SUSTAINED.slowRatio) ||
+          duration > budget * SUSTAINED.hardLatencyMultiple);
+
+      if (errorBurst && shouldAlert(`${fnName}:error`, "error")) {
         tasks.push(
           fireAlert(fnName, "error", errMsg ?? "request failed", {
             status,
             durationMs: Math.round(duration),
+            domain,
+            consecutiveErrors: window.consecutiveErrors,
+            errorRatio: Number(errorRatio.toFixed(2)),
+            samples,
           }),
         );
-      } else if (ok && duration > budget && shouldAlert(`${fnName}:slow`)) {
+      } else if (latencyBreach && shouldAlert(`${fnName}:slow`, "warn")) {
         tasks.push(
           fireAlert(fnName, "warn", `latency ${Math.round(duration)}ms exceeded budget ${budget}ms`, {
             status,
             durationMs: Math.round(duration),
             budgetMs: budget,
+            domain,
+            slowRatio: Number(slowRatio.toFixed(2)),
+            samples,
           }),
         );
       }
+
 
       // Fire-and-forget — never block the response on telemetry.
       void Promise.allSettled(tasks);
