@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { BookOpen, Play, ArrowRight, Sparkles } from "lucide-react";
 import { AUDIO_EDITIONS } from "@/lib/quranApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { heartAyahForDay, ayahDayIndex } from "@/data/heartAyat";
 
 type Last = { surah: number; ayah: number; surahName?: string };
 
 function dailySeed() {
-  const d = new Date();
-  return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+  return ayahDayIndex();
 }
 
 /**
@@ -35,27 +35,8 @@ const QuranContinueBlock = () => {
       }
     } catch { /* ignore */ }
 
-    let cancelled = false;
-    const n = (dailySeed() % 6236) + 1;
-    (async () => {
-      try {
-        const [ar, en] = await Promise.all([
-          fetch(`https://api.alquran.cloud/v1/ayah/${n}/ar.alafasy`).then((r) => r.json()),
-          fetch(`https://api.alquran.cloud/v1/ayah/${n}/en.sahih`).then((r) => r.json()),
-        ]);
-        if (cancelled) return;
-        const surah = ar?.data?.surah?.number ?? 1;
-        const ayah = ar?.data?.numberInSurah ?? 1;
-        setVerse({
-          arabic: ar?.data?.text ?? "",
-          english: en?.data?.text ?? "",
-          ref: `${ar?.data?.surah?.englishName ?? "Al-Fatiha"} ${surah}:${ayah}`,
-          surah,
-          ayah,
-        });
-      } catch { /* offline */ }
-    })();
-    return () => { cancelled = true; };
+    const pick = heartAyahForDay();
+    setVerse({ arabic: pick.ar, english: pick.en, ref: pick.ref, surah: pick.s, ayah: pick.a });
   }, []);
 
   const reciterLabel = AUDIO_EDITIONS.find((e) => e.id === reciterId)?.label ?? "Mishary Alafasy";
