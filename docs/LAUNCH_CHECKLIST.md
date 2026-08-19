@@ -73,8 +73,8 @@ Companion docs: `docs/PRODUCTION_CHECKLIST.md` (engineering depth), `docs/BETA_T
 
 ## 8. Store submission
 
-- [ ] App icons, screenshots (6.7", 6.1", tablet, Android), feature graphic
-- [ ] Store listing copy from `docs/STORE_LISTING.md`
+- [x] App icons, screenshots (6.7", 6.1", iPad, Android phone + tablet), feature graphic — generated in `store-assets/` (`bun run store:screenshots` to refresh)
+- [x] Store listing copy from `docs/STORE_LISTING.md`
 - [ ] Age rating questionnaires completed
 - [ ] TestFlight internal build + 5 external testers passed a full session
 - [ ] Play internal testing track green, then closed → open testing
