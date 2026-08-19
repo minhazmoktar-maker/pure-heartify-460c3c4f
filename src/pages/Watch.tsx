@@ -441,7 +441,7 @@ const Watch = () => {
       <Navbar />
 
 
-      <div className="mx-auto max-w-[1800px] px-4 py-4 md:px-6 lg:flex lg:gap-6">
+      <div role="main" className="mx-auto max-w-[1800px] px-4 py-4 md:px-6 lg:flex lg:gap-6">
         <div className="min-w-0 flex-1">
           <button
             onClick={() => {
