@@ -73,6 +73,26 @@ Deno.serve(async (req) => {
     return json({ error: "missing_configuration" }, 500);
   }
 
+  // Auth: internal cron secret/token OR verified admin JWT (same gate as the
+  // other pipeline workers). Never let anonymous callers burn YouTube quota.
+  const cronSecret = req.headers.get("x-cron-secret");
+  const cronToken = req.headers.get("x-cron-token");
+  const isCron =
+    (!!cronSecret && cronSecret === (Deno.env.get("CRON_SECRET") ?? "\u0000")) ||
+    (!!cronToken && (cronToken === (Deno.env.get("INGEST_CRON_TOKEN") ?? "\u0000") ||
+      cronToken === (Deno.env.get("AUDIT_CRON_TOKEN") ?? "\u0000")));
+
+  if (!isCron) {
+    const jwt = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+    if (!jwt) return json({ error: "unauthorized" }, 401);
+    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { data: userRes } = await admin.auth.getUser(jwt);
+    const uid = userRes?.user?.id;
+    if (!uid) return json({ error: "unauthorized" }, 401);
+    const { data: isAdmin } = await admin.rpc("has_role", { _user_id: uid, _role: "admin" });
+    if (!isAdmin) return json({ error: "forbidden" }, 403);
+  }
+
   const url = new URL(req.url);
   const batches = Math.min(Number(url.searchParams.get("batches") ?? 40) || 40, 200);
 
