@@ -451,12 +451,30 @@ const Watch = () => {
             Back
           </button>
 
-          {isEmbeddableVideo ? (
+          {playbackBlocked ? (
+            <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-card border border-border bg-card px-6 text-center">
+              <p className="text-heading font-semibold text-foreground">This video can't play inside Heartify</p>
+              <p className="max-w-md text-sm text-muted-foreground">
+                The owner disabled off-site playback. We've removed it from Heartify so it won't
+                show up again{nextVideo ? " — taking you to the next video." : "."}
+              </p>
+              {nextVideo && (
+                <button
+                  onClick={handleNext}
+                  className="mt-1 flex items-center gap-2 rounded-pill bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  <Play className="h-4 w-4 fill-current" />
+                  Play next now
+                </button>
+              )}
+            </div>
+          ) : isEmbeddableVideo ? (
             <div
               className="relative aspect-video w-full overflow-hidden rounded-card bg-black"
               style={{ viewTransitionName: `video-${videoId}` } as React.CSSProperties}
             >
               {playerActivated ? (
+
                 <iframe
                   ref={iframeRef}
                   src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&iv_load_policy=3&disablekb=0&fs=1&enablejsapi=1${startTimeParam ? `&start=${startTimeParam}` : ""}&origin=${window.location.origin}`}
