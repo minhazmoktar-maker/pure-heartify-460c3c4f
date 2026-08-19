@@ -11,6 +11,8 @@
  * `embed_checked_at` rows, so repeated runs eventually cover everything and
  * then keep re-verifying the corpus.
  */
+import { createClient } from "npm:@supabase/supabase-js@2";
+
 const YOUTUBE_API_KEYS: string[] = [
   Deno.env.get("YOUTUBE_API_KEY"),
   Deno.env.get("YOUTUBE_API_KEY_2"),
@@ -21,7 +23,8 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-cron-secret, x-cron-token",
 };
 
 const json = (body: unknown, status = 200) =>
