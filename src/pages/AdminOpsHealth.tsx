@@ -130,6 +130,10 @@ export default function AdminOpsHealth() {
           <p className="text-xs text-muted-foreground">
             {totalReq.toLocaleString()} requests · {totalErr.toLocaleString()} errors · last {hours}h
           </p>
+          <p className="text-[11px] text-muted-foreground">
+            Successes on high-volume read paths are sampled (1 in 5); every error and
+            budget breach is recorded.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {[1, 24, 168].map((h) => (
