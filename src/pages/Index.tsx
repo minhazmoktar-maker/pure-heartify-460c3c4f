@@ -16,6 +16,7 @@ import HomeHero from "@/components/HomeHero";
 import CircleWidget from "@/components/social/CircleWidget";
 import TopPickHero from "@/components/TopPickHero";
 import ScholarsRail from "@/components/ScholarsRail";
+import ReturnDigestCard from "@/components/ReturnDigestCard";
 
 const AudioPlayer = lazy(() => import("@/components/AudioPlayer"));
 const InfiniteVideoGrid = lazy(() => import("@/components/InfiniteVideoGrid"));
@@ -150,6 +151,9 @@ const Index = () => {
             <HomeHero />
 
             <div className="mx-auto max-w-[1800px] space-y-3 px-4 pt-3 md:px-6">
+              {/* Return-value loop: only renders when something genuinely
+                  changed since the user's last watch. */}
+              <ReturnDigestCard />
               <StreakAtRiskBanner />
               <RamadanBanner />
               <JumuahBanner />

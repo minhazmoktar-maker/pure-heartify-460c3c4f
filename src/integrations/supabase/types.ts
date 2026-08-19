@@ -7181,6 +7181,7 @@ export type Database = {
         Args: { _accept: boolean; _connection_id: string }
         Returns: Json
       }
+      return_digest: { Args: { p_limit?: number }; Returns: Json }
       revoke_auto_approval: {
         Args: { _reason?: string; _video_id: string }
         Returns: undefined
