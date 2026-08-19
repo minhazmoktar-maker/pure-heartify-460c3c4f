@@ -92,9 +92,15 @@ test.describe("core surfaces", () => {
       )
       .toBe(true);
 
-    // The page must resolve into real content — never a bare "Loading…" shell.
-    const body = ((await page.textContent("body")) ?? "").toLowerCase();
-    expect(body.length, "watch page stayed on a loading shell").toBeGreaterThan(300);
+    // The page must resolve into real content — never stay on a "Loading…"
+    // shell. Metadata + related rails arrive a beat after first paint, so poll
+    // instead of sampling once.
+    await expect
+      .poll(async () => ((await page.textContent("body")) ?? "").trim().length, {
+        timeout: 25_000,
+        message: "watch page stayed on a loading shell",
+      })
+      .toBeGreaterThan(300);
     expect(errors, errors.join("\n")).toEqual([]);
   });
 
