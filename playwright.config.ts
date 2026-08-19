@@ -15,8 +15,16 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
+    // Use the full Chromium build rather than the `chrome-headless-shell`
+    // binary. The shell links against a narrower set of system libraries
+    // (libglib et al.) that is missing on some CI images and in the Lovable
+    // sandbox, which made the whole suite fail to launch. The full build is
+    // installed by `playwright install --with-deps chromium` everywhere and
+    // needs no local-only library-path workarounds.
+    channel: "chromium",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
