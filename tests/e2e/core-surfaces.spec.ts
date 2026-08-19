@@ -11,7 +11,11 @@ import { test, expect } from "@playwright/test";
  * silent "Loading…" or empty-state regression fails the pipeline.
  */
 
-const NOISE = /youtube|ytimg|doubleclick|gstatic|googletag|third.?party|favicon|manifest|service worker/i;
+// Third-party / sandbox-only noise. Everything else is treated as a real
+// regression. The `data:` CSP entry is the Lovable sandbox injecting a module
+// script into `vite preview`; it does not exist in a deployed build.
+const NOISE =
+  /youtube|ytimg|doubleclick|gstatic|googletag|third.?party|favicon|manifest|service worker|data:application\/octet-stream|Content Security Policy/i;
 
 function collectErrors(page: import("@playwright/test").Page) {
   const errors: string[] = [];
@@ -88,8 +92,9 @@ test.describe("core surfaces", () => {
       )
       .toBe(true);
 
+    // The page must resolve into real content — never a bare "Loading…" shell.
     const body = ((await page.textContent("body")) ?? "").toLowerCase();
-    expect(body.includes("loading") && body.length < 200).toBe(false);
+    expect(body.length, "watch page stayed on a loading shell").toBeGreaterThan(300);
     expect(errors, errors.join("\n")).toEqual([]);
   });
 
