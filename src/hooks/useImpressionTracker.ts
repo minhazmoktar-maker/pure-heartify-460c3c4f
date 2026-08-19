@@ -18,9 +18,26 @@ export function useImpressionTracker(enabled: boolean = true) {
   const seenRef = useRef<Set<string>>(new Set());
   const inFlightRef = useRef(false);
   const debounceRef = useRef<number | null>(null);
+  // The RPC is authenticated-only by design (anon EXECUTE was revoked as a
+  // security fix). Track sign-in state so anonymous sessions never fire it.
+  const signedInRef = useRef(false);
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) signedInRef.current = !!data.session;
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      signedInRef.current = !!session;
+    });
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const flush = useCallback(async () => {
-    if (!enabled || inFlightRef.current) return;
+    if (!enabled || !signedInRef.current || inFlightRef.current) return;
     const q = queueRef.current;
     if (q.size === 0) return;
     const batch = Array.from(q).slice(0, MAX_BATCH);
@@ -36,9 +53,10 @@ export function useImpressionTracker(enabled: boolean = true) {
     }
   }, [enabled]);
 
+
   const track = useCallback(
     (videoId: string | undefined | null) => {
-      if (!enabled || !videoId) return;
+      if (!enabled || !videoId || !signedInRef.current) return;
       if (seenRef.current.has(videoId)) return;
       seenRef.current.add(videoId);
       queueRef.current.add(videoId);
@@ -58,7 +76,7 @@ export function useImpressionTracker(enabled: boolean = true) {
 
   const markAction = useCallback(
     async (videoId: string, action: "watch" | "complete" | "save" | "share" | "follow" | "rewatch" | "skip" | "not_interested") => {
-      if (!videoId) return;
+      if (!videoId || !signedInRef.current) return;
       try {
         await supabase.rpc("mark_feed_action", { _video_id: videoId, _action: action });
       } catch {
@@ -67,6 +85,7 @@ export function useImpressionTracker(enabled: boolean = true) {
     },
     [],
   );
+
 
   useEffect(() => {
     if (!enabled) return;
