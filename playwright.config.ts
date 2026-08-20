@@ -22,6 +22,11 @@ export default defineConfig({
     // full browser build on hosts where the shell's system libraries are
     // unavailable — scripts/playwright.sh does this automatically.
     channel: process.env.PLAYWRIGHT_CHANNEL || undefined,
+    // Nix sandboxes ship a pre-patched Chromium that does not live in
+    // Playwright's expected download folder. scripts/playwright.sh sets this.
+    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH
+      ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH }
+      : undefined,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 
