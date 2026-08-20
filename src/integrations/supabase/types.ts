@@ -1606,6 +1606,7 @@ export type Database = {
           embedding_model: string | null
           embedding_updated_at: string | null
           halal_score: number
+          hidden_reason: string | null
           id: string
           ingested_at: string
           is_archived: boolean
@@ -1649,6 +1650,7 @@ export type Database = {
           embedding_model?: string | null
           embedding_updated_at?: string | null
           halal_score?: number
+          hidden_reason?: string | null
           id?: string
           ingested_at?: string
           is_archived?: boolean
@@ -1692,6 +1694,7 @@ export type Database = {
           embedding_model?: string | null
           embedding_updated_at?: string | null
           halal_score?: number
+          hidden_reason?: string | null
           id?: string
           ingested_at?: string
           is_archived?: boolean
@@ -6128,6 +6131,10 @@ export type Database = {
           table_name: string
         }[]
       }
+      _visual_floor_backfill_chunk: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
       add_anon_ameen: {
         Args: { _dua_id: string; _fp: string }
         Returns: number
@@ -6313,6 +6320,10 @@ export type Database = {
       apply_video_embeddings: {
         Args: { _model: string; _rows: Json }
         Returns: number
+      }
+      apply_visual_serving_floor_backfill: {
+        Args: { p_limit?: number }
+        Returns: Json
       }
       apply_visual_verdicts: { Args: { p_verdicts: Json }; Returns: Json }
       are_connected: { Args: { _a: string; _b: string }; Returns: boolean }

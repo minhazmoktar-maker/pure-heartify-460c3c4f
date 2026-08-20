@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
 
   let body: { batch?: number } = {};
   try { body = await req.json(); } catch { /* optional body */ }
-  const batch = Math.max(1, Math.min(Number(body.batch ?? 40), 100));
+  const batch = Math.max(1, Math.min(Number(body.batch ?? 40), 300));
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
