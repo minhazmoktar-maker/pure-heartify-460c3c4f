@@ -31,51 +31,62 @@ export async function hasActivePremium(userId: string | null | undefined): Promi
 
 /**
  * Extracts the caller's user id from an Authorization: Bearer <jwt> header
- * without throwing. Returns null when the token is absent, invalid, or is
- * an anon/service key (both have `role` claim but no `sub` user id, and
- * anonymous browsers send the publishable anon key on every request).
+ * without throwing. Returns null when the token is absent, invalid, expired,
+ * unsigned/forged, or is an anon/service key.
  *
- * Fast-path: locally base64-decodes the JWT payload to short-circuit the
- * ~200-400ms `auth.getClaims` network round-trip for anon calls. This is
- * the hottest edge-function code path — it runs on every feed/search hit.
+ * The token signature is ALWAYS verified against the auth server before any
+ * claim is trusted — a locally decoded payload is never authoritative. The
+ * local decode is used only as a negative fast-path (anon/service tokens and
+ * malformed tokens resolve to null without a network round-trip), plus a
+ * short-lived positive cache keyed by the full token so repeat calls from the
+ * same session don't re-hit the auth server on every request.
  */
+const VERIFIED_TTL_MS = 60_000;
+const verifiedCache = new Map<string, { userId: string; at: number }>();
+
 export async function getCallerUserId(req: Request): Promise<string | null> {
   const auth = req.headers.get("Authorization");
   if (!auth?.startsWith("Bearer ")) return null;
-  const token = auth.slice("Bearer ".length);
+  const token = auth.slice("Bearer ".length).trim();
+  if (!token) return null;
 
-  // Local decode — avoids network I/O for the 90%+ of requests that carry
-  // the anon/publishable key rather than a real user session.
+  // Negative fast-path only: never trust `sub` from this decode.
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
   try {
-    const parts = token.split(".");
-    if (parts.length === 3) {
-      const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/").padEnd(
-        parts[1].length + ((4 - parts[1].length % 4) % 4),
-        "=",
-      );
-      const payload = JSON.parse(atob(b64));
-      const role = payload?.role;
-      // Anon / service tokens carry no user identity.
-      if (role === "anon" || role === "service_role") return null;
-      // Real user tokens: return sub without extra network verification.
-      // Downstream RLS still enforces per-user access — we're only reading
-      // it to shape feed personalization.
-      if (typeof payload?.sub === "string" && payload.sub) return payload.sub;
-    }
+    const seg = parts[1];
+    const b64 = seg.replace(/-/g, "+").replace(/_/g, "/").padEnd(
+      seg.length + ((4 - seg.length % 4) % 4),
+      "=",
+    );
+    const payload = JSON.parse(atob(b64));
+    const role = payload?.role;
+    if (role === "anon" || role === "service_role") return null;
+    if (typeof payload?.exp === "number" && payload.exp * 1000 <= Date.now()) return null;
+    if (typeof payload?.sub !== "string" || !payload.sub) return null;
   } catch {
-    // Fall through to remote verification.
+    return null;
   }
+
+  const hit = verifiedCache.get(token);
+  if (hit && Date.now() - hit.at < VERIFIED_TTL_MS) return hit.userId;
 
   try {
     const client = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: auth } } },
+      { auth: { persistSession: false, autoRefreshToken: false } },
     );
+    // Cryptographically validates the signature (JWKS / project secret).
     const { data, error } = await client.auth.getClaims(token);
-    if (error || !data?.claims?.sub) return null;
-    return String(data.claims.sub);
+    const sub = data?.claims?.sub;
+    if (error || !sub) return null;
+    const userId = String(sub);
+    if (verifiedCache.size > 500) verifiedCache.clear();
+    verifiedCache.set(token, { userId, at: Date.now() });
+    return userId;
   } catch {
     return null;
   }
 }
+
