@@ -46,12 +46,20 @@ Use "female_detected" when any female is visible, "music" for musical/performanc
 "flagged" for other prohibited imagery, "clean" only when clearly safe.
 If the image is unreadable or you are unsure, answer "flagged".`;
 
+// Each classification gets its own hard timeout: without it a single hung
+// gateway request keeps the whole invocation alive until the edge runtime
+// kills it, which is what surfaced as 504s on the 5-minute cron.
+const CALL_TIMEOUT_MS = 20_000;
+
 async function classify(item: Claimed, key: string): Promise<Verdict> {
   const fallback: Verdict = { video_id: item.video_id, state: "unchecked", confidence: 0, flags: ["model_error"] };
   if (!item.thumbnail_url) return fallback;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), CALL_TIMEOUT_MS);
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
+      signal: ctrl.signal,
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: MODEL,
@@ -66,8 +74,12 @@ async function classify(item: Claimed, key: string): Promise<Verdict> {
         ],
       }),
     });
-    if (!res.ok) return fallback;
+    if (!res.ok) {
+      console.error(`[visual-safety-sweep] gateway ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      return fallback;
+    }
     const json = await res.json();
+
     const raw: string = json?.choices?.[0]?.message?.content ?? "";
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) return fallback;
@@ -81,9 +93,13 @@ async function classify(item: Claimed, key: string): Promise<Verdict> {
       confidence: Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
       flags: Array.isArray(parsed.flags) ? parsed.flags.map(String).slice(0, 6) : [],
     };
-  } catch {
+  } catch (e) {
+    console.error(`[visual-safety-sweep] classify failed: ${(e as Error).message}`);
     return fallback;
+  } finally {
+    clearTimeout(timer);
   }
+
 }
 
 Deno.serve(async (req) => {
@@ -116,11 +132,21 @@ Deno.serve(async (req) => {
   }
   if (!AI_KEY) return json({ error: "LOVABLE_API_KEY not configured", claimed: items.length }, 500);
 
+  // Stop claiming new waves once we approach the edge budget and apply what we
+  // already have; unscanned rows keep visual_state = 'unchecked' and are
+  // re-claimed by the next cron tick.
+  const deadline = Date.now() + 90_000;
   const verdicts: Verdict[] = [];
+  let truncated = false;
   for (let i = 0; i < items.length; i += CONCURRENCY) {
+    if (Date.now() > deadline) {
+      truncated = true;
+      break;
+    }
     const slice = items.slice(i, i + CONCURRENCY);
     verdicts.push(...(await Promise.all(slice.map((it) => classify(it, AI_KEY)))));
   }
+
 
   const usable = verdicts.filter((v) => v.state !== "unchecked");
   const { data: applied, error: applyErr } = await admin.rpc("apply_visual_verdicts", { p_verdicts: usable });
@@ -128,7 +154,7 @@ Deno.serve(async (req) => {
 
   const { data: escalation } = await admin.rpc("escalate_visually_unsafe_channels");
 
-  return json({ scanned: verdicts.length, applied, escalation: escalation ?? null }, 200);
+  return json({ scanned: verdicts.length, truncated, applied, escalation: escalation ?? null }, 200);
 });
 
 function json(body: unknown, status: number) {
