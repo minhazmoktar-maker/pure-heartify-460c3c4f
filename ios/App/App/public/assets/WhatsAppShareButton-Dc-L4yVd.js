@@ -1,0 +1,5 @@
+import{j as i}from"./query-vendor-BAcq99Oi.js";import{r as m}from"./react-vendor-CtrwoeSd.js";import{c as u,s as h,t as x}from"./index-yV94duvQ.js";import{aG as b}from"./icons-vendor-DxFQbNg7.js";function _({message:r,url:p,className:c,label:a="Share on WhatsApp"}){const[s,o]=m.useState(!1);async function d(){if(s)return;o(!0);let t=p;try{const{data:e}=await h.rpc("get_or_create_referral_code");if(e&&typeof e=="string"){const f=t.includes("?")?"&":"?";t=`${t}${f}ref=${encodeURIComponent(e)}`}}catch{}const n=encodeURIComponent(`${r}
+
+${t}
+
+via Heartify ✦`),l=typeof navigator<"u"&&/android|iphone|ipad|ipod/i.test(navigator.userAgent)?`whatsapp://send?text=${n}`:`https://wa.me/?text=${n}`;x("share.whatsapp",{kind:"dua"}),window.open(l,"_blank","noopener"),o(!1)}return i.jsxs("button",{onClick:d,disabled:s,"aria-label":a,className:u("tap-target inline-flex items-center gap-2 rounded-pill bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60",c),children:[i.jsx(b,{className:"h-4 w-4"}),a]})}export{_ as W};

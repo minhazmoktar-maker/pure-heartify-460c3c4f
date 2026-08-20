@@ -43,11 +43,13 @@ const BUDGET_MS: Record<string, number> = {
   "discover-channels": 180_000,
   "moderate-channels": 180_000,
   "sweep-embeddable": 180_000,
+  "visual-safety-sweep": 240_000,
+  "sweep-female-music": 180_000,
 };
 const DEFAULT_BUDGET_MS = 3000;
 
 /** Keep in sync with `FN_DOMAIN` in observe.ts. */
-type Domain = "recommendations" | "ingestion" | "edge";
+type Domain = "recommendations" | "ingestion" | "moderation" | "edge";
 const FN_DOMAIN: Record<string, Domain> = {
   feed: "recommendations",
   recommendations: "recommendations",
@@ -58,13 +60,50 @@ const FN_DOMAIN: Record<string, Domain> = {
   "discover-channels": "ingestion",
   "moderate-channels": "ingestion",
   "sweep-embeddable": "ingestion",
+  "visual-safety-sweep": "moderation",
+  "sweep-female-music": "moderation",
 };
 const DOMAIN_LABEL: Record<Domain, string> = {
   recommendations: "Recommendations & feed",
-  ingestion: "Ingestion & moderation",
+  ingestion: "Ingestion & discovery",
+  moderation: "Safety sweeps (halal floor)",
   edge: "Other edge functions",
 };
-const DOMAIN_ORDER: Domain[] = ["recommendations", "ingestion", "edge"];
+const DOMAIN_ORDER: Domain[] = ["recommendations", "ingestion", "moderation", "edge"];
+
+/**
+ * On-call triage notes, surfaced inline so a pager doesn't require opening the
+ * runbook first. Kept deliberately short: what it means, then the first move.
+ * Full procedures: docs/RUNBOOK_SWEEPS.md.
+ */
+const TRIAGE: Record<string, { errors: string; latency: string }> = {
+  "visual-safety-sweep": {
+    errors:
+      "Usually the AI gateway timing out or a statement timeout on the batch write. Partial verdicts are expected — check that visual_state counts are still moving before escalating.",
+    latency:
+      "Slow AI-gateway responses. Safe to ignore unless the sweep stops writing verdicts; reduce batch size if p95 stays above 3× budget.",
+  },
+  "sweep-embeddable": {
+    errors:
+      "Almost always YouTube Data API quota exhaustion (403). The sweep stops cleanly and resumes after the quota resets at 00:00 PT — no action needed unless errors persist past the reset.",
+    latency:
+      "Long runs are normal for batch crawls. Investigate only if runs never complete or overlap the next cron tick.",
+  },
+  "sweep-female-music": {
+    errors:
+      "Pattern-sweep failures leave unverified videos out of the serving floor, so users stay safe. Re-run manually and check blocked_creators pattern syntax.",
+    latency: "Batch job — only pathological runs matter.",
+  },
+  feed: {
+    errors: "User-visible. Check entitlements/rate limits first, then RPC health in db_health.",
+    latency: "Check pool RPC slow queries; the verified-only filter needs its partial index.",
+  },
+  surfaces: {
+    errors:
+      "401s on for_you are expected for signed-out callers (auth-required surface), not an incident.",
+    latency: "Per-surface retrievers run independently; find the slow retriever in the logs.",
+  },
+};
 
 /** Below this request count a window is statistically meaningless. */
 const MIN_SAMPLES = 5;
@@ -230,6 +269,14 @@ export default function AdminOpsHealth() {
                   </div>
                 </div>
               </CardContent>
+              {(errorBadge || (slow && !lowTraffic)) && TRIAGE[r.fn_name] && (
+                <CardContent className="pt-0">
+                  <p className="rounded-md bg-muted/60 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+                    <span className="font-medium text-foreground">Triage: </span>
+                    {errorBadge ? TRIAGE[r.fn_name].errors : TRIAGE[r.fn_name].latency}
+                  </p>
+                </CardContent>
+              )}
             </Card>
           );
               })}
@@ -237,6 +284,35 @@ export default function AdminOpsHealth() {
           );
         })}
       </div>
+
+      <Card className="mt-8">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Alert reference</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-xs text-muted-foreground">
+          <p>
+            <span className="font-medium text-foreground">warn</span> = error rate ≥ 5% or p95 over
+            budget, sustained across at least {MIN_SAMPLES} requests.{" "}
+            <span className="font-medium text-foreground">page</span> = error rate ≥ 20% or p95 over
+            3× budget. Single cold-start failures and low-traffic windows never alert.
+          </p>
+          {Object.entries(TRIAGE).map(([fn, note]) => (
+            <div key={fn} className="border-t border-border/60 pt-2">
+              <div className="font-medium text-foreground">{fn}</div>
+              <div>
+                <span className="font-medium">Errors:</span> {note.errors}
+              </div>
+              <div>
+                <span className="font-medium">Latency:</span> {note.latency}
+              </div>
+            </div>
+          ))}
+          <p className="border-t border-border/60 pt-2">
+            Full procedures, dashboards and escalation paths:{" "}
+            <code>docs/RUNBOOK_SWEEPS.md</code>.
+          </p>
+        </CardContent>
+      </Card>
     </main>
   );
 }

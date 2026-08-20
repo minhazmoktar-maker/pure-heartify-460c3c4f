@@ -32,12 +32,16 @@ export const LATENCY_BUDGET_MS: Record<string, number> = {
   "discover-channels": 180_000,
   "moderate-channels": 180_000,
   "sweep-embeddable": 180_000,
+  // Safety sweeps run AI-gateway calls per video; a slow gateway is expected
+  // and handled by partial verdicts, so only pathological runs should page.
+  "visual-safety-sweep": 240_000,
+  "sweep-female-music": 180_000,
 };
 
 const DEFAULT_BUDGET_MS = 3000;
 
 /** Domain buckets used for alert routing + the ops dashboard grouping. */
-export const FN_DOMAIN: Record<string, "recommendations" | "ingestion" | "edge"> = {
+export const FN_DOMAIN: Record<string, "recommendations" | "ingestion" | "moderation" | "edge"> = {
   feed: "recommendations",
   recommendations: "recommendations",
   surfaces: "recommendations",
@@ -47,6 +51,8 @@ export const FN_DOMAIN: Record<string, "recommendations" | "ingestion" | "edge">
   "discover-channels": "ingestion",
   "moderate-channels": "ingestion",
   "sweep-embeddable": "ingestion",
+  "visual-safety-sweep": "moderation",
+  "sweep-female-music": "moderation",
 };
 
 /**
