@@ -23,9 +23,8 @@
     <link rel="preconnect" href="https://www.youtube.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.youtube.com" />
 
-    <!-- Preload the entry module so JS/CSS (and the bundled hero LCP image) start fetching immediately.
-         The app icon is not the LCP element on any route, so we don't preload it (it would compete with the true LCP). -->
-    <link rel="modulepreload" href="/src/main.tsx" />
+    <!-- Vite injects the entry module automatically; an explicit modulepreload
+         of /src/main.tsx was being inlined as a data URL and blocked by CSP. -->
 
     <!-- Perf: fonts as non-blocking <link> (was @import in CSS, blocks render).
          P3 craft layer — Fraunces (warm editorial serif) is our single display
