@@ -375,26 +375,6 @@ export const tracks: Track[] = [
     addedAt: "2026-06-11",
     popularity: 82,
   },
-  {
-    id: "d-baqarah-last-sds",
-    title: "Last Two Verses of Al-Baqarah",
-    artist: "Abdul Rahman Al-Sudais",
-    album: "Nightly Protection",
-    duration: "3:20",
-    cover: albumDua,
-    category: "Dua & Dhikr",
-    isPremium: false,
-    plays: "62M",
-    url: SDS(2),
-    language: "Arabic",
-    description:
-      "The Prophet ﷺ said: whoever recites them at night, they will suffice him.",
-    source: "mp3quran.net (full surah)",
-    tags: ["baqarah", "night", "protection"],
-    addedAt: "2026-06-12",
-    popularity: 88,
-  },
-
   // === Ruqya ===
   {
     id: "r-fatiha-basit",

@@ -7530,6 +7530,7 @@ export type Database = {
         content_language: string | null
         reason: string | null
         benefit_score: number | null
+        visual_state: string | null
       }
       surface_video: {
         video_id: string | null
@@ -7546,6 +7547,7 @@ export type Database = {
         is_trusted_channel: boolean | null
         is_premium_only: boolean | null
         content_language: string | null
+        visual_state: string | null
       }
     }
   }
