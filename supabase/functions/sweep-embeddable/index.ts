@@ -44,13 +44,25 @@ const sbFetch = (path: string, init: RequestInit = {}) =>
     },
   });
 
+let quotaExhausted = false;
+
 async function ytStatus(ids: string[]): Promise<Map<string, boolean> | null> {
+  let sawQuotaError = false;
   for (const key of YOUTUBE_API_KEYS) {
     const url =
       `https://www.googleapis.com/youtube/v3/videos?part=status&id=${ids.join(",")}&key=${key}`;
     const res = await fetch(url);
     if (!res.ok) {
-      console.error(`[sweep-embeddable] youtube ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      const body = (await res.text()).slice(0, 300);
+      // Quota errors are not transient: every remaining call in this run — and
+      // every run until quota resets — fails the same way. Log once per key and
+      // let the caller stop instead of emitting hundreds of identical errors.
+      if (res.status === 403 && /quota/i.test(body)) {
+        sawQuotaError = true;
+        console.warn("[sweep-embeddable] youtube quota exhausted for one key — skipping");
+        continue;
+      }
+      console.error(`[sweep-embeddable] youtube ${res.status}: ${body}`);
       continue;
     }
     const data = await res.json() as {
@@ -67,8 +79,10 @@ async function ytStatus(ids: string[]): Promise<Map<string, boolean> | null> {
     }
     return map;
   }
+  if (sawQuotaError) quotaExhausted = true;
   return null;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
