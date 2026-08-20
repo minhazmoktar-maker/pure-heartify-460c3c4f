@@ -93,9 +93,13 @@ async function classify(item: Claimed, key: string): Promise<Verdict> {
       confidence: Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
       flags: Array.isArray(parsed.flags) ? parsed.flags.map(String).slice(0, 6) : [],
     };
-  } catch {
+  } catch (e) {
+    console.error(`[visual-safety-sweep] classify failed: ${(e as Error).message}`);
     return fallback;
+  } finally {
+    clearTimeout(timer);
   }
+
 }
 
 Deno.serve(async (req) => {
