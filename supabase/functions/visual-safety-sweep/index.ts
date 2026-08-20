@@ -132,11 +132,21 @@ Deno.serve(async (req) => {
   }
   if (!AI_KEY) return json({ error: "LOVABLE_API_KEY not configured", claimed: items.length }, 500);
 
+  // Stop claiming new waves once we approach the edge budget and apply what we
+  // already have; unscanned rows keep visual_state = 'unchecked' and are
+  // re-claimed by the next cron tick.
+  const deadline = Date.now() + 90_000;
   const verdicts: Verdict[] = [];
+  let truncated = false;
   for (let i = 0; i < items.length; i += CONCURRENCY) {
+    if (Date.now() > deadline) {
+      truncated = true;
+      break;
+    }
     const slice = items.slice(i, i + CONCURRENCY);
     verdicts.push(...(await Promise.all(slice.map((it) => classify(it, AI_KEY)))));
   }
+
 
   const usable = verdicts.filter((v) => v.state !== "unchecked");
   const { data: applied, error: applyErr } = await admin.rpc("apply_visual_verdicts", { p_verdicts: usable });
