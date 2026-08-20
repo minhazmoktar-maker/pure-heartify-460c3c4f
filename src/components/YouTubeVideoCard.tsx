@@ -36,15 +36,15 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
     setThumbFailed(true);
   };
 
-  const handleThumbError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    advanceThumbnail(e.currentTarget.src);
+  const handleThumbError = () => {
+    advanceThumbnail();
   };
   // YouTube returns a 120x90 "video unavailable" placeholder for unavailable
-  // sizes/videos; detect it and try the next real thumbnail size first.
+  // videos. Detect it and fall back to a local color block.
   const handleThumbLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     if (img.naturalWidth > 0 && img.naturalWidth <= 120 && img.src.includes("i.ytimg.com")) {
-      advanceThumbnail(img.src);
+      advanceThumbnail();
     }
   };
 
