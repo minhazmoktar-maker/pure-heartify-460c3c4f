@@ -97,7 +97,6 @@ export interface HalalVerdict {
   reason: string | null;
 }
 
-const BAD_VISUAL = new Set(["female_detected", "music", "flagged", "rejected", "haram"]);
 
 /**
  * @param strict when true (default for all users) tier-2 terms are blocked too.
@@ -120,8 +119,13 @@ export function assessStrict(v: HalalAssessInput, strict = true): HalalVerdict {
   if (INTL_FEMALE_RE.test(text)) return { allowed: false, tier: 1, reason: "tier1_intl" };
   if (INTL_FEMALE_SCRIPT_RE.test(raw)) return { allowed: false, tier: 1, reason: "tier1_intl_script" };
 
+  // Verified-only visual floor: a video is servable only after the thumbnail
+  // sweep has actually inspected it and returned `clean`. `unchecked` is
+  // treated exactly like a flag — a clean title is never sufficient evidence
+  // that the imagery contains no women, instruments or other haram visuals.
   const vs = (v.visual_state ?? "unchecked").toLowerCase();
-  if (BAD_VISUAL.has(vs)) return { allowed: false, tier: 3, reason: `visual:${vs}` };
+  if (vs !== "clean") return { allowed: false, tier: 3, reason: `visual:${vs}` };
+
 
   if (strict && !TIER2_FALSE_POSITIVE_RE.test(text) && TIER2_RE.test(text)) {
     return { allowed: false, tier: 2, reason: "tier2_text" };

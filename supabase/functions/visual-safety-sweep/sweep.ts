@@ -23,7 +23,7 @@ export type Verdict = {
 };
 
 export const CALL_TIMEOUT_MS = 20_000;
-export const CONCURRENCY = 8;
+export const CONCURRENCY = 16;
 /** Wall-clock budget for claiming new waves; edge hard limit is higher. */
 export const BUDGET_MS = 90_000;
 

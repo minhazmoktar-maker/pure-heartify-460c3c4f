@@ -40,15 +40,16 @@ export function applyLanguagePreference(items: SurfaceVideo[], ctx: SurfaceConte
   return [...matched, ...items.filter((v) => !have.has(v.video_id))];
 }
 
-const BAD_VISUAL = new Set(["female_detected", "music", "flagged", "rejected", "haram"]);
 
 /**
- * Visual gate — anything the autonomous thumbnail sweep flagged (women,
- * musical imagery, other prohibited visuals) can never render, on any
- * surface, regardless of how clean its title is.
+ * Visual gate — allow-list, not deny-list. A video renders only once the
+ * autonomous thumbnail sweep has actually looked at it and returned `clean`.
+ * Unreviewed ("unchecked") rows are held back exactly like flagged ones, so no
+ * video with women, musical imagery or other prohibited visuals can slip
+ * through on the strength of a clean title alone.
  */
 export function applyVisualGate(items: SurfaceVideo[]): SurfaceVideo[] {
-  return items.filter((v) => !BAD_VISUAL.has((v.visual_state ?? "unchecked").toLowerCase()));
+  return items.filter((v) => (v.visual_state ?? "unchecked").toLowerCase() === "clean");
 }
 
 export function applyBlocklist(items: SurfaceVideo[]): SurfaceVideo[] {

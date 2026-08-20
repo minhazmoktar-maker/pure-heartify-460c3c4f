@@ -201,7 +201,7 @@ export async function retrieveColdStart(
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
       .eq("category", c)
-      .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
+      .eq("visual_state", "clean")
       .gte("halal_score", 85)
       .order("ingested_at", { ascending: false })
       .limit(perTopic * 6), ctx);
@@ -224,7 +224,7 @@ export async function retrieveColdStart(
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
       .gte("halal_score", 85)
-      .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
+      .eq("visual_state", "clean")
       .order("ingested_at", { ascending: false })
       .limit(120), ctx);
     const topUp = shuffleWithSeed(((data ?? []) as SurfaceVideo[]), personalSeed(ctx, "coldtopup"));
@@ -344,7 +344,7 @@ export async function retrieveBrowse(ctx: SurfaceContext) {
       .in("moderation_state", ["approved", "auto_approved"])
       .eq("is_hidden", false).eq("is_archived", false)
       .eq("category", c)
-      .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
+      .eq("visual_state", "clean")
       .order("halal_score", { ascending: false, nullsFirst: false })
       .limit(perCat * 3), ctx);
     buckets[idx] = shuffleWithSeed(((data ?? []) as SurfaceVideo[]), sessionSeed(ctx.sessionId + c)).slice(0, perCat);
@@ -365,7 +365,7 @@ export async function retrieveListen(ctx: SurfaceContext) {
     .in("moderation_state", ["approved", "auto_approved"])
     .eq("is_hidden", false).eq("is_archived", false)
     .in("category", AUDIO_CATS)
-    .or("visual_state.is.null,visual_state.in.(unchecked,clean)")
+    .eq("visual_state", "clean")
     .order("halal_score", { ascending: false, nullsFirst: false })
     .order("ingested_at", { ascending: false })
     .limit(240), ctx);
