@@ -20,28 +20,20 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const timeAgo = formatTimeAgo(video.publishedAt);
   const liked = isFavorite(video.id);
   const isEmbeddableVideo = /^[a-zA-Z0-9_-]{11}$/.test(video.id);
-  // Thumbnail chain, ordered by *availability* rather than raw resolution.
-  //
-  // `maxresdefault.jpg` only exists for uploads whose source was >=720p, so a
-  // large slice of the corpus 404s on it. Those 404s were the only console
-  // errors left on Home and they also cost a wasted round-trip per card on
-  // mobile. `hqdefault.jpg` (480x360) is guaranteed by YouTube for every video
-  // and is already larger than the rendered card on any device we target, so it
-  // leads the chain; the remaining entries stay as defensive fallbacks.
+  // Thumbnail chain using only URLs that YouTube guarantees to resolve.
+  // `/0.jpg` is the canonical 480x360 default thumbnail and returns a
+  // placeholder for removed/private videos instead of 404ing, so it keeps the
+  // console clean and avoids wasted mobile round-trips. We still detect the
+  // placeholder and fall back to a local color block.
   const thumbnailCandidates = [
-    isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg` : undefined,
-    isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg` : undefined,
+    isEmbeddableVideo ? `https://i.ytimg.com/vi/${video.id}/0.jpg` : undefined,
     video.thumbnailUrl,
   ].filter((src, pos, arr): src is string => Boolean(src) && arr.indexOf(src) === pos);
   const [thumbFailed, setThumbFailed] = useState(false);
   const [thumbnailSrc, setThumbnailSrc] = useState(thumbnailCandidates[0] ?? video.thumbnailUrl);
 
-  const advanceThumbnail = (currentSrc: string) => {
-    const currentIndex = thumbnailCandidates.findIndex((src) => currentSrc.includes(src) || src.includes(currentSrc));
-    const nextIndex = currentIndex >= 0 ? currentIndex + 1 : 1;
-    const nextSrc = thumbnailCandidates[nextIndex];
-    if (nextSrc) setThumbnailSrc(nextSrc);
-    else setThumbFailed(true);
+  const advanceThumbnail = () => {
+    setThumbFailed(true);
   };
 
   const handleThumbError = (e: React.SyntheticEvent<HTMLImageElement>) => {
