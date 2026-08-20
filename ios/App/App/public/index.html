@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Security headers (meta-supported subset; HSTS/X-Frame-Options must be set at the CDN/hosting layer) -->
+    <!-- Note: frame-ancestors, X-Frame-Options, HSTS, sandbox, and report-uri are set at the CDN via public/_headers (they're ignored inside <meta http-equiv>). -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://*.supabase.co https://storage.googleapis.com https://pure-heartify.lovable.app https://www.searchtruth.com https://*.everyayah.com https://everyayah.com; media-src 'self' blob: https://*.supabase.co https://download.quranicaudio.com https://*.quranicaudio.com https://server8.mp3quran.net https://*.mp3quran.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.googleapis.com https://ai.gateway.lovable.dev https://connector-gateway.lovable.dev https://api.alquran.cloud https://cdn.jsdelivr.net https://ipapi.co; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=()" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/app-icon-1024.png" />
+    <!-- Per-route <link rel="canonical"> is emitted by src/components/SEO.tsx via react-helmet-async. -->
+    <!-- Do not hardcode a sitewide canonical here — it would duplicate/override subpage canonicals for non-JS crawlers. -->
+
+    <!-- Perf: eager DNS + TCP + TLS to critical origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://tbgxtwgliumqqtuppztu.supabase.co" crossorigin />
+    <link rel="preconnect" href="https://i.ytimg.com" crossorigin />
+    <link rel="dns-prefetch" href="https://i.ytimg.com" />
+    <link rel="preconnect" href="https://www.youtube.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.youtube.com" />
+
+    <!-- Vite injects the entry module automatically; an explicit modulepreload
+         of /src/main.tsx was being inlined as a data URL and blocked by CSP. -->
+
+    <!-- Perf: fonts as non-blocking <link> (was @import in CSS, blocks render).
+         P3 craft layer — Fraunces (warm editorial serif) is our single display
+         face for headings; Inter remains the body sans. Space Grotesk retired. -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap"
+    />
+    <!-- Preload the actual Amiri WOFF2 so Qur'anic ayat paint with correct
+         ligatures on the first frame — no FOUT on the most sacred surface. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/amiri/v30/J7aRnpd8CGxBHpUrtLMS7JNKIjk.woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/amiriquran/v19/_Xmo-Hk0rD6DbUL4_vH8Zp5v5i2-sf-3O38.woff2"
+      crossorigin="anonymous"
+    />
+    <!-- LCP: the homepage hero headline is text, so its paint is gated on the
+         display face. Preload the latin subsets of Fraunces (headings) and
+         Inter (body) so the real font is in cache before first paint instead
+         of arriving after the swap. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/fraunces/v38/6NU78FyLNQOQZAnv9bYEvDiIdE9Ea92uemAk_WBq8U_9v0c2Wa0KxC9TeA.woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&display=swap" />
+    </noscript>
+
+
+    <title>Heartify — Curated Halal Video &amp; Audio App</title>
+    <meta name="description" content="Heartify is a clean, Islamic-friendly video and audio app with curated, distraction-free content for focused and mindful viewing." />
+    <meta name="author" content="Heartify" />
+    <meta name="google-site-verification" content="rmD3CQR8zQrc_bTQjRHub2HVEyxJoPVxdcHE0N18UO8" />
+
+    <!-- Sitewide og:* fallback for non-JS social crawlers. Per-route og:title/description/url are overridden by src/components/SEO.tsx (Helmet dedupes by property). og:url is intentionally omitted here so each route emits its own self-referencing og:url via Helmet — a static homepage og:url would misattribute deep-link previews on non-JS crawlers. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Heartify" />
+    <meta property="og:title" content="Heartify — Curated Halal Video &amp; Audio App" />
+    <meta property="og:description" content="Heartify is a clean, Islamic-friendly video and audio app with curated, distraction-free content for focused and mindful viewing." />
+    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/HgJPL26O2WS8LMGVF5P81QDctht2/social-images/social-1776278275766-IMG_2438.webp" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Heartify — Curated Halal Video &amp; Audio App" />
+    <meta name="twitter:description" content="Heartify is a clean, Islamic-friendly video and audio app with curated, distraction-free content for focused and mindful viewing." />
+    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/HgJPL26O2WS8LMGVF5P81QDctht2/social-images/social-1776278275766-IMG_2438.webp" />
+
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0F172A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Heartify" />
+
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"Organization","name":"Heartify","url":"https://pure-heartify.lovable.app/","logo":"https://pure-heartify.lovable.app/app-icon-1024.png"}
+    </script>
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"WebSite","name":"Heartify","url":"https://pure-heartify.lovable.app/","potentialAction":{"@type":"SearchAction","target":"https://pure-heartify.lovable.app/search?q={search_term_string}","query-input":"required name=search_term_string"}}
+    </script>
+    <script type="module" crossorigin src="/assets/index-yV94duvQ.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-CtrwoeSd.js">
+    <link rel="modulepreload" crossorigin href="/assets/query-vendor-BAcq99Oi.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-vendor-C0LD2Hyi.js">
+    <link rel="modulepreload" crossorigin href="/assets/charts-vendor-Ibn2WeTg.js">
+    <link rel="modulepreload" crossorigin href="/assets/icons-vendor-DxFQbNg7.js">
+    <link rel="modulepreload" crossorigin href="/assets/supabase-vendor-C9wpV_YX.js">
+    <link rel="modulepreload" crossorigin href="/assets/motion-vendor-DrfZAt50.js">
+    <link rel="modulepreload" crossorigin href="/assets/date-vendor-aDLjEcHe.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-Dy86MP0S.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

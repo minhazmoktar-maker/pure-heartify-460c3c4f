@@ -1,0 +1,18 @@
+# Heartify
+
+> Heartify is a clean, Islamic-friendly video and audio app with curated, distraction-free halal content for focused and mindful viewing.
+
+Heartify curates videos and audio from trusted creators across categories like Quran, lectures, nasheeds, learning, and family-friendly content. The moderation pipeline filters non-halal material before it reaches viewers.
+
+## Pages
+
+- [Home](/): Curated halal videos, audio, and daily doses.
+- [Search](/search): Search the curated halal library.
+- [Channels](/channels): Browse trusted creators and channels.
+- [Privacy](/privacy): How Heartify handles your data.
+- [Terms](/terms): Terms of service.
+
+## Optional
+
+- [Sign in](/login): Existing account sign-in.
+- [Sign up](/signup): Create a Heartify account.

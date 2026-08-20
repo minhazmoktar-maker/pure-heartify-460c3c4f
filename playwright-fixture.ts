@@ -1,3 +1,6 @@
-// Re-export the base fixture from the package
-// Override or extend test/expect here if needed
-export { test, expect } from "lovable-agent-playwright-config/fixture";
+/**
+ * Root fixture. Prefers the Lovable harness fixture when the package is
+ * installed, and falls back to plain Playwright otherwise so a missing
+ * harness package can never abort suite collection.
+ */
+export { test, expect } from "./tests/playwright-fixture";
