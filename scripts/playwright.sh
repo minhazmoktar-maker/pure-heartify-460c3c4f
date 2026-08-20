@@ -17,6 +17,10 @@ if [ -d /nix/store ]; then
   if [ -n "$WRAPPED" ] && command -v patchelf >/dev/null 2>&1; then
     NIX_CHROMIUM_LIBS=$(patchelf --print-rpath "$WRAPPED" 2>/dev/null || true)
   fi
+  NIX_CHROME_BIN=$(ls -d /nix/store/*-playwright-chromium/chrome-linux/chrome 2>/dev/null | head -1 || true)
+  if [ -n "$NIX_CHROME_BIN" ] && [ -z "${PLAYWRIGHT_CHROMIUM_PATH:-}" ]; then
+    export PLAYWRIGHT_CHROMIUM_PATH="$NIX_CHROME_BIN"
+  fi
   if [ -n "$NIX_CHROMIUM_LIBS" ]; then
     export LD_LIBRARY_PATH="${NIX_CHROMIUM_LIBS}${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
     export PLAYWRIGHT_CHANNEL="${PLAYWRIGHT_CHANNEL:-chromium}"

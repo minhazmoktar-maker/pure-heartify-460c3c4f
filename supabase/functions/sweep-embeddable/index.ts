@@ -12,6 +12,7 @@
  * then keep re-verifying the corpus.
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { isQuotaError, runEmbedSweep, type StatusResult } from "./sweep.ts";
 
 const YOUTUBE_API_KEYS: string[] = [
   Deno.env.get("YOUTUBE_API_KEY"),
@@ -44,9 +45,7 @@ const sbFetch = (path: string, init: RequestInit = {}) =>
     },
   });
 
-let quotaExhausted = false;
-
-async function ytStatus(ids: string[]): Promise<Map<string, boolean> | null> {
+async function ytStatus(ids: string[]): Promise<StatusResult> {
   let sawQuotaError = false;
   for (const key of YOUTUBE_API_KEYS) {
     const url =
@@ -57,7 +56,7 @@ async function ytStatus(ids: string[]): Promise<Map<string, boolean> | null> {
       // Quota errors are not transient: every remaining call in this run — and
       // every run until quota resets — fails the same way. Log once per key and
       // let the caller stop instead of emitting hundreds of identical errors.
-      if (res.status === 403 && /quota/i.test(body)) {
+      if (isQuotaError(res.status, body)) {
         sawQuotaError = true;
         console.warn("[sweep-embeddable] youtube quota exhausted for one key — skipping");
         continue;
@@ -77,12 +76,10 @@ async function ytStatus(ids: string[]): Promise<Map<string, boolean> | null> {
         it.status?.uploadStatus !== "rejected";
       map.set(it.id, ok);
     }
-    return map;
+    return { map };
   }
-  if (sawQuotaError) quotaExhausted = true;
-  return null;
+  return { map: null, quotaExhausted: sawQuotaError };
 }
-
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -113,39 +110,31 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const batches = Math.min(Number(url.searchParams.get("batches") ?? 40) || 40, 200);
 
-  let checked = 0;
-  let hidden = 0;
-
-  for (let b = 0; b < batches; b++) {
-    const res = await sbFetch(
-      "curated_videos?select=video_id" +
-        "&embeddable=eq.true&is_archived=eq.false&is_hidden=eq.false" +
-        "&order=embed_checked_at.asc.nullsfirst&limit=50",
-    );
-    if (!res.ok) {
-      console.error(`[sweep-embeddable] fetch failed ${res.status}`);
-      break;
-    }
-    const rows = await res.json() as Array<{ video_id: string }>;
-    if (!rows.length) break;
-    const ids = rows.map((r) => r.video_id);
-
-    const status = await ytStatus(ids);
-    if (!status) break; // all keys failed / quota exhausted
-
-    const bad = ids.filter((id) => status.get(id) === false);
-    const good = ids.filter((id) => status.get(id) !== false);
-    checked += ids.length;
-
-    if (good.length) {
-      await sbFetch(`curated_videos?video_id=in.(${good.join(",")})`, {
+  const result = await runEmbedSweep({
+    batches,
+    fetchBatch: async () => {
+      const res = await sbFetch(
+        "curated_videos?select=video_id" +
+          "&embeddable=eq.true&is_archived=eq.false&is_hidden=eq.false" +
+          "&order=embed_checked_at.asc.nullsfirst&limit=50",
+      );
+      if (!res.ok) {
+        console.error(`[sweep-embeddable] fetch failed ${res.status}`);
+        return null;
+      }
+      const rows = await res.json() as Array<{ video_id: string }>;
+      return rows.map((r) => r.video_id);
+    },
+    ytStatus,
+    markGood: async (ids) => {
+      await sbFetch(`curated_videos?video_id=in.(${ids.join(",")})`, {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
         body: JSON.stringify({ embed_checked_at: new Date().toISOString() }),
       });
-    }
-    if (bad.length) {
-      const r = await sbFetch(`curated_videos?video_id=in.(${bad.join(",")})`, {
+    },
+    markBad: async (ids) => {
+      const r = await sbFetch(`curated_videos?video_id=in.(${ids.join(",")})`, {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
         body: JSON.stringify({
@@ -154,14 +143,24 @@ Deno.serve(async (req) => {
           embed_checked_at: new Date().toISOString(),
         }),
       });
-      if (r.ok) hidden += bad.length;
-      else console.error(`[sweep-embeddable] hide failed ${r.status}: ${(await r.text()).slice(0, 200)}`);
-    }
-  }
+      if (!r.ok) console.error(`[sweep-embeddable] hide failed ${r.status}: ${(await r.text()).slice(0, 200)}`);
+      return r.ok;
+    },
+  });
+
+  const { checked, hidden, quotaExhausted, deferred, stopReason } = result;
 
   console.log(
-    `[sweep-embeddable] checked=${checked} hidden=${hidden} quota_exhausted=${quotaExhausted}`,
+    `[sweep-embeddable] checked=${checked} hidden=${hidden} deferred=${deferred.length} ` +
+      `stop=${stopReason} quota_exhausted=${quotaExhausted}`,
   );
-  return json({ ok: true, checked, hidden, quota_exhausted: quotaExhausted });
+  return json({
+    ok: true,
+    checked,
+    hidden,
+    deferred: deferred.length,
+    stop_reason: stopReason,
+    quota_exhausted: quotaExhausted,
+  });
 
 });

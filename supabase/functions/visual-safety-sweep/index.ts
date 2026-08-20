@@ -13,22 +13,24 @@
  */
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import {
+  BUDGET_MS,
+  CALL_TIMEOUT_MS,
+  CONCURRENCY,
+  fallbackVerdict,
+  guardedClassify,
+  parseVerdict,
+  runVisualSweep,
+  type Verdict,
+} from "./sweep.ts";
 
 const MODEL = "google/gemini-3-flash-preview";
-const CONCURRENCY = 8;
 
 type Claimed = {
   video_id: string;
   title: string | null;
   channel_title: string | null;
   thumbnail_url: string | null;
-};
-
-type Verdict = {
-  video_id: string;
-  state: "clean" | "female_detected" | "music" | "flagged" | "unchecked";
-  confidence: number;
-  flags: string[];
 };
 
 const PROMPT = `You are a strict Islamic content-safety reviewer for a halal video platform.
@@ -46,20 +48,12 @@ Use "female_detected" when any female is visible, "music" for musical/performanc
 "flagged" for other prohibited imagery, "clean" only when clearly safe.
 If the image is unreadable or you are unsure, answer "flagged".`;
 
-// Each classification gets its own hard timeout: without it a single hung
-// gateway request keeps the whole invocation alive until the edge runtime
-// kills it, which is what surfaced as 504s on the 5-minute cron.
-const CALL_TIMEOUT_MS = 20_000;
-
 async function classify(item: Claimed, key: string): Promise<Verdict> {
-  const fallback: Verdict = { video_id: item.video_id, state: "unchecked", confidence: 0, flags: ["model_error"] };
-  if (!item.thumbnail_url) return fallback;
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), CALL_TIMEOUT_MS);
-  try {
+  if (!item.thumbnail_url) return fallbackVerdict(item.video_id, "no_thumbnail");
+  return await guardedClassify(item.video_id, async (signal) => {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      signal: ctrl.signal,
+      signal,
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: MODEL,
@@ -76,30 +70,11 @@ async function classify(item: Claimed, key: string): Promise<Verdict> {
     });
     if (!res.ok) {
       console.error(`[visual-safety-sweep] gateway ${res.status}: ${(await res.text()).slice(0, 200)}`);
-      return fallback;
+      return fallbackVerdict(item.video_id, `gateway_${res.status}`);
     }
     const json = await res.json();
-
-    const raw: string = json?.choices?.[0]?.message?.content ?? "";
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) return fallback;
-    const parsed = JSON.parse(match[0]) as { state?: string; confidence?: number; flags?: unknown };
-    const state = ["clean", "female_detected", "music", "flagged"].includes(String(parsed.state))
-      ? (parsed.state as Verdict["state"])
-      : "flagged";
-    return {
-      video_id: item.video_id,
-      state,
-      confidence: Math.max(0, Math.min(100, Number(parsed.confidence ?? 0))),
-      flags: Array.isArray(parsed.flags) ? parsed.flags.map(String).slice(0, 6) : [],
-    };
-  } catch (e) {
-    console.error(`[visual-safety-sweep] classify failed: ${(e as Error).message}`);
-    return fallback;
-  } finally {
-    clearTimeout(timer);
-  }
-
+    return parseVerdict(item.video_id, json?.choices?.[0]?.message?.content ?? "");
+  }, CALL_TIMEOUT_MS);
 }
 
 Deno.serve(async (req) => {
@@ -135,20 +110,13 @@ Deno.serve(async (req) => {
   // Stop claiming new waves once we approach the edge budget and apply what we
   // already have; unscanned rows keep visual_state = 'unchecked' and are
   // re-claimed by the next cron tick.
-  const deadline = Date.now() + 90_000;
-  const verdicts: Verdict[] = [];
-  let truncated = false;
-  for (let i = 0; i < items.length; i += CONCURRENCY) {
-    if (Date.now() > deadline) {
-      truncated = true;
-      break;
-    }
-    const slice = items.slice(i, i + CONCURRENCY);
-    verdicts.push(...(await Promise.all(slice.map((it) => classify(it, AI_KEY)))));
-  }
+  const { verdicts, usable, truncated } = await runVisualSweep({
+    items,
+    classify: (it) => classify(it, AI_KEY),
+    concurrency: CONCURRENCY,
+    budgetMs: BUDGET_MS,
+  });
 
-
-  const usable = verdicts.filter((v) => v.state !== "unchecked");
   const { data: applied, error: applyErr } = await admin.rpc("apply_visual_verdicts", { p_verdicts: usable });
   if (applyErr) return json({ error: applyErr.message, scanned: verdicts.length }, 500);
 

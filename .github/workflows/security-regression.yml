@@ -54,6 +54,19 @@ jobs:
             sleep 1
           done
 
+      - name: Sweep worker unit regressions (timeouts + quota)
+        run: bunx vitest run src/test/visual-safety-sweep.test.ts src/test/sweep-embeddable.test.ts
+
+      - name: Forged-token impersonation suite
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:8080
+        run: bunx playwright test tests/e2e/forged-token.spec.ts --reporter=github,list
+
+      - name: Anonymous comment visibility suite
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:8080
+        run: bunx playwright test tests/e2e/anon-comments.spec.ts --reporter=github,list
+
       - name: Security regression suite
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:8080
