@@ -75,12 +75,12 @@ export function useComments(videoId: string | undefined) {
   const listQuery = useQuery({
     queryKey: ["video_comments", videoId, user?.id ?? "anon"],
     queryFn: () => fetchComments(videoId!, user?.id),
-    // `video_comments` has no anon SELECT grant, so querying it while signed
-    // out returned 401s on every watch page (visible in the console as
-    // "Failed to load resource: 401"). The thread already renders a
-    // "Sign in to join the conversation" state for anonymous visitors, so skip
-    // the request entirely instead of failing it.
-    enabled: !!videoId && !!user?.id,
+    // Anonymous visitors can read visible comments: `anon` has SELECT on
+    // `video_comments` and a dedicated `status = 'visible'` policy that does
+    // not call has_role() (anon has no EXECUTE on it — that combined policy
+    // was the real cause of the earlier 401s).
+    enabled: !!videoId,
+
     staleTime: 30_000,
   });
 
