@@ -159,6 +159,9 @@ Deno.serve(async (req) => {
     }
   }
 
-  console.log(`[sweep-embeddable] checked=${checked} hidden=${hidden}`);
-  return json({ ok: true, checked, hidden });
+  console.log(
+    `[sweep-embeddable] checked=${checked} hidden=${hidden} quota_exhausted=${quotaExhausted}`,
+  );
+  return json({ ok: true, checked, hidden, quota_exhausted: quotaExhausted });
+
 });
