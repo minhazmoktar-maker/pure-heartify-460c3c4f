@@ -46,12 +46,20 @@ Use "female_detected" when any female is visible, "music" for musical/performanc
 "flagged" for other prohibited imagery, "clean" only when clearly safe.
 If the image is unreadable or you are unsure, answer "flagged".`;
 
+// Each classification gets its own hard timeout: without it a single hung
+// gateway request keeps the whole invocation alive until the edge runtime
+// kills it, which is what surfaced as 504s on the 5-minute cron.
+const CALL_TIMEOUT_MS = 20_000;
+
 async function classify(item: Claimed, key: string): Promise<Verdict> {
   const fallback: Verdict = { video_id: item.video_id, state: "unchecked", confidence: 0, flags: ["model_error"] };
   if (!item.thumbnail_url) return fallback;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), CALL_TIMEOUT_MS);
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
+      signal: ctrl.signal,
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: MODEL,
@@ -66,8 +74,12 @@ async function classify(item: Claimed, key: string): Promise<Verdict> {
         ],
       }),
     });
-    if (!res.ok) return fallback;
+    if (!res.ok) {
+      console.error(`[visual-safety-sweep] gateway ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      return fallback;
+    }
     const json = await res.json();
+
     const raw: string = json?.choices?.[0]?.message?.content ?? "";
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) return fallback;
