@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
 
   const { data: escalation } = await admin.rpc("escalate_visually_unsafe_channels");
 
-  return json({ scanned: verdicts.length, applied, escalation: escalation ?? null }, 200);
+  return json({ scanned: verdicts.length, truncated, applied, escalation: escalation ?? null }, 200);
 });
 
 function json(body: unknown, status: number) {
