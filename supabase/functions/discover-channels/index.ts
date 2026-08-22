@@ -223,7 +223,15 @@ function scoreConfidence(
 
 // ─────────────────────────────── Quota ─────────────────────────────────────
 
-interface QuotaCtx { admin: Admin; usedThisRun: number; apiFailures: number }
+interface QuotaCtx {
+  admin: Admin;
+  usedThisRun: number;
+  apiFailures: number;
+  /** Index into YOUTUBE_API_KEYS of the key currently believed to be live. */
+  keyIndex: number;
+  /** True once every configured key has answered quotaExceeded this run. */
+  quotaExhausted: boolean;
+}
 
 async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   const day = new Date().toISOString().slice(0, 10);
