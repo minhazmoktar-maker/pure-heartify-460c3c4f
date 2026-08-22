@@ -581,7 +581,7 @@ interface JobParams { targetSeedId?: string; requestedMethod?: string }
 
 async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
   const started = Date.now();
-  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0 };
+  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0, keyIndex: 0, quotaExhausted: false };
   let totalEnqueued = 0;
   let totalSkipped = 0;
   let seedsProcessed = 0;
@@ -591,7 +591,10 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
     b.enqueued += r.enqueued; b.skipped += r.skipped; b.ids += r.ids; b.runs++;
     bySource[m] = b;
   };
-  const overBudget = () => ctx.usedThisRun >= DAILY_QUOTA_CAP * BUDGET_STOP_RATIO;
+  // quotaExhausted short-circuits every remaining crawl step: once all keys
+  // are dead, further YouTube calls can only fail.
+  const overBudget = () =>
+    ctx.quotaExhausted || ctx.usedThisRun >= DAILY_QUOTA_CAP * BUDGET_STOP_RATIO;
   const overDeadline = () => Date.now() - started >= SOFT_DEADLINE_MS;
 
   await updateJob(admin, jobId, { status: 'running', started_at: new Date().toISOString() });
@@ -729,6 +732,7 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
       skipped_count: totalSkipped,
       seeds_processed: seedsProcessed,
       api_failures: ctx.apiFailures,
+      quota_exhausted: ctx.quotaExhausted,
       stats: {
         by_source: bySource,
         duration_ms: Date.now() - started,
@@ -752,6 +756,7 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
       skipped_count: totalSkipped,
       seeds_processed: seedsProcessed,
       api_failures: ctx.apiFailures,
+      quota_exhausted: ctx.quotaExhausted,
       stats: { by_source: bySource, duration_ms: Date.now() - started },
     });
     await admin.from('dead_letter_queue').insert({
@@ -801,7 +806,7 @@ Deno.serve(async (req) => {
       requestedBy = user.id;
     }
 
-    if (!YOUTUBE_API_KEY) return json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
+    if (!YOUTUBE_API_KEYS.length) return json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
 
     const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
 
