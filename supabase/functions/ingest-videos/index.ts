@@ -681,6 +681,34 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
       inserted += await upsertVideos(chunk.slice(mid));
       continue;
     }
+    // A SINGLE row timing out can't be split further. It is almost always
+    // transient contention (a concurrent sweep holding locks / a moderation
+    // trigger stalling), not a permanently un-insertable row — so retry with
+    // backoff before giving up, otherwise the video is silently lost.
+    if (body.includes("57014") && chunk.length === 1) {
+      let recovered = false;
+      for (const delayMs of [750, 2_500, 6_000]) {
+        await new Promise((r) => setTimeout(r, delayMs));
+        const retry = await post(chunk);
+        if (retry.ok) {
+          inserted += 1;
+          embedNewVideos(chunk).catch((e) => console.warn("[embed] batch failed:", e));
+          recovered = true;
+          break;
+        }
+        const retryBody = await retry.text();
+        if (!retryBody.includes("57014")) {
+          console.warn(`[ingest] row rejected after timeout retry (${chunk[0].video_id}): ${retryBody.slice(0, 200)}`);
+          recovered = true; // not a timeout any more — stop retrying
+          break;
+        }
+      }
+      if (recovered) continue;
+      console.error(
+        `[ingest] row abandoned after 3 timeout retries (${chunk[0].video_id}) — will be picked up by the next ingestion run`,
+      );
+      continue;
+    }
     console.error(`upsert failed ${res.status} (chunk ${i}-${i + chunk.length}): ${body}`);
   }
   return inserted;
