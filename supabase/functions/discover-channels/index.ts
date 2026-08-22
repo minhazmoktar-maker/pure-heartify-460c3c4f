@@ -253,18 +253,55 @@ async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   return true;
 }
 
-// Fetch with exponential backoff on transient errors.
+const QUOTA_PATTERN =
+  /quotaExceeded|dailyLimitExceeded|rateLimitExceeded|userRateLimitExceeded|exceeded your .*quota/i;
+
+/** Swap the `key=` query param for the given key. */
+function withKey(url: string, key: string): string {
+  return url.replace(/([?&])key=[^&]*/, `$1key=${encodeURIComponent(key)}`);
+}
+
+/**
+ * Fetch with exponential backoff on transient errors, multi-key rotation on
+ * quota errors, and a hard run-level stop once every key is exhausted so the
+ * job doesn't keep hammering a dead quota for the rest of its budget.
+ */
 async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | null> {
+  if (ctx.quotaExhausted) return null;
+
   for (let i = 0; i < attempts; i++) {
     try {
-      const res = await fetch(url);
+      const key = YOUTUBE_API_KEYS[ctx.keyIndex] ?? YOUTUBE_API_KEY;
+      const res = await fetch(withKey(url, key));
       if (res.ok) return await res.json();
+
+      const body = (await res.text()).slice(0, 300);
+      const isQuota =
+        res.status === 429 || (res.status === 403 && QUOTA_PATTERN.test(body)) || QUOTA_PATTERN.test(body);
+
+      if (isQuota) {
+        // Rotate to the next configured key; if none remain, stop the run.
+        if (ctx.keyIndex + 1 < YOUTUBE_API_KEYS.length) {
+          ctx.keyIndex++;
+          console.warn(
+            `youtube quota exhausted on key #${ctx.keyIndex} — rotating to key #${ctx.keyIndex + 1}`,
+          );
+          continue; // retry same URL with the next key (does not consume `i` budget meaningfully)
+        }
+        ctx.quotaExhausted = true;
+        ctx.apiFailures++;
+        console.error(
+          `youtube quota exhausted on all ${YOUTUBE_API_KEYS.length} key(s) — halting discovery run: ${body}`,
+        );
+        return null;
+      }
+
       if (res.status === 403 || res.status === 400 || res.status === 404) {
-        console.error('youtube api error', res.status, (await res.text()).slice(0, 200));
+        console.error('youtube api error', res.status, body);
         ctx.apiFailures++;
         return null;
       }
-      // 5xx / 429 → backoff
+      // 5xx → backoff
       await new Promise((r) => setTimeout(r, 250 * Math.pow(2, i)));
     } catch (e) {
       console.error('youtube fetch failed', e);
