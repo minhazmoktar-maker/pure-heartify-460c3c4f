@@ -16,8 +16,14 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-const YOUTUBE_API_KEY =
-  Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2') ?? '';
+// All configured keys, in rotation order. Discovery previously used a single
+// key, so one `quotaExceeded` killed every call for the rest of the day.
+const YOUTUBE_API_KEYS: string[] = [
+  Deno.env.get('YOUTUBE_API_KEY'),
+  Deno.env.get('YOUTUBE_API_KEY_2'),
+].filter((k): k is string => !!k && k.length > 0);
+// Kept for URL construction; ytFetch swaps in whichever key is still live.
+const YOUTUBE_API_KEY = YOUTUBE_API_KEYS[0] ?? '';
 
 const DAILY_QUOTA_CAP = Number(Deno.env.get('DISCOVERY_DAILY_QUOTA') ?? 4000);
 const MAX_SEEDS_PER_RUN = Number(Deno.env.get('DISCOVERY_SEEDS_PER_RUN') ?? 40);
