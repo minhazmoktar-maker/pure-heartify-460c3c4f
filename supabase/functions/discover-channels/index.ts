@@ -16,8 +16,14 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-const YOUTUBE_API_KEY =
-  Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2') ?? '';
+// All configured keys, in rotation order. Discovery previously used a single
+// key, so one `quotaExceeded` killed every call for the rest of the day.
+const YOUTUBE_API_KEYS: string[] = [
+  Deno.env.get('YOUTUBE_API_KEY'),
+  Deno.env.get('YOUTUBE_API_KEY_2'),
+].filter((k): k is string => !!k && k.length > 0);
+// Kept for URL construction; ytFetch swaps in whichever key is still live.
+const YOUTUBE_API_KEY = YOUTUBE_API_KEYS[0] ?? '';
 
 const DAILY_QUOTA_CAP = Number(Deno.env.get('DISCOVERY_DAILY_QUOTA') ?? 4000);
 const MAX_SEEDS_PER_RUN = Number(Deno.env.get('DISCOVERY_SEEDS_PER_RUN') ?? 40);
@@ -217,7 +223,15 @@ function scoreConfidence(
 
 // ─────────────────────────────── Quota ─────────────────────────────────────
 
-interface QuotaCtx { admin: Admin; usedThisRun: number; apiFailures: number }
+interface QuotaCtx {
+  admin: Admin;
+  usedThisRun: number;
+  apiFailures: number;
+  /** Index into YOUTUBE_API_KEYS of the key currently believed to be live. */
+  keyIndex: number;
+  /** True once every configured key has answered quotaExceeded this run. */
+  quotaExhausted: boolean;
+}
 
 async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   const day = new Date().toISOString().slice(0, 10);
@@ -239,18 +253,55 @@ async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   return true;
 }
 
-// Fetch with exponential backoff on transient errors.
+const QUOTA_PATTERN =
+  /quotaExceeded|dailyLimitExceeded|rateLimitExceeded|userRateLimitExceeded|exceeded your .*quota/i;
+
+/** Swap the `key=` query param for the given key. */
+function withKey(url: string, key: string): string {
+  return url.replace(/([?&])key=[^&]*/, `$1key=${encodeURIComponent(key)}`);
+}
+
+/**
+ * Fetch with exponential backoff on transient errors, multi-key rotation on
+ * quota errors, and a hard run-level stop once every key is exhausted so the
+ * job doesn't keep hammering a dead quota for the rest of its budget.
+ */
 async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | null> {
+  if (ctx.quotaExhausted) return null;
+
   for (let i = 0; i < attempts; i++) {
     try {
-      const res = await fetch(url);
+      const key = YOUTUBE_API_KEYS[ctx.keyIndex] ?? YOUTUBE_API_KEY;
+      const res = await fetch(withKey(url, key));
       if (res.ok) return await res.json();
+
+      const body = (await res.text()).slice(0, 300);
+      const isQuota =
+        res.status === 429 || (res.status === 403 && QUOTA_PATTERN.test(body)) || QUOTA_PATTERN.test(body);
+
+      if (isQuota) {
+        // Rotate to the next configured key; if none remain, stop the run.
+        if (ctx.keyIndex + 1 < YOUTUBE_API_KEYS.length) {
+          ctx.keyIndex++;
+          console.warn(
+            `youtube quota exhausted on key #${ctx.keyIndex} — rotating to key #${ctx.keyIndex + 1}`,
+          );
+          continue; // retry same URL with the next key (does not consume `i` budget meaningfully)
+        }
+        ctx.quotaExhausted = true;
+        ctx.apiFailures++;
+        console.error(
+          `youtube quota exhausted on all ${YOUTUBE_API_KEYS.length} key(s) — halting discovery run: ${body}`,
+        );
+        return null;
+      }
+
       if (res.status === 403 || res.status === 400 || res.status === 404) {
-        console.error('youtube api error', res.status, (await res.text()).slice(0, 200));
+        console.error('youtube api error', res.status, body);
         ctx.apiFailures++;
         return null;
       }
-      // 5xx / 429 → backoff
+      // 5xx → backoff
       await new Promise((r) => setTimeout(r, 250 * Math.pow(2, i)));
     } catch (e) {
       console.error('youtube fetch failed', e);
@@ -530,7 +581,7 @@ interface JobParams { targetSeedId?: string; requestedMethod?: string }
 
 async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
   const started = Date.now();
-  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0 };
+  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0, keyIndex: 0, quotaExhausted: false };
   let totalEnqueued = 0;
   let totalSkipped = 0;
   let seedsProcessed = 0;
@@ -540,7 +591,10 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
     b.enqueued += r.enqueued; b.skipped += r.skipped; b.ids += r.ids; b.runs++;
     bySource[m] = b;
   };
-  const overBudget = () => ctx.usedThisRun >= DAILY_QUOTA_CAP * BUDGET_STOP_RATIO;
+  // quotaExhausted short-circuits every remaining crawl step: once all keys
+  // are dead, further YouTube calls can only fail.
+  const overBudget = () =>
+    ctx.quotaExhausted || ctx.usedThisRun >= DAILY_QUOTA_CAP * BUDGET_STOP_RATIO;
   const overDeadline = () => Date.now() - started >= SOFT_DEADLINE_MS;
 
   await updateJob(admin, jobId, { status: 'running', started_at: new Date().toISOString() });
@@ -678,6 +732,7 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
       skipped_count: totalSkipped,
       seeds_processed: seedsProcessed,
       api_failures: ctx.apiFailures,
+      quota_exhausted: ctx.quotaExhausted,
       stats: {
         by_source: bySource,
         duration_ms: Date.now() - started,
@@ -701,6 +756,7 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
       skipped_count: totalSkipped,
       seeds_processed: seedsProcessed,
       api_failures: ctx.apiFailures,
+      quota_exhausted: ctx.quotaExhausted,
       stats: { by_source: bySource, duration_ms: Date.now() - started },
     });
     await admin.from('dead_letter_queue').insert({
@@ -750,7 +806,7 @@ Deno.serve(async (req) => {
       requestedBy = user.id;
     }
 
-    if (!YOUTUBE_API_KEY) return json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
+    if (!YOUTUBE_API_KEYS.length) return json({ error: 'YOUTUBE_API_KEY not configured' }, 500);
 
     const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
 
