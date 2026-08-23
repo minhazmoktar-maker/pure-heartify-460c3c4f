@@ -133,7 +133,15 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         setPreferences((prev) => ({
           ...prev,
           ui_language: (data.ui_language as LanguageCode) ?? prev.ui_language,
-          content_languages: (data.content_languages as LanguageCode[]) ?? prev.content_languages,
+          // Legacy rows were seeded English-first. In launch markets that made
+          // the feed feel foreign, so promote the regional language to index 0
+          // (the slot the feed reserves a guaranteed share for) while keeping
+          // every language the user actually selected.
+          content_languages: regionFirst(
+            (data.content_languages as LanguageCode[]) ?? prev.content_languages,
+            data.country_code ?? prev.country_code ?? prev.detected_country,
+            (data.ui_language as LanguageCode) ?? prev.ui_language,
+          ),
           country_code: data.country_code ?? prev.country_code,
           rtl_override: data.rtl_override,
           auto_personalize: data.auto_personalize,
