@@ -69,7 +69,11 @@ function defaults(): LocalePreferences {
   const detectedCountry = detectCountry();
   return {
     ui_language: detectedLang,
-    content_languages: Array.from(new Set([detectedLang, "en", "ar"])) as LanguageCode[],
+    // Region-first: a Dhaka/Karachi/Delhi user gets Bengali/Urdu content at
+    // index 0 even when their device runs en-US, so the very first feed feels
+    // local instead of foreign. Index 0 is the language the feed reserves a
+    // guaranteed share for (see `primaryContentLanguage`).
+    content_languages: defaultContentLanguages(detectedLang, detectedCountry),
     country_code: detectedCountry,
     rtl_override: null,
     auto_personalize: true,

@@ -27,4 +27,18 @@ if [ -d /nix/store ]; then
   fi
 fi
 
+# Fallback: some sandbox images pre-install browsers under
+# PLAYWRIGHT_BROWSERS_PATH at a *different* revision than the one the pinned
+# @playwright/test expects (e.g. chromium-1194 installed, 1217 expected). The
+# binary is API-compatible for our specs, so point at whatever full Chromium
+# build is actually present instead of failing to launch.
+if [ -z "${PLAYWRIGHT_CHROMIUM_PATH:-}" ]; then
+  BROWSERS_DIR="${PLAYWRIGHT_BROWSERS_PATH:-/opt/ms-playwright}"
+  CANDIDATE=$(ls -d "$BROWSERS_DIR"/chromium-*/chrome-linux/chrome 2>/dev/null | sort -V | tail -1 || true)
+  if [ -n "$CANDIDATE" ] && [ -x "$CANDIDATE" ]; then
+    export PLAYWRIGHT_CHROMIUM_PATH="$CANDIDATE"
+    export PLAYWRIGHT_CHANNEL="${PLAYWRIGHT_CHANNEL:-chromium}"
+  fi
+fi
+
 exec bunx playwright test "$@"
