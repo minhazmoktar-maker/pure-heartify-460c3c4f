@@ -20,6 +20,11 @@ import {
 } from "../_shared/recommendations/rerankV3.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { observed } from "../_shared/observe.ts";
+import {
+  derivePrimaryLanguage,
+  interleavePrimaryLanguage,
+  PRIMARY_LANGUAGE_SHARE,
+} from "../_shared/localFirst.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -99,6 +104,13 @@ Deno.serve(observed("feed", async (req) => {
       .map((l: string) => l.toLowerCase().replace(/[^a-z]/g, "").slice(0, 3))
       .filter((l: string) => l.length >= 2 && l.length <= 3)
       .slice(0, 8);
+    // Local-first: the caller's primary (regional) language gets a guaranteed
+    // share of every page. Client sends content_languages ordered with the
+    // regional language at index 0 (see src/i18n/region.ts); an explicit
+    // primary_language in the body wins when provided.
+    const primaryLanguage =
+      derivePrimaryLanguage([body?.primary_language]) ??
+      derivePrimaryLanguage(contentLanguages);
     // Sanitize search: strip PostgREST-significant chars (, ( ) * . : & =)
     // to prevent filter injection into the or=(...) clause.
     const rawSearch = typeof body?.search === "string" ? body.search.trim() : "";
@@ -246,7 +258,7 @@ Deno.serve(observed("feed", async (req) => {
     const cacheable = !callerId && !search && excludeIds.size === 0;
     const langKey = contentLanguages.length ? contentLanguages.join(",") : "-";
     const cacheKey = cacheable
-      ? `feed:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}`
+      ? `feed:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}:${primaryLanguage ?? "-"}`
       : "";
 
     // Decide whether we can use the diversified RPC path. It applies a
@@ -617,7 +629,64 @@ Deno.serve(observed("feed", async (req) => {
       else overflow.push(v);
     }
     // v3: MMR alternation on the primary block prevents back-to-back creator/category.
-    const diversified = [...alternateByCreatorAndCategory(primary), ...overflow];
+    let diversified = [...alternateByCreatorAndCategory(primary), ...overflow];
+
+    // --- Local-first guarantee -------------------------------------------
+    // The clean corpus is English-dominant, so even a correct language gate
+    // leaves a Dhaka/Karachi user with a mostly-English page. Top the pool up
+    // with primary-language rows when supply inside it is short of the quota,
+    // then interleave so ~45% of the visible page is local.
+    if (primaryLanguage) {
+      const wanted = Math.max(1, Math.round(limit * PRIMARY_LANGUAGE_SHARE));
+      const have = diversified
+        .slice(0, limit)
+        .filter((v) => ((v.content_language as string | null) ?? "").toLowerCase() === primaryLanguage)
+        .length;
+      if (have < wanted) {
+        try {
+          const seen = new Set(diversified.map((v) => v.video_id as string));
+          const topUpUrl =
+            `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}` +
+            `&moderation_state=in.(approved,auto_approved)` +
+            `&is_hidden=eq.false&is_archived=eq.false` +
+            (isPremium ? "" : "&is_premium_only=eq.false") +
+            `&content_language=eq.${encodeURIComponent(primaryLanguage)}` +
+            (category && category !== "All" ? `&category=eq.${encodeURIComponent(category)}` : "") +
+            `&order=published_at.desc.nullslast,halal_score.desc&limit=${Math.min(limit * 6, 300)}`;
+          const r = await fetch(topUpUrl, {
+            headers: {
+              "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+              "apikey": SUPABASE_SERVICE_ROLE_KEY,
+              "Accept": "application/json",
+            },
+          });
+          if (r.ok) {
+            const rows = (await r.json()) as Array<Record<string, unknown>>;
+            let added = 0;
+            for (const v of rows) {
+              if (added >= wanted - have) break;
+              const id = v.video_id as string;
+              if (!id || seen.has(id) || excludeIds.has(id)) continue;
+              if (!assessStrict(v as never, strictHalal).allowed) continue;
+              const t = `${(v.title as string) ?? ""} ${(v.channel_title as string) ?? ""}`.toLowerCase();
+              if (BLOCKED_TOKENS.some((tok) => t.includes(tok))) continue;
+              seen.add(id);
+              diversified.push(v);
+              added++;
+            }
+            if (added) console.log(`[feed.localFirst] lang=${primaryLanguage} topped_up=${added}`);
+          }
+        } catch (e) {
+          console.warn("[feed.localFirst] top-up skipped:", (e as Error).message);
+        }
+      }
+      diversified = interleavePrimaryLanguage(
+        diversified,
+        (v) => (v.content_language as string | null) ?? null,
+        primaryLanguage,
+        limit,
+      );
+    }
 
     const items = diversified.slice(0, limit);
     const nextCursor = items.length === limit
@@ -638,6 +707,7 @@ Deno.serve(observed("feed", async (req) => {
           publishedAt: v.published_at ?? v.ingested_at,
           isTrustedChannel: v.is_trusted_channel,
           isPremiumOnly: v.is_premium_only ?? false,
+          contentLanguage: (v.content_language as string | null) ?? null,
           reasons: (v.__reasons as string[] | undefined) ?? undefined,
         })),
         nextCursor,

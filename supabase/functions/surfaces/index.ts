@@ -21,6 +21,7 @@ import { enforceContract, computeStats, checkGuarantees } from "../_shared/surfa
 import { loadFeedConfig } from "../_shared/surfaces/config.ts";
 import type { SurfaceContext, SurfaceResponse, SurfaceVideo } from "../_shared/surfaces/types.ts";
 import { observed } from "../_shared/observe.ts";
+import { derivePrimaryLanguage, interleavePrimaryLanguage } from "../_shared/localFirst.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -285,7 +286,18 @@ Deno.serve(observed("surfaces", async (req) => {
     const filtered = excludeIds.size
       ? universal.filter((v) => !excludeIds.has(v.video_id))
       : universal;
-    const picked = enforceContract(filtered, effectiveContract);
+    // Local-first: guarantee the regional language a fixed share of every
+    // rail. Without this the English-dominant corpus makes a Dhaka/Karachi
+    // user's Home feel foreign even though their language is selected.
+    const primaryLanguage =
+      derivePrimaryLanguage([body?.primary_language]) ??
+      derivePrimaryLanguage(effectiveLanguages);
+    const picked = interleavePrimaryLanguage(
+      enforceContract(filtered, effectiveContract),
+      (v) => v.content_language ?? null,
+      primaryLanguage,
+      effectiveContract.maxItems,
+    );
     const stats = computeStats(picked, effectiveContract);
     const guarantees = checkGuarantees(picked, effectiveContract, stats);
 

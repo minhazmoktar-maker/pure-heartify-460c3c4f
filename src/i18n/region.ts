@@ -82,3 +82,27 @@ export function primaryContentLanguage(
   const nonEnglish = list.map((l) => l.toLowerCase()).find((l) => l !== "en" && l !== "ar");
   return nonEnglish ?? null;
 }
+
+/**
+ * Promote the regional language to index 0 for an existing selection.
+ *
+ * Accounts that were created before region-first defaults stored an
+ * English-first list, which in launch markets (BD/PK/IN/ID/...) produced a
+ * feed that felt foreign. This keeps every language the user selected and only
+ * reorders, so it is safe to apply on every hydrate.
+ */
+export function regionFirst(
+  selected: readonly LanguageCode[] | null | undefined,
+  country: string | null | undefined,
+  uiLanguage: LanguageCode,
+): LanguageCode[] {
+  const list = (selected ?? []).filter(Boolean) as LanguageCode[];
+  if (list.length === 0) return defaultContentLanguages(uiLanguage, country ?? null);
+  const regional = country ? REGION_CONTENT_LANGUAGES[country.toUpperCase()] : undefined;
+  const local = regional?.[0];
+  if (!local || local === "en" || list[0] === local) return list;
+  // Only reorder when the user already has the local language selected —
+  // never silently add a language they removed.
+  if (!list.includes(local)) return list;
+  return [local, ...list.filter((l) => l !== local)];
+}
