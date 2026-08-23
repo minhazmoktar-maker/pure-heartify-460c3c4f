@@ -707,6 +707,7 @@ Deno.serve(observed("feed", async (req) => {
           publishedAt: v.published_at ?? v.ingested_at,
           isTrustedChannel: v.is_trusted_channel,
           isPremiumOnly: v.is_premium_only ?? false,
+          contentLanguage: (v.content_language as string | null) ?? null,
           reasons: (v.__reasons as string[] | undefined) ?? undefined,
         })),
         nextCursor,
