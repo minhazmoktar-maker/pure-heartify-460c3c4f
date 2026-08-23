@@ -21,7 +21,7 @@ import {
   type LanguageCode,
 } from "@/i18n";
 import { detectCountry, detectLanguage } from "@/i18n/detect";
-import { defaultContentLanguages } from "@/i18n/region";
+import { defaultContentLanguages, regionFirst } from "@/i18n/region";
 import { detectTimezone } from "@/lib/intl";
 
 export interface LocalePreferences {
