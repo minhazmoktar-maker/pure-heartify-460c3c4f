@@ -440,6 +440,10 @@ export const TRUSTED_CHANNELS: string[] = [
 
   // XXIV. Additional halal channels (recitation, nasheeds, lectures)
   "Holy Tune", "HolyTune", "Holy Tunes", "Quran Holy Tune",
+  // Bangladesh Holy Tune family (Bangla Quran recitation + tafsir)
+  "Holy Tune BD", "HolyTune BD", "Holy Tune Bangla", "Holy Tune Bangladesh",
+  "Holy Tune Quran BD", "হলি টিউন", "হলি টিউন বিডি",
+
   "Quran Tune", "Tranquil Tune", "Soothing Quran", "Heart Soothing Quran",
   "Peaceful Recitation", "Calm Quran", "Quran Melody", "Sacred Tune",
   "Holy Quran Channel", "Holy Quran TV", "Holy Quran Recitation",

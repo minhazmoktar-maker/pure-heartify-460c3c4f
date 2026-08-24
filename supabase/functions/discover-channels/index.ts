@@ -44,8 +44,19 @@ type Admin = ReturnType<typeof createClient>;
 // ─────────────────────────── Topic classification ───────────────────────────
 
 const HALAL_TOPIC_KEYWORDS: Record<string, string[]> = {
-  islamic: ['islam', 'quran', 'tafsir', 'hadith', 'sunnah', 'seerah', 'dawah', 'dua', 'ramadan', 'salah', 'fiqh', 'قرآن', 'حديث', 'سيرة', 'اسلام', 'ইসলাম', 'قرآن پاک', 'ইসলামিক', 'مسلم', 'اسلامی'],
-  education: ['learn', 'course', 'tutorial', 'lesson', 'lecture', 'academy', 'university', 'school', 'درس', 'محاضرة', 'تعليم', 'শিক্ষা', 'পাঠ', 'تعلیم', 'sekolah', 'kuliah'],
+  islamic: ['islam', 'quran', 'tafsir', 'hadith', 'sunnah', 'seerah', 'dawah', 'dua', 'ramadan', 'salah', 'fiqh', 'قرآن', 'حديث', 'سيرة', 'اسلام', 'ইসলাম', 'قرآن پاک', 'ইসলামিক', 'مسلم', 'اسلامی',
+    // Local-first (bn/ur/hi) transliterations — these dominate South Asian
+    // channel titles and were previously invisible to the scorer.
+    'bayan', 'bayaan', 'waz', 'waaz', 'tafseer', 'hadis', 'mufti', 'maulana', 'molana', 'moulana',
+    'qari', 'hafiz', 'shaykh', 'ulama', 'deen', 'deeni', 'islami', 'islamic bayan', 'khutbah', 'khutba',
+    'taqrir', 'taqreer', 'nasihat', 'naseeha', 'madani', 'jalsa', 'mahfil', 'sirat',
+    // Native script
+    'বয়ান', 'ওয়াজ', 'তাফসীর', 'হাদিস', 'মুফতি', 'মাওলানা', 'দ্বীন', 'কুরআন', 'নামাজ', 'মাহফিল',
+    'بیان', 'تقریر', 'مفتی', 'مولانا', 'دین', 'نماز', 'حدیث', 'تفسیر',
+    'बयान', 'तक़रीर', 'इस्लाम', 'कुरान', 'क़ुरान', 'हदीस', 'मुफ़्ती', 'मौलाना', 'नमाज़', 'दीन'],
+  education: ['learn', 'course', 'tutorial', 'lesson', 'lecture', 'academy', 'university', 'school', 'درس', 'محاضرة', 'تعليم', 'শিক্ষা', 'পাঠ', 'تعلیم', 'sekolah', 'kuliah',
+    'madrasa', 'madrasah', 'maktab', 'পড়াশোনা', 'ক্লাস', 'কোর্স', 'শিক্ষক', 'مدرسہ', 'کلاس', 'सीखें', 'पाठ', 'कक्षा', 'शिक्षा'],
+
   science: ['physics', 'chemistry', 'biology', 'astronomy', 'science', 'علم', 'বিজ্ঞান', 'ilmu', 'ilim', 'ciencia', 'ciência', 'wissenschaft', '科学', '科學', '과학'],
   history: ['history', 'historical', 'civilization', 'empire', 'ancient', 'تاريخ', 'ইতিহাস', 'sejarah', 'tarih', 'historia', 'geschichte', '歴史', '历史', '역사'],
   technology: ['tech', 'programming', 'code', 'coding', 'developer', 'engineering', 'ai ', 'برمجة', 'teknologi', 'teknoloji'],
@@ -191,7 +202,15 @@ function scoreConfidence(
     topic === 'education' ? 0.9 :
     topic ? 0.7 : 0.35;
 
-  const eduSignals = ['lecture', 'lesson', 'tutorial', 'course', 'academy', 'university', 'workshop', 'masterclass', 'دروس', 'محاضرة', 'কোর্স'];
+  const eduSignals = [
+    'lecture', 'lesson', 'tutorial', 'course', 'academy', 'university', 'workshop', 'masterclass',
+    'دروس', 'محاضرة', 'কোর্স',
+    // Local-first teaching signals (bn/ur/hi) — transliterated + native.
+    'bayan', 'waz', 'waaz', 'tafseer', 'taqrir', 'khutbah', 'madrasa', 'madrasah', 'maktab', 'darse',
+    'বয়ান', 'ওয়াজ', 'তাফসীর', 'দরস', 'ক্লাস', 'শিক্ষা',
+    'بیان', 'تقریر', 'درس', 'تعلیم', 'مدرسہ',
+    'बयान', 'तक़रीर', 'शिक्षा', 'पाठ',
+  ];
   const eduHits = eduSignals.filter((kw) => hay.includes(kw)).length;
   const eduQuality = Math.min(1, eduHits / 3);
 
@@ -217,9 +236,19 @@ function scoreConfidence(
     0.15 * breakdown.organization +
     0.15 * breakdown.language_confidence;
 
-  const overall = Math.round(Math.max(0, Math.min(1, positive - 0.25 * breakdown.duplicate_probability)) * 100);
+  // Scholar-authority bonus: South Asian Islamic channels are overwhelmingly
+  // named after the teacher ("Mufti Tariq Masood", "মাওলানা …"), which carried
+  // zero signal before and capped them in tier D forever.
+  const SCHOLAR_TITLE_RE =
+    /(^|[^a-z])(mufti|maulana|molana|moulana|mawlana|allama|qari|hafiz|shaykh|sheikh|imam|ustad|ustadh|dr\.)($|[^a-z])|মুফতি|মাওলানা|আল্লামা|হাফেজ|قاری|مفتی|مولانا|علامہ|حافظ|मुफ़्ती|मौलाना|अल्लामा/i;
+  const scholarBonus = SCHOLAR_TITLE_RE.test(`${title} ${description}`) ? 0.10 : 0;
+
+  const overall = Math.round(
+    Math.max(0, Math.min(1, positive + scholarBonus - 0.25 * breakdown.duplicate_probability)) * 100,
+  );
   return { breakdown, overall, eduQuality: Math.round(eduQuality * 100) };
 }
+
 
 // ─────────────────────────────── Quota ─────────────────────────────────────
 
@@ -378,6 +407,10 @@ async function ingestCandidatesBatch(
       confidence_breakdown: breakdown,
       halal_topic_hint: hint,
       language_detected: lang,
+      // Persist the resolved language too so per-language discovery yield is
+      // measurable (previously always NULL, making yield audits impossible).
+      language: lang,
+
       crawl_depth: disc.depth,
       educational_quality: eduQuality,
       organization_type: org,
