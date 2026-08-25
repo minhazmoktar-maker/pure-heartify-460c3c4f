@@ -194,6 +194,10 @@ const AdminConsole = () => {
           <Button asChild variant="secondary" size="sm">
             <Link to="/admin/feed-ab">Feed A/B</Link>
           </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/moderation-audit">Moderation audit</Link>
+          </Button>
+
           <Button onClick={runSweep} disabled={busy} size="sm">
             Run sweep now
           </Button>
