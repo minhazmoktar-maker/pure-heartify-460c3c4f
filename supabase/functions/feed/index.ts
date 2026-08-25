@@ -468,6 +468,13 @@ Deno.serve(observed("feed", async (req) => {
     // but still honor blocked creators, dismissals, hidden videos, and give a
     // mild affinity boost so the ordering is personal rather than identical
     // across users.
+    // Experiment state, read by the diversity guards further down (which run
+    // outside the personalization block). Defaults = shipped v5 behaviour.
+    const abState = {
+      variant: "control" as "control" | "diverse",
+      channelCap: maxPerChannel,
+      longTailShare: 0.2,
+    };
     if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
       // Rotation seed prioritizes session id so every new tab / cold open
@@ -482,6 +489,25 @@ Deno.serve(observed("feed", async (req) => {
         for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
         return (h >>> 0) / 0xffffffff;
       };
+
+      // --- feed_diversity_v6 experiment ------------------------------------
+      // Deterministic 50/50 bucketing on the *stable* identity (never the
+      // session), so a user stays in one arm across sessions and the readout
+      // in /admin/feed-ab is not contaminated by re-bucketing. The `diverse`
+      // arm widens sampling temperature, tightens the per-channel cap and
+      // enlarges the long-tail quota; control is the shipped v5 ranking.
+      const abVariant: "control" | "diverse" =
+        hash01(`feed_diversity_v6:${identity}`) < 0.5 ? "control" : "diverse";
+      const abTempBoost = abVariant === "diverse" ? 0.25 : 0;
+      const abChannelCap = abVariant === "diverse"
+        ? Math.max(2, maxPerChannel - 1)
+        : maxPerChannel;
+      const abLongTailShare = abVariant === "diverse" ? 0.3 : 0.2;
+      abState.variant = abVariant;
+      abState.channelCap = abChannelCap;
+      abState.longTailShare = abLongTailShare;
+
+
 
       if (callerId) {
         try {
@@ -555,7 +581,7 @@ Deno.serve(observed("feed", async (req) => {
               // expectation. Temperature shrinks as real signals accumulate,
               // so established users get a sharper, more personal feed.
               const signalStrength = Math.min(1, (chAff + catAff + longCh + longCat + interestMatch) / 2);
-              const temp = 0.85 - 0.5 * signalStrength;
+              const temp = 0.85 - 0.5 * signalStrength + abTempBoost;
               const u = Math.max(1e-9, hash01(`${identity}:${rotationKey}:${vid}`));
               const finalScore = score - temp * Math.log(-Math.log(u));
 
@@ -615,7 +641,7 @@ Deno.serve(observed("feed", async (req) => {
         const ch = (v.channel_id as string) || (v.channel_title as string) || "__";
         chCount.set(ch, (chCount.get(ch) ?? 0) + 1);
       }
-      const longTailQuota = Math.max(2, Math.floor(limit * 0.2));
+      const longTailQuota = Math.max(2, Math.floor(limit * abState.longTailShare));
       const longTail: Array<Record<string, unknown>> = [];
       const rest: Array<Record<string, unknown>> = [];
       for (const v of ordered) {
@@ -647,7 +673,7 @@ Deno.serve(observed("feed", async (req) => {
     for (const v of ordered) {
       const ch = (v.channel_title as string) ?? "__";
       const n = perChannel.get(ch) ?? 0;
-      if (n < maxPerChannel) { primary.push(v); perChannel.set(ch, n + 1); }
+      if (n < abState.channelCap) { primary.push(v); perChannel.set(ch, n + 1); }
       else overflow.push(v);
     }
     // v3: MMR alternation on the primary block prevents back-to-back creator/category.
@@ -746,6 +772,9 @@ Deno.serve(observed("feed", async (req) => {
         nextCursor,
         total: items.length,
         viewer: { isPremium },
+        // Arm the caller was served, so the client can log an exposure event
+        // for /admin/feed-ab without re-deriving the bucketing.
+        experiment: { key: "feed_diversity_v6", variant: abState.variant },
       },
       200,
       { "X-Cache": hit ? "HIT" : "MISS" },

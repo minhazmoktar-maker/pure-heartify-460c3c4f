@@ -1594,6 +1594,36 @@ export type Database = {
         }
         Relationships: []
       }
+      corpus_progress_snapshots: {
+        Row: {
+          captured_at: string
+          clean: number
+          flagged: number
+          id: number
+          other: number
+          total: number
+          unchecked: number
+        }
+        Insert: {
+          captured_at?: string
+          clean?: number
+          flagged?: number
+          id?: number
+          other?: number
+          total?: number
+          unchecked?: number
+        }
+        Update: {
+          captured_at?: string
+          clean?: number
+          flagged?: number
+          id?: number
+          other?: number
+          total?: number
+          unchecked?: number
+        }
+        Relationships: []
+      }
       curated_videos: {
         Row: {
           category: string
@@ -6429,6 +6459,7 @@ export type Database = {
           target_count: number
         }[]
       }
+      corpus_progress: { Args: { p_hours?: number }; Returns: Json }
       create_challenge: {
         Args: {
           _days: number
@@ -6477,6 +6508,10 @@ export type Database = {
       evaluate_feature_flag: {
         Args: { _key: string; _user_id: string }
         Returns: boolean
+      }
+      experiment_feed_metrics: {
+        Args: { p_hours?: number; p_key?: string }
+        Returns: Json
       }
       export_user_data: { Args: { _uid: string }; Returns: Json }
       f_unaccent: { Args: { "": string }; Returns: string }
@@ -7370,6 +7405,7 @@ export type Database = {
           video_id: string
         }[]
       }
+      snapshot_corpus_progress: { Args: never; Returns: undefined }
       social_admin_stats: { Args: never; Returns: Json }
       social_analytics_series: { Args: { _days?: number }; Returns: Json }
       social_can_view: {

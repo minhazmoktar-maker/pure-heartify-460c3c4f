@@ -185,6 +185,15 @@ const AdminConsole = () => {
               <Sparkles className="mr-2 h-4 w-4" /> Launch monitor
             </Link>
           </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/corpus-progress">Corpus progress</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/locale-coverage">Locale coverage</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/feed-ab">Feed A/B</Link>
+          </Button>
           <Button onClick={runSweep} disabled={busy} size="sm">
             Run sweep now
           </Button>
