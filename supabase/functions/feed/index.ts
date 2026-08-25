@@ -641,7 +641,7 @@ Deno.serve(observed("feed", async (req) => {
         const ch = (v.channel_id as string) || (v.channel_title as string) || "__";
         chCount.set(ch, (chCount.get(ch) ?? 0) + 1);
       }
-      const longTailQuota = Math.max(2, Math.floor(limit * 0.2));
+      const longTailQuota = Math.max(2, Math.floor(limit * abState.longTailShare));
       const longTail: Array<Record<string, unknown>> = [];
       const rest: Array<Record<string, unknown>> = [];
       for (const v of ordered) {
