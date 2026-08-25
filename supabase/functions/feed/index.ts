@@ -566,10 +566,13 @@ Deno.serve(observed("feed", async (req) => {
               if (interestMatch) reasons.push("interest-match");
               if (novelty) reasons.push("new-trusted-creator");
               if (impPen > 0.3) reasons.push("shown-recently");
-              return { v, k: -finalScore, hardHide: !!hardHide, reasons };
+              return { v, k: -finalScore, gate: -score, hardHide: !!hardHide, reasons };
             });
             ordered = scored
-              .filter((x) => !x.hardHide && x.k < 4.5)
+              // Quality gate uses the *pre-noise* score so stochastic rotation
+              // can reorder the page but never smuggle penalized rows in.
+              .filter((x) => !x.hardHide && x.gate < 4.5)
+
               .sort((a, b) => a.k - b.k)
               .map((x) => {
                 (x.v as Record<string, unknown>).__reasons = x.reasons;
