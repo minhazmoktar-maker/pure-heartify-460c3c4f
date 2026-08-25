@@ -202,8 +202,8 @@ async function fetchWatchEntries(): Promise<Entry[]> {
   const url = envFromDotenv("VITE_SUPABASE_URL");
   const key = envFromDotenv("VITE_SUPABASE_PUBLISHABLE_KEY");
   if (!url || !key || MAX_WATCH_URLS <= 0) return [];
-  // PostgREST caps every response at 1000 rows, so page with Range headers
-  // until the cap is reached or the backend stops returning rows.
+  // PostgREST caps every response at 1000 rows, so page through the RPC with an
+  // explicit offset until the cap is reached or the backend runs out of rows.
   const PAGE = 1000;
   const ids: string[] = [];
   try {
@@ -214,9 +214,8 @@ async function fetchWatchEntries(): Promise<Entry[]> {
           apikey: key,
           Authorization: `Bearer ${key}`,
           "Content-Type": "application/json",
-          Range: `${offset}-${Math.min(offset + PAGE, MAX_WATCH_URLS) - 1}`,
         },
-        body: JSON.stringify({ p_limit: MAX_WATCH_URLS }),
+        body: JSON.stringify({ p_limit: PAGE, p_offset: offset }),
       });
       if (!res.ok) break;
       const rows = (await res.json()) as Array<{ video_id: string }>;
