@@ -31,8 +31,16 @@ interface VariantRow {
   autoplay_pass_rate: number | null;
   client_errors: number;
   error_rate: number | null;
+  /** Serving telemetry written by the feed function (feed_serve_samples). */
+  serves: number;
+  latency_avg_ms: number | null;
+  latency_p50_ms: number | null;
+  latency_p95_ms: number | null;
+  items_per_serve: number | null;
+  cache_hit_rate: number | null;
   is_control: boolean;
 }
+
 
 interface Metrics {
   key: string;
