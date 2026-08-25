@@ -100,7 +100,25 @@ for (const file of files.sort()) {
     if (!eqSet(placeholders(en[k]), placeholders(v))) placeholderMismatch.push(k);
   }
 
-  const problems = missing.length + extra.length + empty.length + placeholderMismatch.length;
+  // Required UI + player labels: must exist AND be genuinely localized.
+  const requiredMissing = REQUIRED_KEYS.filter(
+    (k) => typeof dict[k] !== "string" || dict[k].trim().length === 0,
+  );
+  const untranslated = REQUIRED_KEYS.filter(
+    (k) =>
+      typeof dict[k] === "string" &&
+      dict[k].trim().length > 0 &&
+      dict[k].trim() === (en[k] ?? "").trim() &&
+      !ALLOWED_ENGLISH_IDENTICAL.has(`${lang}:${k}`),
+  );
+
+  const problems =
+    missing.length +
+    extra.length +
+    empty.length +
+    placeholderMismatch.length +
+    requiredMissing.length +
+    untranslated.length;
   if (problems === 0) {
     summary.push(`  \u2713 ${lang.padEnd(4)}  ${Object.keys(dict).length} keys, parity`);
     continue;
@@ -113,7 +131,10 @@ for (const file of files.sort()) {
   if (extra.length) lines.push(`      extra (${extra.length}): ${extra.slice(0, 5).join(", ")}${extra.length > 5 ? "\u2026" : ""}`);
   if (empty.length) lines.push(`      empty (${empty.length}): ${empty.slice(0, 5).join(", ")}${empty.length > 5 ? "\u2026" : ""}`);
   if (placeholderMismatch.length) lines.push(`      {var} mismatch (${placeholderMismatch.length}): ${placeholderMismatch.slice(0, 5).join(", ")}`);
+  if (requiredMissing.length) lines.push(`      REQUIRED missing (${requiredMissing.length}): ${requiredMissing.join(", ")}`);
+  if (untranslated.length) lines.push(`      REQUIRED untranslated / English-identical (${untranslated.length}): ${untranslated.join(", ")}`);
   summary.push(lines.join("\n"));
+
 }
 
 console.log(`i18n dictionary parity vs en.json (${enKeys.size} keys):`);
