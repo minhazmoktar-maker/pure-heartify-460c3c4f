@@ -642,7 +642,11 @@ Deno.serve(observed("feed", async (req) => {
         .slice(0, limit)
         .filter((v) => ((v.content_language as string | null) ?? "").toLowerCase() === primaryLanguage)
         .length;
-      if (have < wanted) {
+      // Only top up on the plain first page. With a search term, a section
+      // filter, or a cursor in play the top-up query cannot reproduce the
+      // request's predicates, so its rows would be off-query pollution
+      // interleaved into the top of the page.
+      if (have < wanted && !search && !sectionId && !cursor) {
         try {
           const seen = new Set(diversified.map((v) => v.video_id as string));
           const topUpUrl =
