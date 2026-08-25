@@ -227,7 +227,7 @@ export default function MosqueFinder() {
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                         `${m.lat},${m.lon}`,
-                      )}&query_place_id=`}
+                      )}`}
                       target="_blank" rel="noopener noreferrer"
                       aria-label={`View ${m.name} on Google Maps`}
                     >
