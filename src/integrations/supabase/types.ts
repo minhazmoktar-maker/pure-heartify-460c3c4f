@@ -1711,6 +1711,132 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_appeals: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          message: string
+          reason_code: string | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+          upload_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          message: string
+          reason_code?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+          upload_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          message?: string
+          reason_code?: string | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+          upload_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_appeals_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creator_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_appeals_reason_code_fkey"
+            columns: ["reason_code"]
+            isOneToOne: false
+            referencedRelation: "creator_flag_reasons"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "creator_appeals_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "creator_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_flag_reasons: {
+        Row: {
+          active: boolean
+          appealable: boolean
+          code: string
+          created_at: string
+          guidance: string
+          label: string
+          severity: string
+        }
+        Insert: {
+          active?: boolean
+          appealable?: boolean
+          code: string
+          created_at?: string
+          guidance: string
+          label: string
+          severity?: string
+        }
+        Update: {
+          active?: boolean
+          appealable?: boolean
+          code?: string
+          created_at?: string
+          guidance?: string
+          label?: string
+          severity?: string
+        }
+        Relationships: []
+      }
+      creator_subscriptions: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_subscriptions_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creator_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_upload_events: {
         Row: {
           actor_id: string | null
@@ -1755,20 +1881,27 @@ export type Database = {
           created_at: string
           creator_id: string
           description: string | null
+          detected_language: string | null
+          duration_auto: boolean
           duration_seconds: number | null
+          flag_reason_code: string | null
           halal_score: number | null
           id: string
           language: string
+          language_confidence: number | null
           moderation_reason: string | null
           published_at: string | null
+          resume_token: string | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           size_bytes: number | null
           status: string
+          thumbnail_auto: boolean
           thumbnail_path: string | null
           title: string
           updated_at: string
+          uploaded_bytes: number
           user_id: string
           video_path: string | null
           view_count: number
@@ -1779,20 +1912,27 @@ export type Database = {
           created_at?: string
           creator_id: string
           description?: string | null
+          detected_language?: string | null
+          duration_auto?: boolean
           duration_seconds?: number | null
+          flag_reason_code?: string | null
           halal_score?: number | null
           id?: string
           language?: string
+          language_confidence?: number | null
           moderation_reason?: string | null
           published_at?: string | null
+          resume_token?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           size_bytes?: number | null
           status?: string
+          thumbnail_auto?: boolean
           thumbnail_path?: string | null
           title: string
           updated_at?: string
+          uploaded_bytes?: number
           user_id: string
           video_path?: string | null
           view_count?: number
@@ -1803,20 +1943,27 @@ export type Database = {
           created_at?: string
           creator_id?: string
           description?: string | null
+          detected_language?: string | null
+          duration_auto?: boolean
           duration_seconds?: number | null
+          flag_reason_code?: string | null
           halal_score?: number | null
           id?: string
           language?: string
+          language_confidence?: number | null
           moderation_reason?: string | null
           published_at?: string | null
+          resume_token?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           size_bytes?: number | null
           status?: string
+          thumbnail_auto?: boolean
           thumbnail_path?: string | null
           title?: string
           updated_at?: string
+          uploaded_bytes?: number
           user_id?: string
           video_path?: string | null
           view_count?: number
@@ -1828,6 +1975,60 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "creator_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_uploads_flag_reason_fk"
+            columns: ["flag_reason_code"]
+            isOneToOne: false
+            referencedRelation: "creator_flag_reasons"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      creator_watch_events: {
+        Row: {
+          autoplay_ok: boolean | null
+          completed: boolean
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          position_seconds: number
+          session_id: string | null
+          upload_id: string
+          user_id: string | null
+          watched_seconds: number
+        }
+        Insert: {
+          autoplay_ok?: boolean | null
+          completed?: boolean
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          position_seconds?: number
+          session_id?: string | null
+          upload_id: string
+          user_id?: string | null
+          watched_seconds?: number
+        }
+        Update: {
+          autoplay_ok?: boolean | null
+          completed?: boolean
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          position_seconds?: number
+          session_id?: string | null
+          upload_id?: string
+          user_id?: string | null
+          watched_seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_watch_events_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "creator_uploads"
             referencedColumns: ["id"]
           },
         ]
@@ -6813,7 +7014,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      creator_analytics: { Args: { p_days?: number }; Returns: Json }
+      creator_moderation_trail: { Args: { p_upload_id: string }; Returns: Json }
+      creator_public_profile: { Args: { p_handle: string }; Returns: Json }
       creator_review_summary: { Args: never; Returns: Json }
+      creator_upload_retention: { Args: { p_upload_id: string }; Returns: Json }
       detect_content_language: {
         Args: { _fallback?: string; _title: string }
         Returns: string
@@ -7625,6 +7830,10 @@ export type Database = {
         Args: { _minutes?: number }
         Returns: number
       }
+      resolve_creator_appeal: {
+        Args: { p_appeal_id: string; p_decision: string; p_notes?: string }
+        Returns: Json
+      }
       respond_challenge_invite: {
         Args: { _accept: boolean; _challenge_id: string }
         Returns: Json
@@ -7791,7 +8000,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      submit_creator_appeal: {
+        Args: { p_message: string; p_upload_id: string }
+        Returns: Json
+      }
       sweep_inappropriate_content: { Args: never; Returns: Json }
+      toggle_creator_subscription: {
+        Args: { p_creator_id: string }
+        Returns: Json
+      }
       unaccent: { Args: { "": string }; Returns: string }
       unread_notification_count: { Args: never; Returns: number }
       upsert_reciter: {
