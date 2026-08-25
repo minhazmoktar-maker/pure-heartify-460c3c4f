@@ -19,5 +19,13 @@
   "language.diversityHint": "القيم الأعلى تعرض محتوى أكثر خارج لغتك الأساسية.",
   "language.detected": "تم اكتشاف: {value}",
   "language.saved": "تم حفظ التفضيلات",
-  "language.rtl": "تخطيط من اليمين إلى اليسار"
+  "language.rtl": "تخطيط من اليمين إلى اليسار",
+  "player.play": "تشغيل",
+  "player.pause": "إيقاف مؤقت",
+  "player.mute": "كتم الصوت",
+  "player.unmute": "إلغاء كتم الصوت",
+  "player.captions": "الترجمة",
+  "player.fullscreen": "ملء الشاشة",
+  "player.next": "التالي",
+  "player.replay": "إعادة التشغيل"
 }

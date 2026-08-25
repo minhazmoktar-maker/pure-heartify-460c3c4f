@@ -19,5 +19,13 @@
   "language.diversityHint": "Manyan ƙimomi suna nuna ƙarin abun ciki wanda ba na harshen ka na farko ba.",
   "language.detected": "An gano: {value}",
   "language.saved": "An ajiye zaɓuɓɓuka",
-  "language.rtl": "Tsari daga dama zuwa hagu"
+  "language.rtl": "Tsari daga dama zuwa hagu",
+  "player.play": "Kunna",
+  "player.pause": "Dakata",
+  "player.mute": "Kashe sauti",
+  "player.unmute": "Kunna sauti",
+  "player.captions": "Rubutun fim",
+  "player.fullscreen": "Cikakken allo",
+  "player.next": "Na gaba",
+  "player.replay": "Sake kunnawa"
 }

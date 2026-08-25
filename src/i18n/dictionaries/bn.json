@@ -19,5 +19,13 @@
   "language.diversityHint": "উচ্চ মান আপনার প্রধান ভাষার বাইরে বেশি কনটেন্ট দেখায়।",
   "language.detected": "সনাক্ত: {value}",
   "language.saved": "পছন্দ সংরক্ষিত",
-  "language.rtl": "ডান-থেকে-বাম লেআউট"
+  "language.rtl": "ডান-থেকে-বাম লেআউট",
+  "player.play": "চালান",
+  "player.pause": "বিরতি",
+  "player.mute": "শব্দ বন্ধ",
+  "player.unmute": "শব্দ চালু",
+  "player.captions": "সাবটাইটেল",
+  "player.fullscreen": "পূর্ণ স্ক্রিন",
+  "player.next": "পরবর্তী",
+  "player.replay": "আবার চালান"
 }

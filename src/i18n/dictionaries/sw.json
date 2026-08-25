@@ -19,5 +19,13 @@
   "language.diversityHint": "Thamani za juu huonyesha maudhui zaidi nje ya lugha yako kuu.",
   "language.detected": "Imegunduliwa: {value}",
   "language.saved": "Mapendeleo yamehifadhiwa",
-  "language.rtl": "Mpangilio wa kulia kwenda kushoto"
+  "language.rtl": "Mpangilio wa kulia kwenda kushoto",
+  "player.play": "Cheza",
+  "player.pause": "Sitisha",
+  "player.mute": "Zima sauti",
+  "player.unmute": "Rejesha sauti",
+  "player.captions": "Manukuu",
+  "player.fullscreen": "Skrini kamili",
+  "player.next": "Ifuatayo",
+  "player.replay": "Cheza tena"
 }

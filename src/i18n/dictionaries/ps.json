@@ -19,5 +19,13 @@
   "language.diversityHint": "لوړې ارزښتونه ستاسو د لومړني ژبې څخه بهر ډیر محتوا ښکاره کوي.",
   "language.detected": "کشف شو: {value}",
   "language.saved": "غوره توبونه خوندي شول",
-  "language.rtl": "له ښیې څخه کیڼ اړخ ته ترتیب"
+  "language.rtl": "له ښیې څخه کیڼ اړخ ته ترتیب",
+  "player.play": "پرانیستل",
+  "player.pause": "ودرول",
+  "player.mute": "بې غږ",
+  "player.unmute": "غږ چالان",
+  "player.captions": "سبټایټل",
+  "player.fullscreen": "بشپړ سکرین",
+  "player.next": "بل",
+  "player.replay": "بیا پرانیستل"
 }

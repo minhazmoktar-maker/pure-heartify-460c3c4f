@@ -19,5 +19,13 @@
   "language.diversityHint": "Higher values surface more content outside your primary language.",
   "language.detected": "Detected: {value}",
   "language.saved": "Preferences saved",
-  "language.rtl": "Right-to-left layout"
+  "language.rtl": "Right-to-left layout",
+  "player.play": "Play",
+  "player.pause": "Pause",
+  "player.mute": "Mute",
+  "player.unmute": "Unmute",
+  "player.captions": "Captions",
+  "player.fullscreen": "Fullscreen",
+  "player.next": "Next",
+  "player.replay": "Replay"
 }

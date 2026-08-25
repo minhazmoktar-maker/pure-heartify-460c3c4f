@@ -19,5 +19,13 @@
   "language.diversityHint": "Nilai lebih tinggi menampilkan lebih banyak konten di luar bahasa utama Anda.",
   "language.detected": "Terdeteksi: {value}",
   "language.saved": "Preferensi disimpan",
-  "language.rtl": "Tata letak kanan-ke-kiri"
+  "language.rtl": "Tata letak kanan-ke-kiri",
+  "player.play": "Putar",
+  "player.pause": "Jeda",
+  "player.mute": "Bisukan",
+  "player.unmute": "Suarakan",
+  "player.captions": "Teks",
+  "player.fullscreen": "Layar penuh",
+  "player.next": "Berikutnya",
+  "player.replay": "Putar ulang"
 }

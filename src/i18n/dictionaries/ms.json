@@ -19,5 +19,13 @@
   "language.diversityHint": "Nilai lebih tinggi menyerlahkan kandungan di luar bahasa utama anda.",
   "language.detected": "Dikesan: {value}",
   "language.saved": "Keutamaan disimpan",
-  "language.rtl": "Susun atur kanan-ke-kiri"
+  "language.rtl": "Susun atur kanan-ke-kiri",
+  "player.play": "Main",
+  "player.pause": "Jeda",
+  "player.mute": "Bisukan",
+  "player.unmute": "Nyahbisukan",
+  "player.captions": "Sari kata",
+  "player.fullscreen": "Skrin penuh",
+  "player.next": "Seterusnya",
+  "player.replay": "Main semula"
 }

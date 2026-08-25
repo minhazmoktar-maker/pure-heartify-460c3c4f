@@ -19,5 +19,13 @@
   "language.diversityHint": "Yüksek değerler ana dilinizin dışındaki içeriği daha çok gösterir.",
   "language.detected": "Algılandı: {value}",
   "language.saved": "Tercihler kaydedildi",
-  "language.rtl": "Sağdan sola yerleşim"
+  "language.rtl": "Sağdan sola yerleşim",
+  "player.play": "Oynat",
+  "player.pause": "Duraklat",
+  "player.mute": "Sesi kapat",
+  "player.unmute": "Sesi aç",
+  "player.captions": "Altyazılar",
+  "player.fullscreen": "Tam ekran",
+  "player.next": "Sonraki",
+  "player.replay": "Yeniden oynat"
 }
