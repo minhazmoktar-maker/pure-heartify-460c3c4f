@@ -7365,7 +7365,7 @@ export type Database = {
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
       sitemap_watch_urls: {
-        Args: { p_limit?: number }
+        Args: { p_limit?: number; p_offset?: number }
         Returns: {
           video_id: string
         }[]
