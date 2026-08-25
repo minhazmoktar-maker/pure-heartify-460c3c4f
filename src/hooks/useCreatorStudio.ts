@@ -1,14 +1,27 @@
 /**
  * Creator ecosystem client layer.
  *
- * Handles creator-account onboarding, resumable-ish direct-to-storage uploads
- * via server-minted signed URLs, and submission into the moderation queue.
- * Nothing here can publish content — approval is a moderator-only action.
+ * Handles creator-account onboarding, resumable chunked uploads straight to
+ * storage (TUS, 6MB chunks, survives network drops), and submission into the
+ * moderation queue. Nothing here can publish content — approval is a
+ * moderator-only action.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { uploadResumable } from "@/lib/resumableUpload";
+import { detectLanguage, generateThumbnail, probeDuration } from "@/lib/uploadMedia";
+
+/** Shape returned by the creator-upload-init edge function. */
+interface InitResult {
+  upload_id: string;
+  bucket: string;
+  video: { path: string; token: string };
+  thumbnail: { path: string; token: string } | null;
+}
+
+
 
 export interface CreatorAccount {
   id: string;
@@ -119,6 +132,7 @@ export interface UploadInput {
   language: string;
   category: string;
   file: File;
+  /** Optional creator-supplied cover. Omit to auto-generate from the video. */
   thumbnail?: File | null;
 }
 
@@ -126,40 +140,149 @@ export interface UploadProgress {
   phase: "idle" | "validating" | "uploading" | "submitting" | "done" | "error";
   percent: number;
   message: string | null;
+  /** True when the current attempt continued a previously interrupted upload. */
+  resumed: boolean;
+  /** Set when the attempt failed in a way the creator can retry. */
+  retryable: boolean;
 }
 
-/** Reads the intrinsic duration of a local video file (best-effort). */
-async function probeDuration(file: File): Promise<number | null> {
-  return new Promise((resolve) => {
-    const url = URL.createObjectURL(file);
-    const el = document.createElement("video");
-    el.preload = "metadata";
-    const done = (value: number | null) => {
-      URL.revokeObjectURL(url);
-      resolve(value);
-    };
-    el.onloadedmetadata = () => done(Number.isFinite(el.duration) ? Math.round(el.duration) : null);
-    el.onerror = () => done(null);
-    el.src = url;
-    window.setTimeout(() => done(null), 8000);
-  });
-}
+const IDLE: UploadProgress = {
+  phase: "idle",
+  percent: 0,
+  message: null,
+  resumed: false,
+  retryable: false,
+};
 
 export function useCreatorUpload() {
   const queryClient = useQueryClient();
-  const [progress, setProgress] = useState<UploadProgress>({
-    phase: "idle",
-    percent: 0,
-    message: null,
-  });
+  const [progress, setProgress] = useState<UploadProgress>(IDLE);
+  const abortRef = useRef<AbortController | null>(null);
+  /** Keeps the init result so a retry resumes instead of creating a new row. */
+  const pendingRef = useRef<{ input: UploadInput; init: InitResult } | null>(null);
 
-  const reset = useCallback(() => setProgress({ phase: "idle", percent: 0, message: null }), []);
+  const reset = useCallback(() => {
+    pendingRef.current = null;
+    setProgress(IDLE);
+  }, []);
+
+  const cancel = useCallback(() => {
+    abortRef.current?.abort();
+  }, []);
+
+  const runTransfer = useCallback(
+    async (input: UploadInput, init: InitResult): Promise<{ ok: boolean; message: string }> => {
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      setProgress((p) => ({
+        ...p,
+        phase: "uploading",
+        percent: 12,
+        message: "Uploading video…",
+        retryable: false,
+      }));
+
+      const videoResult = await uploadResumable({
+        bucket: init.bucket,
+        objectPath: init.video.path,
+        file: input.file,
+        contentType: input.file.type,
+        signal: controller.signal,
+        onProgress: (fraction) => {
+          setProgress((p) => ({
+            ...p,
+            phase: "uploading",
+            percent: Math.min(88, 12 + Math.round(fraction * 74)),
+            message: `Uploading video… ${Math.round(fraction * 100)}%`,
+          }));
+        },
+      });
+
+      if (!videoResult.ok) {
+        const message = videoResult.error ?? "Upload interrupted.";
+        setProgress({
+          phase: "error",
+          percent: 0,
+          message,
+          resumed: videoResult.resumed,
+          retryable: true,
+        });
+        return { ok: false, message };
+      }
+
+      if (init.thumbnail && input.thumbnail) {
+        setProgress((p) => ({ ...p, percent: 90, message: "Uploading cover image…" }));
+        await uploadResumable({
+          bucket: init.bucket,
+          objectPath: init.thumbnail.path,
+          file: input.thumbnail,
+          contentType: input.thumbnail.type,
+        });
+      }
+
+      setProgress((p) => ({
+        ...p,
+        phase: "submitting",
+        percent: 94,
+        message: "Sending to moderation…",
+      }));
+
+      const { data: submitted, error: submitError } = await supabase.functions.invoke(
+        "creator-upload-submit",
+        { body: { upload_id: init.upload_id } },
+      );
+      if (submitError || !submitted?.ok) {
+        const blocked = (submitted as { reason?: string } | null)?.reason;
+        const message = blocked
+          ? "This video was blocked by the halal content policy."
+          : submitError?.message ?? "Submission failed.";
+        setProgress({
+          phase: "error",
+          percent: 0,
+          message,
+          resumed: videoResult.resumed,
+          retryable: !blocked,
+        });
+        return { ok: false, message };
+      }
+
+      pendingRef.current = null;
+      await queryClient.invalidateQueries({ queryKey: ["creator-uploads"] });
+      setProgress({
+        phase: "done",
+        percent: 100,
+        message: "Submitted. A reviewer will check it shortly.",
+        resumed: videoResult.resumed,
+        retryable: false,
+      });
+      return { ok: true, message: "Submitted for review." };
+    },
+    [queryClient],
+  );
 
   const upload = useCallback(
     async (input: UploadInput): Promise<{ ok: boolean; message: string }> => {
-      setProgress({ phase: "validating", percent: 5, message: "Checking your video…" });
+      setProgress({
+        phase: "validating",
+        percent: 5,
+        message: "Reading your video…",
+        resumed: false,
+        retryable: false,
+      });
 
+      // Auto-detect duration, cover frame and language before any bytes move.
       const duration = await probeDuration(input.file);
+      let thumbnail = input.thumbnail ?? null;
+      let thumbnailAuto = false;
+      if (!thumbnail) {
+        const generated = await generateThumbnail(input.file, duration);
+        if (generated) {
+          thumbnail = generated.file;
+          thumbnailAuto = true;
+        }
+      }
+      const guess = detectLanguage(`${input.title} ${input.description}`);
 
       const { data: init, error: initError } = await supabase.functions.invoke(
         "creator-upload-init",
@@ -172,7 +295,11 @@ export function useCreatorUpload() {
             content_type: input.file.type,
             size_bytes: input.file.size,
             duration_seconds: duration,
-            thumbnail_content_type: input.thumbnail?.type ?? undefined,
+            duration_auto: duration != null,
+            thumbnail_content_type: thumbnail?.type ?? undefined,
+            thumbnail_auto: thumbnailAuto,
+            detected_language: guess?.code,
+            language_confidence: guess?.confidence,
           },
         },
       );
@@ -182,58 +309,25 @@ export function useCreatorUpload() {
           (init as { message?: string } | null)?.message ??
           initError?.message ??
           "We couldn't start this upload.";
-        setProgress({ phase: "error", percent: 0, message });
+        setProgress({ phase: "error", percent: 0, message, resumed: false, retryable: false });
         return { ok: false, message };
       }
 
-      setProgress({ phase: "uploading", percent: 15, message: "Uploading video…" });
-
-      const { error: videoError } = await supabase.storage
-        .from(init.bucket)
-        .uploadToSignedUrl(init.video.path, init.video.token, input.file, {
-          contentType: input.file.type,
-        });
-      if (videoError) {
-        const message = "Upload failed — please check your connection and retry.";
-        setProgress({ phase: "error", percent: 0, message });
-        return { ok: false, message };
-      }
-
-      if (input.thumbnail && init.thumbnail) {
-        setProgress({ phase: "uploading", percent: 80, message: "Uploading thumbnail…" });
-        await supabase.storage
-          .from(init.bucket)
-          .uploadToSignedUrl(init.thumbnail.path, init.thumbnail.token, input.thumbnail, {
-            contentType: input.thumbnail.type,
-          });
-      }
-
-      setProgress({ phase: "submitting", percent: 92, message: "Sending to moderation…" });
-      const { data: submitted, error: submitError } = await supabase.functions.invoke(
-        "creator-upload-submit",
-        { body: { upload_id: init.upload_id } },
-      );
-      if (submitError || !submitted?.ok) {
-        const message =
-          (submitted as { reason?: string } | null)?.reason
-            ? "This video was blocked by the halal content policy."
-            : submitError?.message ?? "Submission failed.";
-        setProgress({ phase: "error", percent: 0, message });
-        return { ok: false, message };
-      }
-
-      await queryClient.invalidateQueries({ queryKey: ["creator-uploads"] });
-      setProgress({
-        phase: "done",
-        percent: 100,
-        message: "Submitted. A reviewer will check it shortly.",
-      });
-      return { ok: true, message: "Submitted for review." };
+      const prepared: UploadInput = { ...input, thumbnail };
+      pendingRef.current = { input: prepared, init: init as InitResult };
+      return runTransfer(prepared, init as InitResult);
     },
-    [queryClient],
+    [runTransfer],
   );
 
-  return { upload, progress, reset };
+  /** Continues the last interrupted transfer from the final completed chunk. */
+  const retry = useCallback(async (): Promise<{ ok: boolean; message: string }> => {
+    const pending = pendingRef.current;
+    if (!pending) return { ok: false, message: "Nothing to resume." };
+    return runTransfer(pending.input, pending.init);
+  }, [runTransfer]);
+
+  return { upload, retry, cancel, progress, reset, canResume: pendingRef.current !== null };
 }
 
 /** Signed playback URL for an approved (or own/pending) native upload. */
