@@ -204,7 +204,7 @@ async function fetchWatchEntries(): Promise<Entry[]> {
   if (!url || !key || MAX_WATCH_URLS <= 0) return [];
   try {
     const res = await fetch(
-      `${url}/rest/v1/curated_videos?select=video_id&status=eq.approved&visual_state=eq.clean&order=quality_score.desc.nullslast&limit=${MAX_WATCH_URLS}`,
+      `${url}/rest/v1/curated_videos?select=video_id&visual_state=eq.clean&moderation_state=in.(approved,auto_approved)&is_hidden=is.false&is_archived=is.false&order=view_count.desc.nullslast&limit=${MAX_WATCH_URLS}`,
       { headers: { apikey: key, Authorization: `Bearer ${key}` } },
     );
     if (!res.ok) return [];
