@@ -193,7 +193,6 @@ export default function AdminCreatorReview() {
         path="/admin/creator-review"
         title="Creator upload review — Heartify"
         description="Human review queue for native creator uploads."
-        noindex
       />
       <div className="container mx-auto max-w-3xl space-y-4 px-4 py-6">
         <div className="flex items-center justify-between">
