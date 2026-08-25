@@ -57,6 +57,8 @@ const AdminFeedDiversity = lazy(() => import("./pages/AdminFeedDiversity.tsx"));
 const AdminCorpusProgress = lazy(() => import("./pages/AdminCorpusProgress.tsx"));
 const AdminLocaleCoverage = lazy(() => import("./pages/AdminLocaleCoverage.tsx"));
 const AdminFeedAB = lazy(() => import("./pages/AdminFeedAB.tsx"));
+const AdminModerationAudit = lazy(() => import("./pages/AdminModerationAudit.tsx"));
+
 const AdminBenefitLabels = lazy(() => import("./pages/AdminBenefitLabels.tsx"));
 const AdminDedup = lazy(() => import("./pages/AdminDedup.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
