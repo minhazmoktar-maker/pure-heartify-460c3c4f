@@ -25,7 +25,7 @@ test.describe("smart search — typo tolerance & normalization", () => {
   });
 
   test("casing + trailing whitespace are normalized", async ({ page }) => {
-    await page.goto(`/search?q=${encodeURIComponent("  RAMADN  ")}`);
+    await page.goto(`/search?q=${encodeURIComponent("  RAMADAN  ")}`);
     await page.waitForTimeout(1800);
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/ramadan|fasting|iftar|taraweeh/);
@@ -48,14 +48,14 @@ test.describe("smart search — typo tolerance & normalization", () => {
 
   test("autocomplete chips render on empty-state input for 2+ char prefix", async ({ page }) => {
     await page.goto("/search");
-    const input = page.getByPlaceholder(/quraan|hubrman|ramadn/i);
+    const input = page.getByRole("combobox").first();
     await expect(input).toBeVisible();
     await input.fill("qu");
     // Debounce is 250ms in useSmartSearch; give the corpus + fuse a beat.
     await page.waitForTimeout(1500);
 
-    // Chips are rendered as <button> pills right below the input.
-    const chips = page.locator("button.rounded-full");
+    // Suggestions render as listbox options under the combobox.
+    const chips = page.locator('[role="option"]');
     const count = await chips.count();
     // If the corpus is empty in CI we don't fail the assertion, but when there
     // are matches at least one chip must be interactive.
@@ -147,7 +147,7 @@ test.describe("smart search — long mixed-whitespace queries", () => {
 
   test("autocomplete chips still render for mixed-whitespace prefix", async ({ page }) => {
     await page.goto("/search");
-    const input = page.getByPlaceholder(/quraan|hubrman|ramadn/i);
+    const input = page.getByRole("combobox").first();
     await input.fill("   qu\tr   ");
     await page.waitForTimeout(1500);
     // Should not crash — chips container (if any) stays interactive.

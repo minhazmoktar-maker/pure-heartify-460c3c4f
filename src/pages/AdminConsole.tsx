@@ -180,6 +180,11 @@ const AdminConsole = () => {
               <Sparkles className="mr-2 h-4 w-4" /> Full audit
             </Link>
           </Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/launch-monitor">
+              <Sparkles className="mr-2 h-4 w-4" /> Launch monitor
+            </Link>
+          </Button>
           <Button onClick={runSweep} disabled={busy} size="sm">
             Run sweep now
           </Button>
