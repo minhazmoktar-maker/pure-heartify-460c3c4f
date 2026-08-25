@@ -48,7 +48,7 @@ test.describe("smart search — typo tolerance & normalization", () => {
 
   test("autocomplete chips render on empty-state input for 2+ char prefix", async ({ page }) => {
     await page.goto("/search");
-    const input = page.getByRole("textbox").first();
+    const input = page.getByRole("combobox").first();
     await expect(input).toBeVisible();
     await input.fill("qu");
     // Debounce is 250ms in useSmartSearch; give the corpus + fuse a beat.
@@ -147,7 +147,7 @@ test.describe("smart search — long mixed-whitespace queries", () => {
 
   test("autocomplete chips still render for mixed-whitespace prefix", async ({ page }) => {
     await page.goto("/search");
-    const input = page.getByRole("textbox").first();
+    const input = page.getByRole("combobox").first();
     await input.fill("   qu\tr   ");
     await page.waitForTimeout(1500);
     // Should not crash — chips container (if any) stays interactive.
