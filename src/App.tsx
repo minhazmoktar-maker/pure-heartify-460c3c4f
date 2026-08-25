@@ -515,6 +515,8 @@ const App = () => (
                 <Route path="/admin/corpus-progress" element={<AdminRoute><AdminCorpusProgress /></AdminRoute>} />
                 <Route path="/admin/locale-coverage" element={<AdminRoute><AdminLocaleCoverage /></AdminRoute>} />
                 <Route path="/admin/feed-ab" element={<AdminRoute><AdminFeedAB /></AdminRoute>} />
+                <Route path="/admin/moderation-audit" element={<AdminRoute><AdminModerationAudit /></AdminRoute>} />
+
                 <Route path="/admin/benefit-labels" element={<AdminRoute><AdminBenefitLabels /></AdminRoute>} />
                 <Route path="/admin/dedup" element={<AdminRoute><AdminDedup /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />
