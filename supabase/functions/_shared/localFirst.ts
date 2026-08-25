@@ -35,8 +35,20 @@ export function derivePrimaryLanguage(
   return list.find((l) => l !== "en" && l !== "ar") ?? null;
 }
 
-/** Target share of a page reserved for the primary language. */
-export const PRIMARY_LANGUAGE_SHARE = 0.45;
+/**
+ * Target share of a page reserved for the primary (local) language.
+ *
+ * Heartify's launch standard is **80/20**: 80% native/local language, 20%
+ * universal (English + Arabic). This holds for every market, not just
+ * Bangladesh — a Turkish, Indonesian or Hausa user gets the same 80/20 mix
+ * with their own language in the majority slot.
+ *
+ * The share is a *ceiling on intent*, not a hard promise:
+ * `interleavePrimaryLanguage` clamps the quota to actual local supply, so a
+ * thin language degrades smoothly instead of blanking a page.
+ */
+export const PRIMARY_LANGUAGE_SHARE = 0.8;
+
 
 /**
  * Interleave so that ~`share` of the first `limit` positions carry the
