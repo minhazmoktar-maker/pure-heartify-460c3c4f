@@ -772,6 +772,9 @@ Deno.serve(observed("feed", async (req) => {
         nextCursor,
         total: items.length,
         viewer: { isPremium },
+        // Arm the caller was served, so the client can log an exposure event
+        // for /admin/feed-ab without re-deriving the bucketing.
+        experiment: { key: "feed_diversity_v6", variant: abState.variant },
       },
       200,
       { "X-Cache": hit ? "HIT" : "MISS" },
