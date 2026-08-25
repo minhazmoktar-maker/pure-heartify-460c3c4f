@@ -58,6 +58,11 @@ function pctStr(v: number | null) {
   return v == null ? "—" : `${(v * 100).toFixed(1)}%`;
 }
 
+function msStr(v: number | null) {
+  return v == null ? "—" : `${Math.round(v)}ms`;
+}
+
+
 function lift(variant: number | null, control: number | null) {
   if (variant == null || control == null || control === 0) return null;
   return ((variant - control) / control) * 100;
