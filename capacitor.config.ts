@@ -1,4 +1,6 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import { DEFAULT_LOCALE, NATIVE_LOCALE_TAGS } from './src/config/globalization';
+
 
 /**
  * Capacitor configuration.
