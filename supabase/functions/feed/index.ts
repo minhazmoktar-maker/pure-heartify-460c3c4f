@@ -642,7 +642,11 @@ Deno.serve(observed("feed", async (req) => {
         .slice(0, limit)
         .filter((v) => ((v.content_language as string | null) ?? "").toLowerCase() === primaryLanguage)
         .length;
-      if (have < wanted) {
+      // Only top up on the plain first page. With a search term, a section
+      // filter, or a cursor in play the top-up query cannot reproduce the
+      // request's predicates, so its rows would be off-query pollution
+      // interleaved into the top of the page.
+      if (have < wanted && !search && !sectionId && !cursor) {
         try {
           const seen = new Set(diversified.map((v) => v.video_id as string));
           const topUpUrl =
@@ -689,8 +693,15 @@ Deno.serve(observed("feed", async (req) => {
     }
 
     const items = diversified.slice(0, limit);
+    // Keyset cursor must be the *oldest* ingested_at on the page: interleaving
+    // and top-ups can place a newer row last, which would skip rows (stall) or
+    // re-serve them (repeat) on the next page.
     const nextCursor = items.length === limit
-      ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
+      ? (items.reduce<string | null>((min, v) => {
+        const t = (v as Record<string, unknown>).ingested_at as string | null;
+        if (!t) return min;
+        return min === null || t < min ? t : min;
+      }, null))
       : null;
 
 
