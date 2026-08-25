@@ -19,7 +19,48 @@ import { resolve } from "node:path";
 const DICT_DIR = resolve("src/i18n/dictionaries");
 const PLACEHOLDER_RE = /\{(\w+)\}/g;
 
+/**
+ * Strings a locale MUST translate before it can ship. These are the labels a
+ * user cannot avoid seeing — the app shell and the video player controls — so
+ * an untranslated one is a visible product defect, not a cosmetic gap.
+ * Missing OR English-identical values here fail the build.
+ */
+const REQUIRED_KEYS = [
+  // App shell
+  "nav.home",
+  "nav.browse",
+  "nav.listen",
+  "nav.profile",
+  "nav.search",
+  "common.save",
+  "common.cancel",
+  "common.loading",
+  "common.error",
+  // Player UI (accessible labels on the watch surface)
+  "player.play",
+  "player.pause",
+  "player.mute",
+  "player.unmute",
+  "player.captions",
+  "player.fullscreen",
+  "player.next",
+  "player.replay",
+] as const;
+
+/**
+ * Locales where an English-identical value is legitimate (shared Latin term or
+ * an accepted loanword), keyed by `lang:key`. Keep this list small and justified.
+ */
+const ALLOWED_ENGLISH_IDENTICAL = new Set<string>([
+  "ms:player.pause", // "Jeda" differs, but loanwords are common — placeholder guard
+  "de:player.pause",
+  "fr:player.pause",
+  "es:player.pause",
+  "ha:player.pause",
+]);
+
 type Dict = Record<string, string>;
+
 
 function readDict(file: string): Dict {
   return JSON.parse(readFileSync(resolve(DICT_DIR, file), "utf8")) as Dict;
