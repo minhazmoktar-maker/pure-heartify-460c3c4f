@@ -243,6 +243,10 @@ const Appeals = lazy(() => import("./pages/Appeals.tsx"));
 const Diagnostics = lazy(() => import("./pages/Diagnostics.tsx"));
 const Transparency = lazy(() => import("./pages/Transparency.tsx"));
 const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
+const CreatorStudio = lazy(() => import("./pages/CreatorStudio.tsx"));
+const Originals = lazy(() => import("./pages/Originals.tsx"));
+const WatchUpload = lazy(() => import("./pages/WatchUpload.tsx"));
+const AdminCreatorReview = lazy(() => import("./pages/AdminCreatorReview.tsx"));
 const AdminAppeals = lazy(() => import("./pages/AdminAppeals.tsx"));
 const AdminExperiments = lazy(() => import("./pages/AdminExperiments.tsx"));
 const AdminInstitutions = lazy(() => import("./pages/AdminInstitutions.tsx"));
@@ -348,6 +352,9 @@ const App = () => (
                 <Route path="/appeals/:decisionId" element={<Appeals />} />
                 <Route path="/transparency" element={<Transparency />} />
                 <Route path="/creators/dashboard" element={<CreatorDashboard />} />
+                <Route path="/studio" element={<CreatorStudio />} />
+                <Route path="/originals" element={<Originals />} />
+                <Route path="/u/:id" element={<WatchUpload />} />
                 <Route path="/admin/appeals" element={<AdminRoute><AdminAppeals /></AdminRoute>} />
                 <Route path="/admin/experiments" element={<AdminRoute><AdminExperiments /></AdminRoute>} />
                 <Route path="/admin/institutions" element={<AdminRoute><AdminInstitutions /></AdminRoute>} />
@@ -515,6 +522,7 @@ const App = () => (
                 <Route path="/admin/launch-monitor" element={<AdminRoute><AdminLaunchMonitor /></AdminRoute>} />
                 <Route path="/admin/feed-diversity" element={<AdminRoute><AdminFeedDiversity /></AdminRoute>} />
                 <Route path="/admin/corpus-progress" element={<AdminRoute><AdminCorpusProgress /></AdminRoute>} />
+                <Route path="/admin/creator-review" element={<AdminRoute><AdminCreatorReview /></AdminRoute>} />
                 <Route path="/admin/locale-coverage" element={<AdminRoute><AdminLocaleCoverage /></AdminRoute>} />
                 <Route path="/admin/feed-ab" element={<AdminRoute><AdminFeedAB /></AdminRoute>} />
                 <Route path="/admin/moderation-audit" element={<AdminRoute><AdminModerationAudit /></AdminRoute>} />
