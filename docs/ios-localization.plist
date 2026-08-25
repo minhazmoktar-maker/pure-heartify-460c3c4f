@@ -1,0 +1,65 @@
+<!--
+  Heartify — iOS localization keys.
+
+  Generated from src/config/globalization.ts (APP_LOCALES). Merge these keys
+  into the top-level <dict> of `ios/App/App/Info.plist` after `npx cap add ios`.
+
+  Why this matters (how leading global apps do it):
+   - `CFBundleLocalizations` is what makes Heartify appear in
+     Settings > Heartify > Preferred Language and lets iOS negotiate the right
+     locale from the user's Preferred Languages list — without it, iOS treats
+     the app as English-only regardless of what the web layer supports.
+   - `CFBundleDevelopmentRegion` is the source locale (en).
+   - `CFBundleAllowMixedLocalizations` lets the web layer render Bengali/Urdu
+     content while the system UI stays in the device language.
+   - RTL locales (ar, ur, fa, ps) get automatic layout mirroring once they are
+     declared here; the web layer already sets `dir="rtl"` per locale.
+   - Region variants are declared explicitly (en-GB, bn-IN, ur-IN, es-419,
+     pt-BR, zh-Hans, zh-Hant) so device locales resolve to the closest match
+     instead of falling back to English.
+
+  App Store Connect: add a localized listing for each of these locales so the
+  store page matches the in-app language (Apple ranks localized listings per
+  storefront).
+-->
+
+<key>CFBundleDevelopmentRegion</key>
+<string>en</string>
+
+<key>CFBundleAllowMixedLocalizations</key>
+<true/>
+
+<key>CFBundleLocalizations</key>
+<array>
+  <!-- Launch region: South Asia -->
+  <string>bn</string>
+  <string>bn-IN</string>
+  <string>ur</string>
+  <string>ur-IN</string>
+  <string>ps</string>
+  <!-- English (default + diaspora) -->
+  <string>en</string>
+  <string>en-GB</string>
+  <!-- Arabic & Persianate -->
+  <string>ar</string>
+  <string>fa</string>
+  <string>tr</string>
+  <!-- Southeast Asia -->
+  <string>id</string>
+  <string>ms</string>
+  <!-- Africa -->
+  <string>ha</string>
+  <string>sw</string>
+  <!-- Europe & Americas -->
+  <string>fr</string>
+  <string>de</string>
+  <string>es</string>
+  <string>es-419</string>
+  <string>pt-PT</string>
+  <string>pt-BR</string>
+  <!-- East Asia -->
+  <string>zh-Hans</string>
+  <string>zh-Hant</string>
+  <string>ja</string>
+  <string>ko</string>
+</array>
