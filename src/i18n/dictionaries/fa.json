@@ -19,5 +19,13 @@
   "language.diversityHint": "مقادیر بالاتر محتوای بیشتری خارج از زبان اصلی نمایش می‌دهد.",
   "language.detected": "تشخیص داده شد: {value}",
   "language.saved": "تنظیمات ذخیره شد",
-  "language.rtl": "چیدمان راست‌به‌چپ"
+  "language.rtl": "چیدمان راست‌به‌چپ",
+  "player.play": "پخش",
+  "player.pause": "توقف",
+  "player.mute": "بی‌صدا",
+  "player.unmute": "باصدا",
+  "player.captions": "زیرنویس",
+  "player.fullscreen": "تمام‌صفحه",
+  "player.next": "بعدی",
+  "player.replay": "پخش مجدد"
 }

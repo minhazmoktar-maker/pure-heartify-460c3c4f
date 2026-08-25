@@ -62,8 +62,12 @@ Deno.serve(observed("feed", async (req) => {
     return json({ error: "Missing configuration" }, 500);
   }
 
+  // Wall-clock start of the request — the A/B readout needs real serving
+  // latency per arm, which client analytics can never attribute correctly.
+  const tRequest = Date.now();
   try {
     // Premium gating: identify caller (best-effort) and hide premium-only rows
+
     // for non-premium/anon users. Never trust a client-supplied flag.
     const callerId = await getCallerUserId(req);
     const isPremium = await hasActivePremium(callerId);
@@ -751,6 +755,27 @@ Deno.serve(observed("feed", async (req) => {
         return min === null || t < min ? t : min;
       }, null))
       : null;
+
+    // Serving telemetry for /admin/feed-ab: latency, page size and cache-hit
+    // rate attributed to the arm that actually produced this page. Fire-and-
+    // forget — telemetry must never add latency or fail a feed request.
+    void admin
+      .from("feed_serve_samples")
+      .insert({
+        experiment_key: "feed_diversity_v6",
+        variant: abState.variant,
+        user_id: callerId ?? null,
+        session_id: sessionId === "anon" ? null : sessionId,
+        surface: sectionId ?? category ?? "home",
+        sort,
+        latency_ms: Date.now() - tRequest,
+        item_count: items.length,
+        cache_hit: hit,
+        country: req.headers.get("cf-ipcountry") ?? req.headers.get("x-country") ?? null,
+      })
+      .then(({ error }) => {
+        if (error) console.warn("[feed] serve-sample insert failed:", error.message);
+      });
 
 
     return json(

@@ -19,5 +19,13 @@
   "language.diversityHint": "값이 높을수록 주요 언어 외의 콘텐츠가 더 많이 표시됩니다.",
   "language.detected": "감지됨: {value}",
   "language.saved": "환경설정이 저장되었습니다",
-  "language.rtl": "오른쪽에서 왼쪽 레이아웃"
+  "language.rtl": "오른쪽에서 왼쪽 레이아웃",
+  "player.play": "재생",
+  "player.pause": "일시정지",
+  "player.mute": "음소거",
+  "player.unmute": "음소거 해제",
+  "player.captions": "자막",
+  "player.fullscreen": "전체 화면",
+  "player.next": "다음",
+  "player.replay": "다시 재생"
 }

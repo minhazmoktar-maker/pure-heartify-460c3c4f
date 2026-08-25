@@ -57,6 +57,8 @@ const AdminFeedDiversity = lazy(() => import("./pages/AdminFeedDiversity.tsx"));
 const AdminCorpusProgress = lazy(() => import("./pages/AdminCorpusProgress.tsx"));
 const AdminLocaleCoverage = lazy(() => import("./pages/AdminLocaleCoverage.tsx"));
 const AdminFeedAB = lazy(() => import("./pages/AdminFeedAB.tsx"));
+const AdminModerationAudit = lazy(() => import("./pages/AdminModerationAudit.tsx"));
+
 const AdminBenefitLabels = lazy(() => import("./pages/AdminBenefitLabels.tsx"));
 const AdminDedup = lazy(() => import("./pages/AdminDedup.tsx"));
 const AdminReports = lazy(() => import("./pages/AdminReports.tsx"));
@@ -513,6 +515,8 @@ const App = () => (
                 <Route path="/admin/corpus-progress" element={<AdminRoute><AdminCorpusProgress /></AdminRoute>} />
                 <Route path="/admin/locale-coverage" element={<AdminRoute><AdminLocaleCoverage /></AdminRoute>} />
                 <Route path="/admin/feed-ab" element={<AdminRoute><AdminFeedAB /></AdminRoute>} />
+                <Route path="/admin/moderation-audit" element={<AdminRoute><AdminModerationAudit /></AdminRoute>} />
+
                 <Route path="/admin/benefit-labels" element={<AdminRoute><AdminBenefitLabels /></AdminRoute>} />
                 <Route path="/admin/dedup" element={<AdminRoute><AdminDedup /></AdminRoute>} />
                 <Route path="/admin/viral" element={<AdminRoute><AdminViral /></AdminRoute>} />

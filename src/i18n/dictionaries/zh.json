@@ -19,5 +19,13 @@
   "language.diversityHint": "更高的值会显示更多您主要语言之外的内容。",
   "language.detected": "已检测:{value}",
   "language.saved": "偏好已保存",
-  "language.rtl": "从右到左布局"
+  "language.rtl": "从右到左布局",
+  "player.play": "播放",
+  "player.pause": "暂停",
+  "player.mute": "静音",
+  "player.unmute": "取消静音",
+  "player.captions": "字幕",
+  "player.fullscreen": "全屏",
+  "player.next": "下一个",
+  "player.replay": "重播"
 }

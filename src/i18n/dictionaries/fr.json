@@ -19,5 +19,13 @@
   "language.diversityHint": "Les valeurs élevées affichent plus de contenu hors de votre langue principale.",
   "language.detected": "Détecté : {value}",
   "language.saved": "Préférences enregistrées",
-  "language.rtl": "Mise en page de droite à gauche"
+  "language.rtl": "Mise en page de droite à gauche",
+  "player.play": "Lecture",
+  "player.pause": "Pause",
+  "player.mute": "Couper le son",
+  "player.unmute": "Activer le son",
+  "player.captions": "Sous-titres",
+  "player.fullscreen": "Plein écran",
+  "player.next": "Suivant",
+  "player.replay": "Revoir"
 }

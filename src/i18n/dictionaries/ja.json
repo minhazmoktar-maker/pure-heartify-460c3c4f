@@ -19,5 +19,13 @@
   "language.diversityHint": "値が高いほど、主要言語以外のコンテンツが多く表示されます。",
   "language.detected": "検出:{value}",
   "language.saved": "設定を保存しました",
-  "language.rtl": "右から左のレイアウト"
+  "language.rtl": "右から左のレイアウト",
+  "player.play": "再生",
+  "player.pause": "一時停止",
+  "player.mute": "ミュート",
+  "player.unmute": "ミュート解除",
+  "player.captions": "字幕",
+  "player.fullscreen": "全画面",
+  "player.next": "次へ",
+  "player.replay": "もう一度再生"
 }

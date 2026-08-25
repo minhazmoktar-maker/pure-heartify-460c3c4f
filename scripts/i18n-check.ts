@@ -19,7 +19,48 @@ import { resolve } from "node:path";
 const DICT_DIR = resolve("src/i18n/dictionaries");
 const PLACEHOLDER_RE = /\{(\w+)\}/g;
 
+/**
+ * Strings a locale MUST translate before it can ship. These are the labels a
+ * user cannot avoid seeing — the app shell and the video player controls — so
+ * an untranslated one is a visible product defect, not a cosmetic gap.
+ * Missing OR English-identical values here fail the build.
+ */
+const REQUIRED_KEYS = [
+  // App shell
+  "nav.home",
+  "nav.browse",
+  "nav.listen",
+  "nav.profile",
+  "nav.search",
+  "common.save",
+  "common.cancel",
+  "common.loading",
+  "common.error",
+  // Player UI (accessible labels on the watch surface)
+  "player.play",
+  "player.pause",
+  "player.mute",
+  "player.unmute",
+  "player.captions",
+  "player.fullscreen",
+  "player.next",
+  "player.replay",
+] as const;
+
+/**
+ * Locales where an English-identical value is legitimate (shared Latin term or
+ * an accepted loanword), keyed by `lang:key`. Keep this list small and justified.
+ */
+const ALLOWED_ENGLISH_IDENTICAL = new Set<string>([
+  "ms:player.pause", // "Jeda" differs, but loanwords are common — placeholder guard
+  "de:player.pause",
+  "fr:player.pause",
+  "es:player.pause",
+  "ha:player.pause",
+]);
+
 type Dict = Record<string, string>;
+
 
 function readDict(file: string): Dict {
   return JSON.parse(readFileSync(resolve(DICT_DIR, file), "utf8")) as Dict;
@@ -59,7 +100,25 @@ for (const file of files.sort()) {
     if (!eqSet(placeholders(en[k]), placeholders(v))) placeholderMismatch.push(k);
   }
 
-  const problems = missing.length + extra.length + empty.length + placeholderMismatch.length;
+  // Required UI + player labels: must exist AND be genuinely localized.
+  const requiredMissing = REQUIRED_KEYS.filter(
+    (k) => typeof dict[k] !== "string" || dict[k].trim().length === 0,
+  );
+  const untranslated = REQUIRED_KEYS.filter(
+    (k) =>
+      typeof dict[k] === "string" &&
+      dict[k].trim().length > 0 &&
+      dict[k].trim() === (en[k] ?? "").trim() &&
+      !ALLOWED_ENGLISH_IDENTICAL.has(`${lang}:${k}`),
+  );
+
+  const problems =
+    missing.length +
+    extra.length +
+    empty.length +
+    placeholderMismatch.length +
+    requiredMissing.length +
+    untranslated.length;
   if (problems === 0) {
     summary.push(`  \u2713 ${lang.padEnd(4)}  ${Object.keys(dict).length} keys, parity`);
     continue;
@@ -72,7 +131,10 @@ for (const file of files.sort()) {
   if (extra.length) lines.push(`      extra (${extra.length}): ${extra.slice(0, 5).join(", ")}${extra.length > 5 ? "\u2026" : ""}`);
   if (empty.length) lines.push(`      empty (${empty.length}): ${empty.slice(0, 5).join(", ")}${empty.length > 5 ? "\u2026" : ""}`);
   if (placeholderMismatch.length) lines.push(`      {var} mismatch (${placeholderMismatch.length}): ${placeholderMismatch.slice(0, 5).join(", ")}`);
+  if (requiredMissing.length) lines.push(`      REQUIRED missing (${requiredMissing.length}): ${requiredMissing.join(", ")}`);
+  if (untranslated.length) lines.push(`      REQUIRED untranslated / English-identical (${untranslated.length}): ${untranslated.join(", ")}`);
   summary.push(lines.join("\n"));
+
 }
 
 console.log(`i18n dictionary parity vs en.json (${enKeys.size} keys):`);

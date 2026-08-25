@@ -19,5 +19,13 @@
   "language.diversityHint": "Valores maiores exibem mais conteúdo fora do seu idioma principal.",
   "language.detected": "Detectado: {value}",
   "language.saved": "Preferências salvas",
-  "language.rtl": "Layout da direita para a esquerda"
+  "language.rtl": "Layout da direita para a esquerda",
+  "player.play": "Reproduzir",
+  "player.pause": "Pausar",
+  "player.mute": "Silenciar",
+  "player.unmute": "Ativar som",
+  "player.captions": "Legendas",
+  "player.fullscreen": "Tela cheia",
+  "player.next": "Próximo",
+  "player.replay": "Repetir"
 }

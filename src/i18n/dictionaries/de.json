@@ -19,5 +19,13 @@
   "language.diversityHint": "Höhere Werte zeigen mehr Inhalte außerhalb deiner Hauptsprache.",
   "language.detected": "Erkannt: {value}",
   "language.saved": "Einstellungen gespeichert",
-  "language.rtl": "Rechts-nach-links-Layout"
+  "language.rtl": "Rechts-nach-links-Layout",
+  "player.play": "Wiedergabe",
+  "player.pause": "Pause",
+  "player.mute": "Stumm",
+  "player.unmute": "Ton ein",
+  "player.captions": "Untertitel",
+  "player.fullscreen": "Vollbild",
+  "player.next": "Weiter",
+  "player.replay": "Erneut ansehen"
 }

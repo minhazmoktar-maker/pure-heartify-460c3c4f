@@ -31,8 +31,16 @@ interface VariantRow {
   autoplay_pass_rate: number | null;
   client_errors: number;
   error_rate: number | null;
+  /** Serving telemetry written by the feed function (feed_serve_samples). */
+  serves: number;
+  latency_avg_ms: number | null;
+  latency_p50_ms: number | null;
+  latency_p95_ms: number | null;
+  items_per_serve: number | null;
+  cache_hit_rate: number | null;
   is_control: boolean;
 }
+
 
 interface Metrics {
   key: string;
@@ -49,6 +57,11 @@ const MIN_SUBJECTS = 100;
 function pctStr(v: number | null) {
   return v == null ? "—" : `${(v * 100).toFixed(1)}%`;
 }
+
+function msStr(v: number | null) {
+  return v == null ? "—" : `${Math.round(v)}ms`;
+}
+
 
 function lift(variant: number | null, control: number | null) {
   if (variant == null || control == null || control === 0) return null;
@@ -174,6 +187,28 @@ export default function AdminFeedAB() {
                 <span className="text-muted-foreground">Error rate</span>
                 <span className="tabular-nums">{pctStr(v.error_rate)}</span>
               </p>
+              <p className="flex justify-between border-t border-border/60 pt-1">
+                <span className="text-muted-foreground">Feed serves</span>
+                <span className="tabular-nums">{(v.serves ?? 0).toLocaleString()}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-muted-foreground">Latency p50 / p95</span>
+                <span className="tabular-nums">
+                  {msStr(v.latency_p50_ms)} / {msStr(v.latency_p95_ms)}
+                </span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-muted-foreground">Latency avg</span>
+                <span className="tabular-nums">{msStr(v.latency_avg_ms)}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-muted-foreground">Cache hit rate</span>
+                <span className="tabular-nums">{pctStr(v.cache_hit_rate)}</span>
+              </p>
+              <p className="flex justify-between">
+                <span className="text-muted-foreground">Items / serve</span>
+                <span className="tabular-nums">{v.items_per_serve ?? "—"}</span>
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -181,6 +216,7 @@ export default function AdminFeedAB() {
           <p className="text-sm text-muted-foreground">No exposures recorded in this window yet.</p>
         )}
       </div>
+
 
       {control && treatment && (
         <Card className="mt-6">
@@ -196,6 +232,11 @@ export default function AdminFeedAB() {
               <span className="text-muted-foreground">Autoplay pass rate</span>
               <Delta value={lift(treatment.autoplay_pass_rate, control.autoplay_pass_rate)} />
             </p>
+            <p className="flex justify-between">
+              <span className="text-muted-foreground">Feed latency p95 (lower is better)</span>
+              <Delta value={lift(treatment.latency_p95_ms, control.latency_p95_ms)} invert />
+            </p>
+
             <p className="flex justify-between">
               <span className="text-muted-foreground">Error rate (lower is better)</span>
               <Delta value={lift(treatment.error_rate, control.error_rate)} invert />

@@ -19,5 +19,13 @@
   "language.diversityHint": "زیادہ قدر بنیادی زبان سے باہر مزید مواد سامنے لاتی ہے۔",
   "language.detected": "پتہ چلا: {value}",
   "language.saved": "ترجیحات محفوظ ہو گئیں",
-  "language.rtl": "دائیں سے بائیں لے آؤٹ"
+  "language.rtl": "دائیں سے بائیں لے آؤٹ",
+  "player.play": "چلائیں",
+  "player.pause": "وقفہ",
+  "player.mute": "خاموش",
+  "player.unmute": "آواز چالو",
+  "player.captions": "سب ٹائٹل",
+  "player.fullscreen": "پوری اسکرین",
+  "player.next": "اگلا",
+  "player.replay": "دوبارہ چلائیں"
 }
