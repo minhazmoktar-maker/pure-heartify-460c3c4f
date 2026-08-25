@@ -547,10 +547,18 @@ Deno.serve(observed("feed", async (req) => {
                 impPen -
                 skipped * 0.25 -
                 dismissed * 5.0;
-              // Per-session jitter (wider amplitude) → same signed-in user
-              // sees a genuinely different order across tabs/sessions.
-              const j = (hash01(`${identity}:${rotationKey}:${vid}`) - 0.5) * 0.35;
-              const finalScore = score * (1 + j);
+              // Per-session stochastic rank (Gumbel noise on the score) instead
+              // of a small multiplicative jitter. Two *cold-start* accounts have
+              // near-identical signal-free scores, so a ±17% jitter left their
+              // feeds mostly matching; Gumbel sampling makes the ordering
+              // genuinely divergent while still ranking by score in
+              // expectation. Temperature shrinks as real signals accumulate,
+              // so established users get a sharper, more personal feed.
+              const signalStrength = Math.min(1, (chAff + catAff + longCh + longCat + interestMatch) / 2);
+              const temp = 0.85 - 0.5 * signalStrength;
+              const u = Math.max(1e-9, hash01(`${identity}:${rotationKey}:${vid}`));
+              const finalScore = score - temp * Math.log(-Math.log(u));
+
               const reasons: string[] = [];
               if (fresh > 0.4) reasons.push("fresh");
               if (chAff > 0.3) reasons.push("channel-affinity");
