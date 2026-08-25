@@ -14,8 +14,14 @@ import { test, expect } from "@playwright/test";
 // Third-party / sandbox-only noise. Everything else is treated as a real
 // regression. The `data:` CSP entry is the Lovable sandbox injecting a module
 // script into `vite preview`; it does not exist in a deployed build.
+// Third-party / sandbox-only noise. Everything else is treated as a real
+// regression. The `data:` CSP entry is the Lovable sandbox injecting a module
+// script into `vite preview`; it does not exist in a deployed build.
+// react-helmet-async emits a dev-only "function components cannot be given
+// refs" warning under React 18 StrictMode — it never fires in a production
+// build and carries no user impact, so it is filtered too.
 const NOISE =
-  /youtube|ytimg|doubleclick|gstatic|googletag|third.?party|favicon|manifest|service worker|data:application\/octet-stream|Content Security Policy/i;
+  /youtube|ytimg|doubleclick|gstatic|googletag|third.?party|favicon|manifest|service worker|data:application\/octet-stream|Content Security Policy|cannot be given refs|Function components cannot|react-helmet|SideEffect\(NullComponent\)|Download the React DevTools/i;
 
 function collectErrors(page: import("@playwright/test").Page) {
   const errors: string[] = [];
@@ -72,13 +78,45 @@ test.describe("core surfaces", () => {
   });
 
   test("video playback: card → watch page mounts a player", async ({ page }) => {
+    // Home render + card click + watch hydration + related rails: the polls
+    // below already budget ~80s, so the default 30s test timeout would abort
+    // before any of them could fail meaningfully.
+    test.setTimeout(150_000);
     const errors = collectErrors(page);
-    await page.goto("/watch/dQw4w9WgXcQ", { waitUntil: "domcontentloaded" });
+
+
+    // Prefer the real user path: click a card on Home. Cards navigate via an
+    // onClick handler (no <a href>), so assert the resulting URL rather than a
+    // link target. When Home has no cards yet (cold cache / empty pool) fall
+    // back to a cold deep link so the spec still covers the watch route.
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    const card = page.locator('[data-testid="video-card"]').first();
+    const clicked = await card
+      .waitFor({ state: "visible", timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (clicked) {
+      await card.click();
+      await expect(page).toHaveURL(/\/watch\/[\w-]+/, { timeout: 20_000 });
+    } else {
+      await page.goto("/watch/dQw4w9WgXcQ", { waitUntil: "domcontentloaded" });
+    }
 
     // Watch route must resolve past the loading state even for a cold deep link.
     await expect
       .poll(async () => ((await page.textContent("body")) ?? "").trim().length, { timeout: 25_000 })
       .toBeGreaterThan(80);
+    // The watch page uses a click-to-play facade (poster + play button) so the
+    // YouTube iframe is not requested until the user actually starts playback.
+    // Wait for that affordance to hydrate, then click it and assert the embed.
+    const play = page.getByRole("button", { name: /^play /i }).first();
+    const hasPlay = await play
+      .waitFor({ state: "visible", timeout: 20_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (hasPlay) await play.click();
+
     await expect
       .poll(
         async () => {
