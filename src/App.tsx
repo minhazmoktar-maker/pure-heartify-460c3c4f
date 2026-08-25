@@ -332,6 +332,7 @@ const App = () => (
                 <Route path="/sources" element={<Sources />} />
                 <Route path="/plus" element={<HeartifyPlus />} />
                 <Route path="/plus/join" element={<PlusInvite />} />
+                <Route path="/checkout/return" element={<CheckoutReturn />} />
                 <Route path="/invite" element={<Invite />} />
                 <Route path="/offline" element={<OfflineLibrary />} />
                 <Route path="/premium" element={<Navigate to="/plus" replace />} />
