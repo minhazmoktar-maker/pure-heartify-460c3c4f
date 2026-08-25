@@ -202,24 +202,36 @@ async function fetchWatchEntries(): Promise<Entry[]> {
   const url = envFromDotenv("VITE_SUPABASE_URL");
   const key = envFromDotenv("VITE_SUPABASE_PUBLISHABLE_KEY");
   if (!url || !key || MAX_WATCH_URLS <= 0) return [];
+  // PostgREST caps every response at 1000 rows, so page with Range headers
+  // until the cap is reached or the backend stops returning rows.
+  const PAGE = 1000;
+  const ids: string[] = [];
   try {
-    const res = await fetch(`${url}/rest/v1/rpc/sitemap_watch_urls`, {
-      method: "POST",
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ p_limit: MAX_WATCH_URLS }),
-    });
-    if (!res.ok) return [];
-    const rows = (await res.json()) as Array<{ video_id: string }>;
-    return rows
-      .filter((r) => typeof r.video_id === "string" && /^[\w-]{6,32}$/.test(r.video_id))
-      .map((r) => ({ path: `/watch/${r.video_id}`, changefreq: "weekly" as const, priority: "0.6" }));
+    for (let offset = 0; offset < MAX_WATCH_URLS; offset += PAGE) {
+      const res = await fetch(`${url}/rest/v1/rpc/sitemap_watch_urls`, {
+        method: "POST",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+          Range: `${offset}-${Math.min(offset + PAGE, MAX_WATCH_URLS) - 1}`,
+        },
+        body: JSON.stringify({ p_limit: MAX_WATCH_URLS }),
+      });
+      if (!res.ok) break;
+      const rows = (await res.json()) as Array<{ video_id: string }>;
+      if (!rows.length) break;
+      for (const r of rows) {
+        if (typeof r.video_id === "string" && /^[\w-]{6,32}$/.test(r.video_id)) ids.push(r.video_id);
+      }
+      if (rows.length < PAGE) break;
+    }
   } catch {
     return [];
   }
+  return Array.from(new Set(ids))
+    .slice(0, MAX_WATCH_URLS)
+    .map((id) => ({ path: `/watch/${id}`, changefreq: "weekly" as const, priority: "0.6" }));
 }
 
 const watchEntries = await fetchWatchEntries();
