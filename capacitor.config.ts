@@ -1,5 +1,23 @@
 import type { CapacitorConfig } from '@capacitor/cli';
-import { DEFAULT_LOCALE, NATIVE_LOCALE_TAGS } from './src/config/globalization';
+
+/**
+ * Locales the native shells declare, mirroring `APP_LOCALES` in
+ * `src/config/globalization.ts`. Duplicated (not imported) on purpose: the
+ * Capacitor CLI loads this file outside Vite, so the `@/…` path alias used by
+ * the app source is not resolvable here. Keep the two lists in sync — the
+ * generated native files are `android/app/src/main/res/xml/locales_config.xml`
+ * and the `CFBundleLocalizations` block in `docs/ios-localization.plist`.
+ */
+const APP_LOCALE_TAGS = [
+  'bn', 'bn-IN', 'ur', 'ur-IN', 'ps',
+  'en', 'en-GB',
+  'ar', 'fa', 'tr',
+  'id', 'ms',
+  'ha', 'sw',
+  'fr', 'de', 'es', 'es-419', 'pt-PT', 'pt-BR',
+  'zh-Hans', 'zh-Hant', 'ja', 'ko',
+] as const;
+
 
 
 /**
