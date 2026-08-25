@@ -756,6 +756,27 @@ Deno.serve(observed("feed", async (req) => {
       }, null))
       : null;
 
+    // Serving telemetry for /admin/feed-ab: latency, page size and cache-hit
+    // rate attributed to the arm that actually produced this page. Fire-and-
+    // forget — telemetry must never add latency or fail a feed request.
+    void admin
+      .from("feed_serve_samples")
+      .insert({
+        experiment_key: "feed_diversity_v6",
+        variant: abState.variant,
+        user_id: callerId ?? null,
+        session_id: sessionId === "anon" ? null : sessionId,
+        surface: sectionId ?? category ?? "home",
+        sort,
+        latency_ms: Date.now() - tRequest,
+        item_count: items.length,
+        cache_hit: hit,
+        country: req.headers.get("cf-ipcountry") ?? req.headers.get("x-country") ?? null,
+      })
+      .then(({ error }) => {
+        if (error) console.warn("[feed] serve-sample insert failed:", error.message);
+      });
+
 
     return json(
       {
