@@ -62,8 +62,12 @@ Deno.serve(observed("feed", async (req) => {
     return json({ error: "Missing configuration" }, 500);
   }
 
+  // Wall-clock start of the request — the A/B readout needs real serving
+  // latency per arm, which client analytics can never attribute correctly.
+  const tRequest = Date.now();
   try {
     // Premium gating: identify caller (best-effort) and hide premium-only rows
+
     // for non-premium/anon users. Never trust a client-supplied flag.
     const callerId = await getCallerUserId(req);
     const isPremium = await hasActivePremium(callerId);
