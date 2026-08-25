@@ -483,6 +483,25 @@ Deno.serve(observed("feed", async (req) => {
         return (h >>> 0) / 0xffffffff;
       };
 
+      // --- feed_diversity_v6 experiment ------------------------------------
+      // Deterministic 50/50 bucketing on the *stable* identity (never the
+      // session), so a user stays in one arm across sessions and the readout
+      // in /admin/feed-ab is not contaminated by re-bucketing. The `diverse`
+      // arm widens sampling temperature, tightens the per-channel cap and
+      // enlarges the long-tail quota; control is the shipped v5 ranking.
+      const abVariant: "control" | "diverse" =
+        hash01(`feed_diversity_v6:${identity}`) < 0.5 ? "control" : "diverse";
+      const abTempBoost = abVariant === "diverse" ? 0.25 : 0;
+      const abChannelCap = abVariant === "diverse"
+        ? Math.max(2, maxPerChannel - 1)
+        : maxPerChannel;
+      const abLongTailShare = abVariant === "diverse" ? 0.3 : 0.2;
+      abState.variant = abVariant;
+      abState.channelCap = abChannelCap;
+      abState.longTailShare = abLongTailShare;
+
+
+
       if (callerId) {
         try {
           const [signals, impressions, poolMix] = await Promise.all([
