@@ -109,9 +109,13 @@ test.describe("core surfaces", () => {
       .toBeGreaterThan(80);
     // The watch page uses a click-to-play facade (poster + play button) so the
     // YouTube iframe is not requested until the user actually starts playback.
-    // Click that affordance when it is present, then assert the embed mounts.
+    // Wait for that affordance to hydrate, then click it and assert the embed.
     const play = page.getByRole("button", { name: /^play /i }).first();
-    if (await play.isVisible().catch(() => false)) await play.click();
+    const hasPlay = await play
+      .waitFor({ state: "visible", timeout: 20_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (hasPlay) await play.click();
 
     await expect
       .poll(
