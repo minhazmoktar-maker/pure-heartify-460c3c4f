@@ -468,6 +468,13 @@ Deno.serve(observed("feed", async (req) => {
     // but still honor blocked creators, dismissals, hidden videos, and give a
     // mild affinity boost so the ordering is personal rather than identical
     // across users.
+    // Experiment state, read by the diversity guards further down (which run
+    // outside the personalization block). Defaults = shipped v5 behaviour.
+    const abState = {
+      variant: "control" as "control" | "diverse",
+      channelCap: maxPerChannel,
+      longTailShare: 0.2,
+    };
     if ((sort === "fresh" || sort === "recent") && !search) {
       const identity = callerId ?? getClientIdentity(req, null);
       // Rotation seed prioritizes session id so every new tab / cold open
