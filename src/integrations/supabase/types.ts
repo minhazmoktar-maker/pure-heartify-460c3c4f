@@ -2801,6 +2801,51 @@ export type Database = {
         }
         Relationships: []
       }
+      feed_serve_samples: {
+        Row: {
+          cache_hit: boolean
+          country: string | null
+          created_at: string
+          experiment_key: string
+          id: number
+          item_count: number
+          latency_ms: number
+          session_id: string | null
+          sort: string | null
+          surface: string | null
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          cache_hit?: boolean
+          country?: string | null
+          created_at?: string
+          experiment_key?: string
+          id?: number
+          item_count?: number
+          latency_ms: number
+          session_id?: string | null
+          sort?: string | null
+          surface?: string | null
+          user_id?: string | null
+          variant: string
+        }
+        Update: {
+          cache_hit?: boolean
+          country?: string | null
+          created_at?: string
+          experiment_key?: string
+          id?: number
+          item_count?: number
+          latency_ms?: number
+          session_id?: string | null
+          sort?: string | null
+          surface?: string | null
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: []
+      }
       function_metrics: {
         Row: {
           created_at: string
@@ -7041,6 +7086,15 @@ export type Database = {
           token: string
         }[]
       }
+      moderation_audit: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_state?: string
+        }
+        Returns: Json
+      }
       my_progress_summary: { Args: never; Returns: Json }
       next_topic_queries: {
         Args: { p_limit?: number; p_target?: number }
@@ -7177,6 +7231,7 @@ export type Database = {
       }
       prune_topic_queries: { Args: never; Returns: number }
       purge_feed_impressions: { Args: never; Returns: number }
+      purge_feed_serve_samples: { Args: never; Returns: undefined }
       purge_function_metrics: { Args: never; Returns: number }
       rate_limit_cleanup: {
         Args: { _older_than_minutes?: number }
