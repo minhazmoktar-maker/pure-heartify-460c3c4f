@@ -659,7 +659,52 @@ export const TRUSTED_CHANNELS: string[] = [
   "NileBlue", "Sabine Hossenfelder", "Science Without the Gobbledygook",
   // Community-requested trusted podcasts / speakers
   "2 Cents Podcast", "Sazzad Ahsan", "Nafees Salim",
+  // ---------------------------------------------------------------------
+  // Local-first supply (80/20 rule): the native-language channels that make
+  // the feed feel *local* in Heartify's launch markets. Bangla, Urdu and
+  // Hindi first, then the other majority-Muslim languages we translate.
+  // ---------------------------------------------------------------------
+  // Bangla — Quran, tafsir, seerah, lectures
+  "Holy Quran Bangla", "Bangla Waz", "Islamic Bangla", "Quran Bangla Tafsir",
+  "Bangla Tafsir", "Peace TV Bangla", "Islamic Media Bangla",
+  "Sirat Bangla", "Deen Islam Bangla", "Bangla Islamic Lecture",
+  "As-Sunnah Foundation", "As Sunnah Trust", "Bayan Foundation Bangla",
+  "Rahmatullah Media", "Ahsan Media Bangla", "Nurul Islam Bangla",
+  "Islamic Knowledge Bangla", "Quran Shikkha", "Quran Learning Bangla",
+  "Salafi Bangla", "Tawheed Bangla", "Hadith Bangla",
+  "বাংলা ইসলামিক", "ইসলামিক জ্ঞান", "কুরআন শিক্ষা", "তাফসীর বাংলা",
+  // Bangla — educational / STEM (universal knowledge in the local language)
+  "10 Minute School", "Shikho", "Bohubrihi", "Ayman Sadiq",
+  "Enayet Chowdhury", "Sohag Khan", "Bigyan Pic", "Bornomala Academy",
+  // Urdu — Quran, fiqh, lectures
+  "Islamic Urdu Lectures", "Urdu Islamic Bayan", "Dawateislami",
+  "Al-Huda International", "Farhat Hashmi", "Tafseer Urdu",
+  "Quran Urdu Translation", "Islam Ki Baat", "Deen Ki Baatein",
+  "Mufti Tariq Masood", "Mufti Taqi Usmani", "Molana Tariq Jameel",
+  "Engineer Muhammad Ali Mirza", "Dr Israr Ahmed", "Tanzeem e Islami",
+  "Paigham TV", "Madani Channel", "ARY Qtv", "Hadi TV Urdu",
+  "اردو اسلامی", "قرآن اردو", "اسلامی بیان",
+  // Urdu — educational
+  "Taleem City", "Sabaq Foundation", "Ilmkidunya",
+  // Hindi — Islamic + educational
+  "Islamic Hindi Lectures", "Hindi Islamic Speech", "Quran Hindi Translation",
+  "Islam Hindi", "Sach Ki Awaaz", "Dawah Hindi",
+  "Physics Wallah", "Study IQ Education", "Unacademy",
+  // Indonesian / Malay
+  "Yufid TV", "Rodja TV", "Khalid Basalamah", "Adi Hidayat Official",
+  "Nouman Ali Khan Indonesia", "Islam Itu Indah", "Muslim Media Malaysia",
+  "Ustaz Wadi Annuar", "Ustaz Azhar Idrus Official", "Sinar Islam",
+  // Turkish
+  "Diyanet TV", "Nihat Hatipoglu", "Mehmet Yildiz Islam", "Semerkand TV",
+  // Arabic (regional supply)
+  "Iqraa TV", "Al Resalah", "Huda TV Arabic", "Zad TV", "Al Nas TV",
+  // Persian / Pashto
+  "Islam Farsi", "Quran Farsi", "Pashto Islamic Bayan", "Pashto Dawah",
+  // Hausa / Swahili
+  "Hausa Islamic Lectures", "Sheikh Jafar Mahmud Adam", "Hausa Dawah",
+  "Swahili Islamic Lectures", "Uongozi wa Kiislamu", "Dawah Swahili",
 ];
+
 
 
 
