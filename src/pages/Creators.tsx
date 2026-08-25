@@ -103,9 +103,14 @@ const Creators = () => {
               Every video and channel here flows through the same moderation pipeline as our own ingestion. Nothing goes live until it passes review — jazākum Allāhu khayran for keeping the platform halal.
             </p>
           </div>
-          <SuggestContentDialog
-            trigger={<Button size="lg" className="rounded-pill">Suggest content</Button>}
-          />
+          <div className="flex flex-wrap gap-3">
+            <Button asChild size="lg" variant="outline" className="rounded-pill">
+              <Link to="/studio">Upload to Heartify</Link>
+            </Button>
+            <SuggestContentDialog
+              trigger={<Button size="lg" className="rounded-pill">Suggest content</Button>}
+            />
+          </div>
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-3">
