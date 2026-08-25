@@ -96,6 +96,8 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
       as="article"
       index={index}
       className="group cursor-pointer"
+      data-testid="video-card"
+      data-video-id={video.id}
       onClick={handleClick}
     >
       <div
