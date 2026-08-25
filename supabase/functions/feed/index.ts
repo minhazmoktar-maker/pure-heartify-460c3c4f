@@ -581,7 +581,7 @@ Deno.serve(observed("feed", async (req) => {
               // expectation. Temperature shrinks as real signals accumulate,
               // so established users get a sharper, more personal feed.
               const signalStrength = Math.min(1, (chAff + catAff + longCh + longCat + interestMatch) / 2);
-              const temp = 0.85 - 0.5 * signalStrength;
+              const temp = 0.85 - 0.5 * signalStrength + abTempBoost;
               const u = Math.max(1e-9, hash01(`${identity}:${rotationKey}:${vid}`));
               const finalScore = score - temp * Math.log(-Math.log(u));
 
