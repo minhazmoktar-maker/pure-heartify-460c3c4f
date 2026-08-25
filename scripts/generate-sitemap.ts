@@ -173,6 +173,41 @@ const families: Array<{ name: string; entries: Entry[] }> = [
   { name: "halal-topics", entries: Object.keys(HALAL_TOPICS).map((slug) => ({ path: `/halal/${slug}`, changefreq: "weekly", priority: "0.7" })) },
 ];
 
+// ---------------------------------------------------------------------------
+// Watch URLs (deep-link friendly).
+//
+// `/watch/:id` is the canonical share target and the same path Android App
+// Links and iOS Universal Links open natively (see the `.well-known` files), so
+// indexing it gives crawlers *and* link-verification tooling a real URL list to
+// walk. Videos live in the database, so they are fetched at build time from the
+// public read policy with a hard cap — publish output limits make a file per
+// video impossible at corpus scale, and only the highest-quality clean videos
+// deserve an indexable URL anyway. If the backend is unreachable (offline CI),
+// the sitemap is still written without this family instead of failing the build.
+const MAX_WATCH_URLS = Number(process.env.SITEMAP_MAX_WATCH_URLS ?? 5000);
+
+async function fetchWatchEntries(): Promise<Entry[]> {
+  const url = process.env.VITE_SUPABASE_URL;
+  const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key || MAX_WATCH_URLS <= 0) return [];
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/curated_videos?select=video_id&status=eq.approved&visual_state=eq.clean&order=quality_score.desc.nullslast&limit=${MAX_WATCH_URLS}`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+    );
+    if (!res.ok) return [];
+    const rows = (await res.json()) as Array<{ video_id: string }>;
+    return rows
+      .filter((r) => typeof r.video_id === "string" && /^[\w-]{6,32}$/.test(r.video_id))
+      .map((r) => ({ path: `/watch/${r.video_id}`, changefreq: "weekly" as const, priority: "0.6" }));
+  } catch {
+    return [];
+  }
+}
+
+const watchEntries = await fetchWatchEntries();
+if (watchEntries.length) families.push({ name: "watch", entries: watchEntries });
+
 const coreFiles = writeChunked("core", core);
 const familyFiles = families.flatMap((f) => (f.entries.length ? writeChunked(f.name, f.entries) : []));
 const allFiles = [...coreFiles, ...familyFiles];
