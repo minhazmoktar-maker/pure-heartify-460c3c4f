@@ -7364,6 +7364,12 @@ export type Database = {
       set_my_timezone: { Args: { _tz: string }; Returns: string }
       set_profile_handle: { Args: { _handle: string }; Returns: string }
       settle_team_streaks: { Args: never; Returns: number }
+      sitemap_watch_urls: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          video_id: string
+        }[]
+      }
       social_admin_stats: { Args: never; Returns: Json }
       social_analytics_series: { Args: { _days?: number }; Returns: Json }
       social_can_view: {

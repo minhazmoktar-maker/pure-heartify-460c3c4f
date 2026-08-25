@@ -207,20 +207,31 @@ export default function MosqueFinder() {
                   </span>
                 </CardHeader>
                 <CardContent className="flex gap-2 pt-0">
+                  {/* Google Maps universal URLs: on iOS/Android these hand off
+                      to the installed Google Maps app, and fall back to the web
+                      map in a browser. Passing the mosque name alongside the
+                      coordinates makes the destination label read correctly
+                      instead of showing raw lat/lon. */}
                   <Button asChild size="sm" variant="outline">
                     <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lon}`}
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                        `${m.lat},${m.lon}`,
+                      )}&destination_name=${encodeURIComponent(m.name)}&travelmode=walking`}
                       target="_blank" rel="noopener noreferrer"
+                      aria-label={`Directions to ${m.name} in Google Maps`}
                     >
                       <Navigation className="mr-1 h-3 w-3" /> Directions
                     </a>
                   </Button>
                   <Button asChild size="sm" variant="ghost">
                     <a
-                      href={`https://www.openstreetmap.org/?mlat=${m.lat}&mlon=${m.lon}#map=18/${m.lat}/${m.lon}`}
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        `${m.lat},${m.lon}`,
+                      )}`}
                       target="_blank" rel="noopener noreferrer"
+                      aria-label={`View ${m.name} on Google Maps`}
                     >
-                      <ExternalLink className="mr-1 h-3 w-3" /> Map
+                      <ExternalLink className="mr-1 h-3 w-3" /> Google Maps
                     </a>
                   </Button>
                 </CardContent>

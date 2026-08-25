@@ -6,7 +6,7 @@
 //
 // Data is imported directly from src/data/* so it stays in sync with the app.
 
-import { writeFileSync, mkdirSync, existsSync } from "fs";
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -172,6 +172,69 @@ const families: Array<{ name: string; entries: Entry[] }> = [
   { name: "reciters", entries: RECITERS.map((r) => ({ path: `/reciter/${r.id}`, changefreq: "monthly", priority: "0.7" })) },
   { name: "halal-topics", entries: Object.keys(HALAL_TOPICS).map((slug) => ({ path: `/halal/${slug}`, changefreq: "weekly", priority: "0.7" })) },
 ];
+
+// ---------------------------------------------------------------------------
+// Watch URLs (deep-link friendly).
+//
+// `/watch/:id` is the canonical share target and the same path Android App
+// Links and iOS Universal Links open natively (see the `.well-known` files), so
+// indexing it gives crawlers *and* link-verification tooling a real URL list to
+// walk. Videos live in the database, so they are fetched at build time from the
+// public read policy with a hard cap — publish output limits make a file per
+// video impossible at corpus scale, and only the highest-quality clean videos
+// deserve an indexable URL anyway. If the backend is unreachable (offline CI),
+// the sitemap is still written without this family instead of failing the build.
+const MAX_WATCH_URLS = Number(process.env.SITEMAP_MAX_WATCH_URLS ?? 5000);
+
+/** Minimal .env reader — the generator runs outside Vite, so import.meta.env is empty. */
+function envFromDotenv(name: string): string | undefined {
+  if (process.env[name]) return process.env[name];
+  try {
+    const raw = readFileSync(resolve(__dirname, "../.env"), "utf8");
+    const line = raw.split(/\r?\n/).find((l) => l.trim().startsWith(`${name}=`));
+    return line?.slice(line.indexOf("=") + 1).trim().replace(/^["']|["']$/g, "");
+  } catch {
+    return undefined;
+  }
+}
+
+async function fetchWatchEntries(): Promise<Entry[]> {
+  const url = envFromDotenv("VITE_SUPABASE_URL");
+  const key = envFromDotenv("VITE_SUPABASE_PUBLISHABLE_KEY");
+  if (!url || !key || MAX_WATCH_URLS <= 0) return [];
+  // PostgREST caps every response at 1000 rows, so page through the RPC with an
+  // explicit offset until the cap is reached or the backend runs out of rows.
+  const PAGE = 1000;
+  const ids: string[] = [];
+  try {
+    for (let offset = 0; offset < MAX_WATCH_URLS; offset += PAGE) {
+      const res = await fetch(`${url}/rest/v1/rpc/sitemap_watch_urls`, {
+        method: "POST",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ p_limit: PAGE, p_offset: offset }),
+      });
+      if (!res.ok) break;
+      const rows = (await res.json()) as Array<{ video_id: string }>;
+      if (!rows.length) break;
+      for (const r of rows) {
+        if (typeof r.video_id === "string" && /^[\w-]{6,32}$/.test(r.video_id)) ids.push(r.video_id);
+      }
+      if (rows.length < PAGE) break;
+    }
+  } catch {
+    return [];
+  }
+  return Array.from(new Set(ids))
+    .slice(0, MAX_WATCH_URLS)
+    .map((id) => ({ path: `/watch/${id}`, changefreq: "weekly" as const, priority: "0.6" }));
+}
+
+const watchEntries = await fetchWatchEntries();
+if (watchEntries.length) families.push({ name: "watch", entries: watchEntries });
 
 const coreFiles = writeChunked("core", core);
 const familyFiles = families.flatMap((f) => (f.entries.length ? writeChunked(f.name, f.entries) : []));
