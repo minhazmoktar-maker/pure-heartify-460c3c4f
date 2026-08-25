@@ -178,7 +178,7 @@ export default function AdminCreatorReview() {
   if (!isModerator) {
     return (
       <div className="container mx-auto max-w-md px-4 py-20 text-center">
-        <SEO path="/admin/creator-review" title="Creator review — Heartify" description="Moderation queue." noindex />
+        <SEO path="/admin/creator-review" title="Creator review — Heartify" description="Moderation queue." />
         <p className="text-sm text-muted-foreground">You don't have access to this page.</p>
         <Button asChild variant="outline" className="mt-4 h-11">
           <Link to="/">Back home</Link>
