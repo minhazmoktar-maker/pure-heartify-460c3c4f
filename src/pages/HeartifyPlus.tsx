@@ -16,6 +16,7 @@ import {
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import HouseholdPanel from "@/components/plus/HouseholdPanel";
+import WalletCheckout from "@/components/plus/WalletCheckout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ import { useEntitlement } from "@/hooks/useEntitlement";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlusWaitlist, type PreferredTier } from "@/hooks/usePlusWaitlist";
 import { cn } from "@/lib/utils";
+import type { WalletPlan } from "@/lib/mobileWallet";
 import { useLocale } from "@/contexts/LocaleContext";
 import { formatCurrency } from "@/lib/intl";
 import {
@@ -442,6 +444,15 @@ export default function HeartifyPlus() {
                   >
                     {t.id === "free" ? "You're on Free" : t.cta}
                   </Button>
+                  {/* Bangladesh settles in BDT through bKash/Nagad rather than a
+                      card processor — most members here have no card at all. */}
+                  {regionKey === "bd" && t.id !== "free" && (
+                    <WalletCheckout
+                      className="mt-4 border-t border-border pt-4"
+                      plan={t.id as WalletPlan}
+                      priceLabel={formatPrice(t.id)}
+                    />
+                  )}
                 </article>
               );
             })}

@@ -24,6 +24,7 @@ import {
   publicEncrypt,
   constants as cryptoConstants,
 } from "node:crypto";
+import { Buffer } from "node:buffer";
 import { observed } from "../_shared/observe.ts";
 import {
   BDT_PRICES,
