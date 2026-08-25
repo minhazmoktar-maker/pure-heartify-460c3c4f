@@ -233,6 +233,11 @@ export default function AdminFeedAB() {
               <Delta value={lift(treatment.autoplay_pass_rate, control.autoplay_pass_rate)} />
             </p>
             <p className="flex justify-between">
+              <span className="text-muted-foreground">Feed latency p95 (lower is better)</span>
+              <Delta value={lift(treatment.latency_p95_ms, control.latency_p95_ms)} invert />
+            </p>
+
+            <p className="flex justify-between">
               <span className="text-muted-foreground">Error rate (lower is better)</span>
               <Delta value={lift(treatment.error_rate, control.error_rate)} invert />
             </p>
