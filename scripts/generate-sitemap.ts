@@ -6,7 +6,7 @@
 //
 // Data is imported directly from src/data/* so it stays in sync with the app.
 
-import { writeFileSync, mkdirSync, existsSync } from "fs";
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -186,9 +186,21 @@ const families: Array<{ name: string; entries: Entry[] }> = [
 // the sitemap is still written without this family instead of failing the build.
 const MAX_WATCH_URLS = Number(process.env.SITEMAP_MAX_WATCH_URLS ?? 5000);
 
+/** Minimal .env reader — the generator runs outside Vite, so import.meta.env is empty. */
+function envFromDotenv(name: string): string | undefined {
+  if (process.env[name]) return process.env[name];
+  try {
+    const raw = readFileSync(resolve(__dirname, "../.env"), "utf8");
+    const line = raw.split(/\r?\n/).find((l) => l.trim().startsWith(`${name}=`));
+    return line?.slice(line.indexOf("=") + 1).trim().replace(/^["']|["']$/g, "");
+  } catch {
+    return undefined;
+  }
+}
+
 async function fetchWatchEntries(): Promise<Entry[]> {
-  const url = process.env.VITE_SUPABASE_URL;
-  const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const url = envFromDotenv("VITE_SUPABASE_URL");
+  const key = envFromDotenv("VITE_SUPABASE_PUBLISHABLE_KEY");
   if (!url || !key || MAX_WATCH_URLS <= 0) return [];
   try {
     const res = await fetch(
