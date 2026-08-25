@@ -99,7 +99,7 @@ export default function CheckoutReturn() {
         title="Payment status — Heartify+"
         description="Confirming your bKash or Nagad payment for Heartify+."
         path="/checkout/return"
-        noindex
+        noBreadcrumbs
       />
       <main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-6 text-center">
         {status === "pending" && (
