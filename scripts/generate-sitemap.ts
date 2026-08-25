@@ -203,10 +203,15 @@ async function fetchWatchEntries(): Promise<Entry[]> {
   const key = envFromDotenv("VITE_SUPABASE_PUBLISHABLE_KEY");
   if (!url || !key || MAX_WATCH_URLS <= 0) return [];
   try {
-    const res = await fetch(
-      `${url}/rest/v1/curated_videos?select=video_id&visual_state=eq.clean&moderation_state=in.(approved,auto_approved)&is_hidden=is.false&is_archived=is.false&order=view_count.desc.nullslast&limit=${MAX_WATCH_URLS}`,
-      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
-    );
+    const res = await fetch(`${url}/rest/v1/rpc/sitemap_watch_urls`, {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ p_limit: MAX_WATCH_URLS }),
+    });
     if (!res.ok) return [];
     const rows = (await res.json()) as Array<{ video_id: string }>;
     return rows
