@@ -700,6 +700,51 @@ export type Database = {
         }
         Relationships: []
       }
+      bn_ingest_verifications: {
+        Row: {
+          checked_at: string
+          content_language: string | null
+          created_at: string
+          duplicate_of: string | null
+          halal_ok: boolean
+          halal_score: number | null
+          id: string
+          metadata_ok: boolean
+          missing_fields: string[]
+          passed: boolean
+          reasons: string[]
+          video_id: string
+        }
+        Insert: {
+          checked_at?: string
+          content_language?: string | null
+          created_at?: string
+          duplicate_of?: string | null
+          halal_ok?: boolean
+          halal_score?: number | null
+          id?: string
+          metadata_ok?: boolean
+          missing_fields?: string[]
+          passed?: boolean
+          reasons?: string[]
+          video_id: string
+        }
+        Update: {
+          checked_at?: string
+          content_language?: string | null
+          created_at?: string
+          duplicate_of?: string | null
+          halal_ok?: boolean
+          halal_score?: number | null
+          id?: string
+          metadata_ok?: boolean
+          missing_fields?: string[]
+          passed?: boolean
+          reasons?: string[]
+          video_id?: string
+        }
+        Relationships: []
+      }
       challenge_members: {
         Row: {
           challenge_id: string
@@ -3322,6 +3367,69 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      mobile_payments: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          failure_reason: string | null
+          gateway_payment_id: string | null
+          gateway_status: string | null
+          gateway_trx_id: string | null
+          id: string
+          merchant_invoice: string
+          plan: string
+          platform: string
+          raw: Json
+          redirect_url: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          wallet: string
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          gateway_payment_id?: string | null
+          gateway_status?: string | null
+          gateway_trx_id?: string | null
+          id?: string
+          merchant_invoice: string
+          plan: string
+          platform?: string
+          raw?: Json
+          redirect_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          wallet: string
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          failure_reason?: string | null
+          gateway_payment_id?: string | null
+          gateway_status?: string | null
+          gateway_trx_id?: string | null
+          id?: string
+          merchant_invoice?: string
+          plan?: string
+          platform?: string
+          raw?: Json
+          redirect_url?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          wallet?: string
         }
         Relationships: []
       }
@@ -6422,6 +6530,7 @@ export type Database = {
         Returns: Json
       }
       block_heartify_user: { Args: { _handle: string }; Returns: Json }
+      bn_catalog_health: { Args: { p_language?: string }; Returns: Json }
       channel_pipeline_tick: { Args: never; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
@@ -6849,6 +6958,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      grant_plan_entitlement: {
+        Args: { p_months?: number; p_plan: string; p_user_id: string }
+        Returns: undefined
       }
       grant_referral_tier_rewards: { Args: never; Returns: Json }
       grow_topic_queries: { Args: { p_limit?: number }; Returns: number }
