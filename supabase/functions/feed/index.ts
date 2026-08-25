@@ -693,8 +693,15 @@ Deno.serve(observed("feed", async (req) => {
     }
 
     const items = diversified.slice(0, limit);
+    // Keyset cursor must be the *oldest* ingested_at on the page: interleaving
+    // and top-ups can place a newer row last, which would skip rows (stall) or
+    // re-serve them (repeat) on the next page.
     const nextCursor = items.length === limit
-      ? (items[items.length - 1] as Record<string, unknown>).ingested_at as string
+      ? (items.reduce<string | null>((min, v) => {
+        const t = (v as Record<string, unknown>).ingested_at as string | null;
+        if (!t) return min;
+        return min === null || t < min ? t : min;
+      }, null))
       : null;
 
 
