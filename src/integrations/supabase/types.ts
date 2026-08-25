@@ -1669,6 +1669,169 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_accounts: {
+        Row: {
+          bio: string | null
+          country: string | null
+          created_at: string
+          display_name: string
+          handle: string
+          id: string
+          languages: string[]
+          status: string
+          strikes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name: string
+          handle: string
+          id?: string
+          languages?: string[]
+          status?: string
+          strikes?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          country?: string | null
+          created_at?: string
+          display_name?: string
+          handle?: string
+          id?: string
+          languages?: string[]
+          status?: string
+          strikes?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      creator_upload_events: {
+        Row: {
+          actor_id: string | null
+          actor_kind: string
+          created_at: string
+          detail: Json
+          event: string
+          id: string
+          upload_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_kind?: string
+          created_at?: string
+          detail?: Json
+          event: string
+          id?: string
+          upload_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          actor_kind?: string
+          created_at?: string
+          detail?: Json
+          event?: string
+          id?: string
+          upload_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_upload_events_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "creator_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_uploads: {
+        Row: {
+          category: string | null
+          created_at: string
+          creator_id: string
+          description: string | null
+          duration_seconds: number | null
+          halal_score: number | null
+          id: string
+          language: string
+          moderation_reason: string | null
+          published_at: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number | null
+          status: string
+          thumbnail_path: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          video_path: string | null
+          view_count: number
+          visual_state: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          duration_seconds?: number | null
+          halal_score?: number | null
+          id?: string
+          language?: string
+          moderation_reason?: string | null
+          published_at?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number | null
+          status?: string
+          thumbnail_path?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          video_path?: string | null
+          view_count?: number
+          visual_state?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          duration_seconds?: number | null
+          halal_score?: number | null
+          id?: string
+          language?: string
+          moderation_reason?: string | null
+          published_at?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number | null
+          status?: string
+          thumbnail_path?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          video_path?: string | null
+          view_count?: number
+          visual_state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_uploads_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creator_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       curated_videos: {
         Row: {
           category: string
@@ -6531,6 +6694,10 @@ export type Database = {
       }
       block_heartify_user: { Args: { _handle: string }; Returns: Json }
       bn_catalog_health: { Args: { p_language?: string }; Returns: Json }
+      bump_creator_upload_view: {
+        Args: { p_upload_id: string }
+        Returns: undefined
+      }
       channel_pipeline_tick: { Args: never; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
@@ -6646,6 +6813,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      creator_review_summary: { Args: never; Returns: Json }
       detect_content_language: {
         Args: { _fallback?: string; _title: string }
         Returns: string
