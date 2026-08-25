@@ -673,7 +673,7 @@ Deno.serve(observed("feed", async (req) => {
     for (const v of ordered) {
       const ch = (v.channel_title as string) ?? "__";
       const n = perChannel.get(ch) ?? 0;
-      if (n < maxPerChannel) { primary.push(v); perChannel.set(ch, n + 1); }
+      if (n < abState.channelCap) { primary.push(v); perChannel.set(ch, n + 1); }
       else overflow.push(v);
     }
     // v3: MMR alternation on the primary block prevents back-to-back creator/category.
