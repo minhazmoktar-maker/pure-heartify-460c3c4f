@@ -1,14 +1,27 @@
 /**
  * Creator ecosystem client layer.
  *
- * Handles creator-account onboarding, resumable-ish direct-to-storage uploads
- * via server-minted signed URLs, and submission into the moderation queue.
- * Nothing here can publish content — approval is a moderator-only action.
+ * Handles creator-account onboarding, resumable chunked uploads straight to
+ * storage (TUS, 6MB chunks, survives network drops), and submission into the
+ * moderation queue. Nothing here can publish content — approval is a
+ * moderator-only action.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { uploadResumable } from "@/lib/resumableUpload";
+import { detectLanguage, generateThumbnail, probeDuration } from "@/lib/uploadMedia";
+
+/** Shape returned by the creator-upload-init edge function. */
+interface InitResult {
+  upload_id: string;
+  bucket: string;
+  video: { path: string; token: string };
+  thumbnail: { path: string; token: string } | null;
+}
+
+
 
 export interface CreatorAccount {
   id: string;
