@@ -189,6 +189,9 @@ const AdminConsole = () => {
             <Link to="/admin/corpus-progress">Corpus progress</Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/creator-review">Creator uploads</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
             <Link to="/admin/locale-coverage">Locale coverage</Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
