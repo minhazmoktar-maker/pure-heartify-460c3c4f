@@ -54,8 +54,8 @@ test.describe("smart search — typo tolerance & normalization", () => {
     // Debounce is 250ms in useSmartSearch; give the corpus + fuse a beat.
     await page.waitForTimeout(1500);
 
-    // Chips are rendered as <button> pills right below the input.
-    const chips = page.locator("button.rounded-full");
+    // Suggestions render as listbox options under the combobox.
+    const chips = page.locator('[role="option"]');
     const count = await chips.count();
     // If the corpus is empty in CI we don't fail the assertion, but when there
     // are matches at least one chip must be interactive.
