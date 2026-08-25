@@ -64,8 +64,44 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
   },
+  /**
+   * iOS shell.
+   * - `scheme` backs the custom `heartify://` deep links handled in
+   *   `src/hooks/useDeepLinks.ts`; universal links come from
+   *   `public/.well-known/apple-app-site-association`.
+   * - `limitsNavigationsToAppBoundDomains` keeps the WKWebView pinned to the
+   *   bundled app, which App Review expects for a store build.
+   * - `preferredContentMode: 'mobile'` prevents desktop-width layouts on iPad.
+   * - `backgroundColor` matches the splash so RTL locales don't flash white.
+   */
   ios: {
     scheme: 'heartify',
+    contentInset: 'always',
+    preferredContentMode: 'mobile',
+    limitsNavigationsToAppBoundDomains: true,
+    backgroundColor: '#0F172A',
+    // Declared for reference; the authoritative list lives in
+    // ios/App/App/Info.plist (see docs/ios-localization.plist).
+    // @ts-expect-error — informational only, ignored by the Capacitor CLI.
+    localizations: APP_LOCALE_TAGS,
+  },
+  /**
+   * Android shell.
+   * - `allowMixedContent: false` + `captureInput` keep the WebView store-safe.
+   * - `webContentsDebuggingEnabled` is off for release builds.
+   * - Per-app language support comes from
+   *   `android/app/src/main/res/xml/locales_config.xml` (API 33+), referenced
+   *   from AndroidManifest as `android:localeConfig`.
+   */
+  android: {
+    allowMixedContent: false,
+    captureInput: true,
+    webContentsDebuggingEnabled: false,
+    backgroundColor: '#0F172A',
+    // Declared for reference; the authoritative list lives in
+    // android/app/src/main/res/xml/locales_config.xml.
+    // @ts-expect-error — informational only, ignored by the Capacitor CLI.
+    localizations: APP_LOCALE_TAGS,
   },
 };
 
