@@ -6,7 +6,7 @@
  * into the same moderation pipeline as the curated corpus.
  */
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BarChart3, FileQuestion, Loader2, RotateCcw, ShieldCheck, Upload, Video } from "lucide-react";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
@@ -423,6 +423,13 @@ export default function CreatorStudio() {
   const { user, loading: authLoading } = useAuth();
   const account = useCreatorAccount();
   const uploads = useMyUploads();
+  // Caption-quality notifications deep-link here as
+  // /studio?captions=<uploadId>&lang=<code> and open that review panel.
+  const [searchParams] = useSearchParams();
+  const captionDeepLink = {
+    uploadId: searchParams.get("captions"),
+    language: searchParams.get("lang"),
+  };
   // 7-day window is enough to tell "no one watched" from "telemetry broke".
   const analytics = useCreatorAnalytics(7);
   const telemetry = useTelemetryHealth(uploads.data, analytics.data);
