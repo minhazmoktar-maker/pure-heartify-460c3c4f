@@ -58,8 +58,16 @@ Deno.serve(async (req) => {
   const cronToken = req.headers.get("x-cron-token");
   const authorized =
     (!!cronSecret && cronSecret === Deno.env.get("CRON_SECRET")) ||
-    (!!cronToken && cronToken === Deno.env.get("INGEST_CRON_TOKEN"));
-  if (!authorized) return json({ error: "unauthorized" }, 401);
+    (!!cronToken && cronToken === Deno.env.get("INGEST_CRON_TOKEN")) ||
+    (!!cronToken && cronToken === Deno.env.get("AUDIT_CRON_TOKEN"));
+  if (!authorized) {
+    console.log(
+      `moderate-backlog: unauthorized (token_present=${!!cronToken}, secret_present=${!!cronSecret})`,
+    );
+    return json({ error: "unauthorized" }, 401);
+  }
+  console.log("moderate-backlog: authorized run starting");
+
 
 
   let body: { batch?: number; concurrency?: number } = {};
