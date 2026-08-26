@@ -128,11 +128,23 @@ function ctxFor(u: SimUser, config: FeedRuntimeConfig): SurfaceContext {
  * Synthetic retrieval: affinity-ranked head (identical shape for users with
  * the same popular channels) + a broad exploration tail. This is the pool
  * shape that historically produced "every user sees the same feed".
+ *
+ * The exploration tail is drawn with the session-scoped personal seed, which
+ * mirrors production: retrieval itself samples (Gumbel top-k) rather than
+ * always handing the ranker the identical rows, so a returning user keeps
+ * discovering catalog instead of re-shuffling one fixed slice.
  */
-function candidatePool(u: SimUser, corpus: SurfaceVideo[]): SurfaceVideo[] {
+function candidatePool(
+  u: SimUser,
+  corpus: SurfaceVideo[],
+  seed: number,
+): SurfaceVideo[] {
   const affinity = new Set(u.affinityChannels.map((c) => `ch${c}`));
   const head = corpus.filter((v) => affinity.has(v.channel_id!));
-  const tail = corpus.filter((v) => !affinity.has(v.channel_id!));
+  const tail = shuffleWithSeed(
+    corpus.filter((v) => !affinity.has(v.channel_id!)),
+    seed,
+  );
   return [...head.slice(0, 60), ...tail.slice(0, 240)];
 }
 
@@ -143,7 +155,9 @@ export function simulateForYou(
   config: FeedRuntimeConfig = DEFAULT_FEED_CONFIG,
 ) {
   const ctx = ctxFor(u, config);
-  const pool = candidatePool(u, corpus);
+  const seed = personalSeed(ctx, "foryou");
+  const pool = candidatePool(u, corpus, seed);
+
 
   const level = config.sliderEnabled ? u.diversityLevel : 50;
   const headSize = Math.max(4, Math.round(24 - (level / 100) * 20));
@@ -249,5 +263,86 @@ export function runSimulation(
     maxChannelShare,
     guaranteeFailures,
     catalogCoverage: covered.size / corpus.length,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Repeat-visit simulation.
+//
+// A habitual user opens Heartify 100x/day (>1000x/month). Every one of those
+// opens is a new session id, which is the primary entropy source for
+// `personalSeed`. This harness replays the same user across N sessions and
+// measures how much of each visit is genuinely new content.
+// ---------------------------------------------------------------------------
+
+export interface RepeatVisitReport {
+  visits: number;
+  /** Distinct feeds (by exact ordered id list) across all visits. */
+  distinctFeeds: number;
+  /** Mean share of items in visit N that were NOT in visit N-1. */
+  meanConsecutiveNovelty: number;
+  /** Worst consecutive-visit novelty across the whole run. */
+  minConsecutiveNovelty: number;
+  /** Mean pairwise overlap across every visit pair. */
+  meanPairwiseOverlap: number;
+  /** Share of the corpus the user saw at least once across all visits. */
+  catalogCoverage: number;
+  /** Any visit that rendered a duplicate id (must always be 0). */
+  duplicatesWithinFeed: number;
+}
+
+export function simulateRepeatVisits(
+  user: SimUser,
+  corpus: SurfaceVideo[],
+  visits = 1000,
+  config: FeedRuntimeConfig = DEFAULT_FEED_CONFIG,
+): RepeatVisitReport {
+  const feeds: string[][] = [];
+  const covered = new Set<string>();
+  let duplicatesWithinFeed = 0;
+
+  for (let v = 0; v < visits; v++) {
+    const { items } = simulateForYou(
+      { ...user, sessionId: `${user.sessionId}-visit-${v}` },
+      corpus,
+      config,
+    );
+    const ids = items.map((x) => x.video_id);
+    duplicatesWithinFeed += ids.length - new Set(ids).size;
+    ids.forEach((id) => covered.add(id));
+    feeds.push(ids);
+  }
+
+  let noveltySum = 0;
+  let minNovelty = 1;
+  for (let i = 1; i < feeds.length; i++) {
+    const prev = new Set(feeds[i - 1]);
+    const fresh = feeds[i].filter((id) => !prev.has(id)).length;
+    const novelty = feeds[i].length ? fresh / feeds[i].length : 0;
+    noveltySum += novelty;
+    minNovelty = Math.min(minNovelty, novelty);
+  }
+
+  let pairs = 0;
+  let overlapSum = 0;
+  // Sample pairs — 1000 visits would be ~500k comparisons otherwise.
+  const step = Math.max(1, Math.floor(feeds.length / 60));
+  for (let i = 0; i < feeds.length; i += step) {
+    const a = new Set(feeds[i]);
+    for (let j = i + step; j < feeds.length; j += step) {
+      const shared = feeds[j].filter((id) => a.has(id)).length;
+      overlapSum += shared / Math.max(1, Math.min(a.size, feeds[j].length));
+      pairs++;
+    }
+  }
+
+  return {
+    visits,
+    distinctFeeds: new Set(feeds.map((f) => f.join(","))).size,
+    meanConsecutiveNovelty: feeds.length > 1 ? noveltySum / (feeds.length - 1) : 0,
+    minConsecutiveNovelty: feeds.length > 1 ? minNovelty : 0,
+    meanPairwiseOverlap: pairs ? overlapSum / pairs : 0,
+    catalogCoverage: covered.size / corpus.length,
+    duplicatesWithinFeed,
   };
 }
