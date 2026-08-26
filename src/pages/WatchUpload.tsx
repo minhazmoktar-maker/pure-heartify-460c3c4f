@@ -51,6 +51,28 @@ export default function WatchUpload() {
   const requestCaptions = useRequestCaptions(id);
   const vttUrls = useVttUrls(captions.data);
 
+  // ?cc=xx deep-links a caption language (used by Originals cards); otherwise
+  // the fallback chain picks the native lane track and degrades gracefully.
+  const [searchParams] = useSearchParams();
+  const [preferredCaption, setPreferredCaption] = useState<string | null>(
+    searchParams.get("cc"),
+  );
+  const tracks = captions.data ?? [];
+  const { track: activeCaption, reason: captionReason } = useMemo(
+    () =>
+      resolveCaptionTrack(tracks, {
+        preferred: preferredCaption,
+        nativeLanguage: primaryLanguage,
+        uiLanguage,
+        contentLanguage: row?.language,
+      }),
+    [tracks, preferredCaption, primaryLanguage, uiLanguage, row?.language],
+  );
+  const hasPrimaryCaptions =
+    !primaryLanguage ||
+    tracks.some((t) => t.language.split("-")[0] === primaryLanguage);
+
+
   const lane = useMemo(
     () => (isNativeItem(row?.language, primaryLanguage) ? "native" : "diversified") as
       | "native"
