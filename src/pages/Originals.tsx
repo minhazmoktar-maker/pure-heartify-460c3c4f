@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { UPLOAD_LANGUAGES } from "@/hooks/useCreatorStudio";
-import { useUploadCaptionsIndex } from "@/hooks/useUploadCaptions";
+import { useUploadCaptionsIndex, usePrefetchUploadCaptions } from "@/hooks/useUploadCaptions";
 import { resolveCaptionTrack } from "@/lib/captionFallback";
 import CaptionPicker from "@/components/CaptionPicker";
 import { useLocale } from "@/contexts/LocaleContext";
@@ -111,6 +111,9 @@ export default function Originals() {
   const rows = query.data ?? [];
   // One batched lookup keeps the per-card caption pickers cheap.
   const captionIndex = useUploadCaptionsIndex(rows.map((r) => r.id));
+  // Warm the tracks for the cards on screen so opening a video shows captions
+  // immediately instead of after a round-trip.
+  usePrefetchUploadCaptions(rows.map((r) => r.id));
 
   return (
     <>

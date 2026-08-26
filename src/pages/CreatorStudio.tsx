@@ -6,7 +6,7 @@
  * into the same moderation pipeline as the curated corpus.
  */
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BarChart3, FileQuestion, Loader2, RotateCcw, ShieldCheck, Upload, Video } from "lucide-react";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import CaptionQualityPanel from "@/components/CaptionQualityPanel";
+import CaptionReviewPanel from "@/components/CaptionReviewPanel";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -422,6 +423,13 @@ export default function CreatorStudio() {
   const { user, loading: authLoading } = useAuth();
   const account = useCreatorAccount();
   const uploads = useMyUploads();
+  // Caption-quality notifications deep-link here as
+  // /studio?captions=<uploadId>&lang=<code> and open that review panel.
+  const [searchParams] = useSearchParams();
+  const captionDeepLink = {
+    uploadId: searchParams.get("captions"),
+    language: searchParams.get("lang"),
+  };
   // 7-day window is enough to tell "no one watched" from "telemetry broke".
   const analytics = useCreatorAnalytics(7);
   const telemetry = useTelemetryHealth(uploads.data, analytics.data);
@@ -593,7 +601,30 @@ export default function CreatorStudio() {
                         </Badge>
                       </div>
                       {(u.status === "pending_review" || u.status === "approved") && (
-                        <CaptionQualityPanel uploadId={u.id} durationSeconds={u.duration_seconds} />
+                        <>
+                          <CaptionQualityPanel uploadId={u.id} durationSeconds={u.duration_seconds} />
+                          {/* Review step: watch the captions in place before
+                              publishing. Opened automatically when a quality
+                              notification deep-links to this upload. */}
+                          <details
+                            className="mt-2 rounded-lg border border-border p-2"
+                            open={captionDeepLink.uploadId === u.id}
+                            data-testid={`caption-review-details-${u.id}`}
+                          >
+                            <summary className="cursor-pointer text-xs font-medium text-foreground">
+                              Review captions before publishing
+                            </summary>
+                            <div className="mt-2">
+                              <CaptionReviewPanel
+                                uploadId={u.id}
+                                durationSeconds={u.duration_seconds}
+                                initialLanguage={
+                                  captionDeepLink.uploadId === u.id ? captionDeepLink.language : null
+                                }
+                              />
+                            </div>
+                          </details>
+                        </>
                       )}
                       {u.status === "approved" && (
                         <Link

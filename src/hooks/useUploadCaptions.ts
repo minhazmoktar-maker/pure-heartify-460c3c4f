@@ -9,6 +9,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { startCaptionTimer } from "@/lib/captionPerf";
 
 export interface CaptionSegment {
   start_ms: number;
@@ -51,13 +52,19 @@ export function useUploadCaptions(uploadId: string | undefined) {
     enabled: Boolean(uploadId),
     staleTime: 5 * 60 * 1000,
     queryFn: async (): Promise<CaptionTrack[]> => {
+      const done = startCaptionTimer(uploadId as string, "fetch");
       const { data, error } = await supabase
         .from("creator_upload_captions")
         .select("language, source, segment_count, segments")
         .eq("upload_id", uploadId as string)
         .order("source", { ascending: true });
-      if (error) throw error;
-      return ((data ?? []) as unknown as CaptionTrack[]).filter((t) => t.segment_count > 0);
+      if (error) {
+        done(0);
+        throw error;
+      }
+      const tracks = ((data ?? []) as unknown as CaptionTrack[]).filter((t) => t.segment_count > 0);
+      done(tracks.length);
+      return tracks;
     },
   });
 }
@@ -133,4 +140,86 @@ export function useUploadCaptionsIndex(uploadIds: string[] | undefined) {
       return map;
     },
   });
+}
+
+/**
+ * Save an edited caption track (creator or moderator; enforced by RLS).
+ * Timings are normalised — sorted, non-negative, empty cues dropped — so a
+ * hand-edited draft can never regress into an unplayable track.
+ */
+export function useSaveCaptionTrack(uploadId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ language, segments }: { language: string; segments: CaptionSegment[] }) => {
+      if (!uploadId) throw new Error("missing upload");
+      const clean = segments
+        .map((s) => ({
+          start_ms: Math.max(0, Math.round(s.start_ms)),
+          end_ms: s.end_ms === null || s.end_ms === undefined ? null : Math.max(0, Math.round(s.end_ms)),
+          text: (s.text ?? "").trim(),
+        }))
+        .filter((s) => s.text.length > 0)
+        .sort((a, b) => a.start_ms - b.start_ms);
+      if (clean.length === 0) throw new Error("a caption track needs at least one cue with text");
+      const { error } = await supabase
+        .from("creator_upload_captions")
+        .update({
+          segments: clean as unknown as never,
+          segment_count: clean.length,
+          source: "manual",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("upload_id", uploadId)
+        .eq("language", language);
+      if (error) throw error;
+      return clean;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["upload-captions", uploadId] });
+      void qc.invalidateQueries({ queryKey: ["upload-captions-index"] });
+    },
+  });
+}
+
+/**
+ * Prefetch the caption tracks a viewer is most likely to need next (the cards
+ * currently on screen), timed through `captionPerf` so slow caption loads are
+ * measurable rather than anecdotal.
+ */
+export function usePrefetchUploadCaptions(uploadIds: string[] | undefined) {
+  const qc = useQueryClient();
+  const key = (uploadIds ?? []).filter(Boolean).slice(0, 8).join(",");
+  useEffect(() => {
+    const ids = key ? key.split(",") : [];
+    let cancelled = false;
+    (async () => {
+      for (const id of ids) {
+        if (cancelled) return;
+        const cached = qc.getQueryData(["upload-captions", id]);
+        if (cached) continue;
+        const done = startCaptionTimer(id, "prefetch");
+        try {
+          const tracks = await qc.fetchQuery({
+            queryKey: ["upload-captions", id],
+            staleTime: 5 * 60 * 1000,
+            queryFn: async (): Promise<CaptionTrack[]> => {
+              const { data, error } = await supabase
+                .from("creator_upload_captions")
+                .select("language, source, segment_count, segments")
+                .eq("upload_id", id)
+                .order("source", { ascending: true });
+              if (error) throw error;
+              return ((data ?? []) as unknown as CaptionTrack[]).filter((t) => t.segment_count > 0);
+            },
+          });
+          done((tracks as CaptionTrack[]).length);
+        } catch {
+          done(0);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [key, qc]);
 }

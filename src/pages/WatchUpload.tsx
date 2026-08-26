@@ -22,7 +22,10 @@ import {
   useVttUrls,
 } from "@/hooks/useUploadCaptions";
 import { useLocale } from "@/contexts/LocaleContext";
-import CaptionPicker from "@/components/CaptionPicker";
+import CaptionPicker, { isRtlCaption } from "@/components/CaptionPicker";
+import CaptionOverlay from "@/components/CaptionOverlay";
+import CaptionSettingsSheet from "@/components/CaptionSettingsSheet";
+import { captionPerfSummary } from "@/lib/captionPerf";
 import { resolveCaptionTrack } from "@/lib/captionFallback";
 import { isNativeItem, languageLabel } from "@/components/LaneToggle";
 import { trackLaneEvent, flushLaneEvents } from "@/lib/laneTelemetry";
@@ -44,6 +47,7 @@ export default function WatchUpload() {
   const { id } = useParams<{ id: string }>();
   const [row, setRow] = useState<Row | null>(null);
   const [loading, setLoading] = useState(true);
+  const [playheadSeconds, setPlayheadSeconds] = useState(0);
   const playback = useUploadPlayback(id);
   const telemetry = useUploadTelemetry(id);
   const { preferences, locale: uiLanguage } = useLocale();
@@ -153,7 +157,7 @@ export default function WatchUpload() {
         description={(row.description ?? row.title).slice(0, 155)}
       />
       <div className="container mx-auto max-w-3xl px-4 pb-24 pt-4">
-        <div className="overflow-hidden rounded-xl border border-border bg-black">
+        <div className="relative overflow-hidden rounded-xl border border-border bg-black">
           {playback.loading ? (
             <div className="flex aspect-video items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -170,6 +174,7 @@ export default function WatchUpload() {
               onTimeUpdate={(event) => {
                 const video = event.currentTarget;
                 telemetry.onTimeUpdate(video.currentTime, video.duration || 0);
+                setPlayheadSeconds(video.currentTime);
                 const state = watchRef.current;
                 const delta = video.currentTime - state.last;
                 if (delta > 0 && delta < 4) state.watched += delta;
@@ -179,6 +184,9 @@ export default function WatchUpload() {
               onPlay={() => telemetry.onAutoplayResult(true)}
               onError={() => telemetry.onAutoplayResult(false)}
             >
+              {/* Tracks stay attached for native browser CC menus and for
+                  downloads; on-screen rendering is handled by CaptionOverlay so
+                  the viewer's size/background/RTL settings apply everywhere. */}
               {tracks.map((track) => (
                 <track
                   key={track.language}
@@ -186,11 +194,18 @@ export default function WatchUpload() {
                   src={vttUrls[track.language]}
                   srcLang={track.language}
                   label={`${languageLabel(track.language)}${track.source === "mt" ? " (translated)" : ""}`}
-                  default={activeCaption?.language === track.language}
                 />
               ))}
 
             </video>
+          ) : null}
+          {playback.url ? (
+            <CaptionOverlay
+              segments={activeCaption ? tracks.find((t) => t.language === activeCaption.language)?.segments : undefined}
+              language={activeCaption?.language}
+              currentTime={playheadSeconds}
+              testId="watch-caption-overlay"
+            />
           ) : (
             <div className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground">
               {playback.error ?? "Playback unavailable."}
@@ -248,13 +263,19 @@ export default function WatchUpload() {
               <span data-testid="watch-upload-captions-badge" className="sr-only">
                 CC · {tracks.length}
               </span>
-              <CaptionPicker
-                tracks={tracks}
-                selected={activeCaption?.language ?? null}
-                reason={captionReason}
-                onSelect={setPreferredCaption}
-                testId="watch-caption-picker"
-              />
+              <div className="flex flex-wrap items-center gap-2">
+                <CaptionPicker
+                  tracks={tracks}
+                  selected={activeCaption?.language ?? null}
+                  reason={captionReason}
+                  onSelect={setPreferredCaption}
+                  testId="watch-caption-picker"
+                />
+                <CaptionSettingsSheet previewRtl={isRtlCaption(activeCaption?.language)} testId="watch-caption-settings" />
+              </div>
+              <span data-testid="watch-caption-perf" className="block text-[11px] text-muted-foreground">
+                {tracks.length} track{tracks.length > 1 ? "s" : ""} loaded in {captionPerfSummary().p50}ms (p50)
+              </span>
             </>
           )}
           {!hasPrimaryCaptions && primaryLanguage && (
