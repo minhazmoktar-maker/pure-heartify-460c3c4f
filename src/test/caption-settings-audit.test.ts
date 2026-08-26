@@ -110,7 +110,7 @@ describe("caption audit trail", () => {
         action: "quality_check",
         score: 46,
         segment_count: 2,
-        issues: [{ code: "overlap", message: 'cue "A" overlaps' }],
+        issues: [{ code: "overlap" }, { message: 'cue "A" overlaps' }],
         thresholds: { tripped: ["overlap", "sync_drift"] },
         actor_id: "user-1",
         actor_role: null,
