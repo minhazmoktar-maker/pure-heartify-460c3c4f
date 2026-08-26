@@ -203,8 +203,11 @@ async function computeRecommendations(args: ComputeArgs) {
       console.warn("[rec] semantic recall skipped:", (e as Error).message);
     }
 
+    // Over-fetch when a local language must own 80% of the page: the
+    // interleave can only promote local rows the provider actually returned.
+    const scoreLimit = primaryLanguage ? Math.min(limit * 4, 160) : limit;
     const recommendations = await provider.recommend(signals, candidates, {
-      limit,
+      limit: scoreLimit,
       surface,
       categoryFilter,
       excludeWatched,
@@ -235,6 +238,7 @@ async function computeRecommendations(args: ComputeArgs) {
         limit,
       );
     }
+    if (filteredRecs.length > limit) filteredRecs = filteredRecs.slice(0, limit);
 
     // Fire-and-forget impression logging via SECURITY DEFINER RPC.
     // Each row is logged independently — one failure won't sink the batch,
