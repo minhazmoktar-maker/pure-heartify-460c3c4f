@@ -347,7 +347,10 @@ function UploadModerationActions({ upload }: { upload: { id: string; status: Upl
   const submitAppeal = async () => {
     try {
       await appeal.mutateAsync({ uploadId: upload.id, message });
-      toast({ title: "Appeal opened", description: "A reviewer will take a second look." });
+      toast({
+        title: "Appeal opened",
+        description: "Track it any time under Studio → Appeals.",
+      });
       setMessage("");
       setOpen(false);
     } catch (error) {
