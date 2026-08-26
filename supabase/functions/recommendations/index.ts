@@ -23,6 +23,11 @@ import { hasActivePremium } from "../_shared/entitlements.ts";
 import { toPgVector } from "../_shared/embed.ts";
 import { readThrough } from "../_shared/cache.ts";
 import { observed } from "../_shared/observe.ts";
+import {
+  derivePrimaryLanguage,
+  interleavePrimaryLanguage,
+  sanitizeLang,
+} from "../_shared/localFirst.ts";
 
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -90,23 +95,32 @@ Deno.serve(observed("recommendations", async (req) => {
     const categoryFilter = body.categoryFilter ? String(body.categoryFilter) : null;
     const excludeWatched = body.excludeWatched !== false;
     const sessionId = body.sessionId ? String(body.sessionId) : null;
+    // 80/20 localization standard: the caller's primary (local) language owns
+    // 80% of the page, the remaining 20% stays language-diversified.
+    const bodyLanguages = (Array.isArray(body.contentLanguages) ? body.contentLanguages : [])
+      .map(sanitizeLang)
+      .filter((l: string | null): l is string => !!l)
+      .slice(0, 8);
+    const bodyPrimary =
+      derivePrimaryLanguage([body.primaryLanguage]) ?? derivePrimaryLanguage(bodyLanguages);
 
     // Read-through cache — anonymous cold-start only (no userId, no session,
     // no category filter). Keeps the hottest global surface warm without
     // leaking per-user signals across callers. 60s TTL.
     const cacheable = !userId && !sessionId && !categoryFilter;
     if (cacheable) {
-      const cacheKey = `rec:anon:${surface}:${limit}:${excludeWatched ? 1 : 0}`;
+      const cacheKey = `rec:anon:${surface}:${limit}:${excludeWatched ? 1 : 0}:${bodyPrimary ?? "-"}`;
       const { value, hit } = await readThrough(cacheKey, 60, async () => {
         return await computeRecommendations({
           userId, limit, surface, categoryFilter, excludeWatched, sessionId,
+          bodyPrimary, bodyLanguages,
         });
       });
       return json(value, 200, { "X-Cache": hit ? "HIT" : "MISS" });
     }
 
     const value = await computeRecommendations({
-      userId, limit, surface, categoryFilter, excludeWatched, sessionId,
+      userId, limit, surface, categoryFilter, excludeWatched, sessionId, bodyPrimary, bodyLanguages,
     });
     return json(value);
   } catch (e) {
@@ -121,13 +135,24 @@ interface ComputeArgs {
   categoryFilter: string | null;
   excludeWatched: boolean;
   sessionId: string | null;
+  bodyPrimary?: string | null;
+  bodyLanguages?: string[];
 }
 
 async function computeRecommendations(args: ComputeArgs) {
-  const { userId, limit, surface, categoryFilter, excludeWatched, sessionId } = args;
+  const { userId, limit, surface, categoryFilter, excludeWatched, sessionId, bodyPrimary, bodyLanguages } = args;
     const provider = getRecommendationProvider();
     const signals = await gatherSignals(admin, userId);
-    const candidates = await fetchCandidates(admin, signals, categoryFilter);
+    // Anonymous callers have no stored preferences, so without this the
+    // language-match scoring rule never fires and the local lane's rows are
+    // outranked by the (much larger) English supply before the 80/20
+    // interleave ever sees them.
+    if (signals.contentLanguages.length === 0 && bodyLanguages?.length) {
+      signals.contentLanguages = bodyLanguages;
+    }
+    const primaryLanguage =
+      derivePrimaryLanguage([bodyPrimary]) ?? derivePrimaryLanguage(signals.contentLanguages);
+    const candidates = await fetchCandidates(admin, signals, categoryFilter, primaryLanguage);
 
     // Semantic recall: expand the candidate pool with videos similar to the
     // user's most-signal-heavy anchor (favorite > recently watched > top trend).
@@ -186,8 +211,11 @@ async function computeRecommendations(args: ComputeArgs) {
       console.warn("[rec] semantic recall skipped:", (e as Error).message);
     }
 
+    // Over-fetch when a local language must own 80% of the page: the
+    // interleave can only promote local rows the provider actually returned.
+    const scoreLimit = primaryLanguage ? Math.min(limit * 12, 300) : limit;
     const recommendations = await provider.recommend(signals, candidates, {
-      limit,
+      limit: scoreLimit,
       surface,
       categoryFilter,
       excludeWatched,
@@ -206,6 +234,19 @@ async function computeRecommendations(args: ComputeArgs) {
       const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
       filteredRecs = recommendations.filter((r) => !premiumSet.has(r.video.video_id));
     }
+
+    // 80/20 local-first ordering. Applied after the premium gate so the
+    // shipped page — not the raw candidate pool — carries the guaranteed
+    // local-language share, with the minority slots language-diversified.
+    if (primaryLanguage) {
+      filteredRecs = interleavePrimaryLanguage(
+        filteredRecs,
+        (r) => (r.video as { content_language?: string | null }).content_language ?? null,
+        primaryLanguage,
+        limit,
+      );
+    }
+    if (filteredRecs.length > limit) filteredRecs = filteredRecs.slice(0, limit);
 
     // Fire-and-forget impression logging via SECURITY DEFINER RPC.
     // Each row is logged independently — one failure won't sink the batch,

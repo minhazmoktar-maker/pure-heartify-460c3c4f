@@ -7,6 +7,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { growth } from "@/lib/growthEvents";
+import { useLocale } from "@/contexts/LocaleContext";
 
 export interface RecommendationReason {
   code: string;
@@ -62,8 +63,13 @@ function sessionId(): string {
 export function useRecommendations(opts: Options = {}) {
   const surface = opts.surface ?? "home";
   const limit = opts.limit ?? 24;
+  // 80/20 localization: server guarantees the primary (local) language 80% of
+  // the page, so the client must send its ordered content languages.
+  const { preferences } = useLocale();
+  const contentLanguages = preferences.content_languages ?? [];
+  const langKey = contentLanguages.join(",");
   return useQuery({
-    queryKey: ["recommendations", surface, opts.categoryFilter ?? null, limit],
+    queryKey: ["recommendations", surface, opts.categoryFilter ?? null, limit, langKey],
     enabled: opts.enabled !== false,
     staleTime: 60_000,
     queryFn: async (): Promise<RecommendationsPayload> => {
@@ -73,6 +79,7 @@ export function useRecommendations(opts: Options = {}) {
           categoryFilter: opts.categoryFilter ?? null,
           limit,
           sessionId: sessionId(),
+          contentLanguages,
         },
       });
       if (error) throw error;

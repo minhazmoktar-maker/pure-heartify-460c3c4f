@@ -73,6 +73,16 @@ export function interleavePrimaryLanguage<T>(
   }
   if (local.length === 0 || other.length === 0) return items;
 
+  // The remaining ~20% is the *diversified* half of the 80/20 standard: it
+  // must not collapse into a single (almost always English) language. Round
+  // robin the non-primary pool across its distinct languages so the minority
+  // slots show a genuine spread — English, Arabic, and whatever else the
+  // corpus supplies — while preserving relative order inside each language.
+  const nonPrimary = diversifyByLanguage(other, getLang);
+  other.length = 0;
+  other.push(...nonPrimary);
+
+
   const window = Math.max(1, Math.min(limit, items.length));
   // Never promise more local slots than we actually have supply for.
   const quota = Math.min(local.length, Math.max(1, Math.round(window * share)));
@@ -91,6 +101,40 @@ export function interleavePrimaryLanguage<T>(
     if (pos < window && slots.has(pos) && li < local.length) out.push(local[li++]);
     else if (oi < other.length) out.push(other[oi++]);
     else if (li < local.length) out.push(local[li++]);
+  }
+  return out;
+}
+
+/**
+ * Round-robin a list across its distinct languages, preserving each
+ * language's internal order. Used for the diversified 20% of a page so the
+ * minority slots are not all one language.
+ */
+export function diversifyByLanguage<T>(
+  items: T[],
+  getLang: (v: T) => string | null,
+): T[] {
+  if (items.length < 3) return items;
+  const buckets = new Map<string, T[]>();
+  for (const v of items) {
+    const key = (getLang(v) ?? "unknown").toLowerCase();
+    const b = buckets.get(key);
+    if (b) b.push(v);
+    else buckets.set(key, [v]);
+  }
+  if (buckets.size < 2) return items;
+  // Larger supplies lead so the head of the page stays dense.
+  const lanes = Array.from(buckets.values()).sort((a, b) => b.length - a.length);
+  const out: T[] = [];
+  for (let i = 0; out.length < items.length; i++) {
+    let progressed = false;
+    for (const lane of lanes) {
+      if (i < lane.length) {
+        out.push(lane[i]);
+        progressed = true;
+      }
+    }
+    if (!progressed) break;
   }
   return out;
 }
