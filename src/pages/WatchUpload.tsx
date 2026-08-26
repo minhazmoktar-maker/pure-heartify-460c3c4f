@@ -184,6 +184,9 @@ export default function WatchUpload() {
               onPlay={() => telemetry.onAutoplayResult(true)}
               onError={() => telemetry.onAutoplayResult(false)}
             >
+              {/* Tracks stay attached for native browser CC menus and for
+                  downloads; on-screen rendering is handled by CaptionOverlay so
+                  the viewer's size/background/RTL settings apply everywhere. */}
               {tracks.map((track) => (
                 <track
                   key={track.language}
@@ -191,7 +194,6 @@ export default function WatchUpload() {
                   src={vttUrls[track.language]}
                   srcLang={track.language}
                   label={`${languageLabel(track.language)}${track.source === "mt" ? " (translated)" : ""}`}
-                  default={activeCaption?.language === track.language}
                 />
               ))}
 
