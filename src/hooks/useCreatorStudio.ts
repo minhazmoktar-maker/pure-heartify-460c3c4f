@@ -94,10 +94,11 @@ export function useCreatorAccount() {
     enabled: !!user,
     staleTime: 60_000,
     queryFn: async (): Promise<CreatorAccount | null> => {
+      if (!user) return null;
       const { data, error } = await supabase
         .from("creator_accounts")
         .select("id,user_id,display_name,handle,bio,country,languages,status,strikes")
-        .eq("user_id", user!.id)
+        .eq("user_id", user.id)
         .maybeSingle();
       if (error) throw error;
       return (data as CreatorAccount | null) ?? null;
@@ -112,12 +113,13 @@ export function useMyUploads() {
     enabled: !!user,
     staleTime: 15_000,
     queryFn: async (): Promise<CreatorUpload[]> => {
+      if (!user) return [];
       const { data, error } = await supabase
         .from("creator_uploads")
         .select(
           "id,title,description,language,category,status,visual_state,moderation_reason,review_notes,duration_seconds,view_count,published_at,created_at",
         )
-        .eq("user_id", user!.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(100);
       if (error) throw error;
