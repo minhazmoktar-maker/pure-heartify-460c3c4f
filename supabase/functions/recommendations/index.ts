@@ -113,14 +113,14 @@ Deno.serve(observed("recommendations", async (req) => {
       const { value, hit } = await readThrough(cacheKey, 60, async () => {
         return await computeRecommendations({
           userId, limit, surface, categoryFilter, excludeWatched, sessionId,
-          bodyPrimary,
+          bodyPrimary, bodyLanguages,
         });
       });
       return json(value, 200, { "X-Cache": hit ? "HIT" : "MISS" });
     }
 
     const value = await computeRecommendations({
-      userId, limit, surface, categoryFilter, excludeWatched, sessionId, bodyPrimary,
+      userId, limit, surface, categoryFilter, excludeWatched, sessionId, bodyPrimary, bodyLanguages,
     });
     return json(value);
   } catch (e) {
@@ -136,12 +136,20 @@ interface ComputeArgs {
   excludeWatched: boolean;
   sessionId: string | null;
   bodyPrimary?: string | null;
+  bodyLanguages?: string[];
 }
 
 async function computeRecommendations(args: ComputeArgs) {
-  const { userId, limit, surface, categoryFilter, excludeWatched, sessionId, bodyPrimary } = args;
+  const { userId, limit, surface, categoryFilter, excludeWatched, sessionId, bodyPrimary, bodyLanguages } = args;
     const provider = getRecommendationProvider();
     const signals = await gatherSignals(admin, userId);
+    // Anonymous callers have no stored preferences, so without this the
+    // language-match scoring rule never fires and the local lane's rows are
+    // outranked by the (much larger) English supply before the 80/20
+    // interleave ever sees them.
+    if (signals.contentLanguages.length === 0 && bodyLanguages?.length) {
+      signals.contentLanguages = bodyLanguages;
+    }
     const primaryLanguage =
       derivePrimaryLanguage([bodyPrimary]) ?? derivePrimaryLanguage(signals.contentLanguages);
     const candidates = await fetchCandidates(admin, signals, categoryFilter, primaryLanguage);
