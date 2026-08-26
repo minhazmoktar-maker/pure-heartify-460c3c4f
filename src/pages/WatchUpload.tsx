@@ -195,13 +195,11 @@ export default function WatchUpload() {
             </Badge>
           )}
           {tracks.length > 0 && (
-            <span
-              data-testid="watch-upload-captions-badge"
-              className="inline-flex items-center gap-1 text-foreground"
-            >
+            <span className="inline-flex items-center gap-1 text-foreground">
               <Captions className="h-3.5 w-3.5" /> CC · {tracks.length}
             </span>
           )}
+
           {row.status === "approved" && (
             <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="h-3.5 w-3.5" /> Halal reviewed
