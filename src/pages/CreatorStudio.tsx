@@ -509,7 +509,7 @@ export default function CreatorStudio() {
                     Your creator account is {account.data.status}. Uploading is paused.
                   </p>
                   <Button asChild variant="outline" className="mt-3 h-11">
-                    <Link to="/appeals?kind=creator">File an appeal</Link>
+                    <Link to="#creator-uploads">Review upload decisions</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -517,7 +517,7 @@ export default function CreatorStudio() {
               <UploadForm />
             )}
 
-            <section>
+            <section id="creator-uploads">
               <h2 className="mb-2 text-sm font-semibold text-foreground">Your uploads</h2>
               {uploads.isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />

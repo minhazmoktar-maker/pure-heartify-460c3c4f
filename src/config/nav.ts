@@ -52,6 +52,7 @@ import {
   Clock,
   Flame,
   Users,
+  Upload,
   type LucideIcon,
 } from "lucide-react";
 
@@ -111,6 +112,8 @@ export const MORE_NAV_ITEMS: readonly NavItem[] = [
   { to: "/reminders", label: "Habit reminders", icon: Bell },
   { to: "/recap", label: "Weekly recap", icon: LineChart },
   { to: "/playlists", label: "Playlists", icon: ListMusic },
+  { to: "/originals", label: "Heartify Originals", icon: Sparkles },
+  { to: "/studio", label: "Creator Studio", icon: Upload },
   { to: "/profile?tab=favorites", label: "Favorites", icon: Heart },
   { to: "/profile?tab=history", label: "Watch history", icon: Clock },
   { to: "/profile?tab=streak", label: "Streak", icon: Flame },
