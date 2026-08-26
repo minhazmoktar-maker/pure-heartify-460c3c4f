@@ -2196,6 +2196,7 @@ export type Database = {
           is_premium_only: boolean
           is_trusted_channel: boolean
           last_decision_id: string | null
+          moderation_claimed_at: string | null
           moderation_confidence: number | null
           moderation_provider: string | null
           moderation_reasoning: string | null
@@ -2240,6 +2241,7 @@ export type Database = {
           is_premium_only?: boolean
           is_trusted_channel?: boolean
           last_decision_id?: string | null
+          moderation_claimed_at?: string | null
           moderation_confidence?: number | null
           moderation_provider?: string | null
           moderation_reasoning?: string | null
@@ -2284,6 +2286,7 @@ export type Database = {
           is_premium_only?: boolean
           is_trusted_channel?: boolean
           last_decision_id?: string | null
+          moderation_claimed_at?: string | null
           moderation_confidence?: number | null
           moderation_provider?: string | null
           moderation_reasoning?: string | null
@@ -7123,6 +7126,21 @@ export type Database = {
       check_ops_alerts: { Args: never; Returns: undefined }
       check_pipeline_watchdog: { Args: never; Returns: Json }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
+      claim_moderation_backlog: {
+        Args: { p_limit?: number }
+        Returns: {
+          category: string
+          channel_id: string
+          channel_title: string
+          description: string
+          duration_seconds: number
+          language: string
+          published_at: string
+          tags: string[]
+          title: string
+          video_id: string
+        }[]
+      }
       claim_visual_scan_batch: {
         Args: { p_limit?: number }
         Returns: {
@@ -8249,7 +8267,9 @@ export type Database = {
         Args: { p_message: string; p_upload_id: string }
         Returns: Json
       }
-      sweep_inappropriate_content: { Args: never; Returns: Json }
+      sweep_inappropriate_content:
+        | { Args: never; Returns: Json }
+        | { Args: { p_chunk?: number; p_max_chunks?: number }; Returns: Json }
       toggle_creator_subscription: {
         Args: { p_creator_id: string }
         Returns: Json
