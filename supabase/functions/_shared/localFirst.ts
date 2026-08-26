@@ -104,3 +104,37 @@ export function interleavePrimaryLanguage<T>(
   }
   return out;
 }
+
+/**
+ * Round-robin a list across its distinct languages, preserving each
+ * language's internal order. Used for the diversified 20% of a page so the
+ * minority slots are not all one language.
+ */
+export function diversifyByLanguage<T>(
+  items: T[],
+  getLang: (v: T) => string | null,
+): T[] {
+  if (items.length < 3) return items;
+  const buckets = new Map<string, T[]>();
+  for (const v of items) {
+    const key = (getLang(v) ?? "unknown").toLowerCase();
+    const b = buckets.get(key);
+    if (b) b.push(v);
+    else buckets.set(key, [v]);
+  }
+  if (buckets.size < 2) return items;
+  // Larger supplies lead so the head of the page stays dense.
+  const lanes = Array.from(buckets.values()).sort((a, b) => b.length - a.length);
+  const out: T[] = [];
+  for (let i = 0; out.length < items.length; i++) {
+    let progressed = false;
+    for (const lane of lanes) {
+      if (i < lane.length) {
+        out.push(lane[i]);
+        progressed = true;
+      }
+    }
+    if (!progressed) break;
+  }
+  return out;
+}
