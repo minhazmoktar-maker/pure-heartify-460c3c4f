@@ -166,9 +166,10 @@ export default function WatchUpload() {
                   src={vttUrls[track.language]}
                   srcLang={track.language}
                   label={`${languageLabel(track.language)}${track.source === "mt" ? " (translated)" : ""}`}
-                  default={primaryLanguage ? track.language.split("-")[0] === primaryLanguage : false}
+                  default={activeCaption?.language === track.language}
                 />
               ))}
+
             </video>
           ) : (
             <div className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground">
