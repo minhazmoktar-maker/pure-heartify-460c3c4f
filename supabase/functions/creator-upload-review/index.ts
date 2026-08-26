@@ -75,6 +75,22 @@ Deno.serve(async (req) => {
       .eq("id", upload.id);
     if (error) return json({ error: "update_failed", detail: error.message }, 500);
     await logUploadEvent(admin, upload.id, "approved", reviewer.id, "moderator", { notes });
+    // Kick off automatic captions. Fire-and-forget: caption failures must never
+    // block or reverse an approval (the cron sweep retries missing ones).
+    try {
+      const cronToken = Deno.env.get("INGEST_CRON_TOKEN");
+      if (cronToken) {
+        void fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/creator-captions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-cron-token": cronToken,
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          },
+          body: JSON.stringify({ cron: true, limit: 1 }),
+        }).catch(() => {});
+      }
+    } catch { /* best effort */ }
     return json({ ok: true, status: "approved" }, 200);
   }
 

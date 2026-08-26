@@ -1837,6 +1837,50 @@ export type Database = {
           },
         ]
       }
+      creator_upload_captions: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          model: string | null
+          segment_count: number
+          segments: Json
+          source: string
+          updated_at: string
+          upload_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language: string
+          model?: string | null
+          segment_count?: number
+          segments?: Json
+          source?: string
+          updated_at?: string
+          upload_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          model?: string | null
+          segment_count?: number
+          segments?: Json
+          source?: string
+          updated_at?: string
+          upload_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_upload_captions_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "creator_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_upload_events: {
         Row: {
           actor_id: string | null
@@ -3557,6 +3601,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lane_events: {
+        Row: {
+          content_language: string | null
+          country: string | null
+          duration_seconds: number
+          id: number
+          kind: string
+          lane: string
+          occurred_at: string
+          session_id: string | null
+          ui_language: string | null
+          user_id: string | null
+          video_id: string | null
+          watched_seconds: number
+        }
+        Insert: {
+          content_language?: string | null
+          country?: string | null
+          duration_seconds?: number
+          id?: number
+          kind: string
+          lane: string
+          occurred_at?: string
+          session_id?: string | null
+          ui_language?: string | null
+          user_id?: string | null
+          video_id?: string | null
+          watched_seconds?: number
+        }
+        Update: {
+          content_language?: string | null
+          country?: string | null
+          duration_seconds?: number
+          id?: number
+          kind?: string
+          lane?: string
+          occurred_at?: string
+          session_id?: string | null
+          ui_language?: string | null
+          user_id?: string | null
+          video_id?: string | null
+          watched_seconds?: number
+        }
+        Relationships: []
       }
       leaderboard_snapshots: {
         Row: {
@@ -7429,6 +7518,21 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      lane_analytics: {
+        Args: { p_days?: number }
+        Returns: {
+          avg_watch_seconds: number
+          click_through: number
+          clicks: number
+          completed_watches: number
+          content_language: string
+          country: string
+          impressions: number
+          lane: string
+          retention_pct: number
+          watch_seconds: number
+        }[]
+      }
       launch_monitor: { Args: { p_hours?: number }; Returns: Json }
       learn_from_owner_block: { Args: { _pattern: string }; Returns: number }
       leave_challenge: { Args: { _challenge_id: string }; Returns: Json }
@@ -7524,6 +7628,7 @@ export type Database = {
         Returns: undefined
       }
       log_feed_impressions: { Args: { _video_ids: string[] }; Returns: number }
+      log_lane_events: { Args: { p_events: Json }; Returns: number }
       log_recommendation_event: {
         Args: {
           _event_type: string
