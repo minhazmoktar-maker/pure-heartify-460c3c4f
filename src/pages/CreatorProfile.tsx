@@ -133,7 +133,6 @@ export default function CreatorProfile() {
         </section>
 
         <section>
-          <h1 className="sr-only">{data.display_name} Heartify creator profile</h1>
           <h2 className="mb-2 text-sm font-semibold text-foreground">Latest uploads</h2>
           {data.uploads.length === 0 ? (
             <Card>
