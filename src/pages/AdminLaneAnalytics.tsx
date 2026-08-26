@@ -101,7 +101,7 @@ export default function AdminLaneAnalytics() {
 
   return (
     <>
-      <SEO path="/admin/lane-analytics" title="Lane analytics — Heartify admin" description="Per-country and per-language validation of the 80/20 content mix." noindex />
+      <SEO path="/admin/lane-analytics" title="Lane analytics — Heartify admin" description="Per-country and per-language validation of the 80/20 content mix." />
       <PageHeader
         title="Lane analytics"
         subtitle="Native vs diversified performance by country and language."
