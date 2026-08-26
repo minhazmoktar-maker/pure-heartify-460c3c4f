@@ -7,7 +7,7 @@
  * WebVTT tracks; viewers can request a translation into their own language.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Captions, Loader2, ShieldCheck } from "lucide-react";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
@@ -22,6 +22,8 @@ import {
   useVttUrls,
 } from "@/hooks/useUploadCaptions";
 import { useLocale } from "@/contexts/LocaleContext";
+import CaptionPicker from "@/components/CaptionPicker";
+import { resolveCaptionTrack } from "@/lib/captionFallback";
 import { isNativeItem, languageLabel } from "@/components/LaneToggle";
 import { trackLaneEvent, flushLaneEvents } from "@/lib/laneTelemetry";
 import { toast } from "@/hooks/use-toast";
@@ -50,6 +52,28 @@ export default function WatchUpload() {
   const captions = useUploadCaptions(id);
   const requestCaptions = useRequestCaptions(id);
   const vttUrls = useVttUrls(captions.data);
+
+  // ?cc=xx deep-links a caption language (used by Originals cards); otherwise
+  // the fallback chain picks the native lane track and degrades gracefully.
+  const [searchParams] = useSearchParams();
+  const [preferredCaption, setPreferredCaption] = useState<string | null>(
+    searchParams.get("cc"),
+  );
+  const tracks = captions.data ?? [];
+  const { track: activeCaption, reason: captionReason } = useMemo(
+    () =>
+      resolveCaptionTrack(tracks, {
+        preferred: preferredCaption,
+        nativeLanguage: primaryLanguage,
+        uiLanguage,
+        contentLanguage: row?.language,
+      }),
+    [tracks, preferredCaption, primaryLanguage, uiLanguage, row?.language],
+  );
+  const hasPrimaryCaptions =
+    !primaryLanguage ||
+    tracks.some((t) => t.language.split("-")[0] === primaryLanguage);
+
 
   const lane = useMemo(
     () => (isNativeItem(row?.language, primaryLanguage) ? "native" : "diversified") as
@@ -121,10 +145,6 @@ export default function WatchUpload() {
     );
   }
 
-  const tracks = captions.data ?? [];
-  const hasPrimaryCaptions =
-    !primaryLanguage || tracks.some((t) => t.language.split("-")[0] === primaryLanguage);
-
   return (
     <>
       <SEO
@@ -166,9 +186,10 @@ export default function WatchUpload() {
                   src={vttUrls[track.language]}
                   srcLang={track.language}
                   label={`${languageLabel(track.language)}${track.source === "mt" ? " (translated)" : ""}`}
-                  default={primaryLanguage ? track.language.split("-")[0] === primaryLanguage : false}
+                  default={activeCaption?.language === track.language}
                 />
               ))}
+
             </video>
           ) : (
             <div className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground">
@@ -195,13 +216,11 @@ export default function WatchUpload() {
             </Badge>
           )}
           {tracks.length > 0 && (
-            <span
-              data-testid="watch-upload-captions-badge"
-              className="inline-flex items-center gap-1 text-foreground"
-            >
+            <span className="inline-flex items-center gap-1 text-foreground">
               <Captions className="h-3.5 w-3.5" /> CC · {tracks.length}
             </span>
           )}
+
           {row.status === "approved" && (
             <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="h-3.5 w-3.5" /> Halal reviewed
@@ -209,18 +228,36 @@ export default function WatchUpload() {
           )}
         </div>
 
-        {/* Caption availability + on-demand translation into the viewer's language */}
-        <div className="mt-3 rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
-          {tracks.length === 0 ? (
+        {/* Caption picker (native lane first) + on-demand translation */}
+        <div className="mt-3 space-y-2 rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+          {captions.isLoading ? (
+            <CaptionPicker
+              tracks={[]}
+              selected={null}
+              reason="none"
+              loading
+              onSelect={() => undefined}
+              testId="watch-caption-picker"
+            />
+          ) : tracks.length === 0 ? (
             <span data-testid="watch-upload-captions-pending">
               Captions are generated automatically after review — check back shortly.
             </span>
-          ) : hasPrimaryCaptions ? (
-            <span>
-              Captions available in{" "}
-              {tracks.map((t) => languageLabel(t.language)).join(", ")}.
-            </span>
           ) : (
+            <>
+              <span data-testid="watch-upload-captions-badge" className="sr-only">
+                CC · {tracks.length}
+              </span>
+              <CaptionPicker
+                tracks={tracks}
+                selected={activeCaption?.language ?? null}
+                reason={captionReason}
+                onSelect={setPreferredCaption}
+                testId="watch-caption-picker"
+              />
+            </>
+          )}
+          {!hasPrimaryCaptions && primaryLanguage && (
             <div className="flex flex-wrap items-center gap-2">
               <span>No captions in {languageLabel(primaryLanguage)} yet.</span>
               <Button
@@ -245,6 +282,7 @@ export default function WatchUpload() {
             </div>
           )}
         </div>
+
 
         {row.status !== "approved" && (
           <p className="mt-3 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">

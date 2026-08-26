@@ -101,3 +101,36 @@ export function useVttUrls(tracks: CaptionTrack[] | undefined) {
 
   return urls;
 }
+
+/**
+ * Caption availability for many uploads at once (list surfaces).
+ * Returns a map of upload_id -> available tracks (language + source only, so
+ * the payload stays small for a 60-row list).
+ */
+export function useUploadCaptionsIndex(uploadIds: string[] | undefined) {
+  const ids = (uploadIds ?? []).filter(Boolean);
+  const key = ids.slice().sort().join(",");
+  return useQuery({
+    queryKey: ["upload-captions-index", key],
+    enabled: ids.length > 0,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async (): Promise<Record<string, Array<{ language: string; source: string }>>> => {
+      const { data, error } = await supabase
+        .from("creator_upload_captions")
+        .select("upload_id, language, source, segment_count")
+        .in("upload_id", ids);
+      if (error) throw error;
+      const map: Record<string, Array<{ language: string; source: string }>> = {};
+      for (const row of (data ?? []) as Array<{
+        upload_id: string;
+        language: string;
+        source: string;
+        segment_count: number;
+      }>) {
+        if (!row.segment_count) continue;
+        (map[row.upload_id] ??= []).push({ language: row.language, source: row.source });
+      }
+      return map;
+    },
+  });
+}

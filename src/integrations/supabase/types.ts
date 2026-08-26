@@ -7533,6 +7533,27 @@ export type Database = {
           watch_seconds: number
         }[]
       }
+      lane_analytics_filtered: {
+        Args: {
+          p_country?: string
+          p_from?: string
+          p_lane?: string
+          p_language?: string
+          p_to?: string
+        }
+        Returns: {
+          avg_watch_seconds: number
+          click_through: number
+          clicks: number
+          completed_watches: number
+          content_language: string
+          country: string
+          impressions: number
+          lane: string
+          retention_pct: number
+          watch_seconds: number
+        }[]
+      }
       launch_monitor: { Args: { p_hours?: number }; Returns: Json }
       learn_from_owner_block: { Args: { _pattern: string }; Returns: number }
       leave_challenge: { Args: { _challenge_id: string }; Returns: Json }
