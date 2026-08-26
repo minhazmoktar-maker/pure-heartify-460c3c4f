@@ -7132,11 +7132,8 @@ export type Database = {
           category: string
           channel_id: string
           channel_title: string
-          description: string
-          duration_seconds: number
-          language: string
+          content_language: string
           published_at: string
-          tags: string[]
           title: string
           video_id: string
         }[]
