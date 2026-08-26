@@ -7,7 +7,7 @@
  */
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Loader2, ShieldCheck, Upload, Video } from "lucide-react";
+import { BarChart3, FileQuestion, Loader2, RotateCcw, ShieldCheck, Upload, Video } from "lucide-react";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,15 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -35,6 +44,7 @@ import {
   useMyUploads,
   type UploadStatus,
 } from "@/hooks/useCreatorStudio";
+import { useModerationTrail, useSubmitAppeal } from "@/hooks/useCreatorInsights";
 
 const STATUS_TONE: Record<UploadStatus, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -154,7 +164,7 @@ function CreatorOnboarding({ onCreated }: { onCreated: () => void }) {
 
 function UploadForm() {
   const { toast } = useToast();
-  const { upload, progress, reset } = useCreatorUpload();
+  const { upload, retry, cancel, progress, reset, canResume } = useCreatorUpload();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("bn");
@@ -180,7 +190,17 @@ function UploadForm() {
       setDescription("");
       setFile(null);
       setThumbnail(null);
+      reset();
     }
+  };
+
+  const retryUpload = async () => {
+    const result = await retry();
+    toast({
+      title: result.ok ? "Upload resumed" : "Still interrupted",
+      description: result.message,
+      variant: result.ok ? undefined : "destructive",
+    });
   };
 
   return (
@@ -281,19 +301,111 @@ function UploadForm() {
         {busy && (
           <div className="space-y-1.5">
             <Progress value={progress.percent} />
-            <p className="text-xs text-muted-foreground">{progress.message}</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                {progress.message}{progress.resumed ? " Resumed from the last saved chunk." : ""}
+              </p>
+              <Button type="button" size="sm" variant="ghost" onClick={cancel} className="h-8 shrink-0">
+                Pause
+              </Button>
+            </div>
           </div>
         )}
         {progress.phase === "error" && (
-          <p className="text-xs text-destructive">{progress.message}</p>
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
+            <p className="text-xs text-destructive">{progress.message}</p>
+            {progress.retryable && canResume && (
+              <Button type="button" size="sm" variant="outline" onClick={retryUpload} className="mt-2 h-9">
+                <RotateCcw className="mr-2 h-4 w-4" /> Resume upload
+              </Button>
+            )}
+          </div>
         )}
 
-        <Button onClick={busy ? reset : submit} disabled={busy && progress.percent < 100} className="h-11 w-full">
+        <Button onClick={submit} disabled={busy || !title.trim()} className="h-11 w-full">
           {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {busy ? "Uploading…" : "Submit for review"}
         </Button>
       </CardContent>
     </Card>
+  );
+}
+
+function UploadModerationActions({ upload }: { upload: { id: string; status: UploadStatus; title: string } }) {
+  const { toast } = useToast();
+  const [message, setMessage] = useState("");
+  const [open, setOpen] = useState(false);
+  const trail = useModerationTrail(open ? upload.id : null);
+  const appeal = useSubmitAppeal();
+  const canAppeal = upload.status === "rejected" || upload.status === "removed";
+
+  const submitAppeal = async () => {
+    try {
+      await appeal.mutateAsync({ uploadId: upload.id, message });
+      toast({ title: "Appeal opened", description: "A reviewer will take a second look." });
+      setMessage("");
+      setOpen(false);
+    } catch (error) {
+      toast({ title: "Could not open appeal", description: error instanceof Error ? error.message : "Try again.", variant: "destructive" });
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="mt-2 h-9">
+          <FileQuestion className="mr-2 h-4 w-4" /> Moderation trail
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{upload.title}</DialogTitle>
+          <DialogDescription>Review status, policy reason, notes and appeal history.</DialogDescription>
+        </DialogHeader>
+        {trail.isLoading ? (
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        ) : trail.data ? (
+          <div className="space-y-3 text-sm">
+            <div className="rounded-lg border border-border/60 p-3">
+              <p className="font-medium">{trail.data.reason?.label ?? trail.data.upload.status.replace("_", " ")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {trail.data.reason?.guidance ?? trail.data.upload.review_notes ?? "No reviewer notes yet."}
+              </p>
+            </div>
+            <div className="space-y-2">
+              {trail.data.events.slice(0, 6).map((event) => (
+                <p key={event.id} className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                  {event.event.replaceAll("_", " ")} · {new Date(event.created_at).toLocaleString()}
+                </p>
+              ))}
+            </div>
+            {trail.data.appeals.length > 0 && (
+              <div className="rounded-lg border border-border/60 p-3 text-xs text-muted-foreground">
+                Latest appeal: {trail.data.appeals[0].status} · {new Date(trail.data.appeals[0].created_at).toLocaleDateString()}
+              </div>
+            )}
+            {canAppeal && (trail.data.reason?.appealable ?? true) && (
+              <textarea
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder="Explain why this should receive a second review."
+              />
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">No moderation trail found.</p>
+        )}
+        <DialogFooter>
+          {canAppeal && trail.data && (trail.data.reason?.appealable ?? true) && (
+            <Button onClick={submitAppeal} disabled={appeal.isPending || message.trim().length < 10} className="h-10">
+              {appeal.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Submit appeal
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -364,6 +476,14 @@ export default function CreatorStudio() {
                 <div>
                   <p className="font-semibold text-foreground">{account.data.display_name}</p>
                   <p className="text-xs text-muted-foreground">@{account.data.handle}</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm" variant="outline" className="h-9">
+                    <Link to={`/c/${account.data.handle}`}>Public profile</Link>
+                  </Button>
+                  <Button asChild size="sm" className="h-9">
+                    <Link to="/studio/analytics"><BarChart3 className="mr-2 h-4 w-4" /> Analytics</Link>
+                  </Button>
                 </div>
                 <div className="flex gap-4 text-center">
                   <div>
@@ -436,6 +556,9 @@ export default function CreatorStudio() {
                         >
                           View on Heartify
                         </Link>
+                      )}
+                      {(u.status === "rejected" || u.status === "removed" || u.status === "pending_review") && (
+                        <UploadModerationActions upload={{ id: u.id, status: u.status, title: u.title }} />
                       )}
                     </li>
                   ))}

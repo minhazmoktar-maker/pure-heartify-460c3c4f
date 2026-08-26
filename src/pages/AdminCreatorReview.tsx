@@ -14,10 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useRole } from "@/hooks/useRole";
 import { useUploadPlayback } from "@/hooks/useCreatorStudio";
+import { useAppealsQueue, useFlagReasons, useResolveAppeal } from "@/hooks/useCreatorInsights";
 
 interface QueueRow {
   id: string;
@@ -45,7 +47,9 @@ function ReviewCard({ row, onDone }: { row: QueueRow; onDone: () => void }) {
   const playback = useUploadPlayback(row.id);
   const [verified, setVerified] = useState(false);
   const [notes, setNotes] = useState("");
+  const [reasonCode, setReasonCode] = useState("not_beneficial");
   const [busy, setBusy] = useState(false);
+  const reasons = useFlagReasons();
 
   const decide = async (decision: "approve" | "reject") => {
     if (decision === "approve" && !verified) {
@@ -63,7 +67,8 @@ function ReviewCard({ row, onDone }: { row: QueueRow; onDone: () => void }) {
         decision,
         visual_verified: decision === "approve" ? true : undefined,
         notes: notes || undefined,
-        reason: decision === "reject" ? notes || "policy" : undefined,
+        reason: decision === "reject" ? notes || reasonCode : undefined,
+        flag_reason_code: decision === "reject" ? reasonCode : undefined,
       },
     });
     setBusy(false);
@@ -120,6 +125,18 @@ function ReviewCard({ row, onDone }: { row: QueueRow; onDone: () => void }) {
           rows={2}
           placeholder="Notes shown to the creator (required for rejections)."
         />
+        <Select value={reasonCode} onValueChange={setReasonCode}>
+          <SelectTrigger className="h-11">
+            <SelectValue placeholder="Rejection reason" />
+          </SelectTrigger>
+          <SelectContent>
+            {(reasons.data ?? []).map((reason) => (
+              <SelectItem key={reason.code} value={reason.code}>
+                {reason.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex gap-2">
           <Button onClick={() => decide("approve")} disabled={busy} className="h-10 flex-1">
             {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
@@ -136,6 +153,50 @@ function ReviewCard({ row, onDone }: { row: QueueRow; onDone: () => void }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function AppealsQueue() {
+  const appeals = useAppealsQueue();
+  const resolve = useResolveAppeal();
+  const { toast } = useToast();
+
+  const decide = async (appealId: string, decision: "upheld" | "declined" | "reviewing") => {
+    try {
+      await resolve.mutateAsync({ appealId, decision });
+      toast({ title: `Appeal ${decision}` });
+    } catch (error) {
+      toast({ title: "Appeal update failed", description: error instanceof Error ? error.message : "Try again.", variant: "destructive" });
+    }
+  };
+
+  const rows = appeals.data ?? [];
+  return (
+    <section className="space-y-2">
+      <h2 className="text-sm font-semibold text-foreground">Appeals queue</h2>
+      {appeals.isLoading ? (
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      ) : rows.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-border py-8 text-center text-sm text-muted-foreground">No open creator appeals.</p>
+      ) : (
+        <ul className="space-y-2">
+          {rows.map((appeal) => (
+            <li key={appeal.id} className="rounded-lg border border-border bg-card p-3">
+              <p className="text-sm font-medium text-foreground">{appeal.upload?.title ?? "Upload"}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                @{appeal.creator?.handle ?? "creator"} · {appeal.reason_code ?? "policy"} · {new Date(appeal.created_at).toLocaleString()}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">{appeal.message}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" className="h-9" onClick={() => decide(appeal.id, "upheld")} disabled={resolve.isPending}>Return to review</Button>
+                <Button size="sm" variant="outline" className="h-9" onClick={() => decide(appeal.id, "reviewing")} disabled={resolve.isPending}>Mark reviewing</Button>
+                <Button size="sm" variant="destructive" className="h-9" onClick={() => decide(appeal.id, "declined")} disabled={resolve.isPending}>Decline</Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -218,6 +279,8 @@ export default function AdminCreatorReview() {
             ))}
           </div>
         )}
+
+        <AppealsQueue />
 
         {loading ? (
           <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
