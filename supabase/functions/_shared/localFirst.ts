@@ -73,6 +73,16 @@ export function interleavePrimaryLanguage<T>(
   }
   if (local.length === 0 || other.length === 0) return items;
 
+  // The remaining ~20% is the *diversified* half of the 80/20 standard: it
+  // must not collapse into a single (almost always English) language. Round
+  // robin the non-primary pool across its distinct languages so the minority
+  // slots show a genuine spread — English, Arabic, and whatever else the
+  // corpus supplies — while preserving relative order inside each language.
+  const nonPrimary = diversifyByLanguage(other, getLang);
+  other.length = 0;
+  other.push(...nonPrimary);
+
+
   const window = Math.max(1, Math.min(limit, items.length));
   // Never promise more local slots than we actually have supply for.
   const quota = Math.min(local.length, Math.max(1, Math.round(window * share)));
