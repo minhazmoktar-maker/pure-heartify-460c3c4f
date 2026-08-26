@@ -30,15 +30,13 @@ const TIME_BUDGET_MS = 100_000;
 type Row = {
   video_id: string;
   title: string;
-  description: string | null;
   channel_id: string | null;
   channel_title: string | null;
   category: string | null;
-  tags: string[] | null;
-  language: string | null;
-  duration_seconds: number | null;
+  content_language: string | null;
   published_at: string | null;
 };
+
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
