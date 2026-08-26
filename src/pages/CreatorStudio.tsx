@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import CaptionQualityPanel from "@/components/CaptionQualityPanel";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -591,6 +592,9 @@ export default function CreatorStudio() {
                           {STATUS_LABEL[u.status]}
                         </Badge>
                       </div>
+                      {(u.status === "pending_review" || u.status === "approved") && (
+                        <CaptionQualityPanel uploadId={u.id} durationSeconds={u.duration_seconds} />
+                      )}
                       {u.status === "approved" && (
                         <Link
                           to={`/u/${u.id}`}
