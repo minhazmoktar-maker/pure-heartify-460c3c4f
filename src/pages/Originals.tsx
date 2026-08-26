@@ -14,6 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { UPLOAD_LANGUAGES } from "@/hooks/useCreatorStudio";
+import { useUploadCaptionsIndex } from "@/hooks/useUploadCaptions";
+import { resolveCaptionTrack } from "@/lib/captionFallback";
+import CaptionPicker from "@/components/CaptionPicker";
+import { useLocale } from "@/contexts/LocaleContext";
+import { useNavigate } from "react-router-dom";
 
 interface OriginalRow {
   id: string;
@@ -34,8 +39,49 @@ function duration(seconds: number | null) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+/** Per-card caption picker: defaults to the native lane, falls back gracefully. */
+function CaptionRow({
+  uploadId,
+  contentLanguage,
+  tracks,
+  loading,
+  nativeLanguage,
+  uiLanguage,
+  onPick,
+}: {
+  uploadId: string;
+  contentLanguage: string;
+  tracks: Array<{ language: string; source: string }>;
+  loading: boolean;
+  nativeLanguage: string | undefined;
+  uiLanguage: string;
+  onPick: (language: string) => void;
+}) {
+  const { track } = resolveCaptionTrack(tracks, {
+    nativeLanguage,
+    uiLanguage,
+    contentLanguage,
+  });
+  return (
+    <div className="mt-2">
+      <CaptionPicker
+        compact
+        tracks={tracks}
+        selected={track?.language ?? null}
+        reason="native"
+        loading={loading}
+        onSelect={onPick}
+        testId={`originals-caption-picker-${uploadId}`}
+      />
+    </div>
+  );
+}
+
 export default function Originals() {
   const [language, setLanguage] = useState<string>("all");
+  const navigate = useNavigate();
+  const { preferences, locale: uiLanguage } = useLocale();
+  const primaryLanguage = preferences.content_languages?.[0];
 
   const query = useQuery({
     queryKey: ["heartify-originals", language],
@@ -63,6 +109,8 @@ export default function Originals() {
   );
 
   const rows = query.data ?? [];
+  // One batched lookup keeps the per-card caption pickers cheap.
+  const captionIndex = useUploadCaptionsIndex(rows.map((r) => r.id));
 
   return (
     <>
@@ -132,6 +180,15 @@ export default function Originals() {
                     </p>
                   )}
                 </Link>
+                <CaptionRow
+                  uploadId={row.id}
+                  contentLanguage={row.language}
+                  tracks={captionIndex.data?.[row.id] ?? []}
+                  loading={captionIndex.isLoading}
+                  nativeLanguage={primaryLanguage}
+                  uiLanguage={uiLanguage}
+                  onPick={(lang) => navigate(`/u/${row.id}?cc=${lang}`)}
+                />
                 {/* Creator link is a sibling of the video link, never nested —
                     nested anchors are invalid and swallow the inner tap. */}
                 <p className="mt-auto flex flex-wrap items-center gap-1 pt-3 text-[11px] text-muted-foreground">
