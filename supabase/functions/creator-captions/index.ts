@@ -19,6 +19,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { UPLOAD_BUCKET, resolveCaller } from "../_shared/creatorAuth.ts";
+import { checkCaptionTrack, notifyCaptionQuality } from "../_shared/captionAlerts.ts";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const TRANSLATE_MODEL = "google/gemini-2.5-flash";
@@ -216,7 +217,7 @@ async function saveCaptions(
 async function generateFor(db: SupabaseClient, uploadId: string) {
   const { data: upload } = await db
     .from("creator_uploads")
-    .select("id,video_path,language,detected_language,size_bytes")
+    .select("id,video_path,language,detected_language,size_bytes,creator_id,title,duration_seconds")
     .eq("id", uploadId)
     .maybeSingle();
   if (!upload) throw new Error("upload not found");
@@ -245,7 +246,18 @@ async function generateFor(db: SupabaseClient, uploadId: string) {
   const hint = (upload.detected_language ?? upload.language ?? "en").split("-")[0];
   const result = await transcribe(key, fileUri, mimeType, hint);
   await saveCaptions(db, uploadId, result.language, "asr", GEMINI_MODEL, result.segments);
+  // Quality gate: warn the creator and moderators instead of letting a drifted
+  // or half-empty track reach viewers unnoticed.
+  const check = checkCaptionTrack(result.segments, upload.duration_seconds as number | null);
+  await notifyCaptionQuality(db, {
+    uploadId,
+    language: result.language,
+    check,
+    creatorId: upload.creator_id as string | null,
+    title: upload.title as string | null,
+  });
   return {
+    quality: check,
     cached: false,
     language: result.language,
     source: "asr",
@@ -286,7 +298,20 @@ async function translateFor(db: SupabaseClient, uploadId: string, language: stri
     slice.forEach((s, idx) => out.push({ start_ms: s.start_ms, end_ms: s.end_ms, text: lines[idx] }));
   }
   await saveCaptions(db, uploadId, language, "mt", TRANSLATE_MODEL, out);
-  return { cached: false, language, source: "mt", segment_count: out.length, segments: out };
+  const { data: meta } = await db
+    .from("creator_uploads")
+    .select("creator_id,title,duration_seconds")
+    .eq("id", uploadId)
+    .maybeSingle();
+  const check = checkCaptionTrack(out, (meta?.duration_seconds ?? null) as number | null);
+  await notifyCaptionQuality(db, {
+    uploadId,
+    language,
+    check,
+    creatorId: (meta?.creator_id ?? null) as string | null,
+    title: (meta?.title ?? null) as string | null,
+  });
+  return { cached: false, language, source: "mt", segment_count: out.length, segments: out, quality: check };
 }
 
 Deno.serve(async (req) => {
