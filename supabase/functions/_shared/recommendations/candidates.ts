@@ -19,6 +19,7 @@ export async function fetchCandidates(
   admin: SupabaseClient,
   signals: UserSignals,
   categoryFilter?: string | null,
+  primaryLanguage?: string | null,
 ): Promise<RecommendationCandidate[]> {
   const pool = new Map<string, RecommendationCandidate>();
 
@@ -71,6 +72,37 @@ export async function fetchCandidates(
       })
       .catch(() => {}),
   );
+
+  // 1b) Local-language pool. Heartify's serving standard is 80/20 (80% the
+  //      caller's own language). The freshness pool alone is English-heavy, so
+  //      without a dedicated retrieval lane the downstream interleave has no
+  //      local supply to promote and the page silently degrades to English.
+  const localLang = (primaryLanguage ?? "").toLowerCase().replace(/[^a-z]/g, "").slice(0, 3);
+  if (localLang.length >= 2) {
+    jobs.push(
+      admin
+        .from("curated_videos")
+        .select(select)
+        .in("moderation_state", ["approved", "auto_approved"])
+        .eq("is_hidden", false)
+        .eq("is_archived", false)
+        .eq("content_language", localLang)
+        .match(categoryFilter ? { category: categoryFilter } : {})
+        .order("published_at", { ascending: false })
+        .limit(400)
+        .then(({ data }) => {
+          const perChannel = new Map<string, number>();
+          for (const row of (data ?? []) as Array<Record<string, unknown>>) {
+            const ch = (row.channel_title as string) ?? "__unknown__";
+            const n = perChannel.get(ch) ?? 0;
+            if (n >= RETRIEVAL_MAX_PER_CHANNEL) continue;
+            perChannel.set(ch, n + 1);
+            pool.set(String(row.video_id), project(row));
+          }
+        })
+        .catch(() => {}),
+    );
+  }
 
   // 2) Trending pool (from recommendation_events aggregate).
   if (signals.trendingIds.size > 0) {

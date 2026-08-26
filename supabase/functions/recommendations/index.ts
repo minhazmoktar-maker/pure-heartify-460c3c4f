@@ -142,7 +142,9 @@ async function computeRecommendations(args: ComputeArgs) {
   const { userId, limit, surface, categoryFilter, excludeWatched, sessionId, bodyPrimary } = args;
     const provider = getRecommendationProvider();
     const signals = await gatherSignals(admin, userId);
-    const candidates = await fetchCandidates(admin, signals, categoryFilter);
+    const primaryLanguage =
+      derivePrimaryLanguage([bodyPrimary]) ?? derivePrimaryLanguage(signals.contentLanguages);
+    const candidates = await fetchCandidates(admin, signals, categoryFilter, primaryLanguage);
 
     // Semantic recall: expand the candidate pool with videos similar to the
     // user's most-signal-heavy anchor (favorite > recently watched > top trend).
@@ -225,8 +227,6 @@ async function computeRecommendations(args: ComputeArgs) {
     // 80/20 local-first ordering. Applied after the premium gate so the
     // shipped page — not the raw candidate pool — carries the guaranteed
     // local-language share, with the minority slots language-diversified.
-    const primaryLanguage =
-      derivePrimaryLanguage([bodyPrimary]) ?? derivePrimaryLanguage(signals.contentLanguages);
     if (primaryLanguage) {
       filteredRecs = interleavePrimaryLanguage(
         filteredRecs,
