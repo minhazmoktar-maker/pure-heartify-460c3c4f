@@ -111,7 +111,7 @@ function ReviewCard({ row, onDone }: { row: QueueRow; onDone: () => void }) {
           )}
         </div>
         {row.description && (
-          <p className="whitespace-pre-line text-xs textext-muted-foreground">{row.description}</p>
+          <p className="whitespace-pre-line text-xs text-muted-foreground">{row.description}</p>
         )}
         {/* Review the captions (sync, overlaps, RTL rendering) before approving —
             approval is what publishes them to viewers. */}
