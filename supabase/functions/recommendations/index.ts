@@ -213,7 +213,7 @@ async function computeRecommendations(args: ComputeArgs) {
 
     // Over-fetch when a local language must own 80% of the page: the
     // interleave can only promote local rows the provider actually returned.
-    const scoreLimit = primaryLanguage ? Math.min(limit * 4, 160) : limit;
+    const scoreLimit = primaryLanguage ? Math.min(limit * 12, 300) : limit;
     const recommendations = await provider.recommend(signals, candidates, {
       limit: scoreLimit,
       surface,
