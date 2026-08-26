@@ -745,6 +745,103 @@ export type Database = {
         }
         Relationships: []
       }
+      caption_quality_audits: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_role: string | null
+          created_at: string
+          id: string
+          issues: Json
+          language: string
+          score: number | null
+          segment_count: number | null
+          thresholds: Json
+          upload_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          issues?: Json
+          language: string
+          score?: number | null
+          segment_count?: number | null
+          thresholds?: Json
+          upload_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          issues?: Json
+          language?: string
+          score?: number | null
+          segment_count?: number | null
+          thresholds?: Json
+          upload_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caption_quality_audits_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "creator_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      caption_track_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          language: string
+          note: string | null
+          quality_score: number | null
+          segment_count: number
+          segments: Json
+          source: string
+          upload_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          language: string
+          note?: string | null
+          quality_score?: number | null
+          segment_count?: number
+          segments?: Json
+          source?: string
+          upload_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          language?: string
+          note?: string | null
+          quality_score?: number | null
+          segment_count?: number
+          segments?: Json
+          source?: string
+          upload_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caption_track_versions_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "creator_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       challenge_members: {
         Row: {
           challenge_id: string
@@ -5825,6 +5922,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_caption_settings: {
+        Row: {
+          settings: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          settings?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          settings?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_cohort_members: {
         Row: {
           added_at: string
@@ -7967,6 +8082,10 @@ export type Database = {
       respond_connection_request: {
         Args: { _accept: boolean; _connection_id: string }
         Returns: Json
+      }
+      restore_caption_version: {
+        Args: { p_expected_updated_at: string; p_version_id: string }
+        Returns: string
       }
       return_digest: { Args: { p_limit?: number }; Returns: Json }
       revoke_auto_approval: {
