@@ -91,6 +91,33 @@ const InfiniteVideoGrid = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const { track } = useImpressionTracker(!isLoading && !error);
 
+  // Lane dimensions for the 80/20 analytics lanes, keyed by video id so both
+  // impressions and clicks can be attributed without re-deriving state.
+  const laneById = useMemo(() => {
+    const map = new Map<string, { lane: "native" | "diversified"; contentLanguage: string | null }>();
+    for (const v of allVideos) {
+      map.set(v.id, {
+        lane: isNativeItem(v.contentLanguage, primaryLanguage) ? "native" : "diversified",
+        contentLanguage: v.contentLanguage ?? null,
+      });
+    }
+    return map;
+  }, [allVideos, primaryLanguage]);
+
+  const logLane = useRef<(kind: "impression" | "click", id: string) => void>(() => {});
+  logLane.current = (kind, id) => {
+    const dims = laneById.get(id);
+    if (!dims) return;
+    trackLaneEvent({
+      kind,
+      lane: dims.lane,
+      video_id: id,
+      country: preferences.country_code ?? preferences.detected_country ?? null,
+      ui_language: locale,
+      content_language: dims.contentLanguage,
+    });
+  };
+
   useEffect(() => {
     const root = gridRef.current;
     if (!root || visibleVideos.length === 0) return;
@@ -99,15 +126,28 @@ const InfiniteVideoGrid = ({
         for (const entry of entries) {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
             const id = (entry.target as HTMLElement).dataset.videoId;
-            if (id) track(id);
+            if (id) {
+              track(id);
+              logLane.current("impression", id);
+            }
           }
         }
       },
       { threshold: [0.5] },
     );
     root.querySelectorAll<HTMLElement>("[data-video-id]").forEach((node) => io.observe(node));
-    return () => io.disconnect();
+    const onClick = (event: Event) => {
+      const target = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-video-id]");
+      const id = target?.dataset.videoId;
+      if (id) logLane.current("click", id);
+    };
+    root.addEventListener("click", onClick, true);
+    return () => {
+      io.disconnect();
+      root.removeEventListener("click", onClick, true);
+    };
   }, [visibleVideos, track]);
+
 
   if (isLoading) {
     return (
