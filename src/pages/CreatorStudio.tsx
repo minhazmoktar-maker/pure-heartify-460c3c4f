@@ -594,7 +594,30 @@ export default function CreatorStudio() {
                         </Badge>
                       </div>
                       {(u.status === "pending_review" || u.status === "approved") && (
-                        <CaptionQualityPanel uploadId={u.id} durationSeconds={u.duration_seconds} />
+                        <>
+                          <CaptionQualityPanel uploadId={u.id} durationSeconds={u.duration_seconds} />
+                          {/* Review step: watch the captions in place before
+                              publishing. Opened automatically when a quality
+                              notification deep-links to this upload. */}
+                          <details
+                            className="mt-2 rounded-lg border border-border p-2"
+                            open={captionDeepLink.uploadId === u.id}
+                            data-testid={`caption-review-details-${u.id}`}
+                          >
+                            <summary className="cursor-pointer text-xs font-medium text-foreground">
+                              Review captions before publishing
+                            </summary>
+                            <div className="mt-2">
+                              <CaptionReviewPanel
+                                uploadId={u.id}
+                                durationSeconds={u.duration_seconds}
+                                initialLanguage={
+                                  captionDeepLink.uploadId === u.id ? captionDeepLink.language : null
+                                }
+                              />
+                            </div>
+                          </details>
+                        </>
                       )}
                       {u.status === "approved" && (
                         <Link
