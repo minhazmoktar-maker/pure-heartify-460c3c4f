@@ -245,6 +245,8 @@ const Transparency = lazy(() => import("./pages/Transparency.tsx"));
 const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
 const CreatorStudio = lazy(() => import("./pages/CreatorStudio.tsx"));
 const CreatorAnalytics = lazy(() => import("./pages/CreatorAnalytics.tsx"));
+const CreatorAppealStatus = lazy(() => import("./pages/CreatorAppealStatus.tsx"));
+const LanguagePreferences = lazy(() => import("./pages/LanguagePreferences.tsx"));
 const CreatorProfile = lazy(() => import("./pages/CreatorProfile.tsx"));
 const Originals = lazy(() => import("./pages/Originals.tsx"));
 const WatchUpload = lazy(() => import("./pages/WatchUpload.tsx"));
@@ -347,6 +349,7 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/settings/notifications" element={<NotificationSettings />} />
+                <Route path="/settings/languages" element={<LanguagePreferences />} />
                 <Route path="/playlists" element={<Playlists />} />
                 <Route path="/p/:id" element={<PlaylistDetail />} />
                 <Route path="/diagnostics" element={<Diagnostics />} />
@@ -356,6 +359,7 @@ const App = () => (
                 <Route path="/creators/dashboard" element={<CreatorDashboard />} />
                 <Route path="/studio" element={<CreatorStudio />} />
                 <Route path="/studio/analytics" element={<CreatorAnalytics />} />
+                <Route path="/studio/appeals" element={<CreatorAppealStatus />} />
                 <Route path="/originals" element={<Originals />} />
                 <Route path="/c/:handle" element={<CreatorProfile />} />
                 <Route path="/u/:id" element={<WatchUpload />} />

@@ -391,3 +391,86 @@ export function useUploadTelemetry(uploadId: string | undefined) {
 
   return { onTimeUpdate, onAutoplayResult, flush };
 }
+
+// ---------------------------------------------------------------------------
+// Creator-facing appeal status
+// ---------------------------------------------------------------------------
+
+export interface MyAppeal {
+  id: string;
+  status: "open" | "reviewing" | "upheld" | "declined";
+  message: string;
+  reason_code: string | null;
+  resolution_notes: string | null;
+  created_at: string;
+  resolved_at: string | null;
+  upload: { id: string; title: string; status: string; language: string } | null;
+}
+
+/**
+ * Every appeal the signed-in creator has ever opened. RLS scopes rows to
+ * `user_id = auth.uid()`, so this can never leak another creator's appeal.
+ */
+export function useMyAppeals() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["creator-my-appeals", user?.id ?? "anon"],
+    enabled: Boolean(user),
+    staleTime: 20_000,
+    queryFn: async (): Promise<MyAppeal[]> => {
+      const { data, error } = await supabase
+        .from("creator_appeals")
+        .select(
+          "id,status,message,reason_code,resolution_notes,created_at,resolved_at,upload:creator_uploads(id,title,status,language)",
+        )
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data ?? []) as unknown as MyAppeal[];
+    },
+  });
+}
+
+/**
+ * Playback telemetry sanity check.
+ *
+ * If a creator has published videos that are older than a day and the
+ * analytics window reports zero plays AND zero views, playback telemetry is
+ * almost certainly not firing (blocked insert, broken player wiring, ad
+ * blocker). Surfacing this in Studio means a silent telemetry regression is
+ * visible to the person who notices it first instead of going unreported.
+ */
+export interface TelemetryHealth {
+  status: "ok" | "no_published" | "too_early" | "stalled";
+  publishedCount: number;
+  views: number;
+  plays: number;
+  oldestPublishedHours: number | null;
+}
+
+export function useTelemetryHealth(
+  uploads: Array<{ status: string; published_at: string | null; view_count: number }> | undefined,
+  analytics: { totals: { plays: number; views: number } } | null | undefined,
+): TelemetryHealth {
+  const published = (uploads ?? []).filter((u) => u.status === "approved");
+  const views = published.reduce((sum, u) => sum + (u.view_count ?? 0), 0);
+  const plays = analytics?.totals.plays ?? 0;
+
+  const stamps = published
+    .map((u) => (u.published_at ? new Date(u.published_at).getTime() : null))
+    .filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+  const oldestPublishedHours = stamps.length
+    ? (Date.now() - Math.min(...stamps)) / 3_600_000
+    : null;
+
+  if (published.length === 0) {
+    return { status: "no_published", publishedCount: 0, views, plays, oldestPublishedHours };
+  }
+  if (oldestPublishedHours === null || oldestPublishedHours < 24) {
+    return { status: "too_early", publishedCount: published.length, views, plays, oldestPublishedHours };
+  }
+  if (views === 0 && plays === 0) {
+    return { status: "stalled", publishedCount: published.length, views, plays, oldestPublishedHours };
+  }
+  return { status: "ok", publishedCount: published.length, views, plays, oldestPublishedHours };
+}
