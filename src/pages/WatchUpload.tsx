@@ -2,11 +2,13 @@
  * /u/:id — watch a native Heartify upload.
  *
  * Playback uses a short-lived signed URL minted server-side; unapproved rows
- * are only ever resolvable by their owner or a moderator.
+ * are only ever resolvable by their owner or a moderator. Captions come from
+ * `creator_upload_captions` (auto-generated on approval) and are attached as
+ * WebVTT tracks; viewers can request a translation into their own language.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Loader2, ShieldCheck } from "lucide-react";
+import { Captions, Loader2, ShieldCheck } from "lucide-react";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +16,15 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useUploadPlayback } from "@/hooks/useCreatorStudio";
 import { useUploadTelemetry } from "@/hooks/useCreatorInsights";
+import {
+  useRequestCaptions,
+  useUploadCaptions,
+  useVttUrls,
+} from "@/hooks/useUploadCaptions";
+import { useLocale } from "@/contexts/LocaleContext";
+import { isNativeItem, languageLabel } from "@/components/LaneToggle";
+import { trackLaneEvent, flushLaneEvents } from "@/lib/laneTelemetry";
+import { toast } from "@/hooks/use-toast";
 
 interface Row {
   id: string;
@@ -33,6 +44,40 @@ export default function WatchUpload() {
   const [loading, setLoading] = useState(true);
   const playback = useUploadPlayback(id);
   const telemetry = useUploadTelemetry(id);
+  const { preferences, language: uiLanguage } = useLocale();
+  const primaryLanguage = preferences.content_languages?.[0];
+
+  const captions = useUploadCaptions(id);
+  const requestCaptions = useRequestCaptions(id);
+  const vttUrls = useVttUrls(captions.data);
+
+  const lane = useMemo(
+    () => (isNativeItem(row?.language, primaryLanguage) ? "native" : "diversified") as
+      | "native"
+      | "diversified",
+    [row?.language, primaryLanguage],
+  );
+
+  // Watch-time per lane feeds the 80/20 validation dashboards.
+  const watchRef = useRef({ watched: 0, duration: 0, last: 0 });
+  useEffect(() => {
+    if (!row) return;
+    return () => {
+      const { watched, duration } = watchRef.current;
+      if (watched < 3) return;
+      trackLaneEvent({
+        kind: "watch",
+        lane,
+        video_id: row.id,
+        country: preferences.country_code ?? preferences.detected_country ?? null,
+        ui_language: uiLanguage,
+        content_language: row.language,
+        watched_seconds: Math.round(watched),
+        duration_seconds: Math.round(duration),
+      });
+      void flushLaneEvents();
+    };
+  }, [row, lane, preferences.country_code, preferences.detected_country, uiLanguage]);
 
   useEffect(() => {
     if (!id) return;
@@ -76,6 +121,10 @@ export default function WatchUpload() {
     );
   }
 
+  const tracks = captions.data ?? [];
+  const hasPrimaryCaptions =
+    !primaryLanguage || tracks.some((t) => t.language.split("-")[0] === primaryLanguage);
+
   return (
     <>
       <SEO
@@ -96,14 +145,31 @@ export default function WatchUpload() {
               controls
               playsInline
               preload="metadata"
+              crossOrigin="anonymous"
               className="aspect-video w-full"
               onTimeUpdate={(event) => {
                 const video = event.currentTarget;
                 telemetry.onTimeUpdate(video.currentTime, video.duration || 0);
+                const state = watchRef.current;
+                const delta = video.currentTime - state.last;
+                if (delta > 0 && delta < 4) state.watched += delta;
+                state.last = video.currentTime;
+                state.duration = video.duration || state.duration;
               }}
               onPlay={() => telemetry.onAutoplayResult(true)}
               onError={() => telemetry.onAutoplayResult(false)}
-            />
+            >
+              {tracks.map((track) => (
+                <track
+                  key={track.language}
+                  kind="captions"
+                  src={vttUrls[track.language]}
+                  srcLang={track.language}
+                  label={`${languageLabel(track.language)}${track.source === "mt" ? " (translated)" : ""}`}
+                  default={primaryLanguage ? track.language.split("-")[0] === primaryLanguage : false}
+                />
+              ))}
+            </video>
           ) : (
             <div className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground">
               {playback.error ?? "Playback unavailable."}
@@ -128,12 +194,58 @@ export default function WatchUpload() {
               {row.category}
             </Badge>
           )}
+          {tracks.length > 0 && (
+            <span
+              data-testid="watch-upload-captions-badge"
+              className="inline-flex items-center gap-1 text-foreground"
+            >
+              <Captions className="h-3.5 w-3.5" /> CC · {tracks.length}
+            </span>
+          )}
           {row.status === "approved" && (
             <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="h-3.5 w-3.5" /> Halal reviewed
             </span>
           )}
         </div>
+
+        {/* Caption availability + on-demand translation into the viewer's language */}
+        <div className="mt-3 rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+          {tracks.length === 0 ? (
+            <span data-testid="watch-upload-captions-pending">
+              Captions are generated automatically after review — check back shortly.
+            </span>
+          ) : hasPrimaryCaptions ? (
+            <span>
+              Captions available in{" "}
+              {tracks.map((t) => languageLabel(t.language)).join(", ")}.
+            </span>
+          ) : (
+            <div className="flex flex-wrap items-center gap-2">
+              <span>No captions in {languageLabel(primaryLanguage)} yet.</span>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="h-8"
+                data-testid="watch-upload-translate-captions"
+                disabled={requestCaptions.isPending}
+                onClick={() =>
+                  requestCaptions.mutate(primaryLanguage, {
+                    onError: (err) =>
+                      toast({
+                        title: "Translation unavailable",
+                        description: (err as Error).message,
+                        variant: "destructive",
+                      }),
+                  })
+                }
+              >
+                {requestCaptions.isPending ? "Translating…" : `Translate to ${languageLabel(primaryLanguage)}`}
+              </Button>
+            </div>
+          )}
+        </div>
+
         {row.status !== "approved" && (
           <p className="mt-3 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
             This upload is {row.status.replace("_", " ")} and is only visible to you and the review team.
