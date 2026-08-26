@@ -7,7 +7,7 @@
  * WebVTT tracks; viewers can request a translation into their own language.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Captions, Loader2, ShieldCheck } from "lucide-react";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
@@ -22,6 +22,8 @@ import {
   useVttUrls,
 } from "@/hooks/useUploadCaptions";
 import { useLocale } from "@/contexts/LocaleContext";
+import CaptionPicker from "@/components/CaptionPicker";
+import { resolveCaptionTrack } from "@/lib/captionFallback";
 import { isNativeItem, languageLabel } from "@/components/LaneToggle";
 import { trackLaneEvent, flushLaneEvents } from "@/lib/laneTelemetry";
 import { toast } from "@/hooks/use-toast";
@@ -142,10 +144,6 @@ export default function WatchUpload() {
       </>
     );
   }
-
-  const tracks = captions.data ?? [];
-  const hasPrimaryCaptions =
-    !primaryLanguage || tracks.some((t) => t.language.split("-")[0] === primaryLanguage);
 
   return (
     <>
