@@ -84,7 +84,12 @@ Deno.serve(async (req) => {
   const { data: claimed, error: claimErr } = await admin.rpc("claim_moderation_backlog", {
     p_limit: batch,
   });
-  if (claimErr) return json({ error: `claim failed: ${claimErr.message}` }, 500);
+  if (claimErr) {
+    console.log(`moderate-backlog: claim failed — ${claimErr.message}`);
+    return json({ error: `claim failed: ${claimErr.message}` }, 500);
+  }
+  console.log(`moderate-backlog: claimed ${(claimed ?? []).length} rows`);
+
 
   const rows = (claimed ?? []) as Row[];
   if (rows.length === 0) return json({ claimed: 0, decided: 0, drained: true });
