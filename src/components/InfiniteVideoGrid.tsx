@@ -11,6 +11,7 @@ import type { HalalCategory } from "@/services/youtube";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
 import { useLocale } from "@/contexts/LocaleContext";
+import { trackLaneEvent } from "@/lib/laneTelemetry";
 
 interface Props {
   category?: HalalCategory;
