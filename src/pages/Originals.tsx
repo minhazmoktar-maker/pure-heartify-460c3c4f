@@ -134,6 +134,9 @@ export default function Originals() {
                   <p className="mt-auto pt-3 text-[11px] text-muted-foreground">
                     {row.creator?.display_name ?? "Heartify creator"} · {row.view_count} views
                   </p>
+                  {row.creator?.handle && (
+                    <span className="mt-2 text-[11px] text-primary">Creator profile: @{row.creator.handle}</span>
+                  )}
                 </Link>
               </li>
             ))}

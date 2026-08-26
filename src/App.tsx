@@ -244,6 +244,8 @@ const Diagnostics = lazy(() => import("./pages/Diagnostics.tsx"));
 const Transparency = lazy(() => import("./pages/Transparency.tsx"));
 const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard.tsx"));
 const CreatorStudio = lazy(() => import("./pages/CreatorStudio.tsx"));
+const CreatorAnalytics = lazy(() => import("./pages/CreatorAnalytics.tsx"));
+const CreatorProfile = lazy(() => import("./pages/CreatorProfile.tsx"));
 const Originals = lazy(() => import("./pages/Originals.tsx"));
 const WatchUpload = lazy(() => import("./pages/WatchUpload.tsx"));
 const AdminCreatorReview = lazy(() => import("./pages/AdminCreatorReview.tsx"));
@@ -353,7 +355,9 @@ const App = () => (
                 <Route path="/transparency" element={<Transparency />} />
                 <Route path="/creators/dashboard" element={<CreatorDashboard />} />
                 <Route path="/studio" element={<CreatorStudio />} />
+                <Route path="/studio/analytics" element={<CreatorAnalytics />} />
                 <Route path="/originals" element={<Originals />} />
+                <Route path="/c/:handle" element={<CreatorProfile />} />
                 <Route path="/u/:id" element={<WatchUpload />} />
                 <Route path="/admin/appeals" element={<AdminRoute><AdminAppeals /></AdminRoute>} />
                 <Route path="/admin/experiments" element={<AdminRoute><AdminExperiments /></AdminRoute>} />

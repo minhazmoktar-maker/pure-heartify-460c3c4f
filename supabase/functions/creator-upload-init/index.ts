@@ -31,6 +31,10 @@ interface Body {
   size_bytes?: number;
   duration_seconds?: number;
   thumbnail_content_type?: string;
+  detected_language?: string;
+  language_confidence?: number;
+  thumbnail_auto?: boolean;
+  duration_auto?: boolean;
 }
 
 const LANGS = /^[a-z]{2}(-[A-Za-z0-9]{2,8})?$/;
@@ -63,6 +67,10 @@ Deno.serve(async (req) => {
   const sizeBytes = Number(body.size_bytes ?? 0);
   const duration = body.duration_seconds != null ? Math.round(Number(body.duration_seconds)) : null;
   const thumbType = (body.thumbnail_content_type ?? "").trim();
+  const detectedLanguage = (body.detected_language ?? "").trim() || null;
+  const languageConfidence = body.language_confidence != null ? Number(body.language_confidence) : null;
+  const thumbnailAuto = body.thumbnail_auto === true;
+  const durationAuto = body.duration_auto === true;
 
   const errors: string[] = [];
   if (title.length < 3 || title.length > 160) errors.push("title must be 3-160 characters");
@@ -72,6 +80,8 @@ Deno.serve(async (req) => {
   if (!Number.isFinite(sizeBytes) || sizeBytes <= 0 || sizeBytes > MAX_VIDEO_BYTES) errors.push("video must be under 2GB");
   if (duration != null && (!Number.isFinite(duration) || duration <= 0 || duration > 6 * 3600)) errors.push("duration is invalid");
   if (thumbType && !ALLOWED_IMAGE_TYPES.has(thumbType)) errors.push("thumbnail must be jpeg, png or webp");
+  if (detectedLanguage && !LANGS.test(detectedLanguage)) errors.push("detected_language must be a BCP-47 code");
+  if (languageConfidence != null && (!Number.isFinite(languageConfidence) || languageConfidence < 0 || languageConfidence > 1)) errors.push("language_confidence must be 0-1");
   if (errors.length) return json({ error: "validation_failed", details: errors }, 400);
 
   // Creator account must exist and be in good standing.
@@ -100,6 +110,11 @@ Deno.serve(async (req) => {
         status: "rejected",
         visual_state: "flagged",
         moderation_reason: verdict.reason ?? "halal_text",
+        flag_reason_code: "halal_text_pattern",
+        detected_language: detectedLanguage,
+        language_confidence: languageConfidence,
+        thumbnail_auto: thumbnailAuto,
+        duration_auto: durationAuto,
       })
       .select("id")
       .single();
@@ -132,6 +147,10 @@ Deno.serve(async (req) => {
       status: "uploading",
       size_bytes: sizeBytes,
       duration_seconds: duration,
+      detected_language: detectedLanguage,
+      language_confidence: languageConfidence,
+      thumbnail_auto: thumbnailAuto,
+      duration_auto: durationAuto,
     })
     .select("id,status")
     .single();

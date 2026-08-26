@@ -29,6 +29,7 @@ Deno.serve(async (req) => {
     visual_verified?: boolean;
     notes?: string;
     reason?: string;
+    flag_reason_code?: string;
   };
   try { body = await req.json(); } catch { return json({ error: "invalid json" }, 400); }
 
@@ -47,6 +48,7 @@ Deno.serve(async (req) => {
   if (!upload) return json({ error: "not_found" }, 404);
 
   const notes = (body.notes ?? "").trim().slice(0, 2000) || null;
+  const flagReasonCode = (body.flag_reason_code ?? "").trim() || null;
 
   if (decision === "approve") {
     if (body.visual_verified !== true) {
@@ -77,6 +79,16 @@ Deno.serve(async (req) => {
   }
 
   const reason = (body.reason ?? "policy").trim().slice(0, 200);
+  let reasonSeverity: string | null = null;
+  if (flagReasonCode) {
+    const { data: reasonRow } = await admin
+      .from("creator_flag_reasons")
+      .select("code,severity")
+      .eq("code", flagReasonCode)
+      .maybeSingle();
+    if (!reasonRow) return json({ error: "invalid_flag_reason_code" }, 400);
+    reasonSeverity = reasonRow.severity as string;
+  }
   const nextStatus = decision === "remove" ? "removed" : "rejected";
   const { error } = await admin
     .from("creator_uploads")
@@ -84,6 +96,7 @@ Deno.serve(async (req) => {
       status: nextStatus,
       visual_state: "flagged",
       moderation_reason: reason,
+      flag_reason_code: flagReasonCode,
       review_notes: notes,
       reviewed_by: reviewer.id,
       reviewed_at: new Date().toISOString(),
@@ -93,20 +106,22 @@ Deno.serve(async (req) => {
   if (error) return json({ error: "update_failed", detail: error.message }, 500);
 
   // Strikes accumulate on the creator account; three strikes suspends them.
-  const { data: account } = await admin
-    .from("creator_accounts")
-    .select("id,strikes")
-    .eq("id", upload.creator_id)
-    .maybeSingle();
-  if (account) {
-    const strikes = (account.strikes ?? 0) + 1;
-    await admin
+  if (reasonSeverity !== "minor") {
+    const { data: account } = await admin
       .from("creator_accounts")
-      .update({ strikes, status: strikes >= 3 ? "suspended" : "active" })
-      .eq("id", account.id);
+      .select("id,strikes")
+      .eq("id", upload.creator_id)
+      .maybeSingle();
+    if (account) {
+      const strikes = (account.strikes ?? 0) + 1;
+      await admin
+        .from("creator_accounts")
+        .update({ strikes, status: strikes >= 3 ? "suspended" : "active" })
+        .eq("id", account.id);
+    }
   }
 
-  await logUploadEvent(admin, upload.id, nextStatus, reviewer.id, "moderator", { reason, notes });
+  await logUploadEvent(admin, upload.id, nextStatus, reviewer.id, "moderator", { reason, notes, flag_reason_code: flagReasonCode });
   return json({ ok: true, status: nextStatus }, 200);
 });
 

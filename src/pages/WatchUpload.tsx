@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useUploadPlayback } from "@/hooks/useCreatorStudio";
+import { useUploadTelemetry } from "@/hooks/useCreatorInsights";
 
 interface Row {
   id: string;
@@ -31,6 +32,7 @@ export default function WatchUpload() {
   const [row, setRow] = useState<Row | null>(null);
   const [loading, setLoading] = useState(true);
   const playback = useUploadPlayback(id);
+  const telemetry = useUploadTelemetry(id);
 
   useEffect(() => {
     if (!id) return;
@@ -95,6 +97,12 @@ export default function WatchUpload() {
               playsInline
               preload="metadata"
               className="aspect-video w-full"
+              onTimeUpdate={(event) => {
+                const video = event.currentTarget;
+                telemetry.onTimeUpdate(video.currentTime, video.duration || 0);
+              }}
+              onPlay={() => telemetry.onAutoplayResult(true)}
+              onError={() => telemetry.onAutoplayResult(false)}
             />
           ) : (
             <div className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground">
@@ -105,7 +113,13 @@ export default function WatchUpload() {
 
         <h1 className="mt-4 text-lg font-semibold text-foreground">{row.title}</h1>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span>{row.creator?.display_name ?? "Heartify creator"}</span>
+          {row.creator?.handle ? (
+            <Link to={`/c/${row.creator.handle}`} className="text-primary underline-offset-4 hover:underline">
+              {row.creator.display_name}
+            </Link>
+          ) : (
+            <span>{row.creator?.display_name ?? "Heartify creator"}</span>
+          )}
           <span>·</span>
           <span>{row.view_count} views</span>
           <span className="uppercase">{row.language}</span>
