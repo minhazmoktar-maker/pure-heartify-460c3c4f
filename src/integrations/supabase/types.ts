@@ -7133,6 +7133,7 @@ export type Database = {
           channel_id: string
           channel_title: string
           content_language: string
+          is_trusted_channel: boolean
           published_at: string
           title: string
           video_id: string
