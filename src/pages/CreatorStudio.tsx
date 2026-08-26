@@ -375,7 +375,7 @@ function UploadModerationActions({ upload }: { upload: { id: string; status: Upl
             <div className="space-y-2">
               {trail.data.events.slice(0, 6).map((event) => (
                 <p key={event.id} className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-                  {event.event.replaceAll("_", " ")} · {new Date(event.created_at).toLocaleString()}
+                  {event.event.replace(/_/g, " ")} · {new Date(event.created_at).toLocaleString()}
                 </p>
               ))}
             </div>
