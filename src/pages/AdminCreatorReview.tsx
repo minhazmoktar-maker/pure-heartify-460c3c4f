@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CaptionReviewPanel from "@/components/CaptionReviewPanel";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -110,8 +111,18 @@ function ReviewCard({ row, onDone }: { row: QueueRow; onDone: () => void }) {
           )}
         </div>
         {row.description && (
-          <p className="whitespace-pre-line text-xs text-muted-foreground">{row.description}</p>
+          <p className="whitespace-pre-line text-xs textext-muted-foreground">{row.description}</p>
         )}
+        {/* Review the captions (sync, overlaps, RTL rendering) before approving —
+            approval is what publishes them to viewers. */}
+        <details className="rounded-lg border border-border p-2" data-testid={`admin-caption-review-${row.id}`}>
+          <summary className="cursor-pointer text-xs font-medium text-foreground">
+            Review captions
+          </summary>
+          <div className="mt-2">
+            <CaptionReviewPanel uploadId={row.id} durationSeconds={row.duration_seconds} />
+          </div>
+        </details>
         <label className="flex items-start gap-2 text-xs text-foreground">
           <Checkbox checked={verified} onCheckedChange={(v) => setVerified(v === true)} />
           <span>
