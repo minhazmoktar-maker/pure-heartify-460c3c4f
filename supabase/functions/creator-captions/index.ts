@@ -19,7 +19,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { UPLOAD_BUCKET, resolveCaller } from "../_shared/creatorAuth.ts";
-import { checkCaptionTrack, notifyCaptionQuality } from "../_shared/captionAlerts.ts";
+import { checkCaptionTrack, notifyCaptionQuality, recordCaptionAudit } from "../_shared/captionAlerts.ts";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const TRANSLATE_MODEL = "google/gemini-2.5-flash";
@@ -249,6 +249,13 @@ async function generateFor(db: SupabaseClient, uploadId: string) {
   // Quality gate: warn the creator and moderators instead of letting a drifted
   // or half-empty track reach viewers unnoticed.
   const check = checkCaptionTrack(result.segments, upload.duration_seconds as number | null);
+  await recordCaptionAudit(db, {
+    uploadId,
+    language: result.language,
+    action: "generate_requested",
+    check,
+    segmentCount: result.segments.length,
+  });
   await notifyCaptionQuality(db, {
     uploadId,
     language: result.language,
@@ -304,6 +311,13 @@ async function translateFor(db: SupabaseClient, uploadId: string, language: stri
     .eq("id", uploadId)
     .maybeSingle();
   const check = checkCaptionTrack(out, (meta?.duration_seconds ?? null) as number | null);
+  await recordCaptionAudit(db, {
+    uploadId,
+    language,
+    action: "translate_requested",
+    check,
+    segmentCount: out.length,
+  });
   await notifyCaptionQuality(db, {
     uploadId,
     language,
