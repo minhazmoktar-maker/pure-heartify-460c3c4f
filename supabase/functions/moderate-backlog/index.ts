@@ -109,15 +109,14 @@ Deno.serve(async (req) => {
       const ctx: VideoContext = {
         video_id: r.video_id,
         title: r.title,
-        description: r.description,
         channel_id: r.channel_id,
         channel_title: r.channel_title,
         category: r.category,
-        tags: r.tags ?? [],
-        language: r.language,
-        duration_seconds: r.duration_seconds,
+        tags: [],
+        language: r.content_language,
         published_at: r.published_at,
       };
+
       try {
         const outcome = await runPipeline(ctx, stages, thresholds);
         const res = await persistDecision(
