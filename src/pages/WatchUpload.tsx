@@ -44,7 +44,7 @@ export default function WatchUpload() {
   const [loading, setLoading] = useState(true);
   const playback = useUploadPlayback(id);
   const telemetry = useUploadTelemetry(id);
-  const { preferences, language: uiLanguage } = useLocale();
+  const { preferences, locale: uiLanguage } = useLocale();
   const primaryLanguage = preferences.content_languages?.[0];
 
   const captions = useUploadCaptions(id);
