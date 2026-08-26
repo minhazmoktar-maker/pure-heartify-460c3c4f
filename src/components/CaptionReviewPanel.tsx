@@ -7,17 +7,19 @@
  * quality report per track; and opens the inline editor for fixes. Nothing here
  * publishes anything — it is the last look before the decision.
  */
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CaptionOverlay from "@/components/CaptionOverlay";
 import CaptionEditor from "@/components/CaptionEditor";
 import CaptionSettingsSheet from "@/components/CaptionSettingsSheet";
+import CaptionAuditTrail from "@/components/CaptionAuditTrail";
 import { isRtlCaption } from "@/components/CaptionPicker";
 import { languageLabel } from "@/components/LaneToggle";
 import { useUploadPlayback } from "@/hooks/useCreatorStudio";
 import { useUploadCaptions } from "@/hooks/useUploadCaptions";
 import { analyseCaptionTracks } from "@/lib/captionQuality";
+import { logCaptionAudit } from "@/lib/captionAudit";
 
 interface Props {
   uploadId: string;
@@ -44,6 +46,20 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
     [tracks, durationSeconds],
   );
   const activeReport = reports.find((r) => r.language === active?.language) ?? null;
+
+  // Opening the review step is itself an auditable act: it records the score a
+  // reviewer was shown before they approved or published.
+  const loggedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!activeReport || loggedRef.current === activeReport.language) return;
+    loggedRef.current = activeReport.language;
+    void logCaptionAudit({
+      uploadId,
+      language: activeReport.language,
+      action: "publish_review",
+      report: activeReport,
+    });
+  }, [activeReport, uploadId]);
 
   if (captions.isLoading) {
     return (
@@ -141,8 +157,15 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
       </Button>
 
       {editing && active && (
-        <CaptionEditor uploadId={uploadId} track={active} durationSeconds={durationSeconds} />
+        <CaptionEditor
+          uploadId={uploadId}
+          track={active}
+          durationSeconds={durationSeconds}
+          onSaved={() => void captions.refetch()}
+        />
       )}
+
+      <CaptionAuditTrail uploadId={uploadId} language={active?.language} />
     </div>
   );
 };

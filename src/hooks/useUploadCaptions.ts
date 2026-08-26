@@ -5,6 +5,13 @@
  * turns them into WebVTT blob URLs the <video> element can consume as
  * <track> children, and can request an on-demand translation into any
  * supported locale through the `creator-captions` function.
+ *
+ * Editing is optimistically concurrent: every track carries its `updated_at`,
+ * and a save only lands if that timestamp still matches the row in the
+ * database. Two people editing the same Arabic track therefore get a clear
+ * conflict instead of one silently overwriting the other. Every overwritten
+ * state is snapshotted server-side into `caption_track_versions`, so any edit
+ * can be rolled back before publishing.
  */
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +29,25 @@ export interface CaptionTrack {
   source: string;
   segment_count: number;
   segments: CaptionSegment[];
+  /** Concurrency token — pass back on save to detect a conflicting edit. */
+  updated_at?: string;
 }
+
+export interface CaptionVersion {
+  id: string;
+  language: string;
+  segments: CaptionSegment[];
+  segment_count: number;
+  source: string;
+  note: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+/** Thrown when someone else changed the track since it was loaded. */
+export const CAPTION_CONFLICT = "caption_conflict";
+
+const TRACK_COLUMNS = "language, source, segment_count, segments, updated_at";
 
 function vttTime(ms: number): string {
   const total = Math.max(0, ms);
@@ -46,6 +71,28 @@ export function toVtt(segments: CaptionSegment[]): string {
   return lines.join("\n");
 }
 
+/** Normalise a hand-edited draft into a track that can always be played. */
+export function normalizeSegments(segments: CaptionSegment[]): CaptionSegment[] {
+  return segments
+    .map((s) => ({
+      start_ms: Math.max(0, Math.round(s.start_ms)),
+      end_ms: s.end_ms === null || s.end_ms === undefined ? null : Math.max(0, Math.round(s.end_ms)),
+      text: (s.text ?? "").trim(),
+    }))
+    .filter((s) => s.text.length > 0)
+    .sort((a, b) => a.start_ms - b.start_ms);
+}
+
+async function fetchTracks(uploadId: string): Promise<CaptionTrack[]> {
+  const { data, error } = await supabase
+    .from("creator_upload_captions")
+    .select(TRACK_COLUMNS)
+    .eq("upload_id", uploadId)
+    .order("source", { ascending: true });
+  if (error) throw error;
+  return ((data ?? []) as unknown as CaptionTrack[]).filter((t) => t.segment_count > 0);
+}
+
 export function useUploadCaptions(uploadId: string | undefined) {
   return useQuery({
     queryKey: ["upload-captions", uploadId],
@@ -53,18 +100,14 @@ export function useUploadCaptions(uploadId: string | undefined) {
     staleTime: 5 * 60 * 1000,
     queryFn: async (): Promise<CaptionTrack[]> => {
       const done = startCaptionTimer(uploadId as string, "fetch");
-      const { data, error } = await supabase
-        .from("creator_upload_captions")
-        .select("language, source, segment_count, segments")
-        .eq("upload_id", uploadId as string)
-        .order("source", { ascending: true });
-      if (error) {
+      try {
+        const tracks = await fetchTracks(uploadId as string);
+        done(tracks.length);
+        return tracks;
+      } catch (err) {
         done(0);
-        throw error;
+        throw err;
       }
-      const tracks = ((data ?? []) as unknown as CaptionTrack[]).filter((t) => t.segment_count > 0);
-      done(tracks.length);
-      return tracks;
     },
   });
 }
@@ -75,11 +118,18 @@ export function useRequestCaptions(uploadId: string | undefined) {
   return useMutation({
     mutationFn: async (language?: string) => {
       if (!uploadId) throw new Error("missing upload");
-      const { data, error } = await supabase.functions.invoke("creator-captions", {
-        body: language ? { upload_id: uploadId, language } : { upload_id: uploadId },
-      });
-      if (error) throw error;
-      return data as CaptionTrack;
+      const done = startCaptionTimer(uploadId, "translate");
+      try {
+        const { data, error } = await supabase.functions.invoke("creator-captions", {
+          body: language ? { upload_id: uploadId, language } : { upload_id: uploadId },
+        });
+        if (error) throw error;
+        done(1);
+        return data as CaptionTrack;
+      } catch (err) {
+        done(0);
+        throw err;
+      }
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["upload-captions", uploadId] });
@@ -146,71 +196,122 @@ export function useUploadCaptionsIndex(uploadIds: string[] | undefined) {
  * Save an edited caption track (creator or moderator; enforced by RLS).
  * Timings are normalised — sorted, non-negative, empty cues dropped — so a
  * hand-edited draft can never regress into an unplayable track.
+ *
+ * When `expectedUpdatedAt` is supplied the write is conditional: if another
+ * editor saved first the update matches zero rows and we surface a conflict
+ * rather than clobbering their work.
  */
 export function useSaveCaptionTrack(uploadId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ language, segments }: { language: string; segments: CaptionSegment[] }) => {
+    mutationFn: async ({
+      language,
+      segments,
+      expectedUpdatedAt,
+    }: {
+      language: string;
+      segments: CaptionSegment[];
+      expectedUpdatedAt?: string | null;
+    }): Promise<{ segments: CaptionSegment[]; updatedAt: string }> => {
       if (!uploadId) throw new Error("missing upload");
-      const clean = segments
-        .map((s) => ({
-          start_ms: Math.max(0, Math.round(s.start_ms)),
-          end_ms: s.end_ms === null || s.end_ms === undefined ? null : Math.max(0, Math.round(s.end_ms)),
-          text: (s.text ?? "").trim(),
-        }))
-        .filter((s) => s.text.length > 0)
-        .sort((a, b) => a.start_ms - b.start_ms);
+      const clean = normalizeSegments(segments);
       if (clean.length === 0) throw new Error("a caption track needs at least one cue with text");
-      const { error } = await supabase
+      const updatedAt = new Date().toISOString();
+      let query = supabase
         .from("creator_upload_captions")
         .update({
           segments: clean as unknown as never,
           segment_count: clean.length,
           source: "manual",
-          updated_at: new Date().toISOString(),
+          updated_at: updatedAt,
         })
         .eq("upload_id", uploadId)
         .eq("language", language);
+      if (expectedUpdatedAt) query = query.eq("updated_at", expectedUpdatedAt);
+      const { data, error } = await query.select("updated_at");
       if (error) throw error;
-      return clean;
+      if (!data || data.length === 0) throw new Error(CAPTION_CONFLICT);
+      return { segments: clean, updatedAt };
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["upload-captions", uploadId] });
       void qc.invalidateQueries({ queryKey: ["upload-captions-index"] });
+      void qc.invalidateQueries({ queryKey: ["caption-versions", uploadId] });
+      void qc.invalidateQueries({ queryKey: ["caption-audits", uploadId] });
+    },
+  });
+}
+
+/** Snapshot history for one track, newest first. */
+export function useCaptionVersions(uploadId: string | undefined, language: string | undefined) {
+  return useQuery({
+    queryKey: ["caption-versions", uploadId, language],
+    enabled: Boolean(uploadId && language),
+    staleTime: 30 * 1000,
+    queryFn: async (): Promise<CaptionVersion[]> => {
+      const { data, error } = await supabase
+        .from("caption_track_versions")
+        .select("id, language, segments, segment_count, source, note, created_by, created_at")
+        .eq("upload_id", uploadId as string)
+        .eq("language", language as string)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return (data ?? []) as unknown as CaptionVersion[];
+    },
+  });
+}
+
+/** Roll a track back to a snapshot, refusing if someone else edited meanwhile. */
+export function useRestoreCaptionVersion(uploadId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      versionId,
+      expectedUpdatedAt,
+    }: {
+      versionId: string;
+      expectedUpdatedAt?: string | null;
+    }): Promise<string> => {
+      const { data, error } = await supabase.rpc("restore_caption_version", {
+        p_version_id: versionId,
+        p_expected_updated_at: expectedUpdatedAt ?? null,
+      });
+      if (error) {
+        throw new Error(error.message.includes(CAPTION_CONFLICT) ? CAPTION_CONFLICT : error.message);
+      }
+      return data as unknown as string;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["upload-captions", uploadId] });
+      void qc.invalidateQueries({ queryKey: ["caption-versions", uploadId] });
+      void qc.invalidateQueries({ queryKey: ["caption-audits", uploadId] });
     },
   });
 }
 
 /**
- * Prefetch the caption tracks a viewer is most likely to need next (the cards
- * currently on screen), timed through `captionPerf` so slow caption loads are
- * measurable rather than anecdotal.
+ * Prefetch the caption tracks a viewer is most likely to need next — the cards
+ * currently on screen, or the next few videos queued behind the one playing.
+ * Timed through `captionPerf` so slow caption loads are measurable rather than
+ * anecdotal, and capped so a long feed never turns into a request storm.
  */
-export function usePrefetchUploadCaptions(uploadIds: string[] | undefined) {
+export function usePrefetchUploadCaptions(uploadIds: string[] | undefined, limit = 8) {
   const qc = useQueryClient();
-  const key = (uploadIds ?? []).filter(Boolean).slice(0, 8).join(",");
+  const key = (uploadIds ?? []).filter(Boolean).slice(0, limit).join(",");
   useEffect(() => {
     const ids = key ? key.split(",") : [];
     let cancelled = false;
     (async () => {
       for (const id of ids) {
         if (cancelled) return;
-        const cached = qc.getQueryData(["upload-captions", id]);
-        if (cached) continue;
+        if (qc.getQueryData(["upload-captions", id])) continue;
         const done = startCaptionTimer(id, "prefetch");
         try {
           const tracks = await qc.fetchQuery({
             queryKey: ["upload-captions", id],
             staleTime: 5 * 60 * 1000,
-            queryFn: async (): Promise<CaptionTrack[]> => {
-              const { data, error } = await supabase
-                .from("creator_upload_captions")
-                .select("language, source, segment_count, segments")
-                .eq("upload_id", id)
-                .order("source", { ascending: true });
-              if (error) throw error;
-              return ((data ?? []) as unknown as CaptionTrack[]).filter((t) => t.segment_count > 0);
-            },
+            queryFn: () => fetchTracks(id),
           });
           done((tracks as CaptionTrack[]).length);
         } catch {
@@ -221,5 +322,5 @@ export function usePrefetchUploadCaptions(uploadIds: string[] | undefined) {
     return () => {
       cancelled = true;
     };
-  }, [key, qc]);
+  }, [key, qc, limit]);
 }

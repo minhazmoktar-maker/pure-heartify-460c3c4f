@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUploadPlayback } from "@/hooks/useCreatorStudio";
 import { useUploadTelemetry } from "@/hooks/useCreatorInsights";
 import {
+  usePrefetchUploadCaptions,
   useRequestCaptions,
   useUploadCaptions,
   useVttUrls,
@@ -25,7 +26,8 @@ import { useLocale } from "@/contexts/LocaleContext";
 import CaptionPicker, { isRtlCaption } from "@/components/CaptionPicker";
 import CaptionOverlay from "@/components/CaptionOverlay";
 import CaptionSettingsSheet from "@/components/CaptionSettingsSheet";
-import { captionPerfSummary } from "@/lib/captionPerf";
+import CaptionLoadProgress from "@/components/CaptionLoadProgress";
+import { captionPerfSummary, captionNetworkClass } from "@/lib/captionPerf";
 import { resolveCaptionTrack } from "@/lib/captionFallback";
 import { isNativeItem, languageLabel } from "@/components/LaneToggle";
 import { trackLaneEvent, flushLaneEvents } from "@/lib/laneTelemetry";
@@ -56,6 +58,29 @@ export default function WatchUpload() {
   const captions = useUploadCaptions(id);
   const requestCaptions = useRequestCaptions(id);
   const vttUrls = useVttUrls(captions.data);
+
+  // Warm the caption tracks of the uploads queued behind this one, so pressing
+  // "next" on a 3G connection does not mean waiting for subtitles again. Ids are
+  // resolved once per video and capped, so this never becomes a request storm.
+  const [nextUpIds, setNextUpIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    void (async () => {
+      const { data } = await supabase
+        .from("creator_uploads")
+        .select("id")
+        .eq("status", "approved")
+        .neq("id", id)
+        .order("published_at", { ascending: false })
+        .limit(4);
+      if (!cancelled) setNextUpIds(((data ?? []) as Array<{ id: string }>).map((r) => r.id));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+  usePrefetchUploadCaptions(nextUpIds, 4);
 
   // ?cc=xx deep-links a caption language (used by Originals cards); otherwise
   // the fallback chain picks the native lane track and degrades gracefully.
@@ -246,14 +271,17 @@ export default function WatchUpload() {
         {/* Caption picker (native lane first) + on-demand translation */}
         <div className="mt-3 space-y-2 rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
           {captions.isLoading ? (
-            <CaptionPicker
-              tracks={[]}
-              selected={null}
-              reason="none"
-              loading
-              onSelect={() => undefined}
-              testId="watch-caption-picker"
-            />
+            <>
+              <CaptionLoadProgress loading testId="watch-caption-progress" />
+              <CaptionPicker
+                tracks={[]}
+                selected={null}
+                reason="none"
+                loading
+                onSelect={() => undefined}
+                testId="watch-caption-picker"
+              />
+            </>
           ) : tracks.length === 0 ? (
             <span data-testid="watch-upload-captions-pending">
               Captions are generated automatically after review — check back shortly.
@@ -274,7 +302,8 @@ export default function WatchUpload() {
                 <CaptionSettingsSheet previewRtl={isRtlCaption(activeCaption?.language)} testId="watch-caption-settings" />
               </div>
               <span data-testid="watch-caption-perf" className="block text-[11px] text-muted-foreground">
-                {tracks.length} track{tracks.length > 1 ? "s" : ""} loaded in {captionPerfSummary().p50}ms (p50)
+                {tracks.length} track{tracks.length > 1 ? "s" : ""} loaded in {captionPerfSummary().p50}ms (p50) ·{" "}
+                {captionNetworkClass()}
               </span>
             </>
           )}

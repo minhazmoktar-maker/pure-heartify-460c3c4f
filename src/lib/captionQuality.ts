@@ -40,11 +40,31 @@ export interface CaptionQualityReport {
   leadingSilence: number;
 }
 
-const MAX_GAP_SECONDS = 25;
-const MIN_CUE_MS = 400;
-/** Above ~26 chars/second a cue is unreadable and usually mis-timed. */
-const MAX_CPS = 26;
-const DRIFT_SECONDS = 12;
+/**
+ * The single source of truth for every caption threshold. Exported so the audit
+ * trail can record the exact values that were in force when a check ran — a
+ * score of 64 means nothing later on unless the bar it was measured against is
+ * recorded alongside it.
+ */
+export const CAPTION_QUALITY_THRESHOLDS = {
+  /** Silent gap (seconds) above which speech is assumed to be missing. */
+  maxGapSeconds: 25,
+  /** Cues shorter than this (ms) are unreadable. */
+  minCueMs: 400,
+  /** Above ~26 chars/second a cue is unreadable and usually mis-timed. */
+  maxCps: 26,
+  /** Leading silence (seconds) treated as sync drift. */
+  driftSeconds: 12,
+  /** Below this quality score, publishing should be reviewed first. */
+  minPublishScore: 70,
+  /** Minimum share of the video that captions must cover. */
+  minCoveragePct: 35,
+} as const;
+
+const MAX_GAP_SECONDS = CAPTION_QUALITY_THRESHOLDS.maxGapSeconds;
+const MIN_CUE_MS = CAPTION_QUALITY_THRESHOLDS.minCueMs;
+const MAX_CPS = CAPTION_QUALITY_THRESHOLDS.maxCps;
+const DRIFT_SECONDS = CAPTION_QUALITY_THRESHOLDS.driftSeconds;
 
 function endOf(seg: CaptionSegment): number {
   return seg.end_ms ?? seg.start_ms + 3000;
@@ -170,7 +190,7 @@ export function analyseCaptionTrack(
         message: `Captions stop at ${Math.round(lastEnd)}s of ${Math.round(durationSeconds)}s — the tail is untranscribed.`,
       });
     }
-    if ((coveragePct ?? 100) < 35) {
+    if ((coveragePct ?? 100) < CAPTION_QUALITY_THRESHOLDS.minCoveragePct) {
       issues.push({
         code: "coverage",
         severity: "info",
@@ -201,4 +221,15 @@ export function analyseCaptionTracks(
 export function worstCaptionScore(reports: CaptionQualityReport[]): number | null {
   if (reports.length === 0) return null;
   return reports.reduce((min, r) => Math.min(min, r.score), 100);
+}
+
+/**
+ * Whether a track should be reviewed before publishing. Used by Creator Studio
+ * to surface a warning, and by the audit trail to record why.
+ */
+export function captionBlocksPublish(report: CaptionQualityReport): boolean {
+  return (
+    report.score < CAPTION_QUALITY_THRESHOLDS.minPublishScore ||
+    report.issues.some((i) => i.severity === "warning")
+  );
 }

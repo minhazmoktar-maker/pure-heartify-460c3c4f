@@ -82,6 +82,49 @@ export function checkCaptionTrack(
 }
 
 /**
+ * Record a pipeline-side quality check in the audit trail.
+ *
+ * Written with the service role, so it lands even for automated ASR and
+ * translation runs where there is no signed-in actor. The thresholds in force
+ * are stored alongside the score — a bare "64/100" is unreadable a month later
+ * without the bar it was measured against.
+ */
+export async function recordCaptionAudit(
+  admin: SupabaseClient,
+  args: {
+    uploadId: string;
+    language: string;
+    action: "generate_requested" | "translate_requested" | "quality_check";
+    check: CaptionCheck;
+    segmentCount?: number;
+  },
+): Promise<void> {
+  const tripped: string[] = [];
+  if (args.check.score < CAPTION_SCORE_FAIL) tripped.push("min_publish_score");
+  if (args.check.driftSeconds > CAPTION_DRIFT_SECONDS) tripped.push("sync_drift");
+  if (args.check.overlaps > 0) tripped.push("overlap");
+  if (args.check.emptyCues > 0) tripped.push("empty_segment");
+  try {
+    await admin.from("caption_quality_audits").insert({
+      upload_id: args.uploadId,
+      language: args.language,
+      action: args.action,
+      score: args.check.score,
+      segment_count: args.segmentCount ?? null,
+      issues: args.check.reasons.map((message) => ({ code: "pipeline", message })),
+      thresholds: {
+        minPublishScore: CAPTION_SCORE_FAIL,
+        driftSeconds: CAPTION_DRIFT_SECONDS,
+        tripped,
+      },
+      actor_role: "pipeline",
+    });
+  } catch {
+    // Audit writes are advisory — never fail a caption job over one.
+  }
+}
+
+/**
  * Notify the creator and moderators when a track fails its checks.
  *
  * In-app only: these are workflow alerts, not engagement pushes, so they never
