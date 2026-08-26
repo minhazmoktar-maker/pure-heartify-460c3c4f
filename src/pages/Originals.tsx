@@ -112,11 +112,11 @@ export default function Originals() {
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
             {rows.map((row) => (
-              <li key={row.id}>
-                <Link
-                  to={`/u/${row.id}`}
-                  className="flex h-full flex-col rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent/40"
-                >
+              <li
+                key={row.id}
+                className="flex h-full flex-col rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent/40"
+              >
+                <Link to={`/u/${row.id}`} className="flex flex-1 flex-col">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <PlayCircle className="h-4 w-4 text-primary" />
                     <span className="uppercase">{row.language}</span>
@@ -131,13 +131,24 @@ export default function Originals() {
                       {row.description}
                     </p>
                   )}
-                  <p className="mt-auto pt-3 text-[11px] text-muted-foreground">
-                    {row.creator?.display_name ?? "Heartify creator"} · {row.view_count} views
-                  </p>
-                  {row.creator?.handle && (
-                    <span className="mt-2 text-[11px] text-primary">Creator profile: @{row.creator.handle}</span>
-                  )}
                 </Link>
+                {/* Creator link is a sibling of the video link, never nested —
+                    nested anchors are invalid and swallow the inner tap. */}
+                <p className="mt-auto flex flex-wrap items-center gap-1 pt-3 text-[11px] text-muted-foreground">
+                  {row.creator?.handle ? (
+                    <Link
+                      to={`/c/${row.creator.handle}`}
+                      data-testid="originals-creator-link"
+                      className="min-h-[24px] font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      {row.creator.display_name}
+                    </Link>
+                  ) : (
+                    <span>Heartify creator</span>
+                  )}
+                  <span>·</span>
+                  <span>{row.view_count} views</span>
+                </p>
               </li>
             ))}
           </ul>

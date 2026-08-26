@@ -117,6 +117,11 @@ export interface YouTubeVideo {
    * (e.g. "Because you learn Fiqh", "Trusted source", "New voice worth hearing").
    */
   reason?: string | null;
+  /**
+   * BCP-47-ish language tag the feed assigned to this row. Used client-side to
+   * separate the native lane from the diversified lane (see LaneToggle).
+   */
+  contentLanguage?: string | null;
 }
 
 interface YouTubeProxyResponse {

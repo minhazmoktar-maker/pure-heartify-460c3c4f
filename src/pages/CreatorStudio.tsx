@@ -44,7 +44,12 @@ import {
   useMyUploads,
   type UploadStatus,
 } from "@/hooks/useCreatorStudio";
-import { useModerationTrail, useSubmitAppeal } from "@/hooks/useCreatorInsights";
+import {
+  useCreatorAnalytics,
+  useModerationTrail,
+  useSubmitAppeal,
+  useTelemetryHealth,
+} from "@/hooks/useCreatorInsights";
 
 const STATUS_TONE: Record<UploadStatus, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -413,6 +418,9 @@ export default function CreatorStudio() {
   const { user, loading: authLoading } = useAuth();
   const account = useCreatorAccount();
   const uploads = useMyUploads();
+  // 7-day window is enough to tell "no one watched" from "telemetry broke".
+  const analytics = useCreatorAnalytics(7);
+  const telemetry = useTelemetryHealth(uploads.data, analytics.data);
 
   const stats = useMemo(() => {
     const rows = uploads.data ?? [];
@@ -481,6 +489,9 @@ export default function CreatorStudio() {
                   <Button asChild size="sm" variant="outline" className="h-9">
                     <Link to={`/c/${account.data.handle}`}>Public profile</Link>
                   </Button>
+                  <Button asChild size="sm" variant="outline" className="h-9">
+                    <Link to="/studio/appeals">Appeals</Link>
+                  </Button>
                   <Button asChild size="sm" className="h-9">
                     <Link to="/studio/analytics"><BarChart3 className="mr-2 h-4 w-4" /> Analytics</Link>
                   </Button>
@@ -502,15 +513,43 @@ export default function CreatorStudio() {
               </CardContent>
             </Card>
 
+            {telemetry.status === "stalled" && (
+              <div
+                className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4"
+                data-testid="telemetry-stalled-alert"
+                role="status"
+              >
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                  Views are stuck at zero
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  You have {telemetry.publishedCount} published{" "}
+                  {telemetry.publishedCount === 1 ? "video" : "videos"} live for more than a
+                  day, but Heartify has recorded no plays at all. That usually means playback
+                  telemetry is being blocked rather than that nobody watched. Open one of your
+                  videos below and let it play for a few seconds — if the count still does not
+                  move, contact us and we will investigate.
+                </p>
+                <Button asChild size="sm" variant="outline" className="mt-3 h-9">
+                  <Link to="/contact">Report this</Link>
+                </Button>
+              </div>
+            )}
+
             {account.data.status !== "active" ? (
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-sm text-destructive">
                     Your creator account is {account.data.status}. Uploading is paused.
                   </p>
-                  <Button asChild variant="outline" className="mt-3 h-11">
-                    <Link to="#creator-uploads">Review upload decisions</Link>
-                  </Button>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button asChild variant="outline" className="h-11">
+                      <a href="#creator-uploads">Review upload decisions</a>
+                    </Button>
+                    <Button asChild variant="ghost" className="h-11">
+                      <Link to="/studio/appeals">Appeal status</Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ) : (

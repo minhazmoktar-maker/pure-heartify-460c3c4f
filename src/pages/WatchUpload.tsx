@@ -114,7 +114,7 @@ export default function WatchUpload() {
         <h1 className="mt-4 text-lg font-semibold text-foreground">{row.title}</h1>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {row.creator?.handle ? (
-            <Link to={`/c/${row.creator.handle}`} className="text-primary underline-offset-4 hover:underline">
+            <Link to={`/c/${row.creator.handle}`} data-testid="watch-upload-creator-link" className="text-primary underline-offset-4 hover:underline">
               {row.creator.display_name}
             </Link>
           ) : (

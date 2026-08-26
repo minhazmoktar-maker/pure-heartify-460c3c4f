@@ -1,14 +1,16 @@
-import { Fragment, useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, AlertTriangle, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from "@/components/EmptyState";
 import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
+import LaneToggle, { isNativeItem, type Lane } from "@/components/LaneToggle";
 import { useInfiniteFeed, type FeedSort } from "@/hooks/useInfiniteFeed";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { HalalCategory } from "@/services/youtube";
 import { useImpressionTracker } from "@/hooks/useImpressionTracker";
 import { useFeedDiversity } from "@/contexts/FeedDiversityContext";
+import { useLocale } from "@/contexts/LocaleContext";
 
 interface Props {
   category?: HalalCategory;
@@ -17,6 +19,8 @@ interface Props {
   limit?: number;
   sort?: FeedSort;
   fallbackMessage?: string;
+  /** Show the native vs diversified language lane control above the grid. */
+  showLaneToggle?: boolean;
 }
 
 const InfiniteVideoGrid = ({
@@ -26,7 +30,11 @@ const InfiniteVideoGrid = ({
   limit = 20,
   sort = "fresh",
   fallbackMessage = "No halal-compliant content found.",
+  showLaneToggle = true,
 }: Props) => {
+  const { preferences } = useLocale();
+  const primaryLanguage = preferences.content_languages?.[0];
+  const [lane, setLane] = useState<Lane>("all");
   const { claim, getSeenSnapshot, resetKey } = useFeedDiversity();
   const {
     data,
@@ -59,12 +67,33 @@ const InfiniteVideoGrid = ({
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawVideos, resetKey, claim]);
+
+  // Native (primary-language) vs diversified lanes. Counts come from what is
+  // actually on screen, so the numbers always match what the viewer can see.
+  const { nativeCount, diversifiedCount, visibleVideos } = useMemo(() => {
+    let native = 0;
+    for (const v of allVideos) if (isNativeItem(v.contentLanguage, primaryLanguage)) native += 1;
+    const filtered =
+      lane === "all"
+        ? allVideos
+        : allVideos.filter((v) =>
+            lane === "native"
+              ? isNativeItem(v.contentLanguage, primaryLanguage)
+              : !isNativeItem(v.contentLanguage, primaryLanguage),
+          );
+    return {
+      nativeCount: native,
+      diversifiedCount: allVideos.length - native,
+      visibleVideos: filtered,
+    };
+  }, [allVideos, lane, primaryLanguage]);
+
   const gridRef = useRef<HTMLDivElement>(null);
   const { track } = useImpressionTracker(!isLoading && !error);
 
   useEffect(() => {
     const root = gridRef.current;
-    if (!root || allVideos.length === 0) return;
+    if (!root || visibleVideos.length === 0) return;
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -78,7 +107,7 @@ const InfiniteVideoGrid = ({
     );
     root.querySelectorAll<HTMLElement>("[data-video-id]").forEach((node) => io.observe(node));
     return () => io.disconnect();
-  }, [allVideos, track]);
+  }, [visibleVideos, track]);
 
   if (isLoading) {
     return (
@@ -125,23 +154,47 @@ const InfiniteVideoGrid = ({
 
   return (
     <>
-      <div ref={gridRef} className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {allVideos.map((video, i) => (
-          <Fragment key={video.id}>
-            {/* One-tap benefit label, in-feed after the first row. This is the
-                ground-truth signal for the benefit ranker — placing it where
-                attention already is lifts the response rate. */}
-            {i === 4 && (
-              <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
-                <BenefitLabelPrompt />
+      {showLaneToggle && diversifiedCount + nativeCount > 0 && (
+        <LaneToggle
+          lane={lane}
+          onChange={setLane}
+          primaryLanguage={primaryLanguage}
+          nativeCount={nativeCount}
+          diversifiedCount={diversifiedCount}
+        />
+      )}
+      {visibleVideos.length === 0 ? (
+        <EmptyState
+          icon={Search}
+          tone="muted"
+          title="Nothing in this lane yet"
+          description={
+            lane === "native"
+              ? "We're still growing this language. Switch back to All to keep watching."
+              : "Everything on this page is in your primary language right now. Add another language in settings to widen the mix."
+          }
+          actionLabel="Show all"
+          onAction={() => setLane("all")}
+        />
+      ) : (
+        <div ref={gridRef} className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {visibleVideos.map((video, i) => (
+            <Fragment key={video.id}>
+              {/* One-tap benefit label, in-feed after the first row. This is the
+                  ground-truth signal for the benefit ranker — placing it where
+                  attention already is lifts the response rate. */}
+              {i === 4 && (
+                <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
+                  <BenefitLabelPrompt />
+                </div>
+              )}
+              <div data-video-id={video.id}>
+                <YouTubeVideoCard video={video} index={i} />
               </div>
-            )}
-            <div data-video-id={video.id}>
-              <YouTubeVideoCard video={video} index={i} />
-            </div>
-          </Fragment>
-        ))}
-      </div>
+            </Fragment>
+          ))}
+        </div>
+      )}
 
       {/* Sentinel for infinite scroll */}
       <div ref={sentinelRef} className="h-1" />
