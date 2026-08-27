@@ -654,7 +654,12 @@ Deno.serve(async (req) => {
     const top = (faq ?? [])[0] as
       | { slug: string; title: string; category: string; answer: string; source_url: string | null; score: number }
       | undefined;
-    if (top && Number(top.score) >= FAQ_SCORE_THRESHOLD && top.answer) {
+    // Very short questions carry too little signal for a verbatim deterministic
+    // answer, so they need a much stronger match before being served.
+    const tokenCount = questionNorm.split(" ").filter(Boolean).length;
+    const required = tokenCount <= 2 ? 0.85 : FAQ_SCORE_THRESHOLD;
+    if (top && Number(top.score) >= required && top.answer) {
+
       return await respond({
         layer: "faq",
         answer: top.answer,
