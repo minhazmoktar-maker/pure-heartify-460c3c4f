@@ -5,7 +5,7 @@ import "./index.css";
 import { initSentry } from "./lib/sentry";
 import { captureAttributionOnce } from "./lib/attribution";
 import { growth } from "./lib/growthEvents";
-import { applyIconToDocument, getSelectedIconId } from "./lib/appIcon";
+import { applyIconToDocument } from "./lib/appIcon";
 import { installDiagConsole } from "./lib/diagnostics";
 import { installViteRecovery } from "./lib/viteRecovery";
 import { installBackendFetchInterceptor } from "./lib/backendFetchInterceptor";
@@ -26,9 +26,8 @@ initSentry();
 installDiagConsole();
 
 
-// Phase 10 — apply the user's saved app-icon variant on every boot so the
-// browser tab / installed PWA reflects their choice without a picker mount.
-try { applyIconToDocument(getSelectedIconId()); } catch { /* noop */ }
+// Keep the tab / installed PWA icon locked to the official Heartify logo.
+try { applyIconToDocument(); } catch { /* noop */ }
 
 // Silence known-benign Supabase auth 401/403 noise emitted when an anonymous
 // visitor's expired/absent JWT hits /auth/v1/user. These are expected during

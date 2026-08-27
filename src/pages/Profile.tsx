@@ -10,7 +10,6 @@ import PrivacySettingsCard from "@/components/social/PrivacySettingsCard";
 import LanguageSettings from "@/components/LanguageSettings";
 import FeedCountryDiversity from "@/components/FeedCountryDiversity";
 
-import AppIconPicker from "@/components/AppIconPicker";
 import ThemeModeSetting from "@/components/ThemeModeSetting";
 import KidsModeSetting from "@/components/KidsModeSetting";
 import ChannelDiversitySetting from "@/components/ChannelDiversitySetting";
@@ -331,9 +330,6 @@ const Profile = () => {
               <SoundSetting />
             </div>
 
-            <div className="pt-4">
-              <AppIconPicker />
-            </div>
 
 
             <div className="pt-4">
