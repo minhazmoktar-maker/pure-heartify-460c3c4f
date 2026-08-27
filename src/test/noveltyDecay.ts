@@ -22,7 +22,7 @@
  */
 
 import { collapseDuplicateGroups } from "../../supabase/functions/_shared/recommendations/semanticDedup.ts";
-import { impressionPenalty } from "../../supabase/functions/_shared/recommendations/rerankV3.ts";
+import { impressionPenalty } from "../../supabase/functions/_shared/recommendations/fatigue.ts";
 
 /** FNV-1a → deterministic [0,1). Identical to the feed function's hash01. */
 function hash01(s: string): number {
@@ -35,6 +35,7 @@ function hash01(s: string): number {
 }
 
 export interface SimItem {
+  [k: string]: unknown;
   video_id: string;
   channel_id: string;
   category: string;
@@ -118,7 +119,7 @@ export function serveFeedPage(
     .map((v) => {
       const seen = state.seen.get(v.video_id) ?? 0;
       const [rawPen, rawHide] = impressionPenalty(
-        seen ? { video_id: v.video_id, seen_count: seen, last_seen_at: "", last_action: null } as never : undefined,
+        seen ? { video_id: v.video_id, seen_count: seen, last_seen_at: "", last_action: null } : undefined,
       );
       const pen = knobs.fatigueDetection ? rawPen * knobs.fatiguePenaltyWeight : 0;
       const hardHide = knobs.fatigueDetection && rawHide;
