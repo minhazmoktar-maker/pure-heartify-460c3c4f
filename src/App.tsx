@@ -56,6 +56,7 @@ const AdminLaunchMonitor = lazy(() => import("./pages/AdminLaunchMonitor.tsx"));
 const AdminFeedDiversity = lazy(() => import("./pages/AdminFeedDiversity.tsx"));
 const AdminFeedFlags = lazy(() => import("./pages/AdminFeedFlags.tsx"));
 const AdminFeedQuality = lazy(() => import("./pages/AdminFeedQuality.tsx"));
+const AdminFeedTraces = lazy(() => import("./pages/AdminFeedTraces.tsx"));
 const AdminCorpusProgress = lazy(() => import("./pages/AdminCorpusProgress.tsx"));
 const AdminLocaleCoverage = lazy(() => import("./pages/AdminLocaleCoverage.tsx"));
 const AdminFeedAB = lazy(() => import("./pages/AdminFeedAB.tsx"));
