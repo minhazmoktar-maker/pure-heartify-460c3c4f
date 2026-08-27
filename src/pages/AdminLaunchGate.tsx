@@ -134,7 +134,12 @@ export default function AdminLaunchGate() {
 
   return (
     <>
-      <SEO path="/admin/launch-gate" title="Launch gate — Heartify admin" noindex />
+      <SEO
+        path="/admin/launch-gate"
+        title="Launch gate — Heartify admin"
+        description="Internal launch readiness gate for the Heartify video corpus."
+      />
+
       <PageHeader
         title="Launch gate"
         subtitle="Corpus readiness, serving counts and the automated unchecked-queue sweep."
