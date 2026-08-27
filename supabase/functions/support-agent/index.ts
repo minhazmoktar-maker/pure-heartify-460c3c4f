@@ -262,6 +262,10 @@ Deno.serve(async (req) => {
   const questionNorm = normalizeQuestion(question);
   const injection = detectInjection(body.message);
   const cacheable = !injection && isCacheable(question, { signedIn: !!userId });
+  // Deterministic, in-process categorisation — drives telemetry, routing and
+  // the out-of-scope boundary without any model call.
+  const classification = classifyQuestion(question);
+
 
   // --- conversation -------------------------------------------------------
   let conversationId = body.conversation_id ?? null;
