@@ -89,6 +89,39 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_routing_config: {
+        Row: {
+          created_at: string
+          email: boolean
+          enabled: boolean
+          id: string
+          kind: string | null
+          min_severity: string
+          slack: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: boolean
+          enabled?: boolean
+          id?: string
+          kind?: string | null
+          min_severity?: string
+          slack?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: boolean
+          enabled?: boolean
+          id?: string
+          kind?: string | null
+          min_severity?: string
+          slack?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -4822,6 +4855,8 @@ export type Database = {
           id: string
           kind: string
           message: string
+          notified_at: string | null
+          notify_result: Json | null
           resolved_at: string | null
           resolved_by: string | null
           route: string | null
@@ -4834,6 +4869,8 @@ export type Database = {
           id?: string
           kind: string
           message: string
+          notified_at?: string | null
+          notify_result?: Json | null
           resolved_at?: string | null
           resolved_by?: string | null
           route?: string | null
@@ -4846,6 +4883,8 @@ export type Database = {
           id?: string
           kind?: string
           message?: string
+          notified_at?: string | null
+          notify_result?: Json | null
           resolved_at?: string | null
           resolved_by?: string | null
           route?: string | null
@@ -5611,6 +5650,36 @@ export type Database = {
           created_by?: string | null
           id?: string
           term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      serve_throughput_thresholds: {
+        Row: {
+          created_at: string
+          drop_ratio: number
+          enabled: boolean
+          min_baseline: number
+          min_weekly_impressions: number
+          segment: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          drop_ratio?: number
+          enabled?: boolean
+          min_baseline?: number
+          min_weekly_impressions?: number
+          segment: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          drop_ratio?: number
+          enabled?: boolean
+          min_baseline?: number
+          min_weekly_impressions?: number
+          segment?: string
           updated_at?: string
         }
         Relationships: []
@@ -6888,6 +6957,63 @@ export type Database = {
         }
         Relationships: []
       }
+      worker_health_snapshots: {
+        Row: {
+          canonical_pending: number
+          captured_at: string
+          dedup_grouped_last_hour: number
+          dedup_pending: number
+          dlq_open: number
+          id: string
+          visual_checked_last_hour: number
+          visual_unchecked: number
+          visual_unchecked_approved: number
+        }
+        Insert: {
+          canonical_pending?: number
+          captured_at?: string
+          dedup_grouped_last_hour?: number
+          dedup_pending?: number
+          dlq_open?: number
+          id?: string
+          visual_checked_last_hour?: number
+          visual_unchecked?: number
+          visual_unchecked_approved?: number
+        }
+        Update: {
+          canonical_pending?: number
+          captured_at?: string
+          dedup_grouped_last_hour?: number
+          dedup_pending?: number
+          dlq_open?: number
+          id?: string
+          visual_checked_last_hour?: number
+          visual_unchecked?: number
+          visual_unchecked_approved?: number
+        }
+        Relationships: []
+      }
+      worker_sla_targets: {
+        Row: {
+          enabled: boolean
+          min_per_hour: number
+          updated_at: string
+          worker: string
+        }
+        Insert: {
+          enabled?: boolean
+          min_per_hour?: number
+          updated_at?: string
+          worker: string
+        }
+        Update: {
+          enabled?: boolean
+          min_per_hour?: number
+          updated_at?: string
+          worker?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       admin_experiment_results: {
@@ -7116,6 +7242,7 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_replay_quality_checks: { Args: { p_hours?: number }; Returns: Json }
       admin_retention_cohorts: {
         Args: never
         Returns: {
@@ -7155,6 +7282,7 @@ export type Database = {
           visual_state: string
         }[]
       }
+      admin_worker_health: { Args: { p_hours?: number }; Returns: Json }
       analytics_active_users: {
         Args: { _from: string; _to: string }
         Returns: {
@@ -7334,6 +7462,7 @@ export type Database = {
         Args: { p_drop_ratio?: number; p_min_baseline?: number }
         Returns: Json
       }
+      check_worker_health_sla: { Args: never; Returns: Json }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       claim_moderation_backlog: {
         Args: { p_limit?: number }
@@ -8430,6 +8559,7 @@ export type Database = {
         }[]
       }
       snapshot_corpus_progress: { Args: never; Returns: undefined }
+      snapshot_worker_health: { Args: never; Returns: Json }
       social_admin_stats: { Args: never; Returns: Json }
       social_analytics_series: { Args: { _days?: number }; Returns: Json }
       social_can_view: {
