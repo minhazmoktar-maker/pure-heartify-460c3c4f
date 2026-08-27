@@ -164,6 +164,8 @@ interface UsageRecord {
   flow?: string | null;
   injectionBlocked?: boolean;
   validationFailed?: boolean;
+  cacheHit?: boolean;
+  scrubViolation?: boolean;
 }
 
 async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
@@ -188,9 +190,12 @@ async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
     flow: u.flow ?? null,
     injection_blocked: u.injectionBlocked ?? false,
     validation_failed: u.validationFailed ?? false,
+    cache_hit: u.cacheHit ?? false,
+    scrub_violation: u.scrubViolation ?? false,
   });
   if (error) console.error("[support-agent] usage insert failed", error.message);
 }
+
 
 
 async function recordProviderHealth(admin: SupabaseClient, provider: string, ok: boolean, error?: string) {
@@ -360,8 +365,14 @@ Deno.serve(async (req) => {
     const latencyMs = Date.now() - started;
     const actions = resolveActions(opts.actionIds, { signedIn: !!userId });
     // Final gate: an answer can never carry provider, model or infrastructure
-    // detail, however it was produced.
+    // detail, however it was produced. When the gate has to change the text we
+    // record it as a scrub violation — that is an incident, not a metric.
     const outbound = safeOutboundAnswer(opts.answer);
+    const scrubViolation = outbound.trim() !== (opts.answer ?? "").trim();
+    if (scrubViolation) {
+      console.warn(JSON.stringify({ evt: "support.scrub_violation", layer: opts.layer, conversation: conversationId }));
+    }
+
 
     await admin.from("support_messages").insert({
       conversation_id: conversationId,
@@ -420,7 +431,10 @@ Deno.serve(async (req) => {
       flow: opts.flow ?? null,
       injectionBlocked: opts.injectionBlocked ?? false,
       validationFailed: opts.validationFailed ?? false,
+      cacheHit: opts.layer === "exact_cache" || opts.layer === "semantic_cache",
+      scrubViolation,
     });
+
 
 
     if (opts.escalate) {

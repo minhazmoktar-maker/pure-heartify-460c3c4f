@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { AlertTriangle, BookOpen, Bot, Coins, Loader2, MessageSquare, RefreshCw, ServerCog, Star } from "lucide-react";
+import { AlertTriangle, BookOpen, Bot, Coins, Loader2, MessageSquare, RefreshCw, ServerCog, ShieldAlert, Star } from "lucide-react";
 import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadCsv, downloadJson } from "@/lib/download";
@@ -77,6 +77,28 @@ interface GapReport {
   }[];
 }
 
+/** Escalation / cache / scrub telemetry from admin_support_reliability(). */
+interface Reliability {
+  days: number;
+  totals: {
+    turns: number;
+    escalations: number;
+    escalation_rate: number | null;
+    cache_hits: number;
+    cache_hit_rate: number | null;
+    llm_calls: number;
+    zero_cost_rate: number | null;
+    scrub_violations: number;
+    scrub_violation_rate: number | null;
+    validation_failures: number;
+    degraded: number;
+    injection_blocked: number;
+  };
+  series: { day: string; turns: number; escalation_rate: number; cache_hit_rate: number; scrub_violations: number }[];
+  layers: { layer: string; turns: number; escalation_rate: number; avg_latency_ms: number | null }[];
+  scrub_events: { created_at: string; layer: string; locale: string | null; topic: string | null; conversation_id: string | null }[];
+}
+
 const usd = (v: number | null | undefined) => (v == null ? "—" : `$${Number(v).toFixed(Number(v) < 1 ? 4 : 2)}`);
 
 const pct = (v: number | null | undefined) => (v == null ? "—" : `${Math.round(v * 100)}%`);
@@ -101,15 +123,17 @@ export default function AdminSupportAI() {
   const [data, setData] = useState<Quality | null>(null);
   const [cost, setCost] = useState<Cost | null>(null);
   const [gaps, setGaps] = useState<GapReport | null>(null);
+  const [rel, setRel] = useState<Reliability | null>(null);
   const [loading, setLoading] = useState(true);
   const [indexing, setIndexing] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [quality, costs, gapReport] = await Promise.all([
+    const [quality, costs, gapReport, reliability] = await Promise.all([
       supabase.rpc("admin_support_quality", { _days: days }),
       supabase.rpc("admin_support_ai_cost", { _days: days }),
       supabase.rpc("admin_support_gap_report", { _days: days }),
+      supabase.rpc("admin_support_reliability", { p_days: days }),
     ]);
     if (quality.error) toast.error(quality.error.message);
     else setData(quality.data as unknown as Quality);
@@ -117,6 +141,8 @@ export default function AdminSupportAI() {
     else setCost(costs.data as unknown as Cost);
     if (gapReport.error) console.warn("[admin] gap report unavailable:", gapReport.error.message);
     else setGaps(gapReport.data as unknown as GapReport);
+    if (reliability.error) console.warn("[admin] reliability unavailable:", reliability.error.message);
+    else setRel(reliability.data as unknown as Reliability);
     setLoading(false);
   }, [days]);
 
@@ -233,6 +259,105 @@ export default function AdminSupportAI() {
               </p>
             )}
           </section>
+
+          {rel && (
+            <section className="mt-6 rounded-card border border-border bg-card p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
+                  <ShieldAlert aria-hidden className="h-4 w-4 text-primary" /> Reliability &amp; safety
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => downloadJson(rel, "support-reliability.json")}
+                  className="min-h-11 rounded-card border border-border px-3 text-sm hover:bg-muted"
+                >
+                  Export JSON
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <Stat label="Turns" value={String(rel.totals.turns)} />
+                <Stat
+                  label="Escalation rate"
+                  value={rel.totals.escalation_rate == null ? "—" : `${rel.totals.escalation_rate}%`}
+                  warn={(rel.totals.escalation_rate ?? 0) > 25}
+                />
+                <Stat
+                  label="Cache hit rate"
+                  value={rel.totals.cache_hit_rate == null ? "—" : `${rel.totals.cache_hit_rate}%`}
+                  warn={(rel.totals.cache_hit_rate ?? 100) < 20}
+                />
+                <Stat
+                  label="Scrub violations"
+                  value={String(rel.totals.scrub_violations)}
+                  warn={rel.totals.scrub_violations > 0}
+                />
+                <Stat
+                  label="Zero-inference"
+                  value={rel.totals.zero_cost_rate == null ? "—" : `${rel.totals.zero_cost_rate}%`}
+                  warn={(rel.totals.zero_cost_rate ?? 100) < 50}
+                />
+                <Stat label="Degraded turns" value={String(rel.totals.degraded)} warn={rel.totals.degraded > 0} />
+                <Stat label="Validator blocks" value={String(rel.totals.validation_failures)} />
+                <Stat label="Injection blocked" value={String(rel.totals.injection_blocked)} />
+              </div>
+
+              {rel.totals.scrub_violations > 0 && (
+                <p className="mt-3 flex items-start gap-2 rounded-card border border-destructive/40 bg-destructive/5 px-3 py-2 text-micro text-foreground">
+                  <AlertTriangle aria-hidden className="mt-0.5 h-3.5 w-3.5 shrink-0 text-destructive" />
+                  An answer had to be stripped of internal detail before sending. Treat each event as an incident and
+                  review the originating layer below — alerts also fire automatically.
+                </p>
+              )}
+
+              {!!rel.series.length && (
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-[520px] text-sm">
+                    <caption className="sr-only">Daily escalation, cache hit and scrub trend</caption>
+                    <thead className="text-micro uppercase tracking-wide text-muted-foreground">
+                      <tr>
+                        <th scope="col" className="py-1 text-start">Day</th>
+                        <th scope="col" className="py-1 text-end">Turns</th>
+                        <th scope="col" className="py-1 text-end">Escalation</th>
+                        <th scope="col" className="py-1 text-end">Cache hits</th>
+                        <th scope="col" className="py-1 text-end">Scrubs</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rel.series.map((d) => (
+                        <tr key={d.day} className="border-t border-border">
+                          <td className="py-1.5">{d.day}</td>
+                          <td className="py-1.5 text-end">{d.turns}</td>
+                          <td className={`py-1.5 text-end ${d.escalation_rate > 25 ? "text-destructive" : ""}`}>
+                            {d.escalation_rate}%
+                          </td>
+                          <td className={`py-1.5 text-end ${d.cache_hit_rate < 20 ? "text-destructive" : ""}`}>
+                            {d.cache_hit_rate}%
+                          </td>
+                          <td className={`py-1.5 text-end ${d.scrub_violations > 0 ? "text-destructive" : ""}`}>
+                            {d.scrub_violations}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {!!rel.layers.length && (
+                <div className="mt-4 grid gap-1.5 sm:grid-cols-2">
+                  {rel.layers.map((l) => (
+                    <div key={l.layer} className="flex items-center justify-between rounded-card border border-border px-3 py-2 text-sm">
+                      <span className="font-medium text-foreground">{l.layer}</span>
+                      <span className="text-micro text-muted-foreground">
+                        {l.turns} turns · {l.escalation_rate}% escalated · {l.avg_latency_ms ?? "—"} ms
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
 
           {cost && (
             <>

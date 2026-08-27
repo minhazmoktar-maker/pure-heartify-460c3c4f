@@ -40,20 +40,63 @@ function Avatar({ role }: { role: SupportMessage["role"] }) {
   );
 }
 
+/** Why an answer was wrong — kept short so it maps cleanly onto FAQ drafts. */
+const WRONG_REASONS: { id: string; label: string }[] = [
+  { id: "wrong_answer", label: "Answered the wrong thing" },
+  { id: "incomplete", label: "Incomplete" },
+  { id: "outdated", label: "Out of date" },
+  { id: "not_my_language", label: "Wrong language" },
+  { id: "needs_human", label: "I need a person" },
+];
+
 function FeedbackRow({
   messageId,
   onRate,
-  signedIn,
 }: {
   messageId: string;
-  onRate: (id: string, helpful: boolean) => Promise<boolean>;
-  signedIn: boolean;
+  onRate: (id: string, helpful: boolean, reason?: string) => Promise<boolean>;
 }) {
   const [given, setGiven] = useState<null | boolean>(null);
-  if (!signedIn || messageId.startsWith("local-")) return null;
+  const [asking, setAsking] = useState(false);
+  if (messageId.startsWith("local-")) return null;
+
   if (given !== null) {
-    return <p className="mt-2 text-micro text-muted-foreground">Thank you — this helps us improve the answers.</p>;
+    return (
+      <p className="mt-2 text-micro text-muted-foreground" role="status">
+        {given
+          ? "Thank you — this helps us improve the answers."
+          : "Thanks — we've logged this so a better answer gets written."}
+      </p>
+    );
   }
+
+  if (asking) {
+    return (
+      <div className="mt-2 space-y-1.5">
+        <p className="text-micro text-muted-foreground">What went wrong?</p>
+        <div className="flex flex-wrap gap-1.5">
+          {WRONG_REASONS.map((r) => (
+            <button
+              key={r.id}
+              type="button"
+              onClick={async () => { if (await onRate(messageId, false, r.id)) setGiven(false); }}
+              className="min-h-11 rounded-full border border-border bg-background px-3 text-micro text-foreground transition-colors hover:bg-muted"
+            >
+              {r.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={async () => { if (await onRate(messageId, false)) setGiven(false); }}
+            className="min-h-11 rounded-full px-3 text-micro text-muted-foreground underline transition-colors hover:text-foreground"
+          >
+            Skip
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-2 flex items-center gap-1">
       <span className="text-micro text-muted-foreground">Was this helpful?</span>
@@ -68,7 +111,7 @@ function FeedbackRow({
       <button
         type="button"
         aria-label="This answer was not helpful"
-        onClick={async () => { if (await onRate(messageId, false)) setGiven(false); }}
+        onClick={() => setAsking(true)}
         className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
       >
         <ThumbsDown aria-hidden className="h-4 w-4" />
@@ -77,14 +120,13 @@ function FeedbackRow({
   );
 }
 
+
 function Bubble({
   message,
   onRate,
-  signedIn,
 }: {
   message: SupportMessage;
-  onRate: (id: string, helpful: boolean) => Promise<boolean>;
-  signedIn: boolean;
+  onRate: (id: string, helpful: boolean, reason?: string) => Promise<boolean>;
 }) {
   const isUser = message.role === "user";
   return (
@@ -153,7 +195,7 @@ function Bubble({
         )}
 
         {!isUser && !message.pending && !message.failed && (
-          <FeedbackRow messageId={message.id} onRate={onRate} signedIn={signedIn} />
+          <FeedbackRow messageId={message.id} onRate={onRate} />
         )}
       </div>
     </div>
@@ -167,7 +209,7 @@ function Bubble({
  */
 export default function SupportChat() {
   const { locale } = useLocale();
-  const { messages, sending, error, send, rate, reset, signedIn } = useSupportAgent(locale);
+  const { messages, sending, error, send, rate, reset } = useSupportAgent(locale);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -222,7 +264,7 @@ export default function SupportChat() {
         ) : (
           <>
             {messages.map((m) => (
-              <Bubble key={m.id} message={m} onRate={rate} signedIn={signedIn} />
+              <Bubble key={m.id} message={m} onRate={rate} />
             ))}
             <div ref={endRef} />
           </>
