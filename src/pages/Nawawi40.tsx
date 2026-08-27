@@ -101,7 +101,7 @@ const Nawawi40 = () => {
           name="description"
           content="Read and track the classical 40 Hadith of Imam an-Nawawi with themes, narrators, and personal progress."
         />
-        <link rel="canonical" href="https://pure-heartify.lovable.app/nawawi-40" />
+        <link rel="canonical" href="https://heartifyapp.com/nawawi-40" />
       </Helmet>
 
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">

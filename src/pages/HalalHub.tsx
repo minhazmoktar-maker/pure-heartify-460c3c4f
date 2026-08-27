@@ -10,7 +10,7 @@ import { HALAL_TOPICS, halalTopicList } from "@/data/halalTopics";
 export default function HalalHub() {
   const topics = halalTopicList();
   const path = "/halal";
-  const url = `https://pure-heartify.lovable.app${path}`;
+  const url = `https://heartifyapp.com${path}`;
 
   return (
     <div className="min-h-dvh bg-background">
@@ -29,7 +29,7 @@ export default function HalalHub() {
             itemListElement: topics.map((t, i) => ({
               "@type": "ListItem",
               position: i + 1,
-              url: `https://pure-heartify.lovable.app/halal/${t.slug}`,
+              url: `https://heartifyapp.com/halal/${t.slug}`,
               name: t.title,
             })),
           },

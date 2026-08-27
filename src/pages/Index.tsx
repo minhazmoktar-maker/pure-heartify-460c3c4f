@@ -126,13 +126,13 @@ const Index = () => {
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "Heartify",
-            url: "https://pure-heartify.lovable.app/",
+            url: "https://heartifyapp.com/",
             description:
               "Curated halal video and audio app with trusted creators and moderated content.",
             potentialAction: {
               "@type": "SearchAction",
               target:
-                "https://pure-heartify.lovable.app/search?q={search_term_string}",
+                "https://heartifyapp.com/search?q={search_term_string}",
               "query-input": "required name=search_term_string",
             },
           }}

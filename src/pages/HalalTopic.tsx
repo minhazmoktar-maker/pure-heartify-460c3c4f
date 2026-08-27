@@ -26,7 +26,7 @@ export default function HalalTopic() {
   if (!topic) return <Navigate to="/explore" replace />;
 
   const path = `/halal/${key}`;
-  const url = `https://pure-heartify.lovable.app${path}`;
+  const url = `https://heartifyapp.com${path}`;
 
   return (
     <div className="min-h-dvh bg-background">
@@ -44,7 +44,7 @@ export default function HalalTopic() {
           isPartOf: {
             "@type": "WebSite",
             name: "Heartify",
-            url: "https://pure-heartify.lovable.app/",
+            url: "https://heartifyapp.com/",
           },
           mainEntity: {
             "@type": "ItemList",
@@ -52,7 +52,7 @@ export default function HalalTopic() {
             itemListElement: items.slice(0, 20).map((v, i) => ({
               "@type": "ListItem",
               position: i + 1,
-              url: `https://pure-heartify.lovable.app/watch/${v.id}`,
+              url: `https://heartifyapp.com/watch/${v.id}`,
               name: v.title,
             })),
           },

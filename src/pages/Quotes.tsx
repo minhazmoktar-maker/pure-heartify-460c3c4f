@@ -32,7 +32,7 @@ export default function Quotes() {
       : QUOTE_THEMES.filter((t) => t.slug === activeTheme);
 
   const copyQuote = async (text: string, source: string, id: string) => {
-    const payload = `"${text}"\n— ${source}\n\nvia Heartify · https://pure-heartify.lovable.app/quotes`;
+    const payload = `"${text}"\n— ${source}\n\nvia Heartify · https://heartifyapp.com/quotes`;
     try {
       if (navigator.share) {
         await navigator.share({ text: payload });
@@ -53,12 +53,12 @@ export default function Quotes() {
     name: "Islamic Inspirational Quotes",
     description:
       "A curated library of Islamic inspirational quotes from the Qur'an, hadith, and pious predecessors — organized by theme for daily reflection.",
-    url: "https://pure-heartify.lovable.app/quotes",
+    url: "https://heartifyapp.com/quotes",
     hasPart: QUOTE_THEMES.map((t) => ({
       "@type": "CreativeWork",
       name: t.title,
       description: t.intro,
-      url: `https://pure-heartify.lovable.app/quotes#${t.slug}`,
+      url: `https://heartifyapp.com/quotes#${t.slug}`,
     })),
   };
 

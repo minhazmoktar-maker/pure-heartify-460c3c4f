@@ -36,7 +36,7 @@ const Channels = () => {
           "@type": "CollectionPage",
           name: "Trusted Halal Channels",
           description: `Curated list of ${TOTAL_CHANNELS}+ vetted halal YouTube channels across ${CHANNEL_CATEGORIES.length} categories.`,
-          url: "https://pure-heartify.lovable.app/channels",
+          url: "https://heartifyapp.com/channels",
         }}
       />
       <Navbar />
