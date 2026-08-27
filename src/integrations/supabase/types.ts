@@ -8437,6 +8437,10 @@ export type Database = {
         Args: { p_appeal_id: string; p_decision: string; p_notes?: string }
         Returns: Json
       }
+      resolve_music_category_unchecked: {
+        Args: { p_limit?: number }
+        Returns: Json
+      }
       respond_challenge_invite: {
         Args: { _accept: boolean; _challenge_id: string }
         Returns: Json
