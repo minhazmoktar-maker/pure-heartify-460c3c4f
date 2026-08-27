@@ -1,11 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle2, XCircle, RefreshCw, Download, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  RefreshCw,
+  Download,
+  ShieldCheck,
+  PlayCircle,
+  Gauge,
+  TrendingUp,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
@@ -53,6 +65,52 @@ type Breakdown = {
   matrix: MatrixRow[];
 };
 
+type Forecast = {
+  generated_at: string;
+  target_servable: number;
+  servable_halal: number;
+  awaiting_check: number;
+  cleared_last_hour: number;
+  cleared_last_24h: number;
+  cleared_last_7d: number;
+  rate_per_hour: number;
+  rate_per_day: number;
+  remaining_to_target: number;
+  eta_hours: number | null;
+  eta_days: number | null;
+  eta_at: string | null;
+  queue_drain_hours: number | null;
+  stalled: boolean;
+};
+
+type WorkerConfig = {
+  enabled: boolean;
+  batch_size: number;
+  concurrency: number;
+  max_retries: number;
+  backoff_ms: number;
+  call_timeout_ms: number;
+  budget_ms: number;
+};
+
+type SweepResult = {
+  newly_marked: number;
+  eligible_unchecked: number;
+  checked_last_hour: number;
+  alerted: boolean;
+  ran_at: string;
+  duration_ms: number;
+};
+
+const WORKER_FIELDS: Array<{ key: keyof Omit<WorkerConfig, "enabled">; label: string; min: number; max: number; hint: string }> = [
+  { key: "concurrency", label: "Worker concurrency", min: 1, max: 64, hint: "Thumbnails classified in parallel per wave." },
+  { key: "batch_size", label: "Batch size", min: 1, max: 300, hint: "Videos claimed per worker tick." },
+  { key: "max_retries", label: "Max retries", min: 0, max: 5, hint: "Retries for timeouts / transient gateway errors." },
+  { key: "backoff_ms", label: "Backoff (ms)", min: 100, max: 10000, hint: "Base delay, doubled with jitter per retry." },
+  { key: "call_timeout_ms", label: "Call timeout (ms)", min: 2000, max: 60000, hint: "Hard limit per classification call." },
+  { key: "budget_ms", label: "Tick budget (ms)", min: 10000, max: 240000, hint: "Wall-clock budget before partial results are saved." },
+];
+
 type SweepRun = {
   id: string;
   ran_at: string;
@@ -76,11 +134,16 @@ export default function AdminLaunchGate() {
   const [gate, setGate] = useState<Gate | null>(null);
   const [breakdown, setBreakdown] = useState<Breakdown | null>(null);
   const [runs, setRuns] = useState<SweepRun[]>([]);
+  const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [worker, setWorker] = useState<WorkerConfig | null>(null);
+  const [savingWorker, setSavingWorker] = useState(false);
+  const [sweeping, setSweeping] = useState(false);
+  const [sweepResult, setSweepResult] = useState<SweepResult | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [g, b, r] = await Promise.all([
+    const [g, b, r, f, w] = await Promise.all([
       supabase.rpc("admin_launch_gate", { p_target: 1000000 }),
       supabase.rpc("admin_video_status_breakdown"),
       supabase
@@ -88,14 +151,56 @@ export default function AdminLaunchGate() {
         .select("id, ran_at, newly_marked, eligible_unchecked, checked_last_hour, alerted")
         .order("ran_at", { ascending: false })
         .limit(12),
+      supabase.rpc("admin_launch_forecast", { p_target: 1000000 }),
+      supabase
+        .from("visual_scan_worker_config")
+        .select("enabled, batch_size, concurrency, max_retries, backoff_ms, call_timeout_ms, budget_ms")
+        .eq("id", "default")
+        .maybeSingle(),
     ]);
-    const err = g.error || b.error || r.error;
+    const err = g.error || b.error || r.error || f.error || w.error;
     if (err) toast({ title: err.message, variant: "destructive" });
     setGate((g.data as unknown as Gate) ?? null);
     setBreakdown((b.data as unknown as Breakdown) ?? null);
     setRuns((r.data as SweepRun[]) ?? []);
+    setForecast((f.data as unknown as Forecast) ?? null);
+    setWorker((w.data as WorkerConfig | null) ?? null);
     setLoading(false);
   }, []);
+
+  /** Runs the queue sweep immediately instead of waiting for the 15-minute cron. */
+  async function runSweepNow() {
+    setSweeping(true);
+    setSweepResult(null);
+    const { data, error } = await supabase.rpc("admin_run_unchecked_sweep", { p_max: 20000 });
+    setSweeping(false);
+    if (error) {
+      toast({ title: "Sweep failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    const result = data as unknown as SweepResult;
+    setSweepResult(result);
+    toast({
+      title: "Sweep complete",
+      description: `Queued ${nf.format(result.newly_marked)}, ${nf.format(result.eligible_unchecked)} awaiting check.`,
+    });
+    void load();
+  }
+
+  async function saveWorker() {
+    if (!worker) return;
+    setSavingWorker(true);
+    const { error } = await supabase
+      .from("visual_scan_worker_config")
+      .update(worker)
+      .eq("id", "default");
+    setSavingWorker(false);
+    if (error) {
+      toast({ title: "Could not save worker settings", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Worker settings saved", description: "Applied on the next scan tick." });
+  }
 
   useEffect(() => {
     void load();
@@ -146,6 +251,15 @@ export default function AdminLaunchGate() {
         icon={ShieldCheck}
         actions={
           <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="h-9"
+              disabled={sweeping}
+              onClick={() => void runSweepNow()}
+            >
+              <PlayCircle className={`mr-1.5 h-4 w-4 ${sweeping ? "animate-pulse" : ""}`} />
+              {sweeping ? "Sweeping…" : "Run sweep"}
+            </Button>
             <Button size="sm" variant="outline" className="h-9" onClick={() => void load()}>
               <RefreshCw className="mr-1.5 h-4 w-4" /> Refresh
             </Button>
