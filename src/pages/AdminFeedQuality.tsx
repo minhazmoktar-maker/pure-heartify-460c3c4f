@@ -47,6 +47,17 @@ type Alert = {
   created_at: string;
 };
 
+type Coverage = {
+  total: number;
+  approved: number;
+  rejected: number;
+  moderation_pending: number;
+  visual_unchecked_approved: number;
+  dedup_pending_approved: number;
+  servable: number;
+  checked_pct: number;
+};
+
 const RANGES = [7, 14, 30] as const;
 
 /**
@@ -59,20 +70,29 @@ export default function AdminFeedQuality() {
   const [points, setPoints] = useState<Point[]>([]);
   const [health, setHealth] = useState<DedupHealth | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [coverage, setCoverage] = useState<Coverage | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function load(range = days) {
     setLoading(true);
-    const [ts, hp, al] = await Promise.all([
+    const [ts, hp, al, cv] = await Promise.all([
       supabase.rpc("admin_feed_quality_timeseries", { p_days: range }),
       supabase.rpc("admin_dedup_backfill_health"),
       supabase
         .from("production_alerts")
         .select("id,kind,severity,message,created_at")
-        .in("kind", ["dedup_backfill_stalled", "dedup_backfill_lag", "dedup_canonical_lag"])
+        .in("kind", [
+          "dedup_backfill_stalled",
+          "dedup_backfill_lag",
+          "dedup_canonical_lag",
+          "feed_novelty_dip",
+          "feed_coverage_dip",
+          "feed_diversity_dip",
+        ])
         .is("resolved_at", null)
         .order("created_at", { ascending: false })
         .limit(20),
+      supabase.rpc("admin_serving_coverage"),
     ]);
     if (ts.error) toast({ title: ts.error.message, variant: "destructive" });
     if (hp.error) toast({ title: hp.error.message, variant: "destructive" });
@@ -88,6 +108,7 @@ export default function AdminFeedQuality() {
     );
     setHealth((hp.data ?? null) as unknown as DedupHealth | null);
     setAlerts((al.data ?? []) as unknown as Alert[]);
+    setCoverage((cv.data ?? null) as unknown as Coverage | null);
     setLoading(false);
   }
 
@@ -125,7 +146,7 @@ export default function AdminFeedQuality() {
 
       {alerts.length > 0 && (
         <Card className="p-4 space-y-2 border-destructive/40">
-          <h2 className="text-sm font-semibold">Open dedup alerts</h2>
+          <h2 className="text-sm font-semibold">Open feed quality alerts</h2>
           {alerts.map((a) => (
             <div key={a.id} className="flex items-start gap-2 text-sm">
               <Badge variant={a.severity === "critical" ? "destructive" : "secondary"}>
@@ -148,6 +169,44 @@ export default function AdminFeedQuality() {
         <Stat label="Item coverage" value={pct(latest?.item_coverage_pct, 3)} />
         <Stat label="Sessions (latest day)" value={latest ? String(latest.sessions) : "—"} />
       </div>
+
+      <Card className="p-4 space-y-3">
+        <div>
+          <h2 className="text-sm font-semibold">Corpus check coverage</h2>
+          <p className="text-xs text-muted-foreground">
+            Every video must pass moderation and the visual safety check before it can
+            be served. Anything left in the backlog is never shown to users.
+          </p>
+        </div>
+        {!coverage ? (
+          <Empty />
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <Stat label="Library" value={coverage.total.toLocaleString()} />
+              <Stat label="Checked" value={`${Number(coverage.checked_pct).toFixed(2)}%`} />
+              <Stat label="Servable" value={coverage.servable.toLocaleString()} />
+              <Stat
+                label="Awaiting visual check"
+                value={coverage.visual_unchecked_approved.toLocaleString()}
+              />
+              <Stat
+                label="Awaiting dedup group"
+                value={coverage.dedup_pending_approved.toLocaleString()}
+              />
+              <Stat label="Moderation pending" value={coverage.moderation_pending.toLocaleString()} />
+              <Stat label="Approved" value={coverage.approved.toLocaleString()} />
+              <Stat label="Rejected / blocked" value={coverage.rejected.toLocaleString()} />
+            </div>
+            <div className="h-2 overflow-hidden rounded-pill bg-muted" aria-hidden>
+              <div
+                className="h-full bg-primary"
+                style={{ width: `${Math.min(100, Number(coverage.checked_pct))}%` }}
+              />
+            </div>
+          </>
+        )}
+      </Card>
 
       <Card className="p-4">
         <h2 className="mb-3 text-sm font-semibold">Novelty & duplicate-group avoidance (%)</h2>
