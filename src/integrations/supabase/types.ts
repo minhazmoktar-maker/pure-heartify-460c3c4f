@@ -7033,6 +7033,19 @@ export type Database = {
         Returns: boolean
       }
       admin_content_freshness: { Args: never; Returns: Json }
+      admin_dedup_backfill_health: { Args: never; Returns: Json }
+      admin_feed_quality_timeseries: {
+        Args: { p_days?: number }
+        Returns: {
+          day: string
+          dup_group_avoidance_pct: number
+          exposures: number
+          item_coverage_pct: number
+          novelty_pct: number
+          sessions: number
+          unique_videos: number
+        }[]
+      }
       admin_feed_traces: {
         Args: {
           _hours?: number
@@ -7257,6 +7270,10 @@ export type Database = {
           exists_in: string
           youtube_channel_id: string
         }[]
+      }
+      check_dedup_backfill_lag: {
+        Args: { p_canonical_max_pending?: number; p_min_per_hour?: number }
+        Returns: Json
       }
       check_ops_alerts: { Args: never; Returns: undefined }
       check_pipeline_watchdog: { Args: never; Returns: Json }
