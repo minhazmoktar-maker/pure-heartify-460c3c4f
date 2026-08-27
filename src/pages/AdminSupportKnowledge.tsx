@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { BookOpen, Loader2, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
 import SEO from "@/components/SEO";
+import SupportFaqDrafts from "@/components/admin/SupportFaqDrafts";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
