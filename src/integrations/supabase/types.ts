@@ -7107,6 +7107,7 @@ export type Database = {
           d7: number
         }[]
       }
+      admin_serving_coverage: { Args: never; Returns: Json }
       admin_set_institution_status: {
         Args: { _slug: string; _status: string }
         Returns: undefined
@@ -7273,6 +7274,15 @@ export type Database = {
       }
       check_dedup_backfill_lag: {
         Args: { p_canonical_max_pending?: number; p_min_per_hour?: number }
+        Returns: Json
+      }
+      check_feed_quality_alerts: {
+        Args: {
+          p_min_channel_diversity?: number
+          p_min_coverage?: number
+          p_min_novelty?: number
+          p_min_sessions?: number
+        }
         Returns: Json
       }
       check_ops_alerts: { Args: never; Returns: undefined }
@@ -8345,6 +8355,7 @@ export type Database = {
           video_id: string
         }[]
       }
+      seed_cold_start_profile: { Args: { _user_id: string }; Returns: Json }
       seed_default_notification_prefs: {
         Args: { _user_id: string }
         Returns: undefined
