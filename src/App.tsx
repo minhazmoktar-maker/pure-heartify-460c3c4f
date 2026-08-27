@@ -541,6 +541,8 @@ const App = () => (
                 <Route path="/admin/feed-quality" element={<AdminRoute><AdminFeedQuality /></AdminRoute>} />
                 <Route path="/admin/feed-traces" element={<AdminRoute><AdminFeedTraces /></AdminRoute>} />
                 <Route path="/admin/unchecked-videos" element={<AdminRoute><AdminUncheckedVideos /></AdminRoute>} />
+                <Route path="/admin/unserved-videos" element={<AdminRoute><AdminUnservedVideos /></AdminRoute>} />
+
                 <Route path="/admin/reliability" element={<AdminRoute><AdminReliability /></AdminRoute>} />
                 <Route path="/admin/corpus-progress" element={<AdminRoute><AdminCorpusProgress /></AdminRoute>} />
                 <Route path="/admin/creator-review" element={<AdminRoute><AdminCreatorReview /></AdminRoute>} />
