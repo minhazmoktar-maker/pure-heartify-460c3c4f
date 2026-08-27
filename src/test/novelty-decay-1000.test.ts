@@ -58,10 +58,13 @@ describe("novelty decay — 1000 sessions x 10 refreshes", () => {
 });
 
 describe("novelty decay — ranking knobs actually move the needle", () => {
-  const smallCorpus = buildDedupCorpus(40, 20);
+  // Deliberately tiny catalog (8 channels x 8 videos): the knobs only become
+  // observable once the pool is small enough to exhaust, which is exactly the
+  // pressure a niche language lane puts on the pipeline.
+  const smallCorpus = buildDedupCorpus(8, 8);
 
   function run(overrides: Partial<NoveltyKnobs>) {
-    return runNoveltyDecay(120, 8, smallCorpus, { ...DEFAULT_KNOBS, ...overrides });
+    return runNoveltyDecay(60, 8, smallCorpus, { ...DEFAULT_KNOBS, ...overrides });
   }
 
   it("disabling semantic dedup lets duplicate groups repeat", () => {
