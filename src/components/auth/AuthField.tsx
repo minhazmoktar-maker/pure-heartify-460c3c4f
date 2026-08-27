@@ -52,7 +52,7 @@ export const AuthField = React.forwardRef<HTMLInputElement, AuthFieldProps>(
             aria-describedby={cn(error && errId, hint && hintId) || undefined}
             className={cn(
               "field-input w-full",
-              Icon && "pl-10",
+              Icon && "!pl-10",
               passwordToggle && "pr-10",
               invalid && "field-input--invalid",
               className,
