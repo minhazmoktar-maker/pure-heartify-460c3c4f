@@ -108,6 +108,9 @@ const Onboarding = () => {
     }
     await persistProfileBits();
     await supabase.rpc("seed_default_notification_prefs", { _user_id: user.id }).then(() => {}, () => {});
+    // Cold start: seed the taste profile from declared interests so the very
+    // first For You visit is already personalized instead of generic.
+    await supabase.rpc("seed_cold_start_profile", { _user_id: user.id }).then(() => {}, () => {});
     await supabase
       .from("profiles")
       .update({ onboarding_completed_at: new Date().toISOString() })
