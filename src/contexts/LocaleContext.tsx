@@ -113,10 +113,40 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     document.documentElement.dir = isRtl ? "rtl" : "ltr";
   }, [preferences.ui_language, preferences.rtl_override]);
 
+  // Refine the country with the CDN geo signal. The timezone guess in
+  // `defaults()` renders instantly; this corrects it (travellers, unmapped
+  // timezones) and — for anyone who has not hand-picked their languages —
+  // re-derives the content mix so a signed-out visitor in Türkiye, Bangladesh
+  // or Egypt lands on a feed led by their own language before any account
+  // exists. A manual selection is never overwritten.
+  useEffect(() => {
+    let cancelled = false;
+    void resolveCountry().then((country) => {
+      if (cancelled || !country) return;
+      setPreferences((prev) => {
+        if (country === prev.detected_country && country === prev.country_code) return prev;
+        const untouched =
+          prev.country_code === null || prev.country_code === prev.detected_country;
+        return {
+          ...prev,
+          detected_country: country,
+          country_code: untouched ? country : prev.country_code,
+          content_languages: untouched
+            ? defaultContentLanguages(prev.detected_language ?? prev.ui_language, country)
+            : prev.content_languages,
+        };
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Persist locally.
   useEffect(() => {
     saveLocal(preferences);
   }, [preferences]);
+
 
   // Hydrate from Cloud when signed in (Cloud wins over local).
   useEffect(() => {
