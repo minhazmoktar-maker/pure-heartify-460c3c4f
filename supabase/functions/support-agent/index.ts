@@ -645,7 +645,11 @@ Deno.serve(async (req) => {
   // ======================================================================
   // LAYER 2 — deterministic FAQ engine (no model call)
   // ======================================================================
-  if (cacheable && firstTurn) {
+  // Note: unlike the cache layers this does not require `cacheable` — a question
+  // phrased personally ("cancel *my* subscription") still has a generic,
+  // authoritative answer; only writing it to the shared cache is unsafe.
+  if (firstTurn) {
+
     const { data: faq } = await admin.rpc("support_faq_lookup", {
       _query: question,
       _locale: locale.slice(0, 2),
