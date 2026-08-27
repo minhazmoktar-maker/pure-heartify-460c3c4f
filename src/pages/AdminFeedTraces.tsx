@@ -106,6 +106,12 @@ export default function AdminFeedTraces() {
         <Button size="sm" variant="ghost" onClick={() => load()} disabled={loading}>
           {loading ? "Loading…" : "Apply"}
         </Button>
+        <Button size="sm" variant="outline" onClick={exportJson} disabled={rows.length === 0}>
+          Export rationale (JSON)
+        </Button>
+        <Button size="sm" variant="outline" onClick={exportCsv} disabled={rows.length === 0}>
+          Export rationale (CSV)
+        </Button>
       </div>
 
       {rows.length === 0 && !loading && (
