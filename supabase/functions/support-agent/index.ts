@@ -365,8 +365,14 @@ Deno.serve(async (req) => {
     const latencyMs = Date.now() - started;
     const actions = resolveActions(opts.actionIds, { signedIn: !!userId });
     // Final gate: an answer can never carry provider, model or infrastructure
-    // detail, however it was produced.
+    // detail, however it was produced. When the gate has to change the text we
+    // record it as a scrub violation — that is an incident, not a metric.
     const outbound = safeOutboundAnswer(opts.answer);
+    const scrubViolation = outbound.trim() !== (opts.answer ?? "").trim();
+    if (scrubViolation) {
+      console.warn(JSON.stringify({ evt: "support.scrub_violation", layer: opts.layer, conversation: conversationId }));
+    }
+
 
     await admin.from("support_messages").insert({
       conversation_id: conversationId,
