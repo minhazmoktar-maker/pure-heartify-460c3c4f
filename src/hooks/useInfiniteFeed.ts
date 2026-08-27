@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { filterHalal } from "@/lib/halalGuard";
@@ -69,6 +70,7 @@ async function fetchFeedPage(opts: {
   sessionId: string;
   excludeIds: string[];
   strictHalal: boolean;
+  pageIndex: number;
 }): Promise<FeedPage> {
   const { data, error } = await supabase.functions.invoke("feed", {
     body: {
@@ -82,6 +84,9 @@ async function fetchFeedPage(opts: {
       session_id: opts.sessionId,
       exclude_ids: opts.excludeIds,
       strict_halal: opts.strictHalal,
+      // 0-based page position inside the session, so server-side
+      // feed_exposures rows carry the true absolute item position.
+      page_index: opts.pageIndex,
     },
   });
 
@@ -109,6 +114,9 @@ export function useInfiniteFeed({
   const langKey = contentLanguages.join(",");
   const sessionId = getSessionId();
   const strictHalal = preferences.strict_halal !== false;
+  // Monotonic page counter for exposure positions; reset whenever the first
+  // page is (re)fetched.
+  const pageIndexRef = useRef(0);
 
   return useInfiniteQuery<FeedPage>({
     queryKey: ["feed", category, sectionId, search, limit, langKey, sort, sessionId, keySuffix ?? "", strictHalal],
@@ -126,6 +134,9 @@ export function useInfiniteFeed({
         // stays warm; server dedup is a defense-in-depth layer.
         excludeIds: (getExcludeIds?.() ?? []).slice(-1500),
         strictHalal,
+        // Absolute page position in this session's scroll, so server-side
+        // exposure positions are truthful for novelty measurement.
+        pageIndex: pageParam ? pageIndexRef.current++ : (pageIndexRef.current = 1) - 1,
       }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
