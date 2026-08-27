@@ -7941,6 +7941,7 @@ export type Database = {
         Returns: undefined
       }
       admin_support_ai_cost: { Args: { _days?: number }; Returns: Json }
+      admin_support_gap_report: { Args: { _days?: number }; Returns: Json }
       admin_support_overview: { Args: { _days?: number }; Returns: Json }
       admin_support_quality: { Args: { _days?: number }; Returns: Json }
       admin_unchecked_videos: {

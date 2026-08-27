@@ -50,6 +50,33 @@ interface Cost {
   providers: { provider: string; status: string; consecutive_failures: number; last_error: string | null }[];
 }
 
+/** Gap coverage by category from admin_support_gap_report(). */
+interface GapReport {
+  window_days: number;
+  totals: { gaps: number; open: number; resolved: number; resolution_rate: number | null; pending_drafts: number };
+  by_category: {
+    category: string;
+    gaps: number;
+    open: number;
+    resolved: number;
+    dismissed: number;
+    asks: number;
+    resolution_rate: number | null;
+    best_confidence: number | null;
+    locales: string[];
+    top_question: string | null;
+    last_seen_at: string | null;
+  }[];
+  pending_drafts: {
+    id: string;
+    question: string;
+    answer: string;
+    category: string | null;
+    locale: string | null;
+    ask_count: number;
+  }[];
+}
+
 const usd = (v: number | null | undefined) => (v == null ? "—" : `$${Number(v).toFixed(Number(v) < 1 ? 4 : 2)}`);
 
 const pct = (v: number | null | undefined) => (v == null ? "—" : `${Math.round(v * 100)}%`);
@@ -73,19 +100,23 @@ export default function AdminSupportAI() {
   const [days, setDays] = useState(7);
   const [data, setData] = useState<Quality | null>(null);
   const [cost, setCost] = useState<Cost | null>(null);
+  const [gaps, setGaps] = useState<GapReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [indexing, setIndexing] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [quality, costs] = await Promise.all([
+    const [quality, costs, gapReport] = await Promise.all([
       supabase.rpc("admin_support_quality", { _days: days }),
       supabase.rpc("admin_support_ai_cost", { _days: days }),
+      supabase.rpc("admin_support_gap_report", { _days: days }),
     ]);
     if (quality.error) toast.error(quality.error.message);
     else setData(quality.data as unknown as Quality);
     if (costs.error) console.warn("[admin] cost telemetry unavailable:", costs.error.message);
     else setCost(costs.data as unknown as Cost);
+    if (gapReport.error) console.warn("[admin] gap report unavailable:", gapReport.error.message);
+    else setGaps(gapReport.data as unknown as GapReport);
     setLoading(false);
   }, [days]);
 
@@ -338,6 +369,76 @@ export default function AdminSupportAI() {
               ))}
             </div>
           </section>
+
+          {gaps && (
+            <section className="mt-6">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
+                  <BookOpen aria-hidden className="h-4 w-4 text-primary" /> Gap coverage by category
+                </h2>
+                <span className="text-micro text-muted-foreground">
+                  {gaps.totals.open} open · {pct(gaps.totals.resolution_rate)} resolved ·{" "}
+                  {gaps.totals.pending_drafts} draft{gaps.totals.pending_drafts === 1 ? "" : "s"} awaiting approval
+                </span>
+              </div>
+              <p className="mb-2 text-micro text-muted-foreground">
+                Where the assistant runs out of knowledge, grouped by support category. Low resolution rates with high
+                ask counts are the articles worth writing next.
+              </p>
+              <div className="overflow-x-auto rounded-card border border-border">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50 text-micro uppercase tracking-wide text-muted-foreground">
+                    <tr>
+                      <th className="p-2 text-start">Category</th>
+                      <th className="p-2 text-start">Asks</th>
+                      <th className="p-2 text-start">Open</th>
+                      <th className="p-2 text-start">Resolved</th>
+                      <th className="p-2 text-start">Languages</th>
+                      <th className="p-2 text-start">Most asked</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gaps.by_category.length === 0 && (
+                      <tr><td colSpan={6} className="p-3 text-muted-foreground">No gaps in this range.</td></tr>
+                    )}
+                    {gaps.by_category.map((c) => (
+                      <tr key={c.category} className="border-t border-border">
+                        <td className="p-2 text-foreground">{c.category.replace(/_/g, " ")}</td>
+                        <td className="p-2 text-muted-foreground">{c.asks}</td>
+                        <td className={`p-2 ${c.open > 0 ? "text-destructive" : "text-muted-foreground"}`}>{c.open}</td>
+                        <td className="p-2 text-muted-foreground">{c.resolved} ({pct(c.resolution_rate)})</td>
+                        <td className="p-2 text-muted-foreground">{(c.locales ?? []).join(", ") || "—"}</td>
+                        <td className="max-w-[20rem] p-2 text-muted-foreground">{c.top_question ?? "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {gaps.pending_drafts.length > 0 && (
+                <div className="mt-3 rounded-card border border-border bg-card p-4">
+                  <h3 className="mb-1 font-heading text-sm font-semibold text-foreground">
+                    Suggested FAQ answers awaiting approval
+                  </h3>
+                  <p className="mb-3 text-micro text-muted-foreground">
+                    Drafted from repeated unanswered questions. Review and publish them in the{" "}
+                    <Link to="/admin/support-knowledge" className="underline">knowledge editor</Link>.
+                  </p>
+                  <ul className="space-y-2">
+                    {gaps.pending_drafts.slice(0, 8).map((d) => (
+                      <li key={d.id} className="rounded-card border border-border p-3">
+                        <p className="text-sm font-medium text-foreground">{d.question}</p>
+                        <p className="mt-1 line-clamp-2 text-micro text-muted-foreground">{d.answer}</p>
+                        <p className="mt-1 text-micro text-muted-foreground">
+                          {(d.category ?? "unclassified").replace(/_/g, " ")} · {d.locale ?? "en"} · asked {d.ask_count}×
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+          )}
 
           <section className="mt-6">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">

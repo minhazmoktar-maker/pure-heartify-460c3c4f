@@ -14,7 +14,11 @@
 //   });
 //   if (limited) return json({ error: "Rate limit exceeded" }, 429);
 
-import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
+// Structural client type: avoids a runtime-only `npm:` specifier so this module
+// can also be imported by the Vite/Vitest typechecker.
+export interface RateLimitClient {
+  rpc(fn: string, args: Record<string, unknown>): Promise<{ data: unknown; error: { message: string } | null }>;
+}
 
 export interface RateLimitOptions {
   identity: string;
@@ -24,7 +28,7 @@ export interface RateLimitOptions {
 }
 
 export async function enforceRateLimit(
-  admin: SupabaseClient,
+  admin: RateLimitClient,
   opts: RateLimitOptions,
 ): Promise<boolean> {
   try {
@@ -44,7 +48,9 @@ export async function enforceRateLimit(
       console.warn('[rate-limit] fail-open due to error:', error.message);
       return false;
     }
-    const count = typeof data === 'number' ? data : (data?.[0]?.count ?? 0);
+    const count = typeof data === 'number'
+      ? data
+      : ((data as { count?: number }[] | null)?.[0]?.count ?? 0);
     return count > opts.limit;
   } catch (e) {
     console.warn('[rate-limit] fail-open due to exception:', e);

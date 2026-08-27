@@ -5,6 +5,9 @@
  * executed by the edge function (Deno) and by the Vitest suite (Node), so the
  * cache key the server writes is provably the key the tests assert on.
  */
+import { canonicalizeQuestion } from "./multilingual.ts";
+
+
 
 /** Common typos / spelling variants folded before hashing the cache key. */
 const SPELLING: Array<[RegExp, string]> = [
@@ -28,21 +31,33 @@ const STOPWORDS = new Set([
   "assalamualaikum", "can", "could", "would", "you", "your", "me", "my",
   "i", "do", "does", "did", "is", "are", "am", "to", "of", "for", "on",
   "in", "at", "and", "so", "just", "tell", "help",
+  // Grammatical filler left behind after multilingual canonicalisation
+  // (romanised Bengali/Urdu verb endings, Indonesian/Malay/Turkish particles).
+  "korbo", "korte", "kori", "kore", "korchi", "karu", "karun", "karna", "kar",
+  "kya", "hai", "hain", "ho", "hoy", "cara", "bisa", "boleh", "untuk", "yang",
+  "apakah", "nasil", "nas", "mi", "mu", "ki", "ke", "je", "ne", "que", "como",
+  "wie", "ich", "kann", "el", "la", "le", "les", "un", "una", "der", "die",
+  "das", "how",
 ]);
 
 /**
  * Fold a question into a stable cache key: case, whitespace, punctuation,
  * diacritics, spelling variants and filler words are all collapsed, and the
  * remaining tokens are sorted so word order does not fragment the cache.
+ *
+ * Non-English questions are canonicalised into English support vocabulary
+ * first, so "কিভাবে ভিডিও সেভ করবো" and "how do I save a video" share one key.
  */
 export function normalizeQuestion(input: string): string {
-  let s = (input ?? "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+  const { canonical } = canonicalizeQuestion(input ?? "");
+  let s = canonical.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
   s = s.replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
   for (const [re, to] of SPELLING) s = s.replace(re, to);
   const tokens = s.split(" ").filter((t) => t.length > 0 && !STOPWORDS.has(t));
   if (tokens.length === 0) return s.slice(0, 200);
-  return tokens.sort().join(" ").slice(0, 300);
+  return Array.from(new Set(tokens)).sort().join(" ").slice(0, 300);
 }
+
 
 /**
  * Words that make an answer account-specific. A question containing any of
@@ -68,13 +83,20 @@ const PERSONAL_MARKERS = [
 
 /** True when the question is safe to answer from a globally shared cache. */
 export function isCacheable(rawQuestion: string, opts: { signedIn: boolean }): boolean {
-  const q = (rawQuestion ?? "").toLowerCase().replace(/[^\p{L}\p{N}'\s]/gu, " ").replace(/\s+/g, " ").trim();
-  if (q.length < 6) return false;
-  if (PERSONAL_MARKERS.some((m) => q.includes(m))) return false;
+  const raw = (rawQuestion ?? "").toLowerCase();
+  // Judge both the original and the canonicalised English text, so a personal
+  // question typed in Bengali or Urdu is caught by the same markers.
+  const canonical = canonicalizeQuestion(rawQuestion ?? "").canonical.toLowerCase();
+  const clean = (s: string) =>
+    s.replace(/[^\p{L}\p{N}'\s]/gu, " ").replace(/\s+/g, " ").trim();
+  const candidates = [clean(raw), clean(canonical)];
+  if (candidates.every((q) => q.length < 6)) return false;
+  if (candidates.some((q) => PERSONAL_MARKERS.some((m) => q.includes(m)))) return false;
   // Signed-in status alone never blocks caching — only personal phrasing does.
   void opts;
   return true;
 }
+
 
 /** Router tiers, cheapest first. Everything above `llm_cheap` costs nothing. */
 export type ResolutionLayer =
@@ -171,11 +193,57 @@ export function validateAnswer(answer: string, opts: {
 
 /** Heuristic: does this question make a claim about Heartify policy/pricing? */
 export function requiresGrounding(rawQuestion: string): boolean {
-  const q = (rawQuestion ?? "").toLowerCase();
+  const q = `${(rawQuestion ?? "").toLowerCase()} ${canonicalizeQuestion(rawQuestion ?? "").canonical.toLowerCase()}`;
   return ["policy", "rule", "allowed", "halal", "price", "cost", "premium",
     "refund", "terms", "privacy", "data", "ban", "remove", "delete", "copyright"]
     .some((k) => q.includes(k));
 }
+
+/**
+ * Escalation / degradation hardening.
+ *
+ * When the agent cannot answer it must say so in product language only. This
+ * strips provider names, model ids, stack traces, internal identifiers and
+ * infrastructure vocabulary from anything that could reach a user, so a
+ * failure never becomes an information disclosure.
+ */
+const INTERNAL_PATTERNS: RegExp[] = [
+  /\b(openai|anthropic|gemini|deepseek|groq|mistral|together ?ai|ollama|lovable|supabase|postgres|deno|vercel|cloudflare)\b/gi,
+  /\bgpt-[\w.-]+\b|\bclaude-[\w.-]+\b|\bgemini-[\w.-]+\b|\bllama-?[\w.-]*\b/gi,
+  /\b(edge function|service[_ ]role|anon key|api key|rpc|sql|embedding|vector|prompt tokens?|completion tokens?)\b/gi,
+  /\b(http\s?)?(status\s?)?(4\d{2}|5\d{2})\s?(error|response)\b/gi,
+  /\b[A-Za-z_]+Error\b|\bstack trace\b|\btimeout after \d+ms\b/gi,
+  /\bmodel (call|tier|routing)\b/gi,
+  /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi,
+];
+
+export function containsInternalDetail(text: string): boolean {
+  return INTERNAL_PATTERNS.some((re) => new RegExp(re.source, re.flags).test(text ?? ""));
+}
+
+export function scrubInternal(text: string): string {
+  let out = text ?? "";
+  for (const re of INTERNAL_PATTERNS) {
+    out = out.replace(new RegExp(re.source, re.flags), "our systems");
+  }
+  return out.replace(/(our systems)(\W+our systems)+/gi, "$1").replace(/\s{2,}/g, " ").trim();
+}
+
+/**
+ * The single user-facing message used whenever the agent must degrade or
+ * escalate. Deliberately free of any internal cause.
+ */
+export const ESCALATION_MESSAGE =
+  "I couldn't confirm that from Heartify's Help centre, so I'd rather not guess. " +
+  "Here are the closest Help articles, and our team can pick this up from the Contact page.";
+
+/** Guard applied to every outgoing answer: scrub, then verify it is clean. */
+export function safeOutboundAnswer(candidate: string, fallback = ESCALATION_MESSAGE): string {
+  const scrubbed = scrubInternal(candidate ?? "");
+  if (!scrubbed || containsInternalDetail(scrubbed)) return fallback;
+  return scrubbed;
+}
+
 
 /** Prompt-injection screen applied to the raw user turn before anything else. */
 const INJECTION_PATTERNS = [
@@ -186,10 +254,14 @@ const INJECTION_PATTERNS = [
   /developer mode|jailbreak|DAN mode/i,
   /(show|dump|list) (the )?(database|env|environment|secrets?|api keys?)/i,
   /another user'?s? (account|data|email|profile)/i,
+  // Word order varies once a question is canonicalised from another language,
+  // so match the object itself — no support question needs these terms.
+  /\b(system|initial|hidden) (prompt|instructions)\b/i,
 ];
 
 export function detectInjection(rawQuestion: string): string | null {
-  const q = rawQuestion ?? "";
+  const q = `${rawQuestion ?? ""}\n${canonicalizeQuestion(rawQuestion ?? "").canonical}`;
+
   for (const re of INJECTION_PATTERNS) {
     if (re.test(q)) return re.source.slice(0, 60);
   }

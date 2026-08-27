@@ -27,7 +27,21 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3.23.8";
-import { enforceRateLimit } from "../_shared/rateLimit.ts";
+import {
+  ABUSE_MESSAGE,
+  clientIp,
+  detectAbuse,
+  enforceSupportLimits,
+} from "../_shared/support/limits.ts";
+import { canonicalizeQuestion, faqLocaleFor } from "../_shared/support/multilingual.ts";
+import {
+  detectAccountIntent,
+  loadLoginFacts,
+  loadSubscriptionFacts,
+  loginAnswer,
+  signedOutAccountAnswer,
+  subscriptionAnswer,
+} from "../_shared/support/account.ts";
 import { actionCatalogue, resolveActions } from "../_shared/support/routes.ts";
 import {
   buildAccountBlock,
@@ -54,7 +68,9 @@ import {
   normalizeQuestion,
   requiresGrounding,
   routeQuestion,
+  safeOutboundAnswer,
   validateAnswer,
+  ESCALATION_MESSAGE,
   type ResolutionLayer,
 } from "../_shared/support/normalize.ts";
 import {
@@ -81,9 +97,9 @@ const SEMANTIC_CACHE_THRESHOLD = 0.93;
 const FAQ_SCORE_THRESHOLD = 0.6;
 
 
-const SAFE_FALLBACK =
-  "I couldn't confidently resolve that from Heartify's available information. " +
-  "You can browse the Help centre for related articles, or contact our team and we'll take a closer look.";
+// A single, product-language escalation message. It never names a provider,
+// model, error code or internal component — degradation is not a disclosure.
+const SAFE_FALLBACK = ESCALATION_MESSAGE;
 
 const BodySchema = z.object({
   message: z.string().min(1).max(2000),
@@ -97,14 +113,6 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
-}
-
-function clientIdentity(req: Request, userId: string | null): string {
-  if (userId) return `u:${userId}`;
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-    ?? req.headers.get("cf-connecting-ip")
-    ?? "unknown";
-  return `ip:${ip}`;
 }
 
 async function loadAccountContext(
@@ -233,25 +241,18 @@ Deno.serve(async (req) => {
   const anonKey = userId ? null : (body.anon_key ?? null);
   if (!userId && !anonKey) return json({ error: "anon_key required for signed-out chat" }, 400);
 
-  // --- rate limit (burst + daily quota) -----------------------------------
-  const identity = clientIdentity(req, userId);
-  const burst = await enforceRateLimit(admin, {
-    identity,
-    action: "support_agent",
-    limit: userId ? 20 : 8,
-    windowSeconds: 60,
-  });
-  if (burst) return json({ error: "You're sending messages a bit fast. Please wait a moment." }, 429);
-  const daily = await enforceRateLimit(admin, {
-    identity,
-    action: "support_agent_daily",
-    limit: userId ? 300 : 40,
-    windowSeconds: 86_400,
-  });
-  if (daily) {
-    return json({
-      error: "You've reached today's support chat limit. The Help centre articles are still available.",
-    }, 429);
+  // --- layered rate limiting: user / anon device / IP ---------------------
+  const ip = clientIp(req);
+  const verdict = await enforceSupportLimits(admin, { userId, anonKey, ip });
+  if (verdict.limited) {
+    return new Response(JSON.stringify({ error: verdict.message, scope: verdict.rule?.scope ?? null }), {
+      status: 429,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+        "Retry-After": String(verdict.retryAfterSeconds),
+      },
+    });
   }
 
   const locale = (body.locale ?? "en").slice(0, 12);
@@ -259,6 +260,11 @@ Deno.serve(async (req) => {
   if (!question) return json({ error: "invalid request" }, 400);
 
   const started = Date.now();
+  // Multilingual front door: every downstream layer (classification, cache key,
+  // FAQ lookup, troubleshooting flows) reasons over the canonical English form,
+  // while the answer is served in the caller's own locale.
+  const { canonical, language, translated } = canonicalizeQuestion(question);
+  const faqLocale = faqLocaleFor(language, locale);
   const questionNorm = normalizeQuestion(question);
   const injection = detectInjection(body.message);
   const cacheable = !injection && isCacheable(question, { signedIn: !!userId });
@@ -302,6 +308,31 @@ Deno.serve(async (req) => {
   // the first question in a conversation.
   const firstTurn = history.length === 0;
 
+  // --- abuse detection ----------------------------------------------------
+  // Rate limits stop volume; this stops patterns. Signals are read per
+  // conversation so a normal user asking many different questions is never hit.
+  const sinceMinute = new Date(Date.now() - 60_000).toISOString();
+  const [{ count: injectionAttempts }, { count: recentTurns }] = await Promise.all([
+    admin.from("support_ai_usage").select("id", { count: "exact", head: true })
+      .eq("conversation_id", conversationId).eq("injection_blocked", true),
+    admin.from("support_ai_usage").select("id", { count: "exact", head: true })
+      .eq("conversation_id", conversationId).gte("created_at", sinceMinute),
+  ]);
+  const repeats = history.filter((h) => h.role === "user" && normalizeQuestion(h.content) === questionNorm).length;
+  const abuse = detectAbuse({
+    repeats,
+    turnsPerMinute: recentTurns ?? 0,
+    injectionAttempts: injectionAttempts ?? 0,
+    distinctAnonKeys: 0,
+  });
+  if (abuse.block) {
+    console.warn(JSON.stringify({ evt: "support.abuse_blocked", reasons: abuse.reasons }));
+    return new Response(JSON.stringify({ error: ABUSE_MESSAGE }), {
+      status: 429,
+      headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "900" },
+    });
+  }
+
   /** Persist both turns + telemetry and return the client payload. */
   async function respond(opts: {
     layer: ResolutionLayer;
@@ -328,6 +359,9 @@ Deno.serve(async (req) => {
 
     const latencyMs = Date.now() - started;
     const actions = resolveActions(opts.actionIds, { signedIn: !!userId });
+    // Final gate: an answer can never carry provider, model or infrastructure
+    // detail, however it was produced.
+    const outbound = safeOutboundAnswer(opts.answer);
 
     await admin.from("support_messages").insert({
       conversation_id: conversationId,
@@ -341,7 +375,7 @@ Deno.serve(async (req) => {
       .insert({
         conversation_id: conversationId,
         role: "assistant",
-        content: opts.answer,
+        content: outbound,
         intent: opts.topic,
         confidence: opts.confidence,
         grounded: opts.grounded,
@@ -403,7 +437,7 @@ Deno.serve(async (req) => {
     return json({
       conversation_id: conversationId,
       message_id: assistantRow?.id ?? null,
-      answer: opts.answer,
+      answer: outbound,
       topic: opts.topic,
       confidence: opts.confidence,
       grounded: opts.grounded,
@@ -460,7 +494,7 @@ Deno.serve(async (req) => {
   }
 
   // Greetings, thanks, "who are you", "what can you do", "get me a human".
-  const canned = staticAnswer(question, { signedIn: !!userId });
+  const canned = staticAnswer(canonical, { signedIn: !!userId });
   if (canned) {
     return await respond({
       layer: "static",
@@ -478,7 +512,7 @@ Deno.serve(async (req) => {
   // Structured content reporting: the assistant collects the video and the
   // reason, then writes a real moderation report — it never claims to have
   // filed one it could not file.
-  const reportIntent = detectReportIntent(question);
+  const reportIntent = detectReportIntent(translated ? canonical : question);
   if (reportIntent) {
     if (reportIntent.missing.length > 0) {
       return await respond({
@@ -555,7 +589,7 @@ Deno.serve(async (req) => {
   // opening turn, so a follow-up ("still broken on iPhone 12") is handled with
   // full thread context rather than re-running the script.
   if (firstTurn) {
-    const flow = matchTroubleshootFlow(question);
+    const flow = matchTroubleshootFlow(canonical);
     if (flow) {
       const rendered = renderTroubleshootFlow(flow, question);
       return await respond({
@@ -576,6 +610,46 @@ Deno.serve(async (req) => {
 
   // ======================================================================
 
+  // ======================================================================
+  // LAYER 0.5 — account-aware deterministic resolution.
+  // Subscription status and sign-in problems are answered from the caller's own
+  // rows: exact, free, and never written to the shared cache.
+  // ======================================================================
+  const accountIntent = detectAccountIntent(canonical);
+  if (accountIntent) {
+    if (!userId) {
+      const prompt = signedOutAccountAnswer(accountIntent);
+      return await respond({
+        layer: "tool",
+        answer: prompt.answer,
+        topic: prompt.topic,
+        confidence: prompt.confidence,
+        grounded: true,
+        sources: [],
+        actionIds: prompt.actionIds,
+        escalate: false,
+        llmCalled: false,
+        flow: `account_${accountIntent}`,
+      });
+    }
+    const resolved = accountIntent === "subscription_status"
+      ? subscriptionAnswer(await loadSubscriptionFacts(admin, userId))
+      : loginAnswer(await loadLoginFacts(admin, userId));
+    return await respond({
+      layer: "tool",
+      answer: resolved.answer,
+      topic: resolved.topic,
+      confidence: resolved.confidence,
+      grounded: true,
+      sources: [],
+      actionIds: resolved.actionIds,
+      escalate: resolved.escalate,
+      llmCalled: false,
+      flow: `account_${accountIntent}`,
+    });
+  }
+
+  // ======================================================================
   // LAYER 0 — exact answer cache (no model call)
   // ======================================================================
   const { data: knowledgeState } = await admin
@@ -611,7 +685,7 @@ Deno.serve(async (req) => {
 
   // Embedding is used for both the semantic cache and KB retrieval.
   const vec = isEmbeddingConfigured() && (cacheable || true)
-    ? await embedSupportText(question)
+    ? await embedSupportText(translated ? `${question}\n${canonical}` : question)
     : null;
 
   // ======================================================================
@@ -650,17 +724,42 @@ Deno.serve(async (req) => {
   // authoritative answer; only writing it to the shared cache is unsafe.
   if (firstTurn) {
 
-    const { data: faq } = await admin.rpc("support_faq_lookup", {
-      _query: question,
-      _locale: locale.slice(0, 2),
-      _limit: 1,
-    });
-    const top = (faq ?? [])[0] as
-      | { slug: string; title: string; category: string; answer: string; source_url: string | null; score: number }
-      | undefined;
+    // Try the caller's language first, then the canonical English question —
+    // a Bengali or Urdu question resolves against the English FAQ set when no
+    // localised article exists yet.
+    const attempts: Array<{ query: string; loc: string }> = [
+      { query: question, loc: faqLocale },
+      ...(faqLocale === "en" ? [] : [{ query: canonical, loc: "en" }]),
+      // Word order after canonicalisation follows the source language, so also
+      // try the order-independent normalised form.
+      ...(translated ? [{ query: questionNorm, loc: "en" }] : []),
+    ];
+    type FaqRow = {
+      slug: string; title: string; category: string; answer: string;
+      source_url: string | null; score: number;
+    };
+    // Keep the strongest match across attempts — a weak hit in the caller's
+    // locale must not shadow a strong English one.
+    let top: FaqRow | undefined;
+    for (const attempt of attempts) {
+      const { data } = await admin.rpc("support_faq_lookup", {
+        _query: attempt.query,
+        _locale: attempt.loc,
+        _limit: 1,
+      });
+      const row = ((data ?? []) as FaqRow[])[0];
+      if (row && (!top || Number(row.score) > Number(top.score))) top = row;
+    }
     // Very short questions carry too little signal for a verbatim deterministic
     // answer, so they need a much stronger match before being served.
-    const tokenCount = questionNorm.split(" ").filter(Boolean).length;
+    // Normalisation strips filler, and translation strips more of it, so judge
+    // "too short to trust" on the richer of the two forms — otherwise a real
+    // Bengali or Urdu question is held to the strict bar an English "premium?"
+    // deserves.
+    const tokenCount = Math.max(
+      questionNorm.split(" ").filter(Boolean).length,
+      question.trim().split(/\s+/).filter(Boolean).length,
+    );
     const required = tokenCount <= 2 ? 0.85 : FAQ_SCORE_THRESHOLD;
     if (top && Number(top.score) >= required && top.answer) {
 
@@ -684,8 +783,8 @@ Deno.serve(async (req) => {
   let chunks: KbChunk[] = [];
   const { data: matches, error: matchErr } = await admin.rpc("match_support_kb", {
     _query_embedding: vec ? toPgVector(vec) : null,
-    _query_text: question,
-    _locale: locale.slice(0, 2),
+    _query_text: translated ? canonical : question,
+    _locale: faqLocale,
     _limit: 8,
   });
   if (matchErr) console.error("[support-agent] retrieval failed", matchErr.message);
@@ -694,15 +793,38 @@ Deno.serve(async (req) => {
       .sort((a, b) => (b.similarity ?? 0) - (a.similarity ?? 0))
       .slice(0, 6);
   }
+  // No localised knowledge yet? Fall back to the English corpus with the
+  // canonical question rather than answering from nothing.
+  if (chunks.length === 0 && faqLocale !== "en") {
+    const { data: enMatches } = await admin.rpc("match_support_kb", {
+      _query_embedding: vec ? toPgVector(vec) : null,
+      _query_text: canonical,
+      _locale: "en",
+      _limit: 8,
+    });
+    chunks = ((enMatches ?? []) as KbChunk[])
+      .sort((a, b) => (b.similarity ?? 0) - (a.similarity ?? 0))
+      .slice(0, 6);
+  }
   const allowedSlugs = new Set(chunks.map((c) => c.slug));
   const account = await loadAccountContext(admin, userId, locale);
+
+  /**
+   * Degradation text: always prefer real Heartify knowledge (KB extract) over a
+   * bare apology, and never mention why the model path was abandoned.
+   */
+  function knowledgeFallback(): string {
+    const extract = chunks[0]?.content?.slice(0, 700);
+    return extract
+      ? `Here's the most relevant information from Heartify's Help centre:\n\n${extract}\n\n` +
+        "If that doesn't answer your question, our team can help from the Contact page."
+      : ESCALATION_MESSAGE;
+  }
 
   // ---- LAYER 6 — degraded mode: no inference provider configured/reachable
   async function degradedResponse() {
     const extract = chunks[0]?.content?.slice(0, 700);
-    const answer = extract
-      ? `Here's the most relevant information from Heartify's Help centre:\n\n${extract}\n\nIf that doesn't answer your question, our team can help from the Contact page.`
-      : SAFE_FALLBACK;
+    const answer = knowledgeFallback();
     return await respond({
       layer: "degraded",
       answer,
@@ -768,11 +890,11 @@ Deno.serve(async (req) => {
   if (!envelope) {
     return await respond({
       layer,
-      answer: SAFE_FALLBACK,
-      topic: null,
-      confidence: 0.2,
+      answer: knowledgeFallback(),
+      topic: chunks[0]?.category ?? null,
+      confidence: 0.25,
       grounded: false,
-      sources: [],
+      sources: chunks[0] ? [{ slug: chunks[0].slug, title: chunks[0].title, url: chunks[0].source_url }] : [],
       actionIds: ["open_help", "open_contact"],
       escalate: true,
       provider: completion.provider,
@@ -795,7 +917,10 @@ Deno.serve(async (req) => {
     requiresGrounding: requiresGrounding(question),
     sourceCount: sourceDocs.length,
   });
-  const safeAnswer = validation.ok ? envelope.answer : SAFE_FALLBACK;
+  // A rejected or low-confidence answer degrades to FAQ/KB knowledge — never to
+  // an explanation of what went wrong internally.
+  const lowConfidence = envelope.confidence < LOW_CONFIDENCE;
+  const safeAnswer = validation.ok && !lowConfidence ? envelope.answer : knowledgeFallback();
   if (!validation.ok) {
     console.warn("[support-agent] answer rejected by validator:", validation.reasons.join(","));
   }
