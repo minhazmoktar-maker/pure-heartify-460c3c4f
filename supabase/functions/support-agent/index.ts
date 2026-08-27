@@ -730,7 +730,9 @@ Deno.serve(async (req) => {
     const attempts: Array<{ query: string; loc: string }> = [
       { query: question, loc: faqLocale },
       ...(faqLocale === "en" ? [] : [{ query: canonical, loc: "en" }]),
-      ...(translated ? [{ query: canonical, loc: faqLocale }] : []),
+      // Word order after canonicalisation follows the source language, so also
+      // try the order-independent normalised form.
+      ...(translated ? [{ query: questionNorm, loc: "en" }] : []),
     ];
     type FaqRow = {
       slug: string; title: string; category: string; answer: string;
