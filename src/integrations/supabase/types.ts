@@ -7560,6 +7560,48 @@ export type Database = {
         }
         Relationships: []
       }
+      visual_scan_worker_config: {
+        Row: {
+          backoff_ms: number
+          batch_size: number
+          budget_ms: number
+          call_timeout_ms: number
+          concurrency: number
+          created_at: string
+          enabled: boolean
+          id: string
+          max_retries: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          backoff_ms?: number
+          batch_size?: number
+          budget_ms?: number
+          call_timeout_ms?: number
+          concurrency?: number
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          max_retries?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          backoff_ms?: number
+          batch_size?: number
+          budget_ms?: number
+          call_timeout_ms?: number
+          concurrency?: number
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          max_retries?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       watch_history: {
         Row: {
           completed: boolean
@@ -7929,6 +7971,7 @@ export type Database = {
           variant: string
         }[]
       }
+      admin_launch_forecast: { Args: { p_target?: number }; Returns: Json }
       admin_launch_gate: { Args: { p_target?: number }; Returns: Json }
       admin_moderation_sla: { Args: never; Returns: Json }
       admin_queue_visual_scan: {
@@ -7981,6 +8024,7 @@ export type Database = {
         Args: { p_serve_window_days?: number }
         Returns: Json
       }
+      admin_run_unchecked_sweep: { Args: { p_max?: number }; Returns: Json }
       admin_serving_coverage: { Args: never; Returns: Json }
       admin_set_institution_status: {
         Args: { _slug: string; _status: string }
