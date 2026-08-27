@@ -83,12 +83,16 @@ export function normalizeSegments(segments: CaptionSegment[]): CaptionSegment[] 
     .sort((a, b) => a.start_ms - b.start_ms);
 }
 
-async function fetchTracks(uploadId: string): Promise<CaptionTrack[]> {
-  const { data, error } = await supabase
+async function fetchTracks(uploadId: string, signal?: AbortSignal): Promise<CaptionTrack[]> {
+  let query = supabase
     .from("creator_upload_captions")
     .select(TRACK_COLUMNS)
     .eq("upload_id", uploadId)
     .order("source", { ascending: true });
+  // Closing a review panel unmounts the query — abort the request rather than
+  // paying for a response nobody will read.
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
   if (error) throw error;
   return ((data ?? []) as unknown as CaptionTrack[]).filter((t) => t.segment_count > 0);
 }
@@ -98,10 +102,10 @@ export function useUploadCaptions(uploadId: string | undefined) {
     queryKey: ["upload-captions", uploadId],
     enabled: Boolean(uploadId),
     staleTime: 5 * 60 * 1000,
-    queryFn: async (): Promise<CaptionTrack[]> => {
+    queryFn: async ({ signal }): Promise<CaptionTrack[]> => {
       const done = startCaptionTimer(uploadId as string, "fetch");
       try {
-        const tracks = await fetchTracks(uploadId as string);
+        const tracks = await fetchTracks(uploadId as string, signal);
         done(tracks.length);
         return tracks;
       } catch (err) {
