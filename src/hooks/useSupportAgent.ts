@@ -189,17 +189,32 @@ export function useSupportAgent(locale = "en") {
     [locale, sending, user],
   );
 
+  /**
+   * Records whether an answer was right. A negative rating is a knowledge
+   * signal: the backend opens a knowledge gap and queues a suggested FAQ draft
+   * for that answer's category. Works for signed-out visitors too, scoped to
+   * the device key that owns the thread.
+   */
   const rate = useCallback(
-    async (messageId: string, helpful: boolean) => {
-      if (!user || messageId.startsWith("local-")) return false;
-      const { error: insertError } = await supabase
-        .from("support_message_feedback")
-        .insert({ message_id: messageId, user_id: user.id, helpful });
-      if (!insertError) void track("support_agent_feedback", { helpful });
-      return !insertError;
+    async (messageId: string, helpful: boolean, reason?: string) => {
+      if (messageId.startsWith("local-")) return false;
+      const { error: rpcError } = await supabase.rpc("support_feedback_submit", {
+        p_message_id: messageId,
+        p_helpful: helpful,
+        p_reason: reason ?? null,
+        p_comment: null,
+        p_anon_key: user ? null : getAnonKey(),
+      });
+      if (rpcError) {
+        console.warn("[support] feedback failed", rpcError.message);
+        return false;
+      }
+      void track("support_agent_feedback", { helpful, reason: reason ?? "none" });
+      return true;
     },
     [user],
   );
+
 
   const reset = useCallback(() => {
     conversationId.current = null;
