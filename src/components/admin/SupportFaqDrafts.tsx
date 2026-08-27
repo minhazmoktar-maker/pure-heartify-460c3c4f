@@ -16,10 +16,10 @@ import { supabase } from "@/integrations/supabase/client";
 interface FaqDraft {
   id: string;
   question: string;
-  normalized_question: string;
+  question_norm: string;
   suggested_answer: string | null;
-  topic: string | null;
-  language: string;
+  category: string;
+  locale: string;
   ask_count: number;
   status: string;
   created_at: string;
@@ -35,7 +35,7 @@ export default function SupportFaqDrafts({ onPublished }: { onPublished?: () => 
     setLoading(true);
     const { data, error } = await supabase
       .from("support_faq_drafts")
-      .select("id, question, normalized_question, suggested_answer, topic, language, ask_count, status, created_at")
+      .select("id, question, question_norm, suggested_answer, category, locale, ask_count, status, created_at")
       .eq("status", "needs_approval")
       .order("ask_count", { ascending: false })
       .limit(50);
@@ -99,8 +99,8 @@ export default function SupportFaqDrafts({ onPublished }: { onPublished?: () => 
               <span className="rounded-full bg-muted px-2 py-0.5 text-micro text-muted-foreground">
                 asked {d.ask_count}×
               </span>
-              {d.topic && (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-micro text-muted-foreground">{d.topic}</span>
+              {d.category && (
+                <span className="rounded-full bg-muted px-2 py-0.5 text-micro text-muted-foreground">{d.category}</span>
               )}
             </div>
             <label className="block">
