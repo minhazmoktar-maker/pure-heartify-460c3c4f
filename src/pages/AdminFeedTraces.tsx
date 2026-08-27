@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
+import { downloadCsv, downloadJson, timestampSlug } from "@/lib/download";
 
 type Trace = {
   id: number;
@@ -71,6 +72,47 @@ export default function AdminFeedTraces() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hours]);
 
+  /** Full pipeline traces, verbatim — for offline debugging and audits. */
+  function exportJson() {
+    downloadJson(
+      { exported_at: new Date().toISOString(), window_hours: hours, traces: rows },
+      `feed-rationale-${timestampSlug()}.json`,
+    );
+  }
+
+  /** One CSV row per selected video, carrying its feed's scores and guarantees. */
+  function exportCsv() {
+    const flat = rows.flatMap((r) =>
+      (r.item_ids ?? [null]).map((videoId, position) => ({
+        trace_id: r.id,
+        created_at: r.created_at,
+        session_id: r.session_id,
+        surface: r.surface,
+        variant: r.variant,
+        cold_start: r.cold_start,
+        cold_start_strategy: r.cold_start_strategy,
+        diversity_level: r.diversity_level,
+        ui_language: r.ui_language,
+        device_class: r.device_class,
+        position,
+        video_id: videoId,
+        item_count: r.item_count,
+        pool_size: r.pool_size,
+        distinct_channels: r.distinct_channels,
+        distinct_categories: r.distinct_categories,
+        distinct_languages: r.distinct_languages,
+        max_per_channel: r.max_per_channel,
+        duplicate_count: r.duplicate_count,
+        self_overlap: r.self_overlap,
+        fresh_share: r.fresh_share,
+        took_ms: r.took_ms,
+        guarantees: r.guarantees,
+        trace: r.trace,
+      })),
+    );
+    downloadCsv(flat, `feed-rationale-${timestampSlug()}.csv`);
+  }
+
   return (
     <div className="mx-auto max-w-5xl p-4 pb-24 space-y-6 md:p-6">
       <SEO
@@ -105,6 +147,12 @@ export default function AdminFeedTraces() {
         />
         <Button size="sm" variant="ghost" onClick={() => load()} disabled={loading}>
           {loading ? "Loading…" : "Apply"}
+        </Button>
+        <Button size="sm" variant="outline" onClick={exportJson} disabled={rows.length === 0}>
+          Export rationale (JSON)
+        </Button>
+        <Button size="sm" variant="outline" onClick={exportCsv} disabled={rows.length === 0}>
+          Export rationale (CSV)
         </Button>
       </div>
 

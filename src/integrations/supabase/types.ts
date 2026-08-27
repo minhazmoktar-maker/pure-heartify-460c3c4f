@@ -7046,6 +7046,15 @@ export type Database = {
           unique_videos: number
         }[]
       }
+      admin_feed_serve_throughput: {
+        Args: { _hours?: number }
+        Returns: {
+          bucket: string
+          exposures: number
+          sessions: number
+          unique_videos: number
+        }[]
+      }
       admin_feed_traces: {
         Args: {
           _hours?: number
@@ -7084,6 +7093,16 @@ export type Database = {
         }[]
       }
       admin_moderation_sla: { Args: never; Returns: Json }
+      admin_queue_visual_scan: {
+        Args: {
+          _channel?: string
+          _dedup_status?: string
+          _max?: number
+          _min_age_hours?: number
+          _video_ids?: string[]
+        }
+        Returns: Json
+      }
       admin_register_institution: {
         Args: {
           _contact_email?: string
@@ -7111,6 +7130,30 @@ export type Database = {
       admin_set_institution_status: {
         Args: { _slug: string; _status: string }
         Returns: undefined
+      }
+      admin_unchecked_videos: {
+        Args: {
+          _channel?: string
+          _dedup_status?: string
+          _limit?: number
+          _min_age_hours?: number
+          _offset?: number
+        }
+        Returns: {
+          age_hours: number
+          channel_id: string
+          channel_title: string
+          duplicate_group_id: string
+          ingested_at: string
+          is_duplicate_canonical: boolean
+          moderation_state: string
+          thumbnail_url: string
+          title: string
+          total_count: number
+          video_id: string
+          visual_checked_at: string
+          visual_state: string
+        }[]
       }
       analytics_active_users: {
         Args: { _from: string; _to: string }
@@ -7287,6 +7330,10 @@ export type Database = {
       }
       check_ops_alerts: { Args: never; Returns: undefined }
       check_pipeline_watchdog: { Args: never; Returns: Json }
+      check_serve_throughput: {
+        Args: { p_drop_ratio?: number; p_min_baseline?: number }
+        Returns: Json
+      }
       claim_juz: { Args: { _group_id: string; _juz: number }; Returns: Json }
       claim_moderation_backlog: {
         Args: { p_limit?: number }
@@ -8240,6 +8287,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      remediate_feed_quality: {
+        Args: { _alert_id: string; _kind: string }
+        Returns: Json
       }
       report_heartify_user: {
         Args: { _description?: string; _handle: string; _reason: string }

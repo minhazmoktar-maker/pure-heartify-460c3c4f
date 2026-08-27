@@ -45,6 +45,22 @@ type Alert = {
   severity: string;
   message: string;
   created_at: string;
+  context: {
+    remediation?: {
+      applied_at?: string;
+      mode?: string;
+      knob_changes?: Array<{ knob: string; from: number; to: number }>;
+      actions?: Array<Record<string, unknown>>;
+      reranking_sweep?: string;
+    };
+  } | null;
+};
+
+type Throughput = {
+  bucket: string;
+  exposures: number;
+  sessions: number;
+  unique_videos: number;
 };
 
 type Coverage = {
@@ -80,7 +96,7 @@ export default function AdminFeedQuality() {
       supabase.rpc("admin_dedup_backfill_health"),
       supabase
         .from("production_alerts")
-        .select("id,kind,severity,message,created_at")
+        .select("id,kind,severity,message,created_at,context")
         .in("kind", [
           "dedup_backfill_stalled",
           "dedup_backfill_lag",
@@ -88,6 +104,8 @@ export default function AdminFeedQuality() {
           "feed_novelty_dip",
           "feed_coverage_dip",
           "feed_diversity_dip",
+          "feed_serve_flatline",
+          "feed_segment_flatline",
         ])
         .is("resolved_at", null)
         .order("created_at", { ascending: false })
@@ -145,23 +163,44 @@ export default function AdminFeedQuality() {
       </div>
 
       {alerts.length > 0 && (
-        <Card className="p-4 space-y-2 border-destructive/40">
+        <Card className="p-4 space-y-3 border-destructive/40">
           <h2 className="text-sm font-semibold">Open feed quality alerts</h2>
-          {alerts.map((a) => (
-            <div key={a.id} className="flex items-start gap-2 text-sm">
-              <Badge variant={a.severity === "critical" ? "destructive" : "secondary"}>
-                {a.severity}
-              </Badge>
-              <div>
-                <p>{a.message}</p>
-                <p className="text-xs text-muted-foreground">
-                  {a.kind} · {new Date(a.created_at).toLocaleString()}
-                </p>
+          {alerts.map((a) => {
+            const rem = a.context?.remediation;
+            return (
+              <div key={a.id} className="flex items-start gap-2 text-sm">
+                <Badge variant={a.severity === "critical" ? "destructive" : "secondary"}>
+                  {a.severity}
+                </Badge>
+                <div className="space-y-1">
+                  <p>{a.message}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {a.kind} · {new Date(a.created_at).toLocaleString()}
+                  </p>
+                  {rem && (
+                    <div className="rounded-lg border bg-muted/40 p-2 text-xs">
+                      <p className="font-medium">
+                        Auto-remediation applied{rem.mode ? ` (${rem.mode})` : ""}
+                      </p>
+                      {(rem.knob_changes ?? []).map((k) => (
+                        <p key={k.knob} className="text-muted-foreground">
+                          {k.knob}: {k.from} → {k.to}
+                        </p>
+                      ))}
+                      {rem.reranking_sweep && (
+                        <p className="text-muted-foreground">
+                          Re-ranking sweep: {rem.reranking_sweep}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </Card>
       )}
+
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Novelty (latest day)" value={pct(latest?.novelty_pct)} />
@@ -265,6 +304,82 @@ export default function AdminFeedQuality() {
           </div>
         )}
       </Card>
+
+      <Card className="p-4">
+        <h2 className="text-sm font-semibold">Serve throughput</h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          A flatline here means the corpus is not reaching users. The watchdog compares
+          impressions against a 7-day baseline and raises a flatline alert automatically.
+        </p>
+        {points.length === 0 ? (
+          <Empty />
+        ) : (
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={points}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                <XAxis dataKey="day" fontSize={11} />
+                <YAxis fontSize={11} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="exposures"
+                  name="Impressions"
+                  stroke="hsl(var(--primary))"
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="unique_videos"
+                  name="Unique videos served"
+                  stroke="hsl(var(--accent-foreground))"
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </Card>
+
+      <Card className="p-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">Runbook</h2>
+          <Button size="sm" variant="outline" asChild>
+            <a href="/admin/unchecked-videos">Open unchecked videos</a>
+          </Button>
+        </div>
+        <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+          <li>
+            <span className="font-medium text-foreground">Dedup / canonical lag</span> — the
+            checker already triggers a bounded regroup pass each run. If the pending count is
+            still falling, no action is needed; if it is flat for two runs, raise sweep
+            concurrency.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Novelty dip</span> — exploration rate
+            and fatigue penalties are nudged automatically and recorded on the alert. Verify the
+            next day's novelty recovers above 60% before tuning further.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Coverage dip</span> — usually a
+            backlog symptom: check corpus check coverage above, then queue the unchecked backlog
+            for the next sweep.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Diversity dip</span> — a targeted
+            re-ranking sweep tightens per-channel caps; confirm max-per-channel in recent traces
+            on the feed traces page.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Serve flatline</span> — check the
+            ingestion pipeline and edge function logs first; the corpus is healthy but not being
+            served.
+          </li>
+        </ol>
+      </Card>
+
+
 
       <Card className="p-4 space-y-2">
         <h2 className="text-sm font-semibold">Semantic dedup backfill</h2>
