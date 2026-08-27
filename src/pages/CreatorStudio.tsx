@@ -430,6 +430,12 @@ export default function CreatorStudio() {
     uploadId: searchParams.get("captions"),
     language: searchParams.get("lang"),
   };
+  // Only one upload's caption panels are mounted at a time — mounting them for
+  // every upload fired a creator-media-url + caption fetch per row on load.
+  const [openCaptionsId, setOpenCaptionsId] = useState<string | null>(
+    searchParams.get("captions"),
+  );
+
   // 7-day window is enough to tell "no one watched" from "telemetry broke".
   const analytics = useCreatorAnalytics(7);
   const telemetry = useTelemetryHealth(uploads.data, analytics.data);
@@ -602,28 +608,40 @@ export default function CreatorStudio() {
                       </div>
                       {(u.status === "pending_review" || u.status === "approved") && (
                         <>
-                          <CaptionQualityPanel uploadId={u.id} durationSeconds={u.duration_seconds} />
-                          {/* Review step: watch the captions in place before
-                              publishing. Opened automatically when a quality
-                              notification deep-links to this upload. */}
+                          {/* Both caption panels fetch per upload, so they only
+                              mount while this <details> is actually open.
+                              Opened automatically when a quality notification
+                              deep-links to this upload. */}
                           <details
                             className="mt-2 rounded-lg border border-border p-2"
-                            open={captionDeepLink.uploadId === u.id}
+                            open={openCaptionsId === u.id}
+                            onToggle={(e) =>
+                              setOpenCaptionsId(e.currentTarget.open ? u.id : null)
+                            }
                             data-testid={`caption-review-details-${u.id}`}
                           >
                             <summary className="cursor-pointer text-xs font-medium text-foreground">
                               Review captions before publishing
                             </summary>
-                            <div className="mt-2">
-                              <CaptionReviewPanel
-                                uploadId={u.id}
-                                durationSeconds={u.duration_seconds}
-                                initialLanguage={
-                                  captionDeepLink.uploadId === u.id ? captionDeepLink.language : null
-                                }
-                              />
-                            </div>
+                            {openCaptionsId === u.id && (
+                              <div className="mt-2">
+                                <CaptionQualityPanel
+                                  uploadId={u.id}
+                                  durationSeconds={u.duration_seconds}
+                                />
+                                <CaptionReviewPanel
+                                  uploadId={u.id}
+                                  durationSeconds={u.duration_seconds}
+                                  initialLanguage={
+                                    captionDeepLink.uploadId === u.id
+                                      ? captionDeepLink.language
+                                      : null
+                                  }
+                                />
+                              </div>
+                            )}
                           </details>
+
                         </>
                       )}
                       {u.status === "approved" && (
