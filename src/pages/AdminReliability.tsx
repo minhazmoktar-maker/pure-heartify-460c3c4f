@@ -122,6 +122,70 @@ export default function AdminReliability() {
   const [targets, setTargets] = useState<Array<{ worker: string; min_per_hour: number; enabled: boolean }>>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [sim, setSim] = useState<Simulation | null>(null);
+  const [simKinds, setSimKinds] = useState<string[]>(["dedup_backfill_lag"]);
+  const [simSeverities, setSimSeverities] = useState<string[]>(["warning", "critical"]);
+  const [timelineDays, setTimelineDays] = useState(7);
+
+  // Every kind we can preview: the configured routing rows plus the known cron kinds.
+  const kindOptions = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...routes.map((r) => r.kind).filter((k): k is string => !!k),
+          ...KNOWN_ALERT_KINDS,
+        ]),
+      ).sort(),
+    [routes],
+  );
+
+  /** Dry-run the fan-out routing; the edge function never sends or persists anything. */
+  async function runSimulation() {
+    setBusy(true);
+    const { data, error } = await supabase.functions.invoke("alert-simulate", {
+      body: { kinds: simKinds, severities: simSeverities },
+    });
+    setBusy(false);
+    if (error) {
+      toast({ title: "Simulation failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setSim(data as Simulation);
+  }
+
+  async function exportTimeline(format: "json" | "csv") {
+    setBusy(true);
+    const { data, error } = await supabase.rpc("admin_reliability_timeline", {
+      p_days: timelineDays,
+    });
+    setBusy(false);
+    if (error) {
+      toast({ title: "Export failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    const name = `reliability-timeline-${timelineDays}d-${timestampSlug()}`;
+    if (format === "json") {
+      downloadJson(data, `${name}.json`);
+      toast({ title: "Timeline exported" });
+      return;
+    }
+    // CSV flattens every section into one event stream so it opens in a spreadsheet.
+    const t = (data ?? {}) as Record<string, unknown>;
+    const rows: Array<Record<string, unknown>> = [];
+    for (const [section, value] of Object.entries(t)) {
+      if (!Array.isArray(value)) continue;
+      for (const item of value) {
+        rows.push({ section, ...(item as Record<string, unknown>) });
+      }
+    }
+    if (!rows.length) {
+      toast({ title: "No timeline events in this window" });
+      return;
+    }
+    downloadCsv(rows, `${name}.csv`);
+    toast({ title: `Exported ${rows.length} timeline event(s)` });
+  }
+
 
   const load = useCallback(async () => {
     setLoading(true);
