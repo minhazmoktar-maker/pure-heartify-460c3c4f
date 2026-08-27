@@ -163,23 +163,44 @@ export default function AdminFeedQuality() {
       </div>
 
       {alerts.length > 0 && (
-        <Card className="p-4 space-y-2 border-destructive/40">
+        <Card className="p-4 space-y-3 border-destructive/40">
           <h2 className="text-sm font-semibold">Open feed quality alerts</h2>
-          {alerts.map((a) => (
-            <div key={a.id} className="flex items-start gap-2 text-sm">
-              <Badge variant={a.severity === "critical" ? "destructive" : "secondary"}>
-                {a.severity}
-              </Badge>
-              <div>
-                <p>{a.message}</p>
-                <p className="text-xs text-muted-foreground">
-                  {a.kind} · {new Date(a.created_at).toLocaleString()}
-                </p>
+          {alerts.map((a) => {
+            const rem = a.context?.remediation;
+            return (
+              <div key={a.id} className="flex items-start gap-2 text-sm">
+                <Badge variant={a.severity === "critical" ? "destructive" : "secondary"}>
+                  {a.severity}
+                </Badge>
+                <div className="space-y-1">
+                  <p>{a.message}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {a.kind} · {new Date(a.created_at).toLocaleString()}
+                  </p>
+                  {rem && (
+                    <div className="rounded-lg border bg-muted/40 p-2 text-xs">
+                      <p className="font-medium">
+                        Auto-remediation applied{rem.mode ? ` (${rem.mode})` : ""}
+                      </p>
+                      {(rem.knob_changes ?? []).map((k) => (
+                        <p key={k.knob} className="text-muted-foreground">
+                          {k.knob}: {k.from} → {k.to}
+                        </p>
+                      ))}
+                      {rem.reranking_sweep && (
+                        <p className="text-muted-foreground">
+                          Re-ranking sweep: {rem.reranking_sweep}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </Card>
       )}
+
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Novelty (latest day)" value={pct(latest?.novelty_pct)} />
