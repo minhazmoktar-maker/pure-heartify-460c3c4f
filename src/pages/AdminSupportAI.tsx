@@ -72,14 +72,24 @@ function Stat({ label, value, warn }: { label: string; value: string; warn?: boo
 export default function AdminSupportAI() {
   const [days, setDays] = useState(7);
   const [data, setData] = useState<Quality | null>(null);
+  const [cost, setCost] = useState<Cost | null>(null);
   const [loading, setLoading] = useState(true);
   const [indexing, setIndexing] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data: res, error } = await supabase.rpc("admin_support_quality", { _days: days });
-    if (error) toast.error(error.message);
-    else setData(res as unknown as Quality);
+    const [quality, costs] = await Promise.all([
+      supabase.rpc("admin_support_quality", { _days: days }),
+      // deno-lint-ignore no-explicit-any
+      (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>)(
+        "admin_support_ai_cost",
+        { _days: days },
+      ),
+    ]);
+    if (quality.error) toast.error(quality.error.message);
+    else setData(quality.data as unknown as Quality);
+    if (costs.error) console.warn("[admin] cost telemetry unavailable:", costs.error.message);
+    else setCost(costs.data as Cost);
     setLoading(false);
   }, [days]);
 
