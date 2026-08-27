@@ -25,6 +25,12 @@ const COUNTRY_HEADERS = [
 
 Deno.serve((req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (new URL(req.url).searchParams.get("debug") === "headers") {
+    return new Response(JSON.stringify({ names: [...req.headers.keys()] }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
 
   let country: string | null = null;
   let source: string | null = null;
