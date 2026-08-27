@@ -8,6 +8,9 @@
  */
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 
+import { impressionPenalty } from "./fatigue.ts";
+export { impressionPenalty };
+
 export interface ImpressionRow {
   video_id: string;
   seen_count: number;
@@ -30,22 +33,6 @@ export async function loadImpressions(
   const m = new Map<string, ImpressionRow>();
   for (const r of (data ?? []) as ImpressionRow[]) m.set(r.video_id, r);
   return m;
-}
-
-/** Impression decay curve. Returns [penalty, hardHide]. */
-export function impressionPenalty(imp: ImpressionRow | undefined): [number, boolean] {
-  if (!imp) return [0, 0 as unknown as boolean] as [number, boolean];
-  // Positive action recently → treat as fresh (0 penalty)
-  if (
-    imp.last_action &&
-    ["watch", "complete", "save", "share", "follow", "rewatch"].includes(imp.last_action)
-  ) {
-    return [0, false];
-  }
-  const n = imp.seen_count;
-  if (n >= 8) return [10, true];
-  const curve: Record<number, number> = { 1: 0.05, 2: 0.15, 3: 0.35, 4: 0.5, 5: 0.65, 6: 0.85, 7: 1.1 };
-  return [curve[n] ?? 0, false];
 }
 
 /** Freshness boost: `exp(-hours_since / 72)` for last 30 days. */
