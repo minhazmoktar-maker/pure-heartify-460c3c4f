@@ -431,7 +431,10 @@ Deno.serve(async (req) => {
       flow: opts.flow ?? null,
       injectionBlocked: opts.injectionBlocked ?? false,
       validationFailed: opts.validationFailed ?? false,
+      cacheHit: opts.layer === "exact_cache" || opts.layer === "semantic_cache",
+      scrubViolation,
     });
+
 
 
     if (opts.escalate) {
