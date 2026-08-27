@@ -30,7 +30,20 @@ const FORBIDDEN = [
   /lovable/i, /api key/i,
 ];
 
-const ZERO_COST_LAYERS = ["static", "faq", "exact_cache", "semantic_cache", "degraded", "unsupported", "flow"];
+/** Layers that answer without calling any model. */
+const ZERO_COST_LAYERS = [
+  "static",
+  "faq",
+  "exact_cache",
+  "semantic_cache",
+  "degraded",
+  "unsupported",
+  "flow",
+  "tool",
+  "report",
+  "troubleshoot",
+  "account",
+];
 
 function device(tag: string) {
   return `e2e-${tag}-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
