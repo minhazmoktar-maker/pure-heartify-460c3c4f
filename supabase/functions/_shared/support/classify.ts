@@ -70,11 +70,22 @@ const CATEGORY_RULES: Array<[SupportCategory, RegExp]> = [
 
 /** Requests Heartify support must decline (scholarly, medical, legal, financial). */
 const UNSUPPORTED_RULES: Array<[string, RegExp]> = [
-  ["fatwa", /\b(is it (halal|haram)|fatwa|ruling on|permissible to|hukm|can i (pray|fast|marry|divorce)|zakat calculation for my)\b/i],
+  [
+    "fatwa",
+    /\b(fatwa|ruling on|permissible to|hukm|can i (pray|fast|marry|divorce)|zakat calculation for my|is (it|listening|watching|singing|playing|smoking|dating|working) [^?]*\b(halal|haram)\b|is [^?]{0,40}\b(halal|haram) (in islam|according to)\b)/i,
+  ],
   ["medical", /\b(diagnos|symptom|medicine|dosage|am i (sick|pregnant)|mental illness treatment)\b/i],
   ["legal", /\b(sue|lawsuit|legal advice|represent me in court|is this legal in my country)\b/i],
   ["financial", /\b(investment advice|should i buy|stock tip|crypto advice)\b/i],
 ];
+
+/**
+ * Questions about Heartify's own halal standard are product questions, not
+ * requests for a religious ruling — they must be answered from policy rather
+ * than declined.
+ */
+const HEARTIFY_POLICY_CONTEXT = /\b(heartify|this app|the app|the platform|your (content|videos|policy|standard)|on heartify)\b/i;
+
 
 export interface Classification {
   categories: SupportCategory[];
