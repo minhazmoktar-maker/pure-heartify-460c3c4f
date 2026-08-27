@@ -124,11 +124,9 @@ function FeedbackRow({
 function Bubble({
   message,
   onRate,
-  signedIn,
 }: {
   message: SupportMessage;
-  onRate: (id: string, helpful: boolean) => Promise<boolean>;
-  signedIn: boolean;
+  onRate: (id: string, helpful: boolean, reason?: string) => Promise<boolean>;
 }) {
   const isUser = message.role === "user";
   return (
@@ -197,7 +195,7 @@ function Bubble({
         )}
 
         {!isUser && !message.pending && !message.failed && (
-          <FeedbackRow messageId={message.id} onRate={onRate} signedIn={signedIn} />
+          <FeedbackRow messageId={message.id} onRate={onRate} />
         )}
       </div>
     </div>
@@ -211,7 +209,7 @@ function Bubble({
  */
 export default function SupportChat() {
   const { locale } = useLocale();
-  const { messages, sending, error, send, rate, reset, signedIn } = useSupportAgent(locale);
+  const { messages, sending, error, send, rate, reset } = useSupportAgent(locale);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -266,7 +264,7 @@ export default function SupportChat() {
         ) : (
           <>
             {messages.map((m) => (
-              <Bubble key={m.id} message={m} onRate={rate} signedIn={signedIn} />
+              <Bubble key={m.id} message={m} onRate={rate} />
             ))}
             <div ref={endRef} />
           </>
