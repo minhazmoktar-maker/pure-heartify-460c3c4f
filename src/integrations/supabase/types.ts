@@ -5890,6 +5890,7 @@ export type Database = {
       }
       support_ai_usage: {
         Row: {
+          cache_hit: boolean
           categories: string[]
           completion_tokens: number
           conversation_id: string | null
@@ -5909,11 +5910,13 @@ export type Database = {
           provider: string | null
           question_norm: string | null
           resolved: boolean
+          scrub_violation: boolean
           tier: string | null
           topic: string | null
           validation_failed: boolean
         }
         Insert: {
+          cache_hit?: boolean
           categories?: string[]
           completion_tokens?: number
           conversation_id?: string | null
@@ -5933,11 +5936,13 @@ export type Database = {
           provider?: string | null
           question_norm?: string | null
           resolved?: boolean
+          scrub_violation?: boolean
           tier?: string | null
           topic?: string | null
           validation_failed?: boolean
         }
         Update: {
+          cache_hit?: boolean
           categories?: string[]
           completion_tokens?: number
           conversation_id?: string | null
@@ -5957,6 +5962,7 @@ export type Database = {
           provider?: string | null
           question_norm?: string | null
           resolved?: boolean
+          scrub_violation?: boolean
           tier?: string | null
           topic?: string | null
           validation_failed?: boolean
@@ -6342,6 +6348,7 @@ export type Database = {
           helpful: boolean
           id: string
           message_id: string
+          reason: string | null
           user_id: string | null
         }
         Insert: {
@@ -6351,6 +6358,7 @@ export type Database = {
           helpful: boolean
           id?: string
           message_id: string
+          reason?: string | null
           user_id?: string | null
         }
         Update: {
@@ -6360,6 +6368,7 @@ export type Database = {
           helpful?: boolean
           id?: string
           message_id?: string
+          reason?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -7944,6 +7953,7 @@ export type Database = {
       admin_support_gap_report: { Args: { _days?: number }; Returns: Json }
       admin_support_overview: { Args: { _days?: number }; Returns: Json }
       admin_support_quality: { Args: { _days?: number }; Returns: Json }
+      admin_support_reliability: { Args: { p_days?: number }; Returns: Json }
       admin_unchecked_videos: {
         Args: {
           _channel?: string
@@ -8177,6 +8187,14 @@ export type Database = {
       }
       check_serving_predicate_failures: {
         Args: { p_error_delta?: number; p_warn_delta?: number }
+        Returns: Json
+      }
+      check_support_health: {
+        Args: {
+          p_max_escalation_rate?: number
+          p_min_cache_hit_rate?: number
+          p_min_turns?: number
+        }
         Returns: Json
       }
       check_worker_health_sla: { Args: never; Returns: Json }
@@ -9410,6 +9428,16 @@ export type Database = {
           source_url: string
           title: string
         }[]
+      }
+      support_feedback_submit: {
+        Args: {
+          p_anon_key?: string
+          p_comment?: string
+          p_helpful: boolean
+          p_message_id: string
+          p_reason?: string
+        }
+        Returns: Json
       }
       support_normalize_question: { Args: { _input: string }; Returns: string }
       support_propose_faq_draft: {
