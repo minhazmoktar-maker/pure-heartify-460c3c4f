@@ -231,11 +231,12 @@ export default function WatchUpload() {
               currentTime={playheadSeconds}
               testId="watch-caption-overlay"
             />
-          ) : (
+          ) : playback.loading ? null : (
             <div className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground">
               {playback.error ?? "Playback unavailable."}
             </div>
           )}
+
         </div>
 
         <h1 className="mt-4 text-lg font-semibold text-foreground">{row.title}</h1>
