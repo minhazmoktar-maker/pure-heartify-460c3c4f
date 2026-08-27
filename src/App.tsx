@@ -58,6 +58,7 @@ const AdminFeedDiversity = lazy(() => import("./pages/AdminFeedDiversity.tsx"));
 const AdminFeedFlags = lazy(() => import("./pages/AdminFeedFlags.tsx"));
 const AdminFeedQuality = lazy(() => import("./pages/AdminFeedQuality.tsx"));
 const AdminSupportAI = lazy(() => import("./pages/AdminSupportAI.tsx"));
+const AdminSupportKnowledge = lazy(() => import("./pages/AdminSupportKnowledge.tsx"));
 const AdminFeedTraces = lazy(() => import("./pages/AdminFeedTraces.tsx"));
 const AdminUncheckedVideos = lazy(() => import("./pages/AdminUncheckedVideos.tsx"));
 const AdminUnservedVideos = lazy(() => import("./pages/AdminUnservedVideos.tsx"));
