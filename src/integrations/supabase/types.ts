@@ -2180,6 +2180,8 @@ export type Database = {
           channel_id: string | null
           channel_title: string
           content_language: string | null
+          duplicate_group_id: string | null
+          duplicate_grouped_at: string | null
           embed_checked_at: string | null
           embeddable: boolean
           embedding: string | null
@@ -2190,6 +2192,7 @@ export type Database = {
           id: string
           ingested_at: string
           is_archived: boolean
+          is_duplicate_canonical: boolean
           is_featured: boolean
           is_hidden: boolean
           is_pinned: boolean
@@ -2225,6 +2228,8 @@ export type Database = {
           channel_id?: string | null
           channel_title: string
           content_language?: string | null
+          duplicate_group_id?: string | null
+          duplicate_grouped_at?: string | null
           embed_checked_at?: string | null
           embeddable?: boolean
           embedding?: string | null
@@ -2235,6 +2240,7 @@ export type Database = {
           id?: string
           ingested_at?: string
           is_archived?: boolean
+          is_duplicate_canonical?: boolean
           is_featured?: boolean
           is_hidden?: boolean
           is_pinned?: boolean
@@ -2270,6 +2276,8 @@ export type Database = {
           channel_id?: string | null
           channel_title?: string
           content_language?: string | null
+          duplicate_group_id?: string | null
+          duplicate_grouped_at?: string | null
           embed_checked_at?: string | null
           embeddable?: boolean
           embedding?: string | null
@@ -2280,6 +2288,7 @@ export type Database = {
           id?: string
           ingested_at?: string
           is_archived?: boolean
+          is_duplicate_canonical?: boolean
           is_featured?: boolean
           is_hidden?: boolean
           is_pinned?: boolean
@@ -3324,6 +3333,54 @@ export type Database = {
         }
         Relationships: []
       }
+      feed_exposures: {
+        Row: {
+          channel_id: string | null
+          content_language: string | null
+          duplicate_group_id: string | null
+          id: number
+          page_index: number | null
+          position: number
+          served_at: string
+          session_key: string
+          sort: string | null
+          surface: string
+          user_id: string | null
+          variant: string | null
+          video_id: string
+        }
+        Insert: {
+          channel_id?: string | null
+          content_language?: string | null
+          duplicate_group_id?: string | null
+          id?: number
+          page_index?: number | null
+          position: number
+          served_at?: string
+          session_key: string
+          sort?: string | null
+          surface?: string
+          user_id?: string | null
+          variant?: string | null
+          video_id: string
+        }
+        Update: {
+          channel_id?: string | null
+          content_language?: string | null
+          duplicate_group_id?: string | null
+          id?: number
+          page_index?: number | null
+          position?: number
+          served_at?: string
+          session_key?: string
+          sort?: string | null
+          surface?: string
+          user_id?: string | null
+          variant?: string | null
+          video_id?: string
+        }
+        Relationships: []
+      }
       feed_impressions: {
         Row: {
           first_seen_at: string
@@ -3351,6 +3408,42 @@ export type Database = {
           seen_count?: number
           user_id?: string
           video_id?: string
+        }
+        Relationships: []
+      }
+      feed_ranking_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          key: string
+          max_value: number
+          min_value: number
+          updated_at: string
+          updated_by: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key: string
+          max_value?: number
+          min_value?: number
+          updated_at?: string
+          updated_by?: string | null
+          value?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          key?: string
+          max_value?: number
+          min_value?: number
+          updated_at?: string
+          updated_by?: string | null
+          value?: number
         }
         Relationships: []
       }
@@ -3396,6 +3489,48 @@ export type Database = {
           surface?: string | null
           user_id?: string | null
           variant?: string
+        }
+        Relationships: []
+      }
+      feed_sessions: {
+        Row: {
+          country: string | null
+          created_at: string
+          first_seen_at: string
+          item_count: number
+          last_seen_at: string
+          primary_language: string | null
+          request_count: number
+          session_key: string
+          surfaces: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          first_seen_at?: string
+          item_count?: number
+          last_seen_at?: string
+          primary_language?: string | null
+          request_count?: number
+          session_key: string
+          surfaces?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          first_seen_at?: string
+          item_count?: number
+          last_seen_at?: string
+          primary_language?: string | null
+          request_count?: number
+          session_key?: string
+          surfaces?: Json
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -7276,6 +7411,7 @@ export type Database = {
         }
         Returns: Json
       }
+      feed_dup_key: { Args: { _title: string }; Returns: string }
       friends_leaderboard: {
         Args: { _metric?: string }
         Returns: {
@@ -7342,12 +7478,14 @@ export type Database = {
           _per_channel?: number
           _section_aliases?: string[]
           _section_id?: string
+          _semantic_dedup?: boolean
         }
         Returns: {
           category: string
           channel_id: string
           channel_title: string
           content_language: string
+          duplicate_group_id: string
           halal_score: number
           ingested_at: string
           is_premium_only: boolean
@@ -8031,6 +8169,7 @@ export type Database = {
         Args: { _channel_id: string }
         Returns: number
       }
+      recompute_duplicate_groups: { Args: { _limit?: number }; Returns: Json }
       record_learned_signal: {
         Args: {
           _action: string
@@ -8271,6 +8410,17 @@ export type Database = {
       toggle_creator_subscription: {
         Args: { p_creator_id: string }
         Returns: Json
+      }
+      touch_feed_session: {
+        Args: {
+          _country?: string
+          _item_count?: number
+          _primary_language?: string
+          _session_key: string
+          _surface?: string
+          _user_id?: string
+        }
+        Returns: undefined
       }
       unaccent: { Args: { "": string }; Returns: string }
       unread_notification_count: { Args: never; Returns: number }

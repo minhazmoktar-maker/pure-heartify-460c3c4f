@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.recompute_duplicate_groups(integer) FROM authenticated;
+REVOKE EXECUTE ON FUNCTION public.get_feed_candidates_diversified(integer, integer, text, text, text[], timestamptz, boolean, text, text[], boolean) FROM anon, authenticated;

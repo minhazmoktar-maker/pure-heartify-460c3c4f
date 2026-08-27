@@ -25,6 +25,10 @@ import {
   interleavePrimaryLanguage,
   PRIMARY_LANGUAGE_SHARE,
 } from "../_shared/localFirst.ts";
+import { loadFeedRankingFlags } from "../_shared/feedRankingFlags.ts";
+import { collapseDuplicateGroups } from "../_shared/recommendations/semanticDedup.ts";
+import { loadSessionServedGroups, recordFeedServe } from "../_shared/feedExposure.ts";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -129,6 +133,23 @@ Deno.serve(observed("feed", async (req) => {
         .map((s: string) => s.slice(0, 24))
         .slice(0, 1500),
     );
+    // 0-based page index within the session, used for exposure positions.
+    const pageIndex = Number.isFinite(Number(body?.page_index))
+      ? Math.min(Math.max(Math.floor(Number(body.page_index)), 0), 500)
+      : (cursor ? 1 : 0);
+
+    // Runtime ranking knobs (/admin/feed-flags). Cached 60s in-isolate, with
+    // shipped defaults if the table is unreachable — the feed must never fail
+    // because a flag lookup did.
+    const rankFlags = await loadFeedRankingFlags(admin);
+
+    // Session-level near-duplicate memory: groups this session already saw, so
+    // page 2+ never re-serves another upload of the same lecture.
+    const sessionServedGroups = rankFlags.semanticDedup && cursor
+      ? await loadSessionServedGroups(admin, sessionId)
+      : new Set<string>();
+
+
 
     // Build PostgREST query
     // Order: freshest content first (published_at), then halal_score, then ingested_at as tiebreaker.
@@ -157,7 +178,7 @@ Deno.serve(observed("feed", async (req) => {
     // `moderation_signals`) that inflate the row payload 50-200x and are
     // never read by feed rendering. Cuts internal PostgREST payload from
     // ~5-15 MB per request to ~50-150 KB.
-    const FEED_COLS = "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state";
+    const FEED_COLS = "video_id,title,channel_id,channel_title,thumbnail_url,category,section_id,published_at,ingested_at,halal_score,view_count,is_trusted_channel,is_premium_only,content_language,visual_state,duplicate_group_id";
     // Hard language gate. The catalog is 100% language-tagged, so a user who
     // picked English must never be served Urdu/Indonesian/Arabic rows — the
     // previous soft re-rank left them in the tail and they surfaced on deeper
@@ -165,7 +186,11 @@ Deno.serve(observed("feed", async (req) => {
     const langClause = contentLanguages.length
       ? `&content_language=in.(${contentLanguages.map((l) => encodeURIComponent(l)).join(",")})`
       : "";
-    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false${langClause}&order=${orderClause}&limit=${fetchLimit}`;
+    // Semantic dedup at the DB layer: only the canonical member of each
+    // near-duplicate group is eligible. Runtime-flagged so it can be rolled
+    // back instantly if grouping ever misfires.
+    const dedupClause = rankFlags.semanticDedup ? "&is_duplicate_canonical=eq.true" : "";
+    let url = `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}&moderation_state=in.(approved,auto_approved)&is_hidden=eq.false&is_archived=eq.false${dedupClause}${langClause}&order=${orderClause}&limit=${fetchLimit}`;
 
     if (category && category !== "All") {
       url += `&category=eq.${encodeURIComponent(category)}`;
@@ -262,7 +287,7 @@ Deno.serve(observed("feed", async (req) => {
     const cacheable = !callerId && !search && excludeIds.size === 0;
     const langKey = contentLanguages.length ? contentLanguages.join(",") : "-";
     const cacheKey = cacheable
-      ? `feed:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}:${primaryLanguage ?? "-"}`
+      ? `feed:${rankFlags.semanticDedup ? "d1" : "d0"}:${sort}:${category ?? "all"}:${sectionId ?? "-"}:${cursor ?? "0"}:${limit}:${maxPerChannel}:${langKey}:${primaryLanguage ?? "-"}`
       : "";
 
     // Decide whether we can use the diversified RPC path. It applies a
@@ -328,6 +353,7 @@ Deno.serve(observed("feed", async (req) => {
           _exclude_premium: !isPremium,
           _order: sort === "recent" ? "recent" : "fresh",
           _languages: contentLanguages.length ? contentLanguages : null,
+          _semantic_dedup: rankFlags.semanticDedup,
         });
         const tFetch = Date.now() - t0;
         if (error) {
@@ -506,7 +532,11 @@ Deno.serve(observed("feed", async (req) => {
       const abChannelCap = abVariant === "diverse"
         ? Math.max(2, maxPerChannel - 1)
         : maxPerChannel;
-      const abLongTailShare = abVariant === "diverse" ? 0.3 : 0.2;
+      // Exploration rate is admin-tunable; the `diverse` arm adds +0.10 on top.
+      const abLongTailShare = Math.min(
+        0.6,
+        rankFlags.explorationRate + (abVariant === "diverse" ? 0.1 : 0),
+      );
       abState.variant = abVariant;
       abState.channelCap = abChannelCap;
       abState.longTailShare = abLongTailShare;
@@ -532,7 +562,7 @@ Deno.serve(observed("feed", async (req) => {
                 })
               : ordered;
 
-            const aff = sort === "recent" ? 0.7 : 1.0;
+            const aff = (sort === "recent" ? 0.7 : 1.0) * rankFlags.personalizationMix;
             const freshAnchor = sort === "recent" ? 1.15 : 0.35;
             const freshBoost = (poolMix.recently_added ?? 0.2) * 2.5; // 0..~0.6
 
@@ -558,7 +588,13 @@ Deno.serve(observed("feed", async (req) => {
               const novelty = ch && !seenCh && v.is_trusted_channel === true ? 1 : 0;
 
               const imp = impressions.get(vid);
-              const [impPen, hardHide] = impressionPenalty(imp);
+              const [rawImpPen, rawHardHide] = impressionPenalty(imp);
+              // Fatigue detection is runtime-flagged: off = no repeat penalty
+              // and no hard hide; on = penalty scaled by the admin weight.
+              const impPen = rankFlags.fatigueDetection
+                ? rawImpPen * rankFlags.fatiguePenaltyWeight
+                : 0;
+              const hardHide = rankFlags.fatigueDetection && rawHardHide;
 
               const fresh = freshnessScore((v.published_at as string) ?? (v.ingested_at as string));
 
@@ -585,7 +621,10 @@ Deno.serve(observed("feed", async (req) => {
               // expectation. Temperature shrinks as real signals accumulate,
               // so established users get a sharper, more personal feed.
               const signalStrength = Math.min(1, (chAff + catAff + longCh + longCat + interestMatch) / 2);
-              const temp = 0.85 - 0.5 * signalStrength + abTempBoost;
+              const temp = Math.max(
+                0.05,
+                rankFlags.explorationTemperature - 0.5 * signalStrength + abTempBoost,
+              );
               const u = Math.max(1e-9, hash01(`${identity}:${rotationKey}:${vid}`));
               const finalScore = score - temp * Math.log(-Math.log(u));
 
@@ -627,7 +666,7 @@ Deno.serve(observed("feed", async (req) => {
         const N = ordered.length;
         // Decay scale ~1/3 of the pool: rank 0 is ~3x likelier than the
         // mid-pool row, but nothing in the pool is unreachable.
-        const scale = Math.max(24, N / 3);
+        const scale = Math.max(24, N / 3) * (1 + rankFlags.explorationRate);
         ordered = ordered
           .map((v, i) => ({ v, k: -Math.log(rand()) * Math.exp(i / scale) })) // smaller key = picked earlier
           .sort((a, b) => a.k - b.k)
@@ -704,7 +743,7 @@ Deno.serve(observed("feed", async (req) => {
           const topUpUrl =
             `${SUPABASE_URL}/rest/v1/curated_videos?select=${FEED_COLS}` +
             `&moderation_state=in.(approved,auto_approved)` +
-            `&is_hidden=eq.false&is_archived=eq.false` +
+            `&is_hidden=eq.false&is_archived=eq.false` + dedupClause +
             (isPremium ? "" : "&is_premium_only=eq.false") +
             `&content_language=eq.${encodeURIComponent(primaryLanguage)}` +
             (category && category !== "All" ? `&category=eq.${encodeURIComponent(category)}` : "") +
@@ -744,7 +783,24 @@ Deno.serve(observed("feed", async (req) => {
       );
     }
 
+    // --- Semantic near-duplicate collapse (last mile) ---------------------
+    // The DB pool is already canonical-only, but interleaving, top-ups and the
+    // fallback cascade can still surface two members of one group (e.g. mid
+    // recompute). This guarantees at most one per group leaves the wire, and
+    // drops groups already served earlier in this session.
+    if (rankFlags.semanticDedup) {
+      const before = diversified.length;
+      const { items: collapsedItems, collapsed } = collapseDuplicateGroups(diversified, {
+        alreadyServedGroups: sessionServedGroups,
+      });
+      diversified = collapsedItems;
+      if (collapsed) {
+        console.log(`[feed.dedup] groups_collapsed=${collapsed} pool=${before}→${diversified.length}`);
+      }
+    }
+
     const items = diversified.slice(0, limit);
+
     // Keyset cursor must be the *oldest* ingested_at on the page: interleaving
     // and top-ups can place a newer row last, which would skip rows (stall) or
     // re-serve them (repeat) on the next page.
@@ -776,6 +832,28 @@ Deno.serve(observed("feed", async (req) => {
       .then(({ error }) => {
         if (error) console.warn("[feed] serve-sample insert failed:", error.message);
       });
+
+    // First-class session + exposure tracking. Written on the serving path so
+    // it is authoritative across web, iOS, Android and PWA clients.
+    recordFeedServe(
+      admin,
+      items.map((v: Record<string, unknown>) => ({
+        video_id: v.video_id as string,
+        duplicate_group_id: (v.duplicate_group_id as string | null) ?? null,
+        content_language: (v.content_language as string | null) ?? null,
+        channel_id: (v.channel_id as string | null) ?? null,
+      })),
+      {
+        sessionKey: sessionId,
+        userId: callerId ?? null,
+        surface: sectionId ?? category ?? "home",
+        sort,
+        pageIndex,
+        variant: abState.variant,
+        country: req.headers.get("cf-ipcountry") ?? req.headers.get("x-country") ?? null,
+        primaryLanguage: primaryLanguage ?? null,
+      },
+    );
 
 
     return json(
