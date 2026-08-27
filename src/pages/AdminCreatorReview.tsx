@@ -45,7 +45,7 @@ interface Summary {
 
 function ReviewCard({ row, onDone }: { row: QueueRow; onDone: () => void }) {
   const { toast } = useToast();
-  const playback = useUploadPlayback(row.id);
+  const playback = useUploadPlayback(row.id, "admin_review");
   const [verified, setVerified] = useState(false);
   const [notes, setNotes] = useState("");
   const [reasonCode, setReasonCode] = useState("not_beneficial");
