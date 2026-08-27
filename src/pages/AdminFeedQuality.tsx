@@ -45,6 +45,22 @@ type Alert = {
   severity: string;
   message: string;
   created_at: string;
+  context: {
+    remediation?: {
+      applied_at?: string;
+      mode?: string;
+      knob_changes?: Array<{ knob: string; from: number; to: number }>;
+      actions?: Array<Record<string, unknown>>;
+      reranking_sweep?: string;
+    };
+  } | null;
+};
+
+type Throughput = {
+  bucket: string;
+  exposures: number;
+  sessions: number;
+  unique_videos: number;
 };
 
 type Coverage = {
