@@ -9,6 +9,7 @@
  * Vitest suite (Node) import the exact same file, so the behaviour the tests
  * assert is the behaviour production runs.
  */
+import { canonicalizeQuestion, type SupportLanguage } from "./multilingual.ts";
 
 // ---------------------------------------------------------------------------
 // Categories
@@ -91,10 +92,15 @@ export interface Classification {
   categories: SupportCategory[];
   primary: SupportCategory;
   unsupported: string | null;
+  /** Detected question language (drives FAQ locale + telemetry). */
+  language: SupportLanguage;
 }
 
 export function classifyQuestion(rawQuestion: string): Classification {
-  const q = (rawQuestion ?? "").toLowerCase();
+  // Non-English questions are folded into English support vocabulary first, so
+  // one rule set covers every language Heartify serves.
+  const { canonical, language } = canonicalizeQuestion(rawQuestion ?? "");
+  const q = `${(rawQuestion ?? "").toLowerCase()}\n${canonical.toLowerCase()}`;
   const categories: SupportCategory[] = [];
   for (const [cat, re] of CATEGORY_RULES) {
     if (re.test(q) && !categories.includes(cat)) categories.push(cat);
@@ -105,8 +111,14 @@ export function classifyQuestion(rawQuestion: string): Classification {
   if (unsupported === "fatwa" && HEARTIFY_POLICY_CONTEXT.test(q)) unsupported = null;
   if (unsupported) categories.unshift("unsupported");
   if (categories.length === 0) categories.push("general_faq");
-  return { categories: categories.slice(0, 6), primary: categories[0], unsupported };
+  return {
+    categories: categories.slice(0, 6),
+    primary: categories[0],
+    unsupported,
+    language,
+  };
 }
+
 
 // ---------------------------------------------------------------------------
 // Static answers (Level 0 — no DB, no model)

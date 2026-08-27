@@ -35,6 +35,7 @@ export const SUPPORT_ACTIONS: readonly SupportAction[] = [
   { id: "open_contact", label: "Contact the team", route: "/contact" },
   { id: "open_status", label: "Service status", route: "/status" },
   { id: "open_creator_dashboard", label: "Creator dashboard", route: "/creators/dashboard", authOnly: true },
+  { id: "open_premium", label: "Heartify Plus", route: "/plus" },
   { id: "open_help", label: "Help centre", route: "/help" },
 ] as const;
 
