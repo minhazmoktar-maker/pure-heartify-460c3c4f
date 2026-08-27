@@ -12,6 +12,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { uploadResumable } from "@/lib/resumableUpload";
 import { detectLanguage, generateThumbnail, probeDuration } from "@/lib/uploadMedia";
+import {
+  recordPlaybackUrlCacheHit,
+  recordPlaybackUrlFetch,
+} from "@/lib/playbackUrlMetrics";
 
 /** Shape returned by the creator-upload-init edge function. */
 interface InitResult {
