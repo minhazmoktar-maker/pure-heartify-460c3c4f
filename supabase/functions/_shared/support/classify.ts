@@ -425,3 +425,24 @@ export function reportConfirmation(reason: ReportReason): string {
     "Heartify's moderation team reviews reports against the platform's content rules; a single report never " +
     "automatically penalises a creator. You can follow the outcome from your profile.";
 }
+
+/**
+ * Map a user-facing reason onto the `video_reports.reason` enumeration the
+ * moderation pipeline already understands. Anything without a precise match
+ * lands in the haram/other buckets rather than being invented.
+ */
+export function toDbReportReason(reason: ReportReason): string {
+  switch (reason) {
+    case "sexual_suggestive": return "sexual_content";
+    case "music": return "music_or_haram";
+    case "gambling":
+    case "alcohol":
+    case "drugs":
+    case "female_visual": return "music_or_haram";
+    case "violence": return "violence";
+    case "misinformation": return "misinformation";
+    case "copyright": return "copyright";
+    case "inappropriate": return "inappropriate_content";
+    default: return "other";
+  }
+}
