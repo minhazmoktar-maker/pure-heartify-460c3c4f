@@ -139,7 +139,8 @@ export function LanguageSettings() {
               ))}
             </SelectContent>
           </Select>
-        
+        </div>
+
 
         {/* Content languages — with live coverage so users can see depth
             before committing, instead of picking a language and landing on
