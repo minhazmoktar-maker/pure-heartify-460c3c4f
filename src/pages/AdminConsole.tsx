@@ -204,6 +204,9 @@ const AdminConsole = () => {
             <Link to="/admin/feed-traces">Feed rationale</Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/unchecked-videos">Unchecked videos</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
             <Link to="/admin/moderation-audit">Moderation audit</Link>
           </Button>
 
