@@ -8,15 +8,9 @@
  */
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 
-import { impressionPenalty } from "./fatigue.ts";
+import { impressionPenalty, type ImpressionRow } from "./fatigue.ts";
 export { impressionPenalty };
-
-export interface ImpressionRow {
-  video_id: string;
-  seen_count: number;
-  last_seen_at: string;
-  last_action: string | null;
-}
+export type { ImpressionRow };
 
 /** Load the caller's recent (≤48h) impression memory. Keyed by video_id. */
 export async function loadImpressions(
