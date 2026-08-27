@@ -752,7 +752,14 @@ Deno.serve(async (req) => {
     }
     // Very short questions carry too little signal for a verbatim deterministic
     // answer, so they need a much stronger match before being served.
-    const tokenCount = questionNorm.split(" ").filter(Boolean).length;
+    // Normalisation strips filler, and translation strips more of it, so judge
+    // "too short to trust" on the richer of the two forms — otherwise a real
+    // Bengali or Urdu question is held to the strict bar an English "premium?"
+    // deserves.
+    const tokenCount = Math.max(
+      questionNorm.split(" ").filter(Boolean).length,
+      question.trim().split(/\s+/).filter(Boolean).length,
+    );
     const required = tokenCount <= 2 ? 0.85 : FAQ_SCORE_THRESHOLD;
     if (top && Number(top.score) >= required && top.answer) {
 
