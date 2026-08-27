@@ -295,7 +295,7 @@ export default function HeartifyPlus() {
               <Sparkles className="h-3 w-3" aria-hidden />
               Introducing Heartify+
             </span>
-            <h1 className="mt-4 font-heading text-title font-bold md:text-display">
+            <h1 className="mt-4 font-heading text-title font-bold !text-[hsl(var(--cream))] md:text-display">
               Halal streaming, without limits.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-[hsl(var(--cream))]/80 md:text-base">
