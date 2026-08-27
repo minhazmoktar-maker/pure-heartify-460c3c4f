@@ -186,6 +186,10 @@ const AdminConsole = () => {
             </Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/launch-gate">Launch gate</Link>
+          </Button>
+
+          <Button asChild variant="secondary" size="sm">
             <Link to="/admin/corpus-progress">Corpus progress</Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
