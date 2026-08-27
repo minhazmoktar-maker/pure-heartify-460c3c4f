@@ -7143,8 +7143,8 @@ export type Database = {
           age_hours: number
           channel_id: string
           channel_title: string
-          created_at: string
           duplicate_group_id: string
+          ingested_at: string
           is_duplicate_canonical: boolean
           moderation_state: string
           thumbnail_url: string
