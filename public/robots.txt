@@ -29,4 +29,4 @@ Disallow: /onboarding
 Disallow: /watch/*?
 Disallow: /*?utm_
 
-Sitemap: https://pure-heartify.lovable.app/sitemap.xml
+Sitemap: https://heartifyapp.com/sitemap.xml
