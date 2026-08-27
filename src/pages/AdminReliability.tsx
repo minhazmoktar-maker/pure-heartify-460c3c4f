@@ -524,9 +524,157 @@ export default function AdminReliability() {
           </table>
         </div>
       </Card>
+
+      {/* Simulate notifications */}
+      <Card className="space-y-3 p-4">
+        <h2 className="text-base font-semibold">Simulate notifications (no sending)</h2>
+        <p className="text-xs text-muted-foreground">
+          Previews which Slack webhook and email recipients each alert kind and severity would
+          reach under the current routing rules. Nothing is sent and no alert is written;
+          recipients are masked.
+        </p>
+
+        <div className="space-y-2">
+          <p className="text-xs font-medium uppercase text-muted-foreground">Alert kinds</p>
+          <div className="flex flex-wrap gap-2">
+            {kindOptions.map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() =>
+                  setSimKinds((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))
+                }
+                className={`min-h-[44px] rounded-md border px-3 text-xs transition-colors ${
+                  simKinds.includes(k) ? "border-primary bg-primary/10" : "hover:bg-muted"
+                }`}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs font-medium uppercase text-muted-foreground">Severities</p>
+          <div className="flex flex-wrap gap-2">
+            {SEVERITIES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() =>
+                  setSimSeverities((p) =>
+                    p.includes(s) ? p.filter((x) => x !== s) : [...p, s],
+                  )
+                }
+                className={`min-h-[44px] rounded-md border px-3 text-xs capitalize transition-colors ${
+                  simSeverities.includes(s) ? "border-primary bg-primary/10" : "hover:bg-muted"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            onClick={runSimulation}
+            disabled={busy || simKinds.length === 0 || simSeverities.length === 0}
+          >
+            {busy ? "Simulating…" : "Preview recipients"}
+          </Button>
+          {sim && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => downloadJson(sim, `notification-simulation-${timestampSlug()}.json`)}
+            >
+              Export simulation JSON
+            </Button>
+          )}
+        </div>
+
+        {sim && (
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary">Nothing sent</Badge>
+              <Badge variant={sim.transports?.slack ? "secondary" : "destructive"}>
+                Slack {sim.transports?.slack ? "configured" : "not configured"}
+              </Badge>
+              <Badge variant={sim.transports?.email ? "secondary" : "destructive"}>
+                Email {sim.transports?.email ? "configured" : "not configured"}
+              </Badge>
+              <Badge variant="outline">{sim.would_notify_count} combination(s) notify</Badge>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="p-2 text-left">Kind</th>
+                    <th className="p-2 text-left">Severity</th>
+                    <th className="p-2 text-left">Matched route</th>
+                    <th className="p-2 text-left">Recipients</th>
+                    <th className="p-2 text-left">Outcome</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sim.results?.map((r) => (
+                    <tr key={`${r.kind}-${r.severity}`} className="border-b last:border-0">
+                      <td className="p-2 font-medium">{r.kind}</td>
+                      <td className="p-2 capitalize">{r.severity}</td>
+                      <td className="p-2 text-xs">{r.matched_route ?? "—"}</td>
+                      <td className="p-2 text-xs">
+                        {r.recipients.length === 0
+                          ? "—"
+                          : r.recipients.map((rec, i) => (
+                              <span key={i} className="block">
+                                {rec.channel}: {rec.target ?? "not configured"}
+                                {rec.blocked_reason ? ` (${rec.blocked_reason})` : ""}
+                              </span>
+                            ))}
+                      </td>
+                      <td className="p-2">
+                        <Badge variant={r.would_notify ? "secondary" : "outline"}>
+                          {r.would_notify ? "would notify" : r.reason}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* Incident timeline export */}
+      <Card className="space-y-3 p-4">
+        <h2 className="text-base font-semibold">Export reliability incident timeline</h2>
+        <p className="text-xs text-muted-foreground">
+          Compiles alert history (with delivery outcome), replay results, worker-health
+          snapshots, remediation actions and daily serving audits into one download.
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            type="number"
+            min={1}
+            max={30}
+            value={timelineDays}
+            aria-label="Timeline window in days"
+            className="h-9 w-24"
+            onChange={(e) => setTimelineDays(Number(e.target.value))}
+          />
+          <span className="text-xs text-muted-foreground">days</span>
+          <Button size="sm" disabled={busy} onClick={() => exportTimeline("json")}>
+            Export JSON
+          </Button>
+          <Button size="sm" variant="outline" disabled={busy} onClick={() => exportTimeline("csv")}>
+            Export CSV
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }
+
 
 function Stat({ label, value }: { label: string; value: number | null | undefined }) {
   return (
