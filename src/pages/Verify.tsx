@@ -129,7 +129,7 @@ export default function Verify() {
         "@context": "https://schema.org",
         "@type": "ClaimReview",
         datePublished: data?.attestation?.issued_at,
-        url: `https://pure-heartify.lovable.app${path}`,
+        url: `https://heartifyapp.com${path}`,
         claimReviewed: `Halal-first moderation attestation for "${data?.title}"`,
         itemReviewed: {
           "@type": "VideoObject",

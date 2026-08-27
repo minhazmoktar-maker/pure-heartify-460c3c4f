@@ -12,7 +12,7 @@ import {
   type LearningPathStep,
 } from "@/hooks/useLearningPaths";
 
-const BASE = "https://pure-heartify.lovable.app";
+const BASE = "https://heartifyapp.com";
 
 /**
  * MVP-6 — a guided learning path: ordered concepts with real prerequisites,

@@ -17,12 +17,54 @@ interface SEOProps {
   keywords?: string;
   /** Locale of the current page (defaults to "en"). */
   locale?: string;
+  /** Force noindex. Private/operational routes are noindexed automatically. */
+  noindex?: boolean;
 }
 
-const BASE = "https://pure-heartify.lovable.app";
+const BASE = "https://heartifyapp.com";
 
 /** Locales that hreflang alternates are emitted for. Keep in sync with src/i18n/dictionaries. */
 const HREFLANG_LOCALES = ["en", "ar", "bn", "de", "fr", "id", "tr"] as const;
+
+/**
+ * Routes that must never appear in search results: admin consoles, auth flows,
+ * account settings, one-time tokens and other session-scoped surfaces.
+ * Mirrors the Disallow rules in public/robots.txt.
+ */
+const NOINDEX_PREFIXES = [
+  "/admin",
+  "/diagnostics",
+  "/settings",
+  "/onboarding",
+  "/login",
+  "/signup",
+  "/auth",
+  "/forgot-password",
+  "/reset-password",
+  "/mfa",
+  "/mfa-enroll",
+  "/mfa-verify",
+  "/oauth",
+  "/oauth-consent",
+  "/checkout",
+  "/checkout-return",
+  "/export-data",
+  "/profile",
+  "/bookmarks",
+  "/journal",
+  "/my-library",
+  "/offline-library",
+  "/creator-studio",
+  "/creator-dashboard",
+  "/creator-analytics",
+  "/appeals",
+  "/invite",
+  "/plus-invite",
+  "/connections",
+  "/notifications",
+  "/404",
+  "/not-found",
+] as const;
 
 function titleCase(s: string): string {
   return s
@@ -66,8 +108,13 @@ export default function SEO({
   noAutoArticle,
   keywords,
   locale = "en",
+  noindex,
 }: SEOProps) {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const isPrivateRoute = NOINDEX_PREFIXES.some(
+    (prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`),
+  );
+  const robotsNoindex = noindex ?? isPrivateRoute;
   const canonical = `${BASE}${cleanPath}`;
   const clampedTitle = title.length > 60 ? title.slice(0, 57) + "…" : title;
   const clampedDesc =
@@ -127,10 +174,14 @@ export default function SEO({
       <title>{clampedTitle}</title>
       <meta name="description" content={clampedDesc} />
       {keywords ? <meta name="keywords" content={keywords} /> : null}
+      <meta
+        name="robots"
+        content={robotsNoindex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"}
+      />
       <link rel="canonical" href={canonical} />
 
-      {/* hreflang alternates */}
-      {HREFLANG_LOCALES.map((lng) => (
+      {/* hreflang alternates — only for indexable pages */}
+      {(robotsNoindex ? [] : HREFLANG_LOCALES).map((lng) => (
         <link
           key={lng}
           rel="alternate"

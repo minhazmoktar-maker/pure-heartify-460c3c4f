@@ -61,8 +61,8 @@ const Fatwa = () => {
       <Helmet>
         <title>Fatwa Q&A Library | Heartify</title>
         <meta name="description" content="Curated fatwas across salah, fasting, zakat, marriage, finance, food, and daily interaction." />
-        <link rel="canonical" href="https://pure-heartify.lovable.app/fatwa" />
-        <meta property="og:url" content="https://pure-heartify.lovable.app/fatwa" />
+        <link rel="canonical" href="https://heartifyapp.com/fatwa" />
+        <meta property="og:url" content="https://heartifyapp.com/fatwa" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "FAQPage",

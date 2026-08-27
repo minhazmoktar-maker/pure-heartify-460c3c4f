@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useConcept } from "@/hooks/useConcepts";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
-const BASE = "https://pure-heartify.lovable.app";
+const BASE = "https://heartifyapp.com";
 
 function thumb(videoId: string, url: string | null) {
   return url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;

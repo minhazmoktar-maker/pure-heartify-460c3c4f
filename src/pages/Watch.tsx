@@ -395,9 +395,9 @@ const Watch = () => {
   const liked = videoId ? isFavorite(videoId) : false;
 
   const toAbsoluteUrl = (value: string) => {
-    if (!value) return "https://pure-heartify.lovable.app/placeholder.svg";
+    if (!value) return "https://heartifyapp.com/placeholder.svg";
     if (/^https?:\/\//i.test(value)) return value;
-    return `https://pure-heartify.lovable.app${value.startsWith("/") ? value : `/${value}`}`;
+    return `https://heartifyapp.com${value.startsWith("/") ? value : `/${value}`}`;
   };
 
   const handleBookmark = () => {
@@ -426,14 +426,14 @@ const Watch = () => {
             description: `Curated halal video by ${currentVideo.channelTitle}.`,
             thumbnailUrl: [toAbsoluteUrl(currentVideo.thumbnailUrl)],
             uploadDate: currentVideo.publishedAt || new Date().toISOString(),
-            url: `https://pure-heartify.lovable.app/watch/${videoId}`,
+            url: `https://heartifyapp.com/watch/${videoId}`,
             ...(isEmbeddableVideo
               ? { embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}` }
               : { contentUrl: currentVideo.videoUrl }),
             publisher: {
               "@type": "Organization",
               name: "Heartify",
-              url: "https://pure-heartify.lovable.app/",
+              url: "https://heartifyapp.com/",
             },
           }}
         />
@@ -623,7 +623,7 @@ const Watch = () => {
                       meta={{
                         title: currentVideo.title,
                         text: `${currentVideo.title} · Heartify`,
-                        url: `https://pure-heartify.lovable.app/watch/${videoId}`,
+                        url: `https://heartifyapp.com/watch/${videoId}`,
                       }}
                       label="Share image"
                     />

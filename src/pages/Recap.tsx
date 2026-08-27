@@ -132,7 +132,7 @@ const Recap = () => {
           />
           <WhatsAppShareButton
             message={`My last 7 days on Heartify: ${totals.prayed} prayers, ${totals.dhikr.toLocaleString()} dhikr, ${streak.current}-day streak. Join me ↓`}
-            url={typeof window !== "undefined" ? `${window.location.origin}/` : "https://pure-heartify.lovable.app/"}
+            url={typeof window !== "undefined" ? `${window.location.origin}/` : "https://heartifyapp.com/"}
             label="WhatsApp"
           />
         </div>

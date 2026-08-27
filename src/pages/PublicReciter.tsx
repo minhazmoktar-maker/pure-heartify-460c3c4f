@@ -28,7 +28,7 @@ export default function PublicReciter() {
   if (!r) return <Navigate to="/listen" replace />;
 
   const path = `/reciter/${r.id}`;
-  const url = `https://pure-heartify.lovable.app${path}`;
+  const url = `https://heartifyapp.com${path}`;
   const title = `${r.name} — Full Qur'an Recitation · Heartify`;
   const description = `Listen to the complete Qur'an recited by ${r.name}${r.location ? ` (${r.location})` : ""} — 114 surahs, streamed from a verified public mount.`;
 

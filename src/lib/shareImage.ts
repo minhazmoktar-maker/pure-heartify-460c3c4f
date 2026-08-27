@@ -175,7 +175,7 @@ async function renderCertificate(input: ShareImageInput): Promise<Blob> {
   setTracking(ctx, "0px");
   ctx.fillStyle = MUTED;
   ctx.font = "500 20px 'Inter', system-ui, sans-serif";
-  ctx.fillText("pure-heartify.lovable.app", CW - ix - 60, headY + 76);
+  ctx.fillText("heartifyapp.com", CW - ix - 60, headY + 76);
 
   // --- Title block (light sans, like the reference) ---
   ctx.textAlign = "center";
@@ -581,7 +581,7 @@ export async function generateShareImage(input: ShareImageInput): Promise<Blob> 
 
   ctx.fillStyle = "#94a3b8";
   ctx.font = "500 24px 'Inter', system-ui, sans-serif";
-  ctx.fillText("pure-heartify.lovable.app", 80, H - 80);
+  ctx.fillText("heartifyapp.com", 80, H - 80);
 
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG encode failed"))), "image/png", 0.95);

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, Sparkles, HeartHandshake, BookOpen } from "lucide-react";
 
-const CANONICAL = "https://pure-heartify.lovable.app/digital-purification";
+const CANONICAL = "https://heartifyapp.com/digital-purification";
 
 const STEPS = [
   {
@@ -84,7 +84,7 @@ export default function DigitalPurification() {
           description:
             "A scholar-guided, eight-step Islamic roadmap for stopping haram content consumption.",
           author: { "@type": "Organization", name: "Heartify" },
-          publisher: { "@type": "Organization", name: "Heartify", logo: { "@type": "ImageObject", url: "https://pure-heartify.lovable.app/app-icon-1024.png" } },
+          publisher: { "@type": "Organization", name: "Heartify", logo: { "@type": "ImageObject", url: "https://heartifyapp.com/app-icon-1024.png" } },
           mainEntityOfPage: CANONICAL,
         })}</script>
         <script type="application/ld+json">{JSON.stringify({

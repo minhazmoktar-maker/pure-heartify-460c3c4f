@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import type { Appeal } from "@/hooks/useAppeals";
 import { useToast } from "@/hooks/use-toast";
+import { useNoIndex } from "@/hooks/useNoIndex";
 
 const BADGE: Record<Appeal["status"], string> = {
   open: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
@@ -17,6 +18,7 @@ const BADGE: Record<Appeal["status"], string> = {
 };
 
 export default function AdminAppeals() {
+  useNoIndex();
   const [rows, setRows] = useState<Appeal[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

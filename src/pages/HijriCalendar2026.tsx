@@ -69,7 +69,7 @@ export default function HijriCalendar2026() {
     publisher: { "@type": "Organization", name: "Heartify" },
     datePublished: "2026-01-01",
     dateModified: new Date().toISOString().slice(0, 10),
-    mainEntityOfPage: "https://pure-heartify.lovable.app/guides/islamic-calendar-2026",
+    mainEntityOfPage: "https://heartifyapp.com/guides/islamic-calendar-2026",
   };
 
   const faqLd = {
