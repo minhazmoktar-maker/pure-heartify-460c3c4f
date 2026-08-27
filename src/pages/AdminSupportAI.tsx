@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { AlertTriangle, BookOpen, Bot, Loader2, MessageSquare, RefreshCw, Star } from "lucide-react";
+import { AlertTriangle, BookOpen, Bot, Coins, Loader2, MessageSquare, RefreshCw, ServerCog, Star } from "lucide-react";
 import SEO from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadCsv, downloadJson } from "@/lib/download";
