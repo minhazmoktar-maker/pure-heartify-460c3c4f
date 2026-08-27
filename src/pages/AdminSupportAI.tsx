@@ -80,7 +80,7 @@ export default function AdminSupportAI() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6">
-      <SEO title="Support AI — Heartify Admin" description="Help assistant quality, gaps and escalations." path="/admin/support-ai" noindex />
+      <SEO title="Support AI — Heartify Admin" description="Help assistant quality, gaps and escalations." path="/admin/support-ai" />
 
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -191,14 +191,14 @@ export default function AdminSupportAI() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => downloadCsv("support-knowledge-gaps.csv", data.top_gaps)}
+                  onClick={() => downloadCsv(data.top_gaps, "support-knowledge-gaps.csv")}
                   className="min-h-11 rounded-card border border-border px-3 text-sm hover:bg-muted"
                 >
                   Export CSV
                 </button>
                 <button
                   type="button"
-                  onClick={() => downloadJson("support-quality.json", data)}
+                  onClick={() => downloadJson(data, "support-quality.json")}
                   className="min-h-11 rounded-card border border-border px-3 text-sm hover:bg-muted"
                 >
                   Export JSON
