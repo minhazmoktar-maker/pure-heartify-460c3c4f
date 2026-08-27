@@ -49,13 +49,13 @@ describe("support action catalogue parity", () => {
 describe("sanitizeActions", () => {
   it("keeps whitelisted routes and caps at three", () => {
     const out = sanitizeActions([
-      { id: "open_settings", label: "Settings", route: "/settings" },
+      { id: "open_help", label: "Help", route: "/help" },
       { id: "open_trust", label: "Trust", route: "/trust" },
       { id: "open_contact", label: "Contact", route: "/contact" },
       { id: "open_status", label: "Status", route: "/status" },
     ]);
     expect(out).toHaveLength(3);
-    expect(out[0].route).toBe("/settings");
+    expect(out[0].route).toBe("/help");
   });
 
   it("rejects off-app, protocol-relative and javascript routes", () => {
