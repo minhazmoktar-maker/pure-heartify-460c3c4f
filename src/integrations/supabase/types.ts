@@ -5890,13 +5890,16 @@ export type Database = {
       }
       support_ai_usage: {
         Row: {
+          categories: string[]
           completion_tokens: number
           conversation_id: string | null
           cost_usd: number
           created_at: string
           degraded: boolean
           escalated: boolean
+          flow: string | null
           id: string
+          injection_blocked: boolean
           latency_ms: number
           layer: string
           llm_called: boolean
@@ -5908,15 +5911,19 @@ export type Database = {
           resolved: boolean
           tier: string | null
           topic: string | null
+          validation_failed: boolean
         }
         Insert: {
+          categories?: string[]
           completion_tokens?: number
           conversation_id?: string | null
           cost_usd?: number
           created_at?: string
           degraded?: boolean
           escalated?: boolean
+          flow?: string | null
           id?: string
+          injection_blocked?: boolean
           latency_ms?: number
           layer: string
           llm_called?: boolean
@@ -5928,15 +5935,19 @@ export type Database = {
           resolved?: boolean
           tier?: string | null
           topic?: string | null
+          validation_failed?: boolean
         }
         Update: {
+          categories?: string[]
           completion_tokens?: number
           conversation_id?: string | null
           cost_usd?: number
           created_at?: string
           degraded?: boolean
           escalated?: boolean
+          flow?: string | null
           id?: string
+          injection_blocked?: boolean
           latency_ms?: number
           layer?: string
           llm_called?: boolean
@@ -5948,6 +5959,7 @@ export type Database = {
           resolved?: boolean
           tier?: string | null
           topic?: string | null
+          validation_failed?: boolean
         }
         Relationships: []
       }
@@ -6049,6 +6061,75 @@ export type Database = {
           },
         ]
       }
+      support_faq_drafts: {
+        Row: {
+          ask_count: number
+          category: string
+          created_at: string
+          gap_id: string | null
+          id: string
+          locale: string
+          origin: string
+          published_document_id: string | null
+          question: string
+          question_norm: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          suggested_answer: string | null
+          updated_at: string
+        }
+        Insert: {
+          ask_count?: number
+          category?: string
+          created_at?: string
+          gap_id?: string | null
+          id?: string
+          locale?: string
+          origin?: string
+          published_document_id?: string | null
+          question: string
+          question_norm: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggested_answer?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ask_count?: number
+          category?: string
+          created_at?: string
+          gap_id?: string | null
+          id?: string
+          locale?: string
+          origin?: string
+          published_document_id?: string | null
+          question?: string
+          question_norm?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggested_answer?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_faq_drafts_gap_id_fkey"
+            columns: ["gap_id"]
+            isOneToOne: false
+            referencedRelation: "support_knowledge_gaps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_faq_drafts_published_document_id_fkey"
+            columns: ["published_document_id"]
+            isOneToOne: false
+            referencedRelation: "support_kb_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_kb_chunks: {
         Row: {
           chunk_index: number
@@ -6096,21 +6177,25 @@ export type Database = {
           body: string
           cacheable: boolean
           category: string
+          checksum: string | null
           created_at: string
           created_by: string | null
           effective_date: string
+          effective_until: string | null
           faq_answer: string | null
           faq_question: string | null
           id: string
           intents: string[]
           keywords: string[]
           language: string
+          last_reviewed_at: string | null
           requires_auth: boolean
           requires_personalization: boolean
           slug: string
           source_url: string | null
           status: string
           summary: string | null
+          superseded_by: string | null
           title: string
           updated_at: string
           version: number
@@ -6120,21 +6205,25 @@ export type Database = {
           body: string
           cacheable?: boolean
           category?: string
+          checksum?: string | null
           created_at?: string
           created_by?: string | null
           effective_date?: string
+          effective_until?: string | null
           faq_answer?: string | null
           faq_question?: string | null
           id?: string
           intents?: string[]
           keywords?: string[]
           language?: string
+          last_reviewed_at?: string | null
           requires_auth?: boolean
           requires_personalization?: boolean
           slug: string
           source_url?: string | null
           status?: string
           summary?: string | null
+          superseded_by?: string | null
           title: string
           updated_at?: string
           version?: number
@@ -6144,26 +6233,38 @@ export type Database = {
           body?: string
           cacheable?: boolean
           category?: string
+          checksum?: string | null
           created_at?: string
           created_by?: string | null
           effective_date?: string
+          effective_until?: string | null
           faq_answer?: string | null
           faq_question?: string | null
           id?: string
           intents?: string[]
           keywords?: string[]
           language?: string
+          last_reviewed_at?: string | null
           requires_auth?: boolean
           requires_personalization?: boolean
           slug?: string
           source_url?: string | null
           status?: string
           summary?: string | null
+          superseded_by?: string | null
           title?: string
           updated_at?: string
           version?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "support_kb_documents_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "support_kb_documents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       support_knowledge_gaps: {
         Row: {
@@ -7819,6 +7920,17 @@ export type Database = {
           d7: number
         }[]
       }
+      admin_review_faq_draft: {
+        Args: {
+          _answer?: string
+          _approve: boolean
+          _category?: string
+          _draft_id: string
+          _question?: string
+          _slug?: string
+        }
+        Returns: Json
+      }
       admin_run_serving_audit: {
         Args: { p_serve_window_days?: number }
         Returns: Json
@@ -9288,12 +9400,23 @@ export type Database = {
         Returns: {
           answer: string
           category: string
+          matched_on: string
           requires_personalization: boolean
           score: number
           slug: string
           source_url: string
           title: string
         }[]
+      }
+      support_normalize_question: { Args: { _input: string }; Returns: string }
+      support_propose_faq_draft: {
+        Args: {
+          _locale?: string
+          _min_asks?: number
+          _question: string
+          _topic?: string
+        }
+        Returns: string
       }
       sweep_inappropriate_content:
         | { Args: never; Returns: Json }
