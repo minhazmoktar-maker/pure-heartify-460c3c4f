@@ -382,7 +382,12 @@ Deno.serve(async (req) => {
       topic: opts.topic,
       locale,
       questionNorm: cacheable ? questionNorm : null,
+      categories: classification.categories,
+      flow: opts.flow ?? null,
+      injectionBlocked: opts.injectionBlocked ?? false,
+      validationFailed: opts.validationFailed ?? false,
     });
+
 
     if (opts.escalate) {
       await admin.from("support_escalations").insert({
