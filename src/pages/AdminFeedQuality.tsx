@@ -305,6 +305,82 @@ export default function AdminFeedQuality() {
         )}
       </Card>
 
+      <Card className="p-4">
+        <h2 className="text-sm font-semibold">Serve throughput</h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          A flatline here means the corpus is not reaching users. The watchdog compares
+          impressions against a 7-day baseline and raises a flatline alert automatically.
+        </p>
+        {points.length === 0 ? (
+          <Empty />
+        ) : (
+          <div className="h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={points}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                <XAxis dataKey="day" fontSize={11} />
+                <YAxis fontSize={11} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="exposures"
+                  name="Impressions"
+                  stroke="hsl(var(--primary))"
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="unique_videos"
+                  name="Unique videos served"
+                  stroke="hsl(var(--accent-foreground))"
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </Card>
+
+      <Card className="p-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">Runbook</h2>
+          <Button size="sm" variant="outline" asChild>
+            <a href="/admin/unchecked-videos">Open unchecked videos</a>
+          </Button>
+        </div>
+        <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+          <li>
+            <span className="font-medium text-foreground">Dedup / canonical lag</span> — the
+            checker already triggers a bounded regroup pass each run. If the pending count is
+            still falling, no action is needed; if it is flat for two runs, raise sweep
+            concurrency.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Novelty dip</span> — exploration rate
+            and fatigue penalties are nudged automatically and recorded on the alert. Verify the
+            next day's novelty recovers above 60% before tuning further.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Coverage dip</span> — usually a
+            backlog symptom: check corpus check coverage above, then queue the unchecked backlog
+            for the next sweep.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Diversity dip</span> — a targeted
+            re-ranking sweep tightens per-channel caps; confirm max-per-channel in recent traces
+            on the feed traces page.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Serve flatline</span> — check the
+            ingestion pipeline and edge function logs first; the corpus is healthy but not being
+            served.
+          </li>
+        </ol>
+      </Card>
+
+
+
       <Card className="p-4 space-y-2">
         <h2 className="text-sm font-semibold">Semantic dedup backfill</h2>
         {!health ? (
