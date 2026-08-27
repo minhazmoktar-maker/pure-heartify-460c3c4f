@@ -47,19 +47,20 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
   );
   const activeReport = reports.find((r) => r.language === active?.language) ?? null;
 
-  // Opening the review step is itself an auditable act: it records the score a
-  // reviewer was shown before they approved or published.
-  const loggedRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (!activeReport || loggedRef.current === activeReport.language) return;
-    loggedRef.current = activeReport.language;
-    void logCaptionAudit({
+  // Audit entries are only written for explicit reviewer actions — mounting the
+  // panel is not a review, so nothing is logged until the button is pressed.
+  const [reviewLogged, setReviewLogged] = useState<string | null>(null);
+  const confirmReview = async () => {
+    if (!activeReport) return;
+    await logCaptionAudit({
       uploadId,
       language: activeReport.language,
       action: "publish_review",
       report: activeReport,
     });
-  }, [activeReport, uploadId]);
+    setReviewLogged(activeReport.language);
+  };
+
 
   if (captions.isLoading) {
     return (
