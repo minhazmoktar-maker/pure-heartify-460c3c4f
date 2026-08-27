@@ -152,6 +152,10 @@ interface UsageRecord {
   topic?: string | null;
   locale: string;
   questionNorm: string | null;
+  categories?: string[];
+  flow?: string | null;
+  injectionBlocked?: boolean;
+  validationFailed?: boolean;
 }
 
 async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
@@ -172,9 +176,14 @@ async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
     topic: u.topic ?? null,
     locale: u.locale,
     question_norm: u.questionNorm,
+    categories: u.categories ?? [],
+    flow: u.flow ?? null,
+    injection_blocked: u.injectionBlocked ?? false,
+    validation_failed: u.validationFailed ?? false,
   });
   if (error) console.error("[support-agent] usage insert failed", error.message);
 }
+
 
 async function recordProviderHealth(admin: SupabaseClient, provider: string, ok: boolean, error?: string) {
   const patch = ok
