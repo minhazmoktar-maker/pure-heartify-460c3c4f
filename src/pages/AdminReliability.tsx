@@ -69,6 +69,43 @@ type RouteRow = {
 
 const SEVERITIES = ["info", "warning", "error", "critical"];
 
+/** Alert kinds raised by the reliability crons, offered even when no routing row exists yet. */
+const KNOWN_ALERT_KINDS = [
+  "dedup_backfill_lag",
+  "canonical_pick_lag",
+  "feed_quality_novelty_dip",
+  "feed_quality_coverage_dip",
+  "feed_quality_diversity_dip",
+  "serve_throughput_flatline",
+  "worker_health_sla_breach",
+  "serving_predicate_visual_spike",
+  "serving_predicate_halal_spike",
+  "pipeline_watchdog",
+];
+
+type SimRecipient = {
+  channel: string;
+  target: string | null;
+  deliverable: boolean;
+  blocked_reason: string | null;
+};
+
+type Simulation = {
+  mode: string;
+  sent: boolean;
+  transports: { slack: boolean; email: boolean; email_recipient_count: number };
+  would_notify_count: number;
+  results: Array<{
+    kind: string;
+    severity: string;
+    would_notify: boolean;
+    reason: string;
+    matched_route: string | null;
+    recipients: SimRecipient[];
+  }>;
+};
+
+
 /**
  * Reliability console — worker-health SLA, alert routing, watchdog tuning and a
  * read-only replay of the last 24h of recorded metrics.
