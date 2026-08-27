@@ -19,3 +19,18 @@
 /sitemaps/*
   Content-Type: application/xml; charset=utf-8
   Cache-Control: public, max-age=3600
+
+# Hashed build output — safe to cache forever (filename changes per build).
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Brand marks live at stable, unhashed paths, so they must revalidate or a CDN
+# can keep serving a previous build's logo after a rebrand.
+/favicon.png
+  Cache-Control: public, max-age=300, must-revalidate
+/app-icon-1024.png
+  Cache-Control: public, max-age=300, must-revalidate
+/icons/*
+  Cache-Control: public, max-age=300, must-revalidate
+/manifest.json
+  Cache-Control: public, max-age=300, must-revalidate

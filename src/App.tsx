@@ -34,6 +34,7 @@ const Status = lazy(() => import("./pages/Status.tsx"));
 const Creators = lazy(() => import("./pages/Creators.tsx"));
 const Sources = lazy(() => import("./pages/Sources.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
+const Help = lazy(() => import("./pages/Help.tsx"));
 const ExportData = lazy(() => import("./pages/ExportData.tsx"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail.tsx"));
 const Achievements = lazy(() => import("./pages/Achievements.tsx"));
@@ -56,6 +57,7 @@ const AdminLaunchMonitor = lazy(() => import("./pages/AdminLaunchMonitor.tsx"));
 const AdminFeedDiversity = lazy(() => import("./pages/AdminFeedDiversity.tsx"));
 const AdminFeedFlags = lazy(() => import("./pages/AdminFeedFlags.tsx"));
 const AdminFeedQuality = lazy(() => import("./pages/AdminFeedQuality.tsx"));
+const AdminSupportAI = lazy(() => import("./pages/AdminSupportAI.tsx"));
 const AdminFeedTraces = lazy(() => import("./pages/AdminFeedTraces.tsx"));
 const AdminUncheckedVideos = lazy(() => import("./pages/AdminUncheckedVideos.tsx"));
 const AdminUnservedVideos = lazy(() => import("./pages/AdminUnservedVideos.tsx"));
@@ -343,6 +345,7 @@ const App = () => (
                 <Route path="/guides/hijri-calendar-guide" element={<HijriCalendar2026 />} />
                 <Route path="/status" element={<Status />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/help" element={<Help />} />
                 <Route path="/account/export-data" element={<ExportData />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/creators" element={<Creators />} />
@@ -539,6 +542,7 @@ const App = () => (
                 <Route path="/admin/feed-diversity" element={<AdminRoute><AdminFeedDiversity /></AdminRoute>} />
                 <Route path="/admin/feed-flags" element={<AdminRoute><AdminFeedFlags /></AdminRoute>} />
                 <Route path="/admin/feed-quality" element={<AdminRoute><AdminFeedQuality /></AdminRoute>} />
+                <Route path="/admin/support-ai" element={<AdminRoute><AdminSupportAI /></AdminRoute>} />
                 <Route path="/admin/feed-traces" element={<AdminRoute><AdminFeedTraces /></AdminRoute>} />
                 <Route path="/admin/unchecked-videos" element={<AdminRoute><AdminUncheckedVideos /></AdminRoute>} />
                 <Route path="/admin/unserved-videos" element={<AdminRoute><AdminUnservedVideos /></AdminRoute>} />

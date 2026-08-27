@@ -18,6 +18,7 @@
  *  - Icons are `lucide-react` components; keep imports narrow.
  */
 import {
+  LifeBuoy,
   Home,
   Compass,
   Library,
@@ -78,6 +79,7 @@ export const MAIN_NAV_ITEMS: readonly NavItem[] = [
   { to: "/listen", label: "Reciters & Scholars", icon: Radio },
   { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
   { to: "/trust", label: "Trust & moderation", icon: ShieldCheck },
+  { to: "/help", label: "Help & Support", icon: LifeBuoy },
   { to: "/profile", label: "Profile & settings", icon: Settings },
 ];
 

@@ -5,6 +5,7 @@ import { Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import { AuthField } from "@/components/auth/AuthField";
+import Logomark from "@/components/Logomark";
 import { PasswordStrength, scorePassword } from "@/components/auth/PasswordStrength";
 
 type Errors = { password?: string; confirmPassword?: string };
@@ -67,6 +68,9 @@ const ResetPassword = () => {
       <SEO title="Set a new Password — Heartify" description="Choose a new password for your Heartify account." path="/reset-password" />
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
+          <div className="mb-4 flex justify-center">
+            <Logomark size={40} className="h-10 w-10" />
+          </div>
           <h1 className="font-heading text-heading font-bold text-foreground">Set New Password</h1>
           <p className="mt-1 text-sm text-muted-foreground">Choose a strong password (min 8 characters)</p>
         </div>
