@@ -146,7 +146,7 @@ export default function AdminFeedQuality() {
 
       {alerts.length > 0 && (
         <Card className="p-4 space-y-2 border-destructive/40">
-          <h2 className="text-sm font-semibold">Open dedup alerts</h2>
+          <h2 className="text-sm font-semibold">Open feed quality alerts</h2>
           {alerts.map((a) => (
             <div key={a.id} className="flex items-start gap-2 text-sm">
               <Badge variant={a.severity === "critical" ? "destructive" : "secondary"}>
