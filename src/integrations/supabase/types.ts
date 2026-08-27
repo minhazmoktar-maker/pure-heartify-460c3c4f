@@ -5888,6 +5888,69 @@ export type Database = {
         }
         Relationships: []
       }
+      support_ai_usage: {
+        Row: {
+          completion_tokens: number
+          conversation_id: string | null
+          cost_usd: number
+          created_at: string
+          degraded: boolean
+          escalated: boolean
+          id: string
+          latency_ms: number
+          layer: string
+          llm_called: boolean
+          locale: string | null
+          model: string | null
+          prompt_tokens: number
+          provider: string | null
+          question_norm: string | null
+          resolved: boolean
+          tier: string | null
+          topic: string | null
+        }
+        Insert: {
+          completion_tokens?: number
+          conversation_id?: string | null
+          cost_usd?: number
+          created_at?: string
+          degraded?: boolean
+          escalated?: boolean
+          id?: string
+          latency_ms?: number
+          layer: string
+          llm_called?: boolean
+          locale?: string | null
+          model?: string | null
+          prompt_tokens?: number
+          provider?: string | null
+          question_norm?: string | null
+          resolved?: boolean
+          tier?: string | null
+          topic?: string | null
+        }
+        Update: {
+          completion_tokens?: number
+          conversation_id?: string | null
+          cost_usd?: number
+          created_at?: string
+          degraded?: boolean
+          escalated?: boolean
+          id?: string
+          latency_ms?: number
+          layer?: string
+          llm_called?: boolean
+          locale?: string | null
+          model?: string | null
+          prompt_tokens?: number
+          provider?: string | null
+          question_norm?: string | null
+          resolved?: boolean
+          tier?: string | null
+          topic?: string | null
+        }
+        Relationships: []
+      }
       support_conversations: {
         Row: {
           anon_key: string | null
@@ -6031,12 +6094,19 @@ export type Database = {
         Row: {
           authority_level: string
           body: string
+          cacheable: boolean
           category: string
           created_at: string
           created_by: string | null
+          effective_date: string
+          faq_answer: string | null
+          faq_question: string | null
           id: string
+          intents: string[]
           keywords: string[]
           language: string
+          requires_auth: boolean
+          requires_personalization: boolean
           slug: string
           source_url: string | null
           status: string
@@ -6048,12 +6118,19 @@ export type Database = {
         Insert: {
           authority_level?: string
           body: string
+          cacheable?: boolean
           category?: string
           created_at?: string
           created_by?: string | null
+          effective_date?: string
+          faq_answer?: string | null
+          faq_question?: string | null
           id?: string
+          intents?: string[]
           keywords?: string[]
           language?: string
+          requires_auth?: boolean
+          requires_personalization?: boolean
           slug: string
           source_url?: string | null
           status?: string
@@ -6065,12 +6142,19 @@ export type Database = {
         Update: {
           authority_level?: string
           body?: string
+          cacheable?: boolean
           category?: string
           created_at?: string
           created_by?: string | null
+          effective_date?: string
+          faq_answer?: string | null
+          faq_question?: string | null
           id?: string
+          intents?: string[]
           keywords?: string[]
           language?: string
+          requires_auth?: boolean
+          requires_personalization?: boolean
           slug?: string
           source_url?: string | null
           status?: string
@@ -6130,6 +6214,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      support_knowledge_state: {
+        Row: {
+          id: boolean
+          knowledge_version: number
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          knowledge_version?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          knowledge_version?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       support_message_feedback: {
         Row: {
@@ -6221,6 +6323,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      support_provider_health: {
+        Row: {
+          consecutive_failures: number
+          last_error: string | null
+          last_error_at: string | null
+          last_ok_at: string | null
+          provider: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          consecutive_failures?: number
+          last_error?: string | null
+          last_error_at?: string | null
+          last_ok_at?: string | null
+          provider: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          consecutive_failures?: number
+          last_error?: string | null
+          last_error_at?: string | null
+          last_ok_at?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_response_cache: {
+        Row: {
+          actions: Json
+          answer: string
+          confidence: number
+          created_at: string
+          embedding: string | null
+          expires_at: string
+          hits: number
+          id: string
+          intent: string | null
+          knowledge_version: number
+          last_hit_at: string | null
+          locale: string
+          model: string | null
+          provider: string | null
+          question_norm: string
+          question_sample: string
+          sources: Json
+        }
+        Insert: {
+          actions?: Json
+          answer: string
+          confidence?: number
+          created_at?: string
+          embedding?: string | null
+          expires_at?: string
+          hits?: number
+          id?: string
+          intent?: string | null
+          knowledge_version?: number
+          last_hit_at?: string | null
+          locale?: string
+          model?: string | null
+          provider?: string | null
+          question_norm: string
+          question_sample: string
+          sources?: Json
+        }
+        Update: {
+          actions?: Json
+          answer?: string
+          confidence?: number
+          created_at?: string
+          embedding?: string | null
+          expires_at?: string
+          hits?: number
+          id?: string
+          intent?: string | null
+          knowledge_version?: number
+          last_hit_at?: string | null
+          locale?: string
+          model?: string | null
+          provider?: string | null
+          question_norm?: string
+          question_sample?: string
+          sources?: Json
+        }
+        Relationships: []
       }
       team_streak_members: {
         Row: {
@@ -7636,6 +7828,7 @@ export type Database = {
         Args: { _slug: string; _status: string }
         Returns: undefined
       }
+      admin_support_ai_cost: { Args: { _days?: number }; Returns: Json }
       admin_support_quality: { Args: { _days?: number }; Returns: Json }
       admin_unchecked_videos: {
         Args: {
@@ -9072,6 +9265,35 @@ export type Database = {
       submit_creator_appeal: {
         Args: { p_message: string; p_upload_id: string }
         Returns: Json
+      }
+      support_cache_match: {
+        Args: {
+          _locale?: string
+          _min_similarity?: number
+          _query_embedding: string
+        }
+        Returns: {
+          actions: Json
+          answer: string
+          confidence: number
+          id: string
+          intent: string
+          similarity: number
+          sources: Json
+        }[]
+      }
+      support_cache_touch: { Args: { _id: string }; Returns: undefined }
+      support_faq_lookup: {
+        Args: { _limit?: number; _locale?: string; _query: string }
+        Returns: {
+          answer: string
+          category: string
+          requires_personalization: boolean
+          score: number
+          slug: string
+          source_url: string
+          title: string
+        }[]
       }
       sweep_inappropriate_content:
         | { Args: never; Returns: Json }
