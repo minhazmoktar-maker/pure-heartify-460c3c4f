@@ -47,6 +47,17 @@ type Alert = {
   created_at: string;
 };
 
+type Coverage = {
+  total: number;
+  approved: number;
+  rejected: number;
+  moderation_pending: number;
+  visual_unchecked_approved: number;
+  dedup_pending_approved: number;
+  servable: number;
+  checked_pct: number;
+};
+
 const RANGES = [7, 14, 30] as const;
 
 /**
