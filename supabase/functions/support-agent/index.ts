@@ -57,10 +57,29 @@ import {
   validateAnswer,
   type ResolutionLayer,
 } from "../_shared/support/normalize.ts";
+import {
+  classifyQuestion,
+  detectReportIntent,
+  INJECTION_REFUSAL,
+  matchTroubleshootFlow,
+  renderTroubleshootFlow,
+  reportConfirmation,
+  reportFollowUp,
+  staticAnswer,
+  toDbReportReason,
+  unsupportedAnswer,
+} from "../_shared/support/classify.ts";
 
 const LOW_CONFIDENCE = 0.5;
 const SEMANTIC_CACHE_THRESHOLD = 0.93;
-const FAQ_SCORE_THRESHOLD = 0.8;
+/**
+ * A deterministic FAQ answer is only served on strong evidence. Weaker matches
+ * still reach the model as retrieval context instead of being served verbatim,
+ * which is what keeps loosely-related questions ("what is the weather") from
+ * getting a confident Heartify answer.
+ */
+const FAQ_SCORE_THRESHOLD = 0.6;
+
 
 const SAFE_FALLBACK =
   "I couldn't confidently resolve that from Heartify's available information. " +
