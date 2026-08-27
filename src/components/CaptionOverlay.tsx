@@ -9,7 +9,11 @@
  */
 import { useMemo } from "react";
 import type { CaptionSegment } from "@/hooks/useUploadCaptions";
-import { captionLineStyle, useCaptionSettings } from "@/hooks/useCaptionSettings";
+import {
+  type CaptionSettings,
+  captionLineStyle,
+  useCaptionSettings,
+} from "@/hooks/useCaptionSettings";
 import { isRtlCaption } from "@/components/CaptionPicker";
 
 interface Props {
@@ -18,6 +22,12 @@ interface Props {
   /** Player position in seconds. */
   currentTime: number;
   testId?: string;
+  /**
+   * Per-surface overrides applied on top of the viewer's saved settings —
+   * used by the Creator Studio review panel, which remembers RTL mirroring,
+   * text scale and high contrast per upload.
+   */
+  overrides?: Partial<CaptionSettings>;
 }
 
 export function activeCue(
