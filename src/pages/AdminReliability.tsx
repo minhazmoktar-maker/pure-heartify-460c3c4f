@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
-import { downloadJson, timestampSlug } from "@/lib/download";
+import { downloadCsv, downloadJson, timestampSlug } from "@/lib/download";
 import {
   Area,
   AreaChart,
@@ -69,6 +69,43 @@ type RouteRow = {
 
 const SEVERITIES = ["info", "warning", "error", "critical"];
 
+/** Alert kinds raised by the reliability crons, offered even when no routing row exists yet. */
+const KNOWN_ALERT_KINDS = [
+  "dedup_backfill_lag",
+  "canonical_pick_lag",
+  "feed_quality_novelty_dip",
+  "feed_quality_coverage_dip",
+  "feed_quality_diversity_dip",
+  "serve_throughput_flatline",
+  "worker_health_sla_breach",
+  "serving_predicate_visual_spike",
+  "serving_predicate_halal_spike",
+  "pipeline_watchdog",
+];
+
+type SimRecipient = {
+  channel: string;
+  target: string | null;
+  deliverable: boolean;
+  blocked_reason: string | null;
+};
+
+type Simulation = {
+  mode: string;
+  sent: boolean;
+  transports: { slack: boolean; email: boolean; email_recipient_count: number };
+  would_notify_count: number;
+  results: Array<{
+    kind: string;
+    severity: string;
+    would_notify: boolean;
+    reason: string;
+    matched_route: string | null;
+    recipients: SimRecipient[];
+  }>;
+};
+
+
 /**
  * Reliability console — worker-health SLA, alert routing, watchdog tuning and a
  * read-only replay of the last 24h of recorded metrics.
@@ -85,6 +122,70 @@ export default function AdminReliability() {
   const [targets, setTargets] = useState<Array<{ worker: string; min_per_hour: number; enabled: boolean }>>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [sim, setSim] = useState<Simulation | null>(null);
+  const [simKinds, setSimKinds] = useState<string[]>(["dedup_backfill_lag"]);
+  const [simSeverities, setSimSeverities] = useState<string[]>(["warning", "critical"]);
+  const [timelineDays, setTimelineDays] = useState(7);
+
+  // Every kind we can preview: the configured routing rows plus the known cron kinds.
+  const kindOptions = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...routes.map((r) => r.kind).filter((k): k is string => !!k),
+          ...KNOWN_ALERT_KINDS,
+        ]),
+      ).sort(),
+    [routes],
+  );
+
+  /** Dry-run the fan-out routing; the edge function never sends or persists anything. */
+  async function runSimulation() {
+    setBusy(true);
+    const { data, error } = await supabase.functions.invoke("alert-simulate", {
+      body: { kinds: simKinds, severities: simSeverities },
+    });
+    setBusy(false);
+    if (error) {
+      toast({ title: "Simulation failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    setSim(data as Simulation);
+  }
+
+  async function exportTimeline(format: "json" | "csv") {
+    setBusy(true);
+    const { data, error } = await supabase.rpc("admin_reliability_timeline", {
+      p_days: timelineDays,
+    });
+    setBusy(false);
+    if (error) {
+      toast({ title: "Export failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    const name = `reliability-timeline-${timelineDays}d-${timestampSlug()}`;
+    if (format === "json") {
+      downloadJson(data, `${name}.json`);
+      toast({ title: "Timeline exported" });
+      return;
+    }
+    // CSV flattens every section into one event stream so it opens in a spreadsheet.
+    const t = (data ?? {}) as Record<string, unknown>;
+    const rows: Array<Record<string, unknown>> = [];
+    for (const [section, value] of Object.entries(t)) {
+      if (!Array.isArray(value)) continue;
+      for (const item of value) {
+        rows.push({ section, ...(item as Record<string, unknown>) });
+      }
+    }
+    if (!rows.length) {
+      toast({ title: "No timeline events in this window" });
+      return;
+    }
+    downloadCsv(rows, `${name}.csv`);
+    toast({ title: `Exported ${rows.length} timeline event(s)` });
+  }
+
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -524,9 +625,157 @@ export default function AdminReliability() {
           </table>
         </div>
       </Card>
+
+      {/* Simulate notifications */}
+      <Card className="space-y-3 p-4">
+        <h2 className="text-base font-semibold">Simulate notifications (no sending)</h2>
+        <p className="text-xs text-muted-foreground">
+          Previews which Slack webhook and email recipients each alert kind and severity would
+          reach under the current routing rules. Nothing is sent and no alert is written;
+          recipients are masked.
+        </p>
+
+        <div className="space-y-2">
+          <p className="text-xs font-medium uppercase text-muted-foreground">Alert kinds</p>
+          <div className="flex flex-wrap gap-2">
+            {kindOptions.map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() =>
+                  setSimKinds((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]))
+                }
+                className={`min-h-[44px] rounded-md border px-3 text-xs transition-colors ${
+                  simKinds.includes(k) ? "border-primary bg-primary/10" : "hover:bg-muted"
+                }`}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs font-medium uppercase text-muted-foreground">Severities</p>
+          <div className="flex flex-wrap gap-2">
+            {SEVERITIES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() =>
+                  setSimSeverities((p) =>
+                    p.includes(s) ? p.filter((x) => x !== s) : [...p, s],
+                  )
+                }
+                className={`min-h-[44px] rounded-md border px-3 text-xs capitalize transition-colors ${
+                  simSeverities.includes(s) ? "border-primary bg-primary/10" : "hover:bg-muted"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            onClick={runSimulation}
+            disabled={busy || simKinds.length === 0 || simSeverities.length === 0}
+          >
+            {busy ? "Simulating…" : "Preview recipients"}
+          </Button>
+          {sim && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => downloadJson(sim, `notification-simulation-${timestampSlug()}.json`)}
+            >
+              Export simulation JSON
+            </Button>
+          )}
+        </div>
+
+        {sim && (
+          <div className="space-y-2 border-t pt-3">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary">Nothing sent</Badge>
+              <Badge variant={sim.transports?.slack ? "secondary" : "destructive"}>
+                Slack {sim.transports?.slack ? "configured" : "not configured"}
+              </Badge>
+              <Badge variant={sim.transports?.email ? "secondary" : "destructive"}>
+                Email {sim.transports?.email ? "configured" : "not configured"}
+              </Badge>
+              <Badge variant="outline">{sim.would_notify_count} combination(s) notify</Badge>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="p-2 text-left">Kind</th>
+                    <th className="p-2 text-left">Severity</th>
+                    <th className="p-2 text-left">Matched route</th>
+                    <th className="p-2 text-left">Recipients</th>
+                    <th className="p-2 text-left">Outcome</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sim.results?.map((r) => (
+                    <tr key={`${r.kind}-${r.severity}`} className="border-b last:border-0">
+                      <td className="p-2 font-medium">{r.kind}</td>
+                      <td className="p-2 capitalize">{r.severity}</td>
+                      <td className="p-2 text-xs">{r.matched_route ?? "—"}</td>
+                      <td className="p-2 text-xs">
+                        {r.recipients.length === 0
+                          ? "—"
+                          : r.recipients.map((rec, i) => (
+                              <span key={i} className="block">
+                                {rec.channel}: {rec.target ?? "not configured"}
+                                {rec.blocked_reason ? ` (${rec.blocked_reason})` : ""}
+                              </span>
+                            ))}
+                      </td>
+                      <td className="p-2">
+                        <Badge variant={r.would_notify ? "secondary" : "outline"}>
+                          {r.would_notify ? "would notify" : r.reason}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* Incident timeline export */}
+      <Card className="space-y-3 p-4">
+        <h2 className="text-base font-semibold">Export reliability incident timeline</h2>
+        <p className="text-xs text-muted-foreground">
+          Compiles alert history (with delivery outcome), replay results, worker-health
+          snapshots, remediation actions and daily serving audits into one download.
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            type="number"
+            min={1}
+            max={30}
+            value={timelineDays}
+            aria-label="Timeline window in days"
+            className="h-9 w-24"
+            onChange={(e) => setTimelineDays(Number(e.target.value))}
+          />
+          <span className="text-xs text-muted-foreground">days</span>
+          <Button size="sm" disabled={busy} onClick={() => exportTimeline("json")}>
+            Export JSON
+          </Button>
+          <Button size="sm" variant="outline" disabled={busy} onClick={() => exportTimeline("csv")}>
+            Export CSV
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }
+
 
 function Stat({ label, value }: { label: string; value: number | null | undefined }) {
   return (

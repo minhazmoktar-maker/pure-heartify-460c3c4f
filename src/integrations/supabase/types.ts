@@ -5684,6 +5684,45 @@ export type Database = {
         }
         Relationships: []
       }
+      serving_audit_reports: {
+        Row: {
+          created_at: string
+          gates: Json
+          id: string
+          ran_at: string
+          rates: Json
+          servable: number
+          served_recent: number
+          total_videos: number
+          unserved: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          gates?: Json
+          id?: string
+          ran_at?: string
+          rates?: Json
+          servable?: number
+          served_recent?: number
+          total_videos?: number
+          unserved?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          gates?: Json
+          id?: string
+          ran_at?: string
+          rates?: Json
+          servable?: number
+          served_recent?: number
+          total_videos?: number
+          unserved?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       share_events: {
         Row: {
           channel: string
@@ -7242,6 +7281,7 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_reliability_timeline: { Args: { p_days?: number }; Returns: Json }
       admin_replay_quality_checks: { Args: { p_hours?: number }; Returns: Json }
       admin_retention_cohorts: {
         Args: never
@@ -7252,6 +7292,10 @@ export type Database = {
           d30: number
           d7: number
         }[]
+      }
+      admin_run_serving_audit: {
+        Args: { p_serve_window_days?: number }
+        Returns: Json
       }
       admin_serving_coverage: { Args: never; Returns: Json }
       admin_set_institution_status: {
@@ -7279,6 +7323,33 @@ export type Database = {
           total_count: number
           video_id: string
           visual_checked_at: string
+          visual_state: string
+        }[]
+      }
+      admin_unserved_videos: {
+        Args: {
+          _channel?: string
+          _gate?: string
+          _limit?: number
+          _offset?: number
+          _serve_window_days?: number
+        }
+        Returns: {
+          age_hours: number
+          channel_id: string
+          channel_title: string
+          duplicate_group_id: string
+          gate: string
+          hidden_reason: string
+          ingested_at: string
+          is_duplicate_canonical: boolean
+          is_hidden: boolean
+          moderation_state: string
+          thumbnail_url: string
+          title: string
+          total_count: number
+          video_id: string
+          visual_flags: string[]
           visual_state: string
         }[]
       }
@@ -7460,6 +7531,10 @@ export type Database = {
       check_pipeline_watchdog: { Args: never; Returns: Json }
       check_serve_throughput: {
         Args: { p_drop_ratio?: number; p_min_baseline?: number }
+        Returns: Json
+      }
+      check_serving_predicate_failures: {
+        Args: { p_error_delta?: number; p_warn_delta?: number }
         Returns: Json
       }
       check_worker_health_sla: { Args: never; Returns: Json }
@@ -8462,6 +8537,10 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: boolean
       }
+      run_serving_audit: {
+        Args: { p_serve_window_days?: number }
+        Returns: Json
+      }
       sadaqah_challenge_reminders: { Args: never; Returns: Json }
       scrub_user_data: { Args: { _uid: string }; Returns: Json }
       search_autocomplete: {
@@ -8548,6 +8627,20 @@ export type Database = {
       send_nudge_by_handle: {
         Args: { _handle: string; _kind: string; _message: string }
         Returns: Json
+      }
+      serving_gate_for: {
+        Args: {
+          _channel_title: string
+          _duplicate_group_id: string
+          _is_archived: boolean
+          _is_duplicate_canonical: boolean
+          _is_hidden: boolean
+          _moderation_state: string
+          _served: boolean
+          _title: string
+          _visual_state: string
+        }
+        Returns: string
       }
       set_learning_step_progress: {
         Args: { _completed: boolean; _concept_slug: string; _path_slug: string }
