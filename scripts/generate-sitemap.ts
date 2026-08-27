@@ -38,7 +38,7 @@ import { HALAL_TOPICS } from "../src/data/halalTopics";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const BASE_URL = "https://pure-heartify.lovable.app";
+const BASE_URL = "https://heartifyapp.com";
 const PUBLIC_DIR = resolve(__dirname, "../public");
 const CHUNK_DIR = resolve(PUBLIC_DIR, "sitemaps");
 const HREFLANGS = ["en", "ar", "bn", "de", "fr", "id", "tr"] as const;
