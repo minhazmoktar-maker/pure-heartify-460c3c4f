@@ -7,7 +7,7 @@
  * quality report per track; and opens the inline editor for fixes. Nothing here
  * publishes anything — it is the last look before the decision.
  */
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CaptionOverlay from "@/components/CaptionOverlay";
