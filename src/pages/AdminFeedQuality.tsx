@@ -170,6 +170,44 @@ export default function AdminFeedQuality() {
         <Stat label="Sessions (latest day)" value={latest ? String(latest.sessions) : "—"} />
       </div>
 
+      <Card className="p-4 space-y-3">
+        <div>
+          <h2 className="text-sm font-semibold">Corpus check coverage</h2>
+          <p className="text-xs text-muted-foreground">
+            Every video must pass moderation and the visual safety check before it can
+            be served. Anything left in the backlog is never shown to users.
+          </p>
+        </div>
+        {!coverage ? (
+          <Empty />
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <Stat label="Library" value={coverage.total.toLocaleString()} />
+              <Stat label="Checked" value={`${Number(coverage.checked_pct).toFixed(2)}%`} />
+              <Stat label="Servable" value={coverage.servable.toLocaleString()} />
+              <Stat
+                label="Awaiting visual check"
+                value={coverage.visual_unchecked_approved.toLocaleString()}
+              />
+              <Stat
+                label="Awaiting dedup group"
+                value={coverage.dedup_pending_approved.toLocaleString()}
+              />
+              <Stat label="Moderation pending" value={coverage.moderation_pending.toLocaleString()} />
+              <Stat label="Approved" value={coverage.approved.toLocaleString()} />
+              <Stat label="Rejected / blocked" value={coverage.rejected.toLocaleString()} />
+            </div>
+            <div className="h-2 overflow-hidden rounded-pill bg-muted" aria-hidden>
+              <div
+                className="h-full bg-primary"
+                style={{ width: `${Math.min(100, Number(coverage.checked_pct))}%` }}
+              />
+            </div>
+          </>
+        )}
+      </Card>
+
       <Card className="p-4">
         <h2 className="mb-3 text-sm font-semibold">Novelty & duplicate-group avoidance (%)</h2>
         {points.length === 0 ? (
