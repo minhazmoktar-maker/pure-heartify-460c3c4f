@@ -80,7 +80,7 @@ export default function AdminUncheckedVideos() {
     if (error) toast({ title: error.message, variant: "destructive" });
     const list = (data ?? []) as unknown as Row[];
     setRows(list);
-    setTotal(list[0］?.total_count ?? 0);
+    setTotal(list[0]?.total_count ?? 0);
     setSelected(new Set());
     setLoading(false);
   }
