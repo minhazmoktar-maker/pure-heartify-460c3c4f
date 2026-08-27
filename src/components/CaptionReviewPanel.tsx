@@ -20,6 +20,7 @@ import { useUploadPlayback } from "@/hooks/useCreatorStudio";
 import { useUploadCaptions } from "@/hooks/useUploadCaptions";
 import { analyseCaptionTracks } from "@/lib/captionQuality";
 import { logCaptionAudit } from "@/lib/captionAudit";
+import { useCaptionPanelState } from "@/hooks/useCaptionPanelState";
 
 interface Props {
   uploadId: string;
@@ -32,9 +33,14 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
   const playback = useUploadPlayback(uploadId, "review_panel");
   const captions = useUploadCaptions(uploadId);
   const tracks = captions.data ?? [];
-  const [language, setLanguage] = useState<string | null>(initialLanguage ?? null);
+  // Per-upload UI state (track, editor open, RTL mirroring, text scale, high
+  // contrast) is remembered across close/reopen and across switching uploads.
+  const { panelState, updatePanelState } = useCaptionPanelState(uploadId);
+  const language = initialLanguage ?? panelState.language;
+  const setLanguage = (next: string) => updatePanelState({ language: next });
+  const editing = panelState.editing;
+  const setEditing = (next: boolean) => updatePanelState({ editing: next });
   const [currentTime, setCurrentTime] = useState(0);
-  const [editing, setEditing] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const active = useMemo(
@@ -102,6 +108,12 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
           language={active?.language}
           currentTime={currentTime}
           testId="caption-review-overlay"
+          overrides={{
+            mirrorRtl: panelState.mirrorRtl,
+            highContrast: panelState.highContrast,
+            fontScale: panelState.textScale,
+            sizePreset: "custom",
+          }}
         />
       </div>
 
@@ -124,6 +136,34 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
           </button>
         ))}
         <CaptionSettingsSheet previewRtl={isRtlCaption(active?.language)} testId="caption-review-settings" />
+        <button
+          type="button"
+          onClick={() => updatePanelState({ mirrorRtl: !panelState.mirrorRtl })}
+          aria-pressed={panelState.mirrorRtl}
+          data-testid="caption-review-mirror-rtl"
+          className="min-h-[32px] rounded-pill border border-border px-3 text-[11px] text-muted-foreground hover:bg-accent/50"
+        >
+          RTL mirroring {panelState.mirrorRtl ? "on" : "off"}
+        </button>
+        <button
+          type="button"
+          onClick={() => updatePanelState({ highContrast: !panelState.highContrast })}
+          aria-pressed={panelState.highContrast}
+          data-testid="caption-review-high-contrast"
+          className="min-h-[32px] rounded-pill border border-border px-3 text-[11px] text-muted-foreground hover:bg-accent/50"
+        >
+          High contrast {panelState.highContrast ? "on" : "off"}
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            updatePanelState({ textScale: panelState.textScale >= 1.6 ? 1 : panelState.textScale + 0.2 })
+          }
+          data-testid="caption-review-text-scale"
+          className="min-h-[32px] rounded-pill border border-border px-3 text-[11px] text-muted-foreground hover:bg-accent/50"
+        >
+          Text {panelState.textScale.toFixed(1)}x
+        </button>
       </div>
 
       {activeReport && (
@@ -152,7 +192,7 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
           size="sm"
           variant="secondary"
           className="h-9"
-          onClick={() => setEditing((v) => !v)}
+          onClick={() => setEditing(!editing)}
           data-testid="caption-review-toggle-editor"
         >
           {editing ? "Close editor" : "Edit timings & text"}

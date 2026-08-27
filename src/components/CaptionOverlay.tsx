@@ -9,7 +9,11 @@
  */
 import { useMemo } from "react";
 import type { CaptionSegment } from "@/hooks/useUploadCaptions";
-import { captionLineStyle, useCaptionSettings } from "@/hooks/useCaptionSettings";
+import {
+  type CaptionSettings,
+  captionLineStyle,
+  useCaptionSettings,
+} from "@/hooks/useCaptionSettings";
 import { isRtlCaption } from "@/components/CaptionPicker";
 
 interface Props {
@@ -18,6 +22,12 @@ interface Props {
   /** Player position in seconds. */
   currentTime: number;
   testId?: string;
+  /**
+   * Per-surface overrides applied on top of the viewer's saved settings —
+   * used by the Creator Studio review panel, which remembers RTL mirroring,
+   * text scale and high contrast per upload.
+   */
+  overrides?: Partial<CaptionSettings>;
 }
 
 export function activeCue(
@@ -37,8 +47,15 @@ export function activeCue(
   return best && best.text?.trim() ? best : null;
 }
 
-const CaptionOverlay = ({ segments, language, currentTime, testId = "caption-overlay" }: Props) => {
-  const { settings } = useCaptionSettings();
+const CaptionOverlay = ({
+  segments,
+  language,
+  currentTime,
+  testId = "caption-overlay",
+  overrides,
+}: Props) => {
+  const { settings: saved } = useCaptionSettings();
+  const settings = overrides ? { ...saved, ...overrides } : saved;
   const rtl = isRtlCaption(language);
   const cue = useMemo(() => activeCue(segments, Math.round(currentTime * 1000)), [segments, currentTime]);
 

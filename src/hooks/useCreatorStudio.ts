@@ -12,6 +12,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { uploadResumable } from "@/lib/resumableUpload";
 import { detectLanguage, generateThumbnail, probeDuration } from "@/lib/uploadMedia";
+import {
+  recordPlaybackUrlCacheHit,
+  recordPlaybackUrlFetch,
+} from "@/lib/playbackUrlMetrics";
 
 /** Shape returned by the creator-upload-init edge function. */
 interface InitResult {
@@ -368,6 +372,7 @@ export function useUploadPlayback(
     if (!uploadId) return;
     const hit = playbackCache.get(uploadId);
     if (hit && hit.expiresAt > Date.now()) {
+      recordPlaybackUrlCacheHit();
       setUrl(hit.url);
       setError(null);
       setLoading(false);
@@ -377,11 +382,16 @@ export function useUploadPlayback(
     const controller = new AbortController();
     setLoading(true);
     (async () => {
+      const startedAt = Date.now();
       const { data, error: fnError } = await supabase.functions.invoke("creator-media-url", {
         body: { upload_id: uploadId, context },
         signal: controller.signal,
       });
+      // Aborted (panel closed): not a cache miss the user paid for, and no
+      // state may be touched — a late setState is exactly the regression the
+      // E2E abort test pins.
       if (!active) return;
+      recordPlaybackUrlFetch(Date.now() - startedAt, !fnError && !!data?.url);
       if (fnError || !data?.url) {
         setError("This video isn't available.");
       } else {
