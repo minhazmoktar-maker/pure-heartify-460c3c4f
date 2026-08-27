@@ -164,6 +164,8 @@ interface UsageRecord {
   flow?: string | null;
   injectionBlocked?: boolean;
   validationFailed?: boolean;
+  cacheHit?: boolean;
+  scrubViolation?: boolean;
 }
 
 async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
@@ -188,9 +190,12 @@ async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
     flow: u.flow ?? null,
     injection_blocked: u.injectionBlocked ?? false,
     validation_failed: u.validationFailed ?? false,
+    cache_hit: u.cacheHit ?? false,
+    scrub_violation: u.scrubViolation ?? false,
   });
   if (error) console.error("[support-agent] usage insert failed", error.message);
 }
+
 
 
 async function recordProviderHealth(admin: SupabaseClient, provider: string, ok: boolean, error?: string) {
