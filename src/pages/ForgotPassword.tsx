@@ -5,6 +5,7 @@ import { Mail, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import { AuthField } from "@/components/auth/AuthField";
+import Logomark from "@/components/Logomark";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -34,9 +35,7 @@ const ForgotPassword = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-card bg-primary">
-              <span className="text-heading font-bold text-primary-foreground">H</span>
-            </div>
+            <Logomark size={40} className="h-10 w-10" />
           </Link>
           <h1 className="mt-4 font-heading text-heading font-bold text-foreground">Reset your password</h1>
           <p className="mt-1 text-sm text-muted-foreground">Enter your email and we'll send a reset link</p>

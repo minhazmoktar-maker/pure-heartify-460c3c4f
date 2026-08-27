@@ -7,6 +7,7 @@ import { Mail, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import { AuthField } from "@/components/auth/AuthField";
+import Logomark from "@/components/Logomark";
 
 type Errors = { email?: string; password?: string };
 
@@ -74,9 +75,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-card bg-primary">
-              <span className="text-heading font-bold text-primary-foreground">H</span>
-            </div>
+            <Logomark size={40} className="h-10 w-10" />
             <span className="font-heading text-title font-bold text-foreground">
               Heartify
             </span>
