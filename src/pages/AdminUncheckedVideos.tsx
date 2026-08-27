@@ -212,8 +212,21 @@ export default function AdminUncheckedVideos() {
           >
             {loading ? "Loading…" : "Apply filters"}
           </Button>
-          <Button size="sm" variant="outline" onClick={exportCsv} disabled={rows.length === 0}>
-            Export CSV
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => void exportAll("csv")}
+            disabled={busy || total === 0}
+          >
+            Export CSV (all filtered)
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => void exportAll("json")}
+            disabled={busy || total === 0}
+          >
+            Export JSON
           </Button>
         </div>
 
