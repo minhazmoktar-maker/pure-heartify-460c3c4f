@@ -76,8 +76,13 @@ export function isCacheable(rawQuestion: string, opts: { signedIn: boolean }): b
   return true;
 }
 
-/** Router tiers, cheapest first. Level 0-2 never touch a model. */
+/** Router tiers, cheapest first. Everything above `llm_cheap` costs nothing. */
 export type ResolutionLayer =
+  | "static"       // L0 self-describing / conversational, answered in-process
+  | "unsupported"  // L0 out-of-scope request declined deterministically
+  | "blocked"      // L0 prompt-injection or extraction attempt refused
+  | "flow"         // L0 guided troubleshooting script
+  | "tool"         // L0 structured action (e.g. filing a content report)
   | "exact_cache"
   | "semantic_cache"
   | "faq"
@@ -85,6 +90,7 @@ export type ResolutionLayer =
   | "llm_standard"
   | "llm_capable"
   | "degraded";
+
 
 export interface RouteDecision {
   tier: "cheap" | "standard" | "capable";
