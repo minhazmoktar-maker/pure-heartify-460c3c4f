@@ -319,6 +319,124 @@ export default function AdminLaunchGate() {
               ))}
             </div>
 
+            {forecast && (
+              <Card className="space-y-3 p-5">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold">Throughput &amp; ETA to 1,000,000</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {[
+                    { label: "Cleared / hour", value: nf.format(forecast.rate_per_hour) },
+                    { label: "Cleared / day", value: nf.format(forecast.rate_per_day) },
+                    { label: "Last 24h", value: nf.format(forecast.cleared_last_24h) },
+                    { label: "Last 7 days", value: nf.format(forecast.cleared_last_7d) },
+                  ].map((m) => (
+                    <div key={m.label}>
+                      <p className="text-xs text-muted-foreground">{m.label}</p>
+                      <p className="text-lg font-semibold tabular-nums">{m.value}</p>
+                    </div>
+                  ))}
+                </div>
+                {forecast.remaining_to_target === 0 ? (
+                  <p className="text-sm font-medium text-primary">
+                    Target reached — {nf.format(forecast.servable_halal)} strict-halal videos serving.
+                  </p>
+                ) : forecast.eta_at ? (
+                  <p className="text-sm">
+                    At the current clear-rate the remaining{" "}
+                    {nf.format(forecast.remaining_to_target)} videos take{" "}
+                    <span className="font-semibold">
+                      {forecast.eta_days && forecast.eta_days >= 1
+                        ? `${forecast.eta_days} days`
+                        : `${forecast.eta_hours} hours`}
+                    </span>{" "}
+                    — projected{" "}
+                    <span className="font-semibold">
+                      {new Date(forecast.eta_at).toLocaleDateString(undefined, {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                    .
+                  </p>
+                ) : (
+                  <p className="text-sm text-destructive">
+                    No videos cleared recently — throughput is stalled, so no ETA can be projected.
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {forecast.queue_drain_hours !== null
+                    ? `Current queue of ${nf.format(forecast.awaiting_check)} drains in ~${forecast.queue_drain_hours}h at this rate.`
+                    : `Queue awaiting check: ${nf.format(forecast.awaiting_check)}.`}{" "}
+                  Blended from the last hour, day and week so a single idle tick does not skew the forecast.
+                </p>
+              </Card>
+            )}
+
+            {worker && (
+              <Card className="space-y-4 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Gauge className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-semibold">Visual-scan worker</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="worker-enabled" className="text-xs text-muted-foreground">
+                      Enabled
+                    </Label>
+                    <Switch
+                      id="worker-enabled"
+                      checked={worker.enabled}
+                      onCheckedChange={(v) => setWorker({ ...worker, enabled: v })}
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Raise concurrency to drain the queue faster. Retries use exponential backoff with
+                  jitter, so timed-out or rate-limited thumbnails are retried safely and stay
+                  claimable by the next tick.
+                </p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {WORKER_FIELDS.map((f) => (
+                    <div key={f.key} className="space-y-1">
+                      <Label htmlFor={`worker-${f.key}`} className="text-xs">
+                        {f.label}
+                      </Label>
+                      <Input
+                        id={`worker-${f.key}`}
+                        type="number"
+                        inputMode="numeric"
+                        min={f.min}
+                        max={f.max}
+                        className="h-11"
+                        value={worker[f.key]}
+                        onChange={(e) =>
+                          setWorker({
+                            ...worker,
+                            [f.key]: Math.max(
+                              f.min,
+                              Math.min(f.max, Number(e.target.value) || f.min),
+                            ),
+                          })
+                        }
+                      />
+                      <p className="text-[11px] text-muted-foreground">{f.hint}</p>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  size="sm"
+                  className="h-11 w-full sm:w-auto"
+                  disabled={savingWorker}
+                  onClick={() => void saveWorker()}
+                >
+                  {savingWorker ? "Saving…" : "Save worker settings"}
+                </Button>
+              </Card>
+            )}
+
             <Card className="space-y-3 p-5">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-semibold">Automated sweep</p>
@@ -339,6 +457,19 @@ export default function AdminLaunchGate() {
                 </p>
               ) : (
                 <p className="text-xs text-muted-foreground">No sweep recorded yet.</p>
+              )}
+              {sweepResult && (
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs">
+                  <p className="font-medium">
+                    Manual sweep finished in {nf.format(sweepResult.duration_ms)} ms
+                  </p>
+                  <p className="text-muted-foreground">
+                    Queued {nf.format(sweepResult.newly_marked)} newly ingested videos ·{" "}
+                    {nf.format(sweepResult.eligible_unchecked)} awaiting check ·{" "}
+                    {nf.format(sweepResult.checked_last_hour)} checked in the last hour
+                    {sweepResult.alerted ? " · alert raised" : ""}.
+                  </p>
+                </div>
               )}
               {runs.length > 0 && (
                 <div className="overflow-x-auto">
