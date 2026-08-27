@@ -111,12 +111,50 @@ export default function AdminUncheckedVideos() {
     load(page);
   }
 
-  function exportCsv() {
-    if (rows.length === 0) return;
-    downloadCsv(
-      rows.map(({ total_count: _t, ...r }) => r),
-      `unchecked-videos-${timestampSlug()}.csv`,
-    );
+  /**
+   * Exports every row matching the active filters (not just the visible page)
+   * by paging the RPC server-side, capped so an audit export stays bounded.
+   */
+  async function exportAll(format: "csv" | "json") {
+    setBusy(true);
+    const CHUNK = 500;
+    const MAX = 10_000;
+    const all: Row[] = [];
+    try {
+      for (let offset = 0; offset < MAX; offset += CHUNK) {
+        const { data, error } = await supabase.rpc("admin_unchecked_videos", {
+          ...filters(),
+          _limit: CHUNK,
+          _offset: offset,
+        });
+        if (error) throw error;
+        const batch = (data ?? []) as unknown as Row[];
+        all.push(...batch);
+        if (batch.length < CHUNK) break;
+      }
+      if (all.length === 0) {
+        toast({ title: "Nothing to export for these filters" });
+        return;
+      }
+      const clean = all.map(({ total_count: _t, ...r }) => r);
+      const name = `unchecked-videos-${timestampSlug()}`;
+      if (format === "csv") downloadCsv(clean, `${name}.csv`);
+      else {
+        downloadJson(
+          { filters: filters(), exported: clean.length, rows: clean },
+          `${name}.json`,
+        );
+      }
+      toast({ title: `Exported ${clean.length.toLocaleString()} rows` });
+    } catch (e) {
+      toast({
+        title: "Export failed",
+        description: e instanceof Error ? e.message : String(e),
+        variant: "destructive",
+      });
+    } finally {
+      setBusy(false);
+    }
   }
 
   const allOnPage = rows.length > 0 && rows.every((r) => selected.has(r.video_id));
