@@ -99,7 +99,10 @@ export function classifyQuestion(rawQuestion: string): Classification {
   for (const [cat, re] of CATEGORY_RULES) {
     if (re.test(q) && !categories.includes(cat)) categories.push(cat);
   }
-  const unsupported = UNSUPPORTED_RULES.find(([, re]) => re.test(q))?.[0] ?? null;
+  let unsupported = UNSUPPORTED_RULES.find(([, re]) => re.test(q))?.[0] ?? null;
+  // "is music halal on Heartify" asks about our policy; "is music halal" asks
+  // for a ruling. Only the latter is declined.
+  if (unsupported === "fatwa" && HEARTIFY_POLICY_CONTEXT.test(q)) unsupported = null;
   if (unsupported) categories.unshift("unsupported");
   if (categories.length === 0) categories.push("general_faq");
   return { categories: categories.slice(0, 6), primary: categories[0], unsupported };
@@ -118,7 +121,8 @@ export interface StaticAnswer {
   escalate?: boolean;
 }
 
-const GREETING = /^(as-?salamu?\s?alaykum[^a-z]*|salam|hi|hey|hello|good (morning|evening|afternoon))[\s!.,]*$/i;
+const GREETING =
+  /^(as-?salamu?\s?alaykum[^a-z]*|salam|hi+|hey|hello|yo|good (morning|evening|afternoon))([\s,]+(there|heartify|team|support|guys|everyone))?[\s!.,?]*$/i;
 const THANKS = /^(thanks?|thank you|jazak(allah)?( khair(an)?)?|shukran|much appreciated)[\s!.,]*$/i;
 const WHO_ARE_YOU = /\b(who are you|what are you|are you (a )?(bot|human|ai|robot))\b/i;
 const WHAT_CAN_YOU_DO = /\b(what can you (do|help with)|how can you help|what do you do)\b/i;
