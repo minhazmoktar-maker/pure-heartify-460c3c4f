@@ -57,7 +57,7 @@ const LaneToggle = ({
   ];
 
   return (
-    <div className="mb-4 space-y-1.5" data-testid="lane-toggle">
+    <div className="mb-4" data-testid="lane-toggle">
       <div
         className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
         role="group"
@@ -86,10 +86,7 @@ const LaneToggle = ({
           );
         })}
       </div>
-      <p className="text-micro text-muted-foreground">
-        {nativePct}% {languageLabel(primaryLanguage)} · {100 - nativePct}% other languages —
-        Heartify aims for an 80/20 balance so your feed stays local without becoming narrow.
-      </p>
+
     </div>
   );
 };
