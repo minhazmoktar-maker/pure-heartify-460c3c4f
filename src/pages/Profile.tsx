@@ -290,9 +290,8 @@ const Profile = () => {
               </p>
             </div>
 
-            <div className="pt-4">
-              <FeedCountryDiversity />
-            </div>
+
+
 
 
 
