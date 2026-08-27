@@ -96,7 +96,7 @@ export default function AdminFeedQuality() {
       supabase.rpc("admin_dedup_backfill_health"),
       supabase
         .from("production_alerts")
-        .select("id,kind,severity,message,created_at")
+        .select("id,kind,severity,message,created_at,context")
         .in("kind", [
           "dedup_backfill_stalled",
           "dedup_backfill_lag",
@@ -104,6 +104,8 @@ export default function AdminFeedQuality() {
           "feed_novelty_dip",
           "feed_coverage_dip",
           "feed_diversity_dip",
+          "feed_serve_flatline",
+          "feed_segment_flatline",
         ])
         .is("resolved_at", null)
         .order("created_at", { ascending: false })
