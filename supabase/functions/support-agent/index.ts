@@ -321,7 +321,11 @@ Deno.serve(async (req) => {
     costUsd?: number;
     llmCalled: boolean;
     degraded?: boolean;
+    flow?: string | null;
+    injectionBlocked?: boolean;
+    validationFailed?: boolean;
   }) {
+
     const latencyMs = Date.now() - started;
     const actions = resolveActions(opts.actionIds, { signedIn: !!userId });
 
