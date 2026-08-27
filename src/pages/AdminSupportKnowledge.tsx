@@ -226,7 +226,10 @@ export default function AdminSupportKnowledge() {
         </div>
       </header>
 
+      <SupportFaqDrafts onPublished={() => void load()} />
+
       <div className="grid gap-4 lg:grid-cols-[20rem_1fr]">
+
         <aside className="rounded-card border border-border bg-card p-3">
           <label htmlFor="kb-search" className="sr-only">Search articles</label>
           <input
