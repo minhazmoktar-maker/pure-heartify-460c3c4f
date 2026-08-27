@@ -43,7 +43,7 @@ const LaneToggle = ({
   diversifiedCount,
 }: Props) => {
   const total = nativeCount + diversifiedCount;
-  const nativePct = total > 0 ? Math.round((nativeCount / total) * 100) : 0;
+
 
   const options: Array<{ key: Lane; label: string; count: number; icon?: typeof Globe }> = [
     { key: "all", label: "All", count: total },
