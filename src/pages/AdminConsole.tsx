@@ -207,6 +207,9 @@ const AdminConsole = () => {
             <Link to="/admin/unchecked-videos">Unchecked videos</Link>
           </Button>
           <Button asChild variant="secondary" size="sm">
+            <Link to="/admin/reliability">Reliability</Link>
+          </Button>
+          <Button asChild variant="secondary" size="sm">
             <Link to="/admin/moderation-audit">Moderation audit</Link>
           </Button>
 
