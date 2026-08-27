@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
-import { downloadJson, timestampSlug } from "@/lib/download";
+import { downloadCsv, downloadJson, timestampSlug } from "@/lib/download";
 import {
   Area,
   AreaChart,
