@@ -332,32 +332,72 @@ export function useCreatorUpload() {
   return { upload, retry, cancel, progress, reset, canResume: pendingRef.current !== null };
 }
 
-/** Signed playback URL for an approved (or own/pending) native upload. */
-export function useUploadPlayback(uploadId: string | undefined) {
-  const [url, setUrl] = useState<string | null>(null);
+/**
+ * Signed playback URL for an approved (or own/pending) native upload.
+ *
+ * Signed URLs live for an hour server-side, so they are cached in-memory for a
+ * shorter window: reopening a review panel (or navigating back to a watch page)
+ * reuses the URL instead of spending another `creator-media-url` call. Closing
+ * the panel unmounts the hook, which aborts any in-flight request.
+ *
+ * `context` records *why* the URL was requested ("review_panel", "watch",
+ * "admin_review"). Monitoring alerts on requests with no context, which is the
+ * signature of a panel fetching without being opened.
+ */
+const PLAYBACK_CACHE_TTL_MS = 45 * 60 * 1000; // signed URLs are valid for 60 min
+const playbackCache = new Map<string, { url: string; expiresAt: number }>();
+
+/** Test/QA helper — drops memoised signed URLs. */
+export function clearUploadPlaybackCache() {
+  playbackCache.clear();
+}
+
+export type PlaybackContext = "review_panel" | "watch" | "admin_review";
+
+export function useUploadPlayback(
+  uploadId: string | undefined,
+  context: PlaybackContext = "watch",
+) {
+  const cached = uploadId ? playbackCache.get(uploadId) : undefined;
+  const fresh = cached && cached.expiresAt > Date.now() ? cached.url : null;
+  const [url, setUrl] = useState<string | null>(fresh);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(!!uploadId);
+  const [loading, setLoading] = useState(!!uploadId && !fresh);
 
   useEffect(() => {
     if (!uploadId) return;
+    const hit = playbackCache.get(uploadId);
+    if (hit && hit.expiresAt > Date.now()) {
+      setUrl(hit.url);
+      setError(null);
+      setLoading(false);
+      return;
+    }
     let active = true;
+    const controller = new AbortController();
     setLoading(true);
     (async () => {
       const { data, error: fnError } = await supabase.functions.invoke("creator-media-url", {
-        body: { upload_id: uploadId },
+        body: { upload_id: uploadId, context },
+        signal: controller.signal,
       });
       if (!active) return;
       if (fnError || !data?.url) {
         setError("This video isn't available.");
       } else {
-        setUrl(data.url as string);
+        const signed = data.url as string;
+        playbackCache.set(uploadId, { url: signed, expiresAt: Date.now() + PLAYBACK_CACHE_TTL_MS });
+        setUrl(signed);
       }
       setLoading(false);
     })();
     return () => {
       active = false;
+      // Panel closed / page left mid-flight: stop the request outright.
+      controller.abort();
     };
-  }, [uploadId]);
+  }, [uploadId, context]);
 
   return { url, error, loading };
 }
+

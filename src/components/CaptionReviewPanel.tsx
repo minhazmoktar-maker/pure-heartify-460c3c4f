@@ -29,7 +29,7 @@ interface Props {
 }
 
 const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Props) => {
-  const playback = useUploadPlayback(uploadId);
+  const playback = useUploadPlayback(uploadId, "review_panel");
   const captions = useUploadCaptions(uploadId);
   const tracks = captions.data ?? [];
   const [language, setLanguage] = useState<string | null>(initialLanguage ?? null);

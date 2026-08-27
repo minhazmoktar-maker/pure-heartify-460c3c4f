@@ -5,6 +5,8 @@ export type AlertKind =
   | "watch_playback_failure"
   | "watch_iframe_error"
   | "network_error"
+  // A UI invariant broke (e.g. an error fallback rendering under a spinner).
+  | "ui_invariant"
   | "unexpected_error";
 
 export type AlertSeverity = "info" | "warn" | "error" | "critical";

@@ -12,16 +12,49 @@ import { UPLOAD_BUCKET, adminClient, resolveCaller } from "../_shared/creatorAut
 
 const TTL_SECONDS = 60 * 60; // 1 hour — long enough for a full watch session.
 
+/** Legitimate reasons a client asks for a signed playback URL. */
+const ALLOWED_CONTEXTS = new Set(["watch", "review_panel", "admin_review"]);
+
+async function alertUnexpectedContext(uploadId: string, context: string) {
+  try {
+    await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/dispatch-alert`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      },
+      body: JSON.stringify({
+        kind: "unexpected_error",
+        severity: "warn",
+        message: "creator-media-url called without a valid playback context",
+        route: "/functions/v1/creator-media-url",
+        context: { upload_id: uploadId, received_context: context || null },
+        persist: true,
+      }),
+    });
+  } catch {
+    /* monitoring must never break playback */
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   let admin;
   try { admin = adminClient(); } catch { return json({ error: "server misconfigured" }, 500); }
 
-  let body: { upload_id?: string };
+  let body: { upload_id?: string; context?: string };
   try { body = await req.json(); } catch { return json({ error: "invalid json" }, 400); }
   const uploadId = (body.upload_id ?? "").trim();
   if (!uploadId) return json({ error: "upload_id required" }, 400);
+
+  // Every client call declares why it needs a URL. A missing/unknown context is
+  // the signature of a panel fetching without being opened (Creator Studio used
+  // to mount a review panel per upload), so it pages instead of going unnoticed.
+  const context = (body.context ?? "").trim();
+  if (!ALLOWED_CONTEXTS.has(context)) {
+    void alertUnexpectedContext(uploadId, context);
+  }
 
   const { data: upload } = await admin
     .from("creator_uploads")
