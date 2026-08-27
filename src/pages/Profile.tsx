@@ -8,6 +8,8 @@ import ReferralCard from "@/components/ReferralCard";
 import HandleClaimCard from "@/components/HandleClaimCard";
 import PrivacySettingsCard from "@/components/social/PrivacySettingsCard";
 import LanguageSettings from "@/components/LanguageSettings";
+import FeedCountryDiversity from "@/components/FeedCountryDiversity";
+
 import AppIconPicker from "@/components/AppIconPicker";
 import ThemeModeSetting from "@/components/ThemeModeSetting";
 import KidsModeSetting from "@/components/KidsModeSetting";
@@ -285,10 +287,14 @@ const Profile = () => {
               <p className="mt-2 text-center text-xs text-muted-foreground">
                 <Link to="/settings/languages" className="text-primary underline-offset-4 hover:underline">
                   Open the full language & region page
-                </Link>{" "}
-                to see how your 80/20 native-vs-diversified mix is built.
+                </Link>
               </p>
             </div>
+
+            <div className="pt-4">
+              <FeedCountryDiversity />
+            </div>
+
 
 
             <div className="pt-4">

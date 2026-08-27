@@ -1,11 +1,11 @@
 /**
  * Native vs diversified lane toggle.
  *
- * Heartify serves every feed page as ~80% native (the user's primary content
- * language) and ~20% diversified (everything else they understand). That rule
- * is invisible unless we show it, so this control makes the split legible —
- * with live counts — and lets the viewer narrow to one lane on demand.
+ * Lets the viewer narrow the feed to their own language or to everything else,
+ * with live counts. The serving ratio behind the lanes is an internal policy
+ * and is deliberately never explained in the UI.
  */
+
 import { Globe, Languages } from "lucide-react";
 import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/i18n";
 
@@ -43,7 +43,7 @@ const LaneToggle = ({
   diversifiedCount,
 }: Props) => {
   const total = nativeCount + diversifiedCount;
-  const nativePct = total > 0 ? Math.round((nativeCount / total) * 100) : 0;
+
 
   const options: Array<{ key: Lane; label: string; count: number; icon?: typeof Globe }> = [
     { key: "all", label: "All", count: total },
@@ -57,7 +57,7 @@ const LaneToggle = ({
   ];
 
   return (
-    <div className="mb-4 space-y-1.5" data-testid="lane-toggle">
+    <div className="mb-4" data-testid="lane-toggle">
       <div
         className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
         role="group"
@@ -86,10 +86,7 @@ const LaneToggle = ({
           );
         })}
       </div>
-      <p className="text-micro text-muted-foreground">
-        {nativePct}% {languageLabel(primaryLanguage)} · {100 - nativePct}% other languages —
-        Heartify aims for an 80/20 balance so your feed stays local without becoming narrow.
-      </p>
+
     </div>
   );
 };
