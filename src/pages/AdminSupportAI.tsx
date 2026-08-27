@@ -24,6 +24,34 @@ interface Quality {
   top_gaps: { id: string; sample_question: string; topic: string | null; ask_count: number; last_seen_at: string }[];
 }
 
+/** Cost + cache telemetry from admin_support_ai_cost(). */
+interface Cost {
+  since: string;
+  total_requests: number;
+  llm_requests: number;
+  no_llm_requests: number;
+  no_llm_rate: number | null;
+  exact_cache_hits: number;
+  semantic_cache_hits: number;
+  faq_hits: number;
+  degraded: number;
+  escalated: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  cost_usd: number;
+  avg_cost_usd: number;
+  avg_latency_ms: number;
+  projected_monthly_usd: number;
+  cache_entries: number;
+  knowledge_version: number;
+  by_layer: { layer: string; n: number; cost_usd: number }[];
+  by_provider: { provider: string; model: string; n: number; cost_usd: number }[];
+  top_questions: { question_norm: string; n: number; llm_n: number }[];
+  providers: { provider: string; status: string; consecutive_failures: number; last_error: string | null }[];
+}
+
+const usd = (v: number | null | undefined) => (v == null ? "—" : `$${Number(v).toFixed(Number(v) < 1 ? 4 : 2)}`);
+
 const pct = (v: number | null | undefined) => (v == null ? "—" : `${Math.round(v * 100)}%`);
 
 function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
