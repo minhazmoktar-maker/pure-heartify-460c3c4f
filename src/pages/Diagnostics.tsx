@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { clearDiag, formatDiag, readDiag, type DiagChannel } from "@/lib/diagnostics";
 import { useStreak } from "@/hooks/useStreak";
+import { useNoIndex } from "@/hooks/useNoIndex";
 
 const TABS: { id: DiagChannel | "all"; label: string }[] = [
   { id: "all", label: "All" },
@@ -16,6 +17,7 @@ const TABS: { id: DiagChannel | "all"; label: string }[] = [
  * copy the streak + download event trail without a desktop console.
  */
 export default function Diagnostics() {
+  useNoIndex();
   const [tab, setTab] = useState<DiagChannel | "all">("all");
   const [nonce, setNonce] = useState(0);
   const streak = useStreak();
