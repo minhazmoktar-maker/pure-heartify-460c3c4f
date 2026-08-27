@@ -430,6 +430,12 @@ export default function CreatorStudio() {
     uploadId: searchParams.get("captions"),
     language: searchParams.get("lang"),
   };
+  // Only one upload's caption panels are mounted at a time — mounting them for
+  // every upload fired a creator-media-url + caption fetch per row on load.
+  const [openCaptionsId, setOpenCaptionsId] = useState<string | null>(
+    searchParams.get("captions"),
+  );
+
   // 7-day window is enough to tell "no one watched" from "telemetry broke".
   const analytics = useCreatorAnalytics(7);
   const telemetry = useTelemetryHealth(uploads.data, analytics.data);
