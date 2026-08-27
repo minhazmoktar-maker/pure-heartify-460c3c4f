@@ -54,3 +54,14 @@ verify_jwt = false
 
 
 
+
+# AI Help & Support assistant — signed-out visitors must be able to ask for
+# help, so JWT verification is off at the edge; the function verifies any
+# bearer token itself, rate-limits per user/IP, and gives anonymous callers
+# no account data.
+[functions.support-agent]
+verify_jwt = false
+
+# KB indexer — verifies an admin/owner JWT or the automation cron secret in code.
+[functions.support-kb-index]
+verify_jwt = false

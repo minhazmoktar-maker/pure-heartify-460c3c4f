@@ -5888,6 +5888,340 @@ export type Database = {
         }
         Relationships: []
       }
+      support_conversations: {
+        Row: {
+          anon_key: string | null
+          created_at: string
+          escalated: boolean
+          id: string
+          last_message_at: string
+          locale: string
+          message_count: number
+          resolution: string | null
+          status: string
+          topic: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          anon_key?: string | null
+          created_at?: string
+          escalated?: boolean
+          id?: string
+          last_message_at?: string
+          locale?: string
+          message_count?: number
+          resolution?: string | null
+          status?: string
+          topic?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          anon_key?: string | null
+          created_at?: string
+          escalated?: boolean
+          id?: string
+          last_message_at?: string
+          locale?: string
+          message_count?: number
+          resolution?: string | null
+          status?: string
+          topic?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      support_escalations: {
+        Row: {
+          anon_key: string | null
+          contact_email: string | null
+          conversation_id: string | null
+          created_at: string
+          handled_at: string | null
+          handled_by: string | null
+          id: string
+          priority: string
+          reason: string
+          status: string
+          summary: string | null
+          user_id: string | null
+        }
+        Insert: {
+          anon_key?: string | null
+          contact_email?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          priority?: string
+          reason: string
+          status?: string
+          summary?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          anon_key?: string | null
+          contact_email?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          priority?: string
+          reason?: string
+          status?: string
+          summary?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_escalations_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "support_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_kb_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          document_id: string
+          embedding: string | null
+          embedding_model: string | null
+          id: string
+          token_estimate: number | null
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          document_id: string
+          embedding?: string | null
+          embedding_model?: string | null
+          id?: string
+          token_estimate?: number | null
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string | null
+          embedding_model?: string | null
+          id?: string
+          token_estimate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_kb_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "support_kb_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_kb_documents: {
+        Row: {
+          authority_level: string
+          body: string
+          category: string
+          created_at: string
+          created_by: string | null
+          id: string
+          keywords: string[]
+          language: string
+          slug: string
+          source_url: string | null
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          authority_level?: string
+          body: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          keywords?: string[]
+          language?: string
+          slug: string
+          source_url?: string | null
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          authority_level?: string
+          body?: string
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          keywords?: string[]
+          language?: string
+          slug?: string
+          source_url?: string | null
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      support_knowledge_gaps: {
+        Row: {
+          ask_count: number
+          best_confidence: number | null
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          locale: string | null
+          question_norm: string
+          resolved_document_id: string | null
+          sample_question: string
+          status: string
+          topic: string | null
+        }
+        Insert: {
+          ask_count?: number
+          best_confidence?: number | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          locale?: string | null
+          question_norm: string
+          resolved_document_id?: string | null
+          sample_question: string
+          status?: string
+          topic?: string | null
+        }
+        Update: {
+          ask_count?: number
+          best_confidence?: number | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          locale?: string | null
+          question_norm?: string
+          resolved_document_id?: string | null
+          sample_question?: string
+          status?: string
+          topic?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_knowledge_gaps_resolved_document_id_fkey"
+            columns: ["resolved_document_id"]
+            isOneToOne: false
+            referencedRelation: "support_kb_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_message_feedback: {
+        Row: {
+          anon_key: string | null
+          comment: string | null
+          created_at: string
+          helpful: boolean
+          id: string
+          message_id: string
+          user_id: string | null
+        }
+        Insert: {
+          anon_key?: string | null
+          comment?: string | null
+          created_at?: string
+          helpful: boolean
+          id?: string
+          message_id: string
+          user_id?: string | null
+        }
+        Update: {
+          anon_key?: string | null
+          comment?: string | null
+          created_at?: string
+          helpful?: boolean
+          id?: string
+          message_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_message_feedback_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "support_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_messages: {
+        Row: {
+          actions: Json
+          confidence: number | null
+          content: string
+          conversation_id: string
+          created_at: string
+          grounded: boolean | null
+          id: string
+          intent: string | null
+          latency_ms: number | null
+          model: string | null
+          role: string
+          sources: Json
+        }
+        Insert: {
+          actions?: Json
+          confidence?: number | null
+          content: string
+          conversation_id: string
+          created_at?: string
+          grounded?: boolean | null
+          id?: string
+          intent?: string | null
+          latency_ms?: number | null
+          model?: string | null
+          role: string
+          sources?: Json
+        }
+        Update: {
+          actions?: Json
+          confidence?: number | null
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          grounded?: boolean | null
+          id?: string
+          intent?: string | null
+          latency_ms?: number | null
+          model?: string | null
+          role?: string
+          sources?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "support_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_streak_members: {
         Row: {
           joined_at: string
@@ -7302,6 +7636,7 @@ export type Database = {
         Args: { _slug: string; _status: string }
         Returns: undefined
       }
+      admin_support_quality: { Args: { _days?: number }; Returns: Json }
       admin_unchecked_videos: {
         Args: {
           _channel?: string
@@ -8237,6 +8572,25 @@ export type Database = {
           video_id: string
         }[]
       }
+      match_support_kb: {
+        Args: {
+          _limit?: number
+          _locale?: string
+          _query_embedding: string
+          _query_text?: string
+        }
+        Returns: {
+          authority_level: string
+          category: string
+          chunk_index: number
+          content: string
+          document_id: string
+          similarity: number
+          slug: string
+          source_url: string
+          title: string
+        }[]
+      }
       mint_admin_review_token: {
         Args: { _purpose?: string; _ttl_hours?: number }
         Returns: {
@@ -8459,6 +8813,15 @@ export type Database = {
       }
       record_listen_seconds: { Args: { _seconds: number }; Returns: number }
       record_streak_activity: { Args: { _client_date?: string }; Returns: Json }
+      record_support_knowledge_gap: {
+        Args: {
+          _confidence?: number
+          _locale?: string
+          _question: string
+          _topic?: string
+        }
+        Returns: string
+      }
       record_topic_query_yield: {
         Args: { p_approved?: number; p_candidates?: number; p_query_id: string }
         Returns: undefined
