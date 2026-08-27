@@ -70,11 +70,22 @@ const CATEGORY_RULES: Array<[SupportCategory, RegExp]> = [
 
 /** Requests Heartify support must decline (scholarly, medical, legal, financial). */
 const UNSUPPORTED_RULES: Array<[string, RegExp]> = [
-  ["fatwa", /\b(is it (halal|haram)|fatwa|ruling on|permissible to|hukm|can i (pray|fast|marry|divorce)|zakat calculation for my)\b/i],
+  [
+    "fatwa",
+    /\b(fatwa|ruling on|permissible to|hukm|can i (pray|fast|marry|divorce)|zakat calculation for my|is (it|listening|watching|singing|playing|smoking|dating|working) [^?]*\b(halal|haram)\b|is [^?]{0,40}\b(halal|haram) (in islam|according to)\b)/i,
+  ],
   ["medical", /\b(diagnos|symptom|medicine|dosage|am i (sick|pregnant)|mental illness treatment)\b/i],
   ["legal", /\b(sue|lawsuit|legal advice|represent me in court|is this legal in my country)\b/i],
   ["financial", /\b(investment advice|should i buy|stock tip|crypto advice)\b/i],
 ];
+
+/**
+ * Questions about Heartify's own halal standard are product questions, not
+ * requests for a religious ruling — they must be answered from policy rather
+ * than declined.
+ */
+const HEARTIFY_POLICY_CONTEXT = /\b(heartify|this app|the app|the platform|your (content|videos|policy|standard)|on heartify)\b/i;
+
 
 export interface Classification {
   categories: SupportCategory[];
@@ -88,7 +99,10 @@ export function classifyQuestion(rawQuestion: string): Classification {
   for (const [cat, re] of CATEGORY_RULES) {
     if (re.test(q) && !categories.includes(cat)) categories.push(cat);
   }
-  const unsupported = UNSUPPORTED_RULES.find(([, re]) => re.test(q))?.[0] ?? null;
+  let unsupported = UNSUPPORTED_RULES.find(([, re]) => re.test(q))?.[0] ?? null;
+  // "is music halal on Heartify" asks about our policy; "is music halal" asks
+  // for a ruling. Only the latter is declined.
+  if (unsupported === "fatwa" && HEARTIFY_POLICY_CONTEXT.test(q)) unsupported = null;
   if (unsupported) categories.unshift("unsupported");
   if (categories.length === 0) categories.push("general_faq");
   return { categories: categories.slice(0, 6), primary: categories[0], unsupported };
@@ -107,7 +121,8 @@ export interface StaticAnswer {
   escalate?: boolean;
 }
 
-const GREETING = /^(as-?salamu?\s?alaykum[^a-z]*|salam|hi|hey|hello|good (morning|evening|afternoon))[\s!.,]*$/i;
+const GREETING =
+  /^(as-?salamu?\s?alaykum[^a-z]*|salam|hi+|hey|hello|yo|good (morning|evening|afternoon))([\s,]+(there|heartify|team|support|guys|everyone))?[\s!.,?]*$/i;
 const THANKS = /^(thanks?|thank you|jazak(allah)?( khair(an)?)?|shukran|much appreciated)[\s!.,]*$/i;
 const WHO_ARE_YOU = /\b(who are you|what are you|are you (a )?(bot|human|ai|robot))\b/i;
 const WHAT_CAN_YOU_DO = /\b(what can you (do|help with)|how can you help|what do you do)\b/i;
@@ -424,4 +439,25 @@ export function reportConfirmation(reason: ReportReason): string {
   return `Thank you — I've filed a report under "${reason.replace(/_/g, " ")}". ` +
     "Heartify's moderation team reviews reports against the platform's content rules; a single report never " +
     "automatically penalises a creator. You can follow the outcome from your profile.";
+}
+
+/**
+ * Map a user-facing reason onto the `video_reports.reason` enumeration the
+ * moderation pipeline already understands. Anything without a precise match
+ * lands in the haram/other buckets rather than being invented.
+ */
+export function toDbReportReason(reason: ReportReason): string {
+  switch (reason) {
+    case "sexual_suggestive": return "sexual_content";
+    case "music": return "music_or_haram";
+    case "gambling":
+    case "alcohol":
+    case "drugs":
+    case "female_visual": return "music_or_haram";
+    case "violence": return "violence";
+    case "misinformation": return "misinformation";
+    case "copyright": return "copyright";
+    case "inappropriate": return "inappropriate_content";
+    default: return "other";
+  }
 }

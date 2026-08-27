@@ -57,10 +57,29 @@ import {
   validateAnswer,
   type ResolutionLayer,
 } from "../_shared/support/normalize.ts";
+import {
+  classifyQuestion,
+  detectReportIntent,
+  INJECTION_REFUSAL,
+  matchTroubleshootFlow,
+  renderTroubleshootFlow,
+  reportConfirmation,
+  reportFollowUp,
+  staticAnswer,
+  toDbReportReason,
+  unsupportedAnswer,
+} from "../_shared/support/classify.ts";
 
 const LOW_CONFIDENCE = 0.5;
 const SEMANTIC_CACHE_THRESHOLD = 0.93;
-const FAQ_SCORE_THRESHOLD = 0.8;
+/**
+ * A deterministic FAQ answer is only served on strong evidence. Weaker matches
+ * still reach the model as retrieval context instead of being served verbatim,
+ * which is what keeps loosely-related questions ("what is the weather") from
+ * getting a confident Heartify answer.
+ */
+const FAQ_SCORE_THRESHOLD = 0.6;
+
 
 const SAFE_FALLBACK =
   "I couldn't confidently resolve that from Heartify's available information. " +
@@ -133,6 +152,10 @@ interface UsageRecord {
   topic?: string | null;
   locale: string;
   questionNorm: string | null;
+  categories?: string[];
+  flow?: string | null;
+  injectionBlocked?: boolean;
+  validationFailed?: boolean;
 }
 
 async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
@@ -153,9 +176,14 @@ async function recordUsage(admin: SupabaseClient, u: UsageRecord) {
     topic: u.topic ?? null,
     locale: u.locale,
     question_norm: u.questionNorm,
+    categories: u.categories ?? [],
+    flow: u.flow ?? null,
+    injection_blocked: u.injectionBlocked ?? false,
+    validation_failed: u.validationFailed ?? false,
   });
   if (error) console.error("[support-agent] usage insert failed", error.message);
 }
+
 
 async function recordProviderHealth(admin: SupabaseClient, provider: string, ok: boolean, error?: string) {
   const patch = ok
@@ -234,6 +262,10 @@ Deno.serve(async (req) => {
   const questionNorm = normalizeQuestion(question);
   const injection = detectInjection(body.message);
   const cacheable = !injection && isCacheable(question, { signedIn: !!userId });
+  // Deterministic, in-process categorisation — drives telemetry, routing and
+  // the out-of-scope boundary without any model call.
+  const classification = classifyQuestion(question);
+
 
   // --- conversation -------------------------------------------------------
   let conversationId = body.conversation_id ?? null;
@@ -289,7 +321,11 @@ Deno.serve(async (req) => {
     costUsd?: number;
     llmCalled: boolean;
     degraded?: boolean;
+    flow?: string | null;
+    injectionBlocked?: boolean;
+    validationFailed?: boolean;
   }) {
+
     const latencyMs = Date.now() - started;
     const actions = resolveActions(opts.actionIds, { signedIn: !!userId });
 
@@ -346,7 +382,12 @@ Deno.serve(async (req) => {
       topic: opts.topic,
       locale,
       questionNorm: cacheable ? questionNorm : null,
+      categories: classification.categories,
+      flow: opts.flow ?? null,
+      injectionBlocked: opts.injectionBlocked ?? false,
+      validationFailed: opts.validationFailed ?? false,
     });
+
 
     if (opts.escalate) {
       await admin.from("support_escalations").insert({
@@ -377,6 +418,164 @@ Deno.serve(async (req) => {
   }
 
   // ======================================================================
+  // LAYER 0 — deterministic, in-process resolution. No database lookup for
+  // knowledge, no embedding, no model call, no cost. Everything here is either
+  // true by construction (identity, capabilities), a refusal, a guided script,
+  // or a structured application action.
+  // ======================================================================
+
+  // Instruction-override / system-extraction attempts are refused outright and
+  // never forwarded to a model.
+  if (injection) {
+    console.warn(JSON.stringify({ evt: "support.injection_blocked", conversation: conversationId }));
+    return await respond({
+      layer: "blocked",
+      answer: INJECTION_REFUSAL.answer,
+      topic: INJECTION_REFUSAL.topic,
+      confidence: 1,
+      grounded: true,
+      sources: [],
+      actionIds: INJECTION_REFUSAL.actionIds,
+      escalate: false,
+      llmCalled: false,
+      injectionBlocked: true,
+    });
+  }
+
+  // Requests Heartify support does not answer (rulings, medical, legal,
+  // financial) get a consistent, honest boundary instead of a guess.
+  if (classification.unsupported) {
+    const declined = unsupportedAnswer(classification.unsupported);
+    return await respond({
+      layer: "unsupported",
+      answer: declined.answer,
+      topic: declined.topic,
+      confidence: 1,
+      grounded: true,
+      sources: [],
+      actionIds: declined.actionIds,
+      escalate: false,
+      llmCalled: false,
+    });
+  }
+
+  // Greetings, thanks, "who are you", "what can you do", "get me a human".
+  const canned = staticAnswer(question, { signedIn: !!userId });
+  if (canned) {
+    return await respond({
+      layer: "static",
+      answer: canned.answer,
+      topic: canned.topic,
+      confidence: 1,
+      grounded: true,
+      sources: [],
+      actionIds: canned.actionIds,
+      escalate: canned.escalate ?? false,
+      llmCalled: false,
+    });
+  }
+
+  // Structured content reporting: the assistant collects the video and the
+  // reason, then writes a real moderation report — it never claims to have
+  // filed one it could not file.
+  const reportIntent = detectReportIntent(question);
+  if (reportIntent) {
+    if (reportIntent.missing.length > 0) {
+      return await respond({
+        layer: "tool",
+        answer: reportFollowUp(reportIntent),
+        topic: "content_reporting",
+        confidence: 0.9,
+        grounded: true,
+        sources: [],
+        actionIds: ["open_help"],
+        escalate: false,
+        clarifying: reportFollowUp(reportIntent),
+        llmCalled: false,
+        flow: "content_report",
+      });
+    }
+    if (!userId) {
+      return await respond({
+        layer: "tool",
+        answer:
+          "I can only file a report from a signed-in account, so the moderation team can follow up with you. " +
+          "Sign in and use the report control on the video, or send the link from the Contact page and the team will act on it.",
+        topic: "content_reporting",
+        confidence: 0.9,
+        grounded: true,
+        sources: [],
+        actionIds: ["open_login", "open_contact"],
+        escalate: false,
+        llmCalled: false,
+        flow: "content_report",
+      });
+    }
+    const { error: reportErr } = await admin.from("video_reports").insert({
+      user_id: userId,
+      video_id: reportIntent.videoId,
+      reason: toDbReportReason(reportIntent.reason!),
+      details: reportIntent.detail,
+      severity: "normal",
+      status: "open",
+      platform: "support_agent",
+    });
+    if (reportErr) {
+      console.error("[support-agent] report insert failed", reportErr.message);
+      return await respond({
+        layer: "tool",
+        answer:
+          "I couldn't file that report automatically. Please use the report control on the video itself, or send the " +
+          "link from the Contact page — the team will pick it up either way.",
+        topic: "content_reporting",
+        confidence: 0.5,
+        grounded: true,
+        sources: [],
+        actionIds: ["open_contact"],
+        escalate: true,
+        llmCalled: false,
+        flow: "content_report",
+      });
+    }
+    return await respond({
+      layer: "tool",
+      answer: reportConfirmation(reportIntent.reason!),
+      topic: "content_reporting",
+      confidence: 1,
+      grounded: true,
+      sources: [],
+      actionIds: ["open_profile", "open_help"],
+      escalate: false,
+      llmCalled: false,
+      flow: "content_report",
+    });
+  }
+
+  // Guided troubleshooting for recognised technical complaints. Only on the
+  // opening turn, so a follow-up ("still broken on iPhone 12") is handled with
+  // full thread context rather than re-running the script.
+  if (firstTurn) {
+    const flow = matchTroubleshootFlow(question);
+    if (flow) {
+      const rendered = renderTroubleshootFlow(flow, question);
+      return await respond({
+        layer: "flow",
+        answer: rendered.answer,
+        topic: rendered.topic,
+        confidence: 0.85,
+        grounded: true,
+        sources: [],
+        actionIds: rendered.actionIds,
+        escalate: false,
+        clarifying: rendered.clarifying,
+        llmCalled: false,
+        flow: flow.id,
+      });
+    }
+  }
+
+  // ======================================================================
+
   // LAYER 0 — exact answer cache (no model call)
   // ======================================================================
   const { data: knowledgeState } = await admin
@@ -446,7 +645,11 @@ Deno.serve(async (req) => {
   // ======================================================================
   // LAYER 2 — deterministic FAQ engine (no model call)
   // ======================================================================
-  if (cacheable && firstTurn) {
+  // Note: unlike the cache layers this does not require `cacheable` — a question
+  // phrased personally ("cancel *my* subscription") still has a generic,
+  // authoritative answer; only writing it to the shared cache is unsafe.
+  if (firstTurn) {
+
     const { data: faq } = await admin.rpc("support_faq_lookup", {
       _query: question,
       _locale: locale.slice(0, 2),
@@ -455,7 +658,12 @@ Deno.serve(async (req) => {
     const top = (faq ?? [])[0] as
       | { slug: string; title: string; category: string; answer: string; source_url: string | null; score: number }
       | undefined;
-    if (top && Number(top.score) >= FAQ_SCORE_THRESHOLD && top.answer) {
+    // Very short questions carry too little signal for a verbatim deterministic
+    // answer, so they need a much stronger match before being served.
+    const tokenCount = questionNorm.split(" ").filter(Boolean).length;
+    const required = tokenCount <= 2 ? 0.85 : FAQ_SCORE_THRESHOLD;
+    if (top && Number(top.score) >= required && top.answer) {
+
       return await respond({
         layer: "faq",
         answer: top.answer,
@@ -603,7 +811,18 @@ Deno.serve(async (req) => {
       _locale: locale,
       _confidence: envelope.confidence,
     });
+    // Repeatedly-unanswered questions become a suggested FAQ for a human to
+    // approve. Nothing is published automatically — the draft carries the
+    // question only, and an admin writes the authoritative answer.
+    const { error: draftErr } = await admin.rpc("support_propose_faq_draft", {
+      _question: question,
+      _topic: envelope.topic,
+      _locale: locale,
+      _min_asks: 3,
+    });
+    if (draftErr) console.error("[support-agent] faq draft proposal failed", draftErr.message);
   }
+
 
   // ---- write-through cache for safe, generic, well-grounded answers only
   if (cacheable && firstTurn && grounded && validation.ok && envelope.confidence >= 0.75) {
@@ -625,6 +844,22 @@ Deno.serve(async (req) => {
     if (cacheErr) console.error("[support-agent] cache write failed", cacheErr.message);
   }
 
+  // Structured, PII-free observability line: one record per model-backed turn.
+  console.log(JSON.stringify({
+    evt: "support.resolved",
+    layer,
+    tier,
+    provider: completion.provider,
+    model: completion.model,
+    categories: classification.categories,
+    grounded,
+    sources: sourceDocs.length,
+    confidence: envelope.confidence,
+    validation_ok: validation.ok,
+    escalated: shouldEscalate,
+    cost_usd: completion.costUsd,
+  }));
+
   return await respond({
     layer,
     answer: safeAnswer,
@@ -642,5 +877,7 @@ Deno.serve(async (req) => {
     completionTokens: completion.completionTokens,
     costUsd: completion.costUsd,
     llmCalled: true,
+    validationFailed: !validation.ok,
   });
+
 });
