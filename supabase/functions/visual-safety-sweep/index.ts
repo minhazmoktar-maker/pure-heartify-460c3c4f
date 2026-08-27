@@ -14,14 +14,14 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
-  BUDGET_MS,
-  CALL_TIMEOUT_MS,
-  CONCURRENCY,
+  classifyWithRetries,
   fallbackVerdict,
   guardedClassify,
+  normalizeWorkerConfig,
   parseVerdict,
   runVisualSweep,
   type Verdict,
+  type WorkerConfig,
 } from "./sweep.ts";
 
 const MODEL = "google/gemini-3-flash-preview";
@@ -48,7 +48,7 @@ Use "female_detected" when any female is visible, "music" for musical/performanc
 "flagged" for other prohibited imagery, "clean" only when clearly safe.
 If the image is unreadable or you are unsure, answer "flagged".`;
 
-async function classify(item: Claimed, key: string): Promise<Verdict> {
+async function classifyOnce(item: Claimed, key: string, timeoutMs: number): Promise<Verdict> {
   if (!item.thumbnail_url) return fallbackVerdict(item.video_id, "no_thumbnail");
   return await guardedClassify(item.video_id, async (signal) => {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -74,7 +74,24 @@ async function classify(item: Claimed, key: string): Promise<Verdict> {
     }
     const json = await res.json();
     return parseVerdict(item.video_id, json?.choices?.[0]?.message?.content ?? "");
-  }, CALL_TIMEOUT_MS);
+  }, timeoutMs);
+}
+
+/**
+ * One video, with safe retries: transient gateway failures and timeouts are
+ * retried with exponential backoff + jitter, decided verdicts short-circuit,
+ * and a missing thumbnail is never retried.
+ */
+async function classify(item: Claimed, key: string, cfg: WorkerConfig, deadline: number): Promise<Verdict> {
+  if (!item.thumbnail_url) return fallbackVerdict(item.video_id, "no_thumbnail");
+  return await classifyWithRetries((attempt) => {
+    if (attempt > 0) console.log(`[visual-safety-sweep] retry ${attempt} for ${item.video_id}`);
+    return classifyOnce(item, key, cfg.call_timeout_ms);
+  }, {
+    maxRetries: cfg.max_retries,
+    backoffMs: cfg.backoff_ms,
+    shouldStop: () => Date.now() > deadline,
+  });
 }
 
 Deno.serve(async (req) => {
@@ -94,9 +111,23 @@ Deno.serve(async (req) => {
 
   let body: { batch?: number } = {};
   try { body = await req.json(); } catch { /* optional body */ }
-  const batch = Math.max(1, Math.min(Number(body.batch ?? 40), 300));
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
+  // Worker knobs are admin-adjustable at runtime (no redeploy) and always
+  // clamped to safe bounds before use.
+  const { data: cfgRow } = await admin
+    .from("visual_scan_worker_config")
+    .select("enabled, batch_size, concurrency, max_retries, backoff_ms, call_timeout_ms, budget_ms")
+    .eq("id", "default")
+    .maybeSingle();
+  const cfg = normalizeWorkerConfig(cfgRow as Partial<WorkerConfig> | null);
+  if (!cfg.enabled) return json({ scanned: 0, skipped: "worker_disabled" }, 200);
+
+  const batch = body.batch !== undefined
+    ? Math.max(1, Math.min(Number(body.batch), 300))
+    : cfg.batch_size;
+  const deadline = Date.now() + cfg.budget_ms;
 
   const { data: claimed, error: claimErr } = await admin.rpc("claim_visual_scan_batch", { p_limit: batch });
   if (claimErr) return json({ error: claimErr.message }, 500);
@@ -112,9 +143,9 @@ Deno.serve(async (req) => {
   // re-claimed by the next cron tick.
   const { verdicts, usable, truncated } = await runVisualSweep({
     items,
-    classify: (it) => classify(it, AI_KEY),
-    concurrency: CONCURRENCY,
-    budgetMs: BUDGET_MS,
+    classify: (it) => classify(it, AI_KEY, cfg, deadline),
+    concurrency: cfg.concurrency,
+    budgetMs: cfg.budget_ms,
   });
 
   const { data: applied, error: applyErr } = await admin.rpc("apply_visual_verdicts", { p_verdicts: usable });
@@ -122,7 +153,13 @@ Deno.serve(async (req) => {
 
   const { data: escalation } = await admin.rpc("escalate_visually_unsafe_channels");
 
-  return json({ scanned: verdicts.length, truncated, applied, escalation: escalation ?? null }, 200);
+  return json({
+    scanned: verdicts.length,
+    truncated,
+    applied,
+    escalation: escalation ?? null,
+    config: cfg,
+  }, 200);
 });
 
 function json(body: unknown, status: number) {
