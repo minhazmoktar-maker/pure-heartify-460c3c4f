@@ -207,6 +207,128 @@ export default function AdminSupportAI() {
             )}
           </section>
 
+          {cost && (
+            <>
+              <section className="mt-6 rounded-card border border-border bg-card p-4">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
+                    <Coins aria-hidden className="h-4 w-4 text-primary" /> Cost &amp; cache efficiency
+                  </h2>
+                  <div className="flex gap-2">
+                    <Link
+                      to="/admin/support-knowledge"
+                      className="flex min-h-11 items-center rounded-card border border-border px-3 text-sm text-foreground hover:bg-muted"
+                    >
+                      Manage knowledge
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => downloadJson(cost, "support-ai-cost.json")}
+                      className="min-h-11 rounded-card border border-border px-3 text-sm hover:bg-muted"
+                    >
+                      Export JSON
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <Stat label="Support questions" value={String(cost.total_requests)} />
+                  <Stat
+                    label="Resolved without AI"
+                    value={pct(cost.no_llm_rate)}
+                    warn={(cost.no_llm_rate ?? 1) < 0.7}
+                  />
+                  <Stat label="AI calls" value={String(cost.llm_requests)} />
+                  <Stat label="Spend (range)" value={usd(cost.cost_usd)} />
+                  <Stat label="Avg cost / question" value={usd(cost.avg_cost_usd)} />
+                  <Stat label="Projected monthly" value={usd(cost.projected_monthly_usd)} />
+                  <Stat label="Cached answers" value={String(cost.cache_entries)} />
+                  <Stat label="Degraded replies" value={String(cost.degraded)} warn={cost.degraded > 0} />
+                </div>
+                <p className="mt-3 text-micro text-muted-foreground">
+                  Target: more than 70% of questions answered from the exact cache, semantic cache or deterministic FAQ.
+                  Exact {cost.exact_cache_hits} · semantic {cost.semantic_cache_hits} · FAQ {cost.faq_hits} ·
+                  tokens in {cost.prompt_tokens.toLocaleString()} / out {cost.completion_tokens.toLocaleString()} ·
+                  knowledge version {cost.knowledge_version}.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {cost.by_layer.map((l) => (
+                    <span key={l.layer} className="rounded-full border border-border px-3 py-1 text-micro text-foreground">
+                      {l.layer.replace(/_/g, " ")} · {l.n} · {usd(l.cost_usd)}
+                    </span>
+                  ))}
+                </div>
+              </section>
+
+              <section className="mt-6 rounded-card border border-border bg-card p-4">
+                <h2 className="mb-2 flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
+                  <ServerCog aria-hidden className="h-4 w-4 text-primary" /> Inference providers
+                </h2>
+                {cost.providers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No provider has been used yet. Until an independent provider is configured, the assistant answers in
+                    degraded mode from the FAQ and knowledge base only.
+                  </p>
+                ) : (
+                  <ul className="space-y-2">
+                    {cost.providers.map((p) => (
+                      <li key={p.provider} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                        <span className="text-foreground">{p.provider}</span>
+                        <span className={p.status === "healthy" ? "text-muted-foreground" : "text-destructive"}>
+                          {p.status}
+                          {p.consecutive_failures > 0 && ` · ${p.consecutive_failures} consecutive failures`}
+                          {p.last_error && ` · ${p.last_error.slice(0, 80)}`}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {cost.by_provider.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {cost.by_provider.map((p) => (
+                      <span key={`${p.provider}-${p.model}`} className="rounded-full border border-border px-3 py-1 text-micro text-foreground">
+                        {p.provider}/{p.model} · {p.n} · {usd(p.cost_usd)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="mt-6">
+                <h2 className="mb-2 font-heading text-lg font-semibold text-foreground">
+                  Top questions (cache candidates)
+                </h2>
+                <div className="overflow-x-auto rounded-card border border-border">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 text-micro uppercase tracking-wide text-muted-foreground">
+                      <tr>
+                        <th className="p-2 text-start">Normalised question</th>
+                        <th className="p-2 text-start">Asked</th>
+                        <th className="p-2 text-start">Needed AI</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cost.top_questions.length === 0 && (
+                        <tr><td colSpan={3} className="p-3 text-muted-foreground">No questions in this range.</td></tr>
+                      )}
+                      {cost.top_questions.map((q) => (
+                        <tr key={q.question_norm} className="border-t border-border">
+                          <td className="max-w-[26rem] p-2 text-foreground">{q.question_norm}</td>
+                          <td className="p-2 text-muted-foreground">{q.n}</td>
+                          <td className={`p-2 ${q.llm_n > 0 ? "text-destructive" : "text-muted-foreground"}`}>{q.llm_n}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-2 text-micro text-muted-foreground">
+                  Questions that still need AI on every ask should get a deterministic FAQ answer in the knowledge editor.
+                </p>
+              </section>
+            </>
+          )}
+
+
+
           <section className="mt-6">
             <h2 className="mb-2 flex items-center gap-2 font-heading text-lg font-semibold text-foreground">
               <MessageSquare aria-hidden className="h-4 w-4 text-primary" /> Top topics
