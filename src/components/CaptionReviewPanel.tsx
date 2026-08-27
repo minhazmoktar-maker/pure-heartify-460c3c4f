@@ -147,15 +147,29 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
         </div>
       )}
 
-      <Button
-        size="sm"
-        variant="secondary"
-        className="h-9"
-        onClick={() => setEditing((v) => !v)}
-        data-testid="caption-review-toggle-editor"
-      >
-        {editing ? "Close editor" : "Edit timings & text"}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant="secondary"
+          className="h-9"
+          onClick={() => setEditing((v) => !v)}
+          data-testid="caption-review-toggle-editor"
+        >
+          {editing ? "Close editor" : "Edit timings & text"}
+        </Button>
+        <Button
+          size="sm"
+          className="h-9"
+          disabled={!activeReport || reviewLogged === activeReport.language}
+          onClick={() => void confirmReview()}
+          data-testid="caption-review-confirm"
+        >
+          {activeReport && reviewLogged === activeReport.language
+            ? "Review recorded"
+            : "Mark captions reviewed"}
+        </Button>
+      </div>
+
 
       {editing && active && (
         <CaptionEditor
