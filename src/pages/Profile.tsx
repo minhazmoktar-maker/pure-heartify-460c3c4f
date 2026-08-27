@@ -8,6 +8,8 @@ import ReferralCard from "@/components/ReferralCard";
 import HandleClaimCard from "@/components/HandleClaimCard";
 import PrivacySettingsCard from "@/components/social/PrivacySettingsCard";
 import LanguageSettings from "@/components/LanguageSettings";
+import FeedCountryDiversity from "@/components/FeedCountryDiversity";
+
 import AppIconPicker from "@/components/AppIconPicker";
 import ThemeModeSetting from "@/components/ThemeModeSetting";
 import KidsModeSetting from "@/components/KidsModeSetting";
