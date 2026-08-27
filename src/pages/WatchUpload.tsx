@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useUploadPlayback } from "@/hooks/useCreatorStudio";
+import { assertUiInvariant } from "@/lib/uiInvariants";
 import { useUploadTelemetry } from "@/hooks/useCreatorInsights";
 import {
   usePrefetchUploadCaptions,
@@ -232,9 +233,7 @@ export default function WatchUpload() {
               testId="watch-caption-overlay"
             />
           ) : playback.loading ? null : (
-            <div className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground">
-              {playback.error ?? "Playback unavailable."}
-            </div>
+            <PlaybackUnavailable message={playback.error} loading={playback.loading} />
           )}
 
         </div>
@@ -345,5 +344,28 @@ export default function WatchUpload() {
         )}
       </div>
     </>
+  );
+}
+
+/**
+ * Post-failure fallback. It must never render while the signed URL is still
+ * loading — that is the "Playback unavailable under the spinner" regression, so
+ * the invariant is asserted here rather than trusted.
+ */
+function PlaybackUnavailable({
+  message,
+  loading,
+}: {
+  message: string | null;
+  loading: boolean;
+}) {
+  assertUiInvariant(!loading, "playback_unavailable_while_loading", { route: "/u/:id" });
+  return (
+    <div
+      data-testid="watch-upload-playback-unavailable"
+      className="flex aspect-video items-center justify-center px-6 text-center text-sm text-muted-foreground"
+    >
+      {message ?? "Playback unavailable."}
+    </div>
   );
 }
