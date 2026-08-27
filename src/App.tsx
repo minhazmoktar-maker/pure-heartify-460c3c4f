@@ -535,6 +535,7 @@ const App = () => (
                 <Route path="/admin/feed-diversity" element={<AdminRoute><AdminFeedDiversity /></AdminRoute>} />
                 <Route path="/admin/feed-flags" element={<AdminRoute><AdminFeedFlags /></AdminRoute>} />
                 <Route path="/admin/feed-quality" element={<AdminRoute><AdminFeedQuality /></AdminRoute>} />
+                <Route path="/admin/feed-traces" element={<AdminRoute><AdminFeedTraces /></AdminRoute>} />
                 <Route path="/admin/corpus-progress" element={<AdminRoute><AdminCorpusProgress /></AdminRoute>} />
                 <Route path="/admin/creator-review" element={<AdminRoute><AdminCreatorReview /></AdminRoute>} />
                 <Route path="/admin/locale-coverage" element={<AdminRoute><AdminLocaleCoverage /></AdminRoute>} />
