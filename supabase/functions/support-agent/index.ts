@@ -835,6 +835,22 @@ Deno.serve(async (req) => {
     if (cacheErr) console.error("[support-agent] cache write failed", cacheErr.message);
   }
 
+  // Structured, PII-free observability line: one record per model-backed turn.
+  console.log(JSON.stringify({
+    evt: "support.resolved",
+    layer,
+    tier,
+    provider: completion.provider,
+    model: completion.model,
+    categories: classification.categories,
+    grounded,
+    sources: sourceDocs.length,
+    confidence: envelope.confidence,
+    validation_ok: validation.ok,
+    escalated: shouldEscalate,
+    cost_usd: completion.costUsd,
+  }));
+
   return await respond({
     layer,
     answer: safeAnswer,
@@ -852,5 +868,7 @@ Deno.serve(async (req) => {
     completionTokens: completion.completionTokens,
     costUsd: completion.costUsd,
     llmCalled: true,
+    validationFailed: !validation.ok,
   });
+
 });
