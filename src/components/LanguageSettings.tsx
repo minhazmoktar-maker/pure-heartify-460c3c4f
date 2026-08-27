@@ -139,16 +139,8 @@ export function LanguageSettings() {
               ))}
             </SelectContent>
           </Select>
-          {activeMix && (
-            <div className="flex flex-wrap gap-1 pt-1">
-              {Object.entries(activeMix.language_mix).map(([lang, ratio]) => (
-                <Badge key={lang} variant="secondary" className="text-micro">
-                  {lang.toUpperCase()} · {Math.round(ratio * 100)}%
-                </Badge>
-              ))}
-            </div>
-          )}
         </div>
+
 
         {/* Content languages — with live coverage so users can see depth
             before committing, instead of picking a language and landing on

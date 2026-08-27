@@ -44,32 +44,16 @@ export default function LanguagePreferences() {
         <Card data-testid="language-mix-explainer">
           <CardContent className="space-y-2 pt-6">
             <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Globe className="h-4 w-4 text-primary" /> How your mix is built
+              <Globe className="h-4 w-4 text-primary" /> Your languages
             </p>
             <p className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">80% native — </span>
               {primaryLabel
-                ? `every feed page reserves the majority of its slots for ${primaryLabel} content.`
-                : "every feed page reserves the majority of its slots for your region's language."}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">20% diversified — </span>
-              {others.length > 0
-                ? `the remaining slots rotate across ${others
-                    .map(
-                      (code) =>
-                        SUPPORTED_LANGUAGES.find((l) => l.code === code)?.native ??
-                        code.toUpperCase(),
-                    )
-                    .join(", ")} so you keep discovering beyond one language.`
-                : "add a second language below and the remaining slots will rotate across it, so you keep discovering beyond one language."}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              The first language you select is the native lane. Reordering is as simple as
-              deselecting and reselecting.
+                ? `Most of what you see will be in ${primaryLabel}, with room for the other languages you choose.`
+                : "Most of what you see will be in your main language, with room for the other languages you choose."}
             </p>
           </CardContent>
         </Card>
+
 
         <LanguageSettings />
       </div>
