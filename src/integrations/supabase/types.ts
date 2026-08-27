@@ -9395,6 +9395,7 @@ export type Database = {
         }[]
       }
       support_cache_touch: { Args: { _id: string }; Returns: undefined }
+      support_correct_text: { Args: { _input: string }; Returns: string }
       support_faq_lookup: {
         Args: { _limit?: number; _locale?: string; _query: string }
         Returns: {
