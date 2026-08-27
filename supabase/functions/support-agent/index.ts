@@ -802,7 +802,18 @@ Deno.serve(async (req) => {
       _locale: locale,
       _confidence: envelope.confidence,
     });
+    // Repeatedly-unanswered questions become a suggested FAQ for a human to
+    // approve. Nothing is published automatically — the draft carries the
+    // question only, and an admin writes the authoritative answer.
+    const { error: draftErr } = await admin.rpc("support_propose_faq_draft", {
+      _question: question,
+      _topic: envelope.topic,
+      _locale: locale,
+      _min_asks: 3,
+    });
+    if (draftErr) console.error("[support-agent] faq draft proposal failed", draftErr.message);
   }
+
 
   // ---- write-through cache for safe, generic, well-grounded answers only
   if (cacheable && firstTurn && grounded && validation.ok && envelope.confidence >= 0.75) {
