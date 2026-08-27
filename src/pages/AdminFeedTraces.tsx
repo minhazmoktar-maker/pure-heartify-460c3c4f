@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
+import { downloadCsv, downloadJson, timestampSlug } from "@/lib/download";
 
 type Trace = {
   id: number;
