@@ -7467,6 +7467,42 @@ export type Database = {
         }
         Relationships: []
       }
+      video_sweep_runs: {
+        Row: {
+          alerted: boolean
+          checked_last_hour: number
+          created_at: string
+          details: Json
+          eligible_unchecked: number
+          id: string
+          newly_marked: number
+          ran_at: string
+          updated_at: string
+        }
+        Insert: {
+          alerted?: boolean
+          checked_last_hour?: number
+          created_at?: string
+          details?: Json
+          eligible_unchecked?: number
+          id?: string
+          newly_marked?: number
+          ran_at?: string
+          updated_at?: string
+        }
+        Update: {
+          alerted?: boolean
+          checked_last_hour?: number
+          created_at?: string
+          details?: Json
+          eligible_unchecked?: number
+          id?: string
+          newly_marked?: number
+          ran_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       video_transcripts: {
         Row: {
           created_at: string
@@ -7893,6 +7929,7 @@ export type Database = {
           variant: string
         }[]
       }
+      admin_launch_gate: { Args: { p_target?: number }; Returns: Json }
       admin_moderation_sla: { Args: never; Returns: Json }
       admin_queue_visual_scan: {
         Args: {
@@ -8005,6 +8042,7 @@ export type Database = {
           visual_state: string
         }[]
       }
+      admin_video_status_breakdown: { Args: never; Returns: Json }
       admin_worker_health: { Args: { p_hours?: number }; Returns: Json }
       analytics_active_users: {
         Args: { _from: string; _to: string }
@@ -9452,6 +9490,7 @@ export type Database = {
       sweep_inappropriate_content:
         | { Args: never; Returns: Json }
         | { Args: { p_chunk?: number; p_max_chunks?: number }; Returns: Json }
+      sweep_unchecked_serving_queue: { Args: { p_max?: number }; Returns: Json }
       toggle_creator_subscription: {
         Args: { p_creator_id: string }
         Returns: Json

@@ -54,6 +54,7 @@ const AdminOps = lazy(() => import("./pages/AdminOps.tsx"));
 const AdminRecHealth = lazy(() => import("./pages/AdminRecHealth.tsx"));
 const AdminOpsHealth = lazy(() => import("./pages/AdminOpsHealth.tsx"));
 const AdminLaunchMonitor = lazy(() => import("./pages/AdminLaunchMonitor.tsx"));
+const AdminLaunchGate = lazy(() => import("./pages/AdminLaunchGate.tsx"));
 const AdminFeedDiversity = lazy(() => import("./pages/AdminFeedDiversity.tsx"));
 const AdminFeedFlags = lazy(() => import("./pages/AdminFeedFlags.tsx"));
 const AdminFeedQuality = lazy(() => import("./pages/AdminFeedQuality.tsx"));
@@ -540,6 +541,7 @@ const App = () => (
                 <Route path="/admin/rec-health" element={<AdminRoute><AdminRecHealth /></AdminRoute>} />
                 <Route path="/admin/ops-health" element={<AdminRoute><AdminOpsHealth /></AdminRoute>} />
                 <Route path="/admin/launch-monitor" element={<AdminRoute><AdminLaunchMonitor /></AdminRoute>} />
+                <Route path="/admin/launch-gate" element={<AdminRoute><AdminLaunchGate /></AdminRoute>} />
                 <Route path="/admin/feed-diversity" element={<AdminRoute><AdminFeedDiversity /></AdminRoute>} />
                 <Route path="/admin/feed-flags" element={<AdminRoute><AdminFeedFlags /></AdminRoute>} />
                 <Route path="/admin/feed-quality" element={<AdminRoute><AdminFeedQuality /></AdminRoute>} />
