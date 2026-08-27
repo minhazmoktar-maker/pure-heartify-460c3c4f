@@ -9,8 +9,16 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=()" />
-    <link rel="icon" href="/favicon.png" type="image/png" />
-    <link rel="apple-touch-icon" href="/app-icon-1024.png" />
+    <!-- Favicon: Google's SERP icon crawler prefers a square icon whose size is a
+         multiple of 48px, served from a stable, crawlable URL. /favicon.ico is the
+         root fallback it checks even when no <link> is present. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
+    <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" />
+    <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
     <!-- Per-route <link rel="canonical"> is emitted by src/components/SEO.tsx via react-helmet-async. -->
     <!-- Do not hardcode a sitewide canonical here — it would duplicate/override subpage canonicals for non-JS crawlers. -->
 
