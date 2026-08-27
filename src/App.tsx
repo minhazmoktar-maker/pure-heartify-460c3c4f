@@ -58,6 +58,7 @@ const AdminFeedFlags = lazy(() => import("./pages/AdminFeedFlags.tsx"));
 const AdminFeedQuality = lazy(() => import("./pages/AdminFeedQuality.tsx"));
 const AdminFeedTraces = lazy(() => import("./pages/AdminFeedTraces.tsx"));
 const AdminUncheckedVideos = lazy(() => import("./pages/AdminUncheckedVideos.tsx"));
+const AdminReliability = lazy(() => import("./pages/AdminReliability.tsx"));
 const AdminCorpusProgress = lazy(() => import("./pages/AdminCorpusProgress.tsx"));
 const AdminLocaleCoverage = lazy(() => import("./pages/AdminLocaleCoverage.tsx"));
 const AdminFeedAB = lazy(() => import("./pages/AdminFeedAB.tsx"));
