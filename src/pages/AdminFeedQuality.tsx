@@ -59,20 +59,29 @@ export default function AdminFeedQuality() {
   const [points, setPoints] = useState<Point[]>([]);
   const [health, setHealth] = useState<DedupHealth | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [coverage, setCoverage] = useState<Coverage | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function load(range = days) {
     setLoading(true);
-    const [ts, hp, al] = await Promise.all([
+    const [ts, hp, al, cv] = await Promise.all([
       supabase.rpc("admin_feed_quality_timeseries", { p_days: range }),
       supabase.rpc("admin_dedup_backfill_health"),
       supabase
         .from("production_alerts")
         .select("id,kind,severity,message,created_at")
-        .in("kind", ["dedup_backfill_stalled", "dedup_backfill_lag", "dedup_canonical_lag"])
+        .in("kind", [
+          "dedup_backfill_stalled",
+          "dedup_backfill_lag",
+          "dedup_canonical_lag",
+          "feed_novelty_dip",
+          "feed_coverage_dip",
+          "feed_diversity_dip",
+        ])
         .is("resolved_at", null)
         .order("created_at", { ascending: false })
         .limit(20),
+      supabase.rpc("admin_serving_coverage"),
     ]);
     if (ts.error) toast({ title: ts.error.message, variant: "destructive" });
     if (hp.error) toast({ title: hp.error.message, variant: "destructive" });
@@ -88,6 +97,7 @@ export default function AdminFeedQuality() {
     );
     setHealth((hp.data ?? null) as unknown as DedupHealth | null);
     setAlerts((al.data ?? []) as unknown as Alert[]);
+    setCoverage((cv.data ?? null) as unknown as Coverage | null);
     setLoading(false);
   }
 
