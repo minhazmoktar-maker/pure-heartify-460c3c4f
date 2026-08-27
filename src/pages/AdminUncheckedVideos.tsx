@@ -15,7 +15,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
-import { downloadCsv, timestampSlug } from "@/lib/download";
+import { downloadCsv, downloadJson, timestampSlug } from "@/lib/download";
 
 type Row = {
   video_id: string;
