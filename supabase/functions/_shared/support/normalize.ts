@@ -50,18 +50,27 @@ export function normalizeQuestion(input: string): string {
  * even when the phrasing looks generic.
  */
 const PERSONAL_MARKERS = [
-  "my", "mine", "i ", "i'm", "im ", "me", "our",
-  "why was", "why did", "my account", "my video", "my streak", "my plan",
-  "my subscription", "my payment", "my invoice", "my email", "refund",
-  "charged", "billed", "banned", "suspended", "removed my", "rejected",
-  "appeal", "ticket", "password reset link", "verification code", "otp",
+  // Ownership of state (a generic how-to like "how do I delete my account" is
+  // still cacheable — only questions ABOUT the caller's own state are not).
+  "my streak", "my plan", "my subscription", "my premium", "my payment",
+  "my invoice", "my receipt", "my email address", "my video", "my videos",
+  "my upload", "my channel", "my report", "my appeal", "my data", "my history",
+  "my watch", "my favorites", "my favourites", "my progress", "my balance",
+  "my order", "my ticket", "my session",
+  // State-of-my-account phrasing.
+  "why was", "why did my", "why is my", "why can't i", "why cant i",
+  "was removed", "was rejected", "was banned", "was suspended",
+  "i was charged", "charged twice", "double charged", "billed me",
+  "refund", "suspended", "banned", "appeal",
+  // Never cache anything that could carry a credential or one-time code.
+  "verification code", "otp", "reset link", "my password is",
 ];
 
 /** True when the question is safe to answer from a globally shared cache. */
 export function isCacheable(rawQuestion: string, opts: { signedIn: boolean }): boolean {
-  const q = ` ${(rawQuestion ?? "").toLowerCase().trim()} `;
-  if (q.trim().length < 6) return false;
-  if (PERSONAL_MARKERS.some((m) => q.includes(m.length > 2 ? m : ` ${m.trim()} `))) return false;
+  const q = (rawQuestion ?? "").toLowerCase().replace(/[^\p{L}\p{N}'\s]/gu, " ").replace(/\s+/g, " ").trim();
+  if (q.length < 6) return false;
+  if (PERSONAL_MARKERS.some((m) => q.includes(m))) return false;
   // Signed-in status alone never blocks caching — only personal phrasing does.
   void opts;
   return true;
