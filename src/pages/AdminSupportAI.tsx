@@ -80,16 +80,12 @@ export default function AdminSupportAI() {
     setLoading(true);
     const [quality, costs] = await Promise.all([
       supabase.rpc("admin_support_quality", { _days: days }),
-      // deno-lint-ignore no-explicit-any
-      (supabase.rpc as unknown as (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>)(
-        "admin_support_ai_cost",
-        { _days: days },
-      ),
+      supabase.rpc("admin_support_ai_cost", { _days: days }),
     ]);
     if (quality.error) toast.error(quality.error.message);
     else setData(quality.data as unknown as Quality);
     if (costs.error) console.warn("[admin] cost telemetry unavailable:", costs.error.message);
-    else setCost(costs.data as Cost);
+    else setCost(costs.data as unknown as Cost);
     setLoading(false);
   }, [days]);
 
