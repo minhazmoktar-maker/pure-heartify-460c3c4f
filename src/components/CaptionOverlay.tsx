@@ -47,8 +47,15 @@ export function activeCue(
   return best && best.text?.trim() ? best : null;
 }
 
-const CaptionOverlay = ({ segments, language, currentTime, testId = "caption-overlay" }: Props) => {
-  const { settings } = useCaptionSettings();
+const CaptionOverlay = ({
+  segments,
+  language,
+  currentTime,
+  testId = "caption-overlay",
+  overrides,
+}: Props) => {
+  const { settings: saved } = useCaptionSettings();
+  const settings = overrides ? { ...saved, ...overrides } : saved;
   const rtl = isRtlCaption(language);
   const cue = useMemo(() => activeCue(segments, Math.round(currentTime * 1000)), [segments, currentTime]);
 
