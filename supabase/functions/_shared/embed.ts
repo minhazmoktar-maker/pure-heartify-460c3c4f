@@ -36,16 +36,29 @@ export async function embedTexts(
   inputs: string | string[],
   { timeoutMs = 8000 }: { timeoutMs?: number } = {},
 ): Promise<number[][] | null> {
-  const key = Deno.env.get("LOVABLE_API_KEY");
-  if (!key) {
-    console.warn("[embed] LOVABLE_API_KEY missing — skipping embedding call");
-    return null;
-  }
   const arr = Array.isArray(inputs) ? inputs : [inputs];
   const clean = arr
     .map((s) => (typeof s === "string" ? s.trim().slice(0, 8000) : ""))
     .filter((s) => s.length > 0);
   if (clean.length === 0) return null;
+
+  // Preferred path: independent provider on our own key (zero Lovable credits).
+  if (isEmbeddingConfigured()) {
+    const out: number[][] = [];
+    for (const text of clean) {
+      const vec = await embedSupportText(text, { timeoutMs });
+      if (!vec) return null;
+      out.push(vec);
+    }
+    return out;
+  }
+
+  const key = Deno.env.get("LOVABLE_API_KEY");
+  if (!key) {
+    console.warn("[embed] no embedding provider configured — skipping");
+    return null;
+  }
+
 
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
