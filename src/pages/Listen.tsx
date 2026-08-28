@@ -406,45 +406,51 @@ function ReciterDetail({
             const isActive = t && currentId === t.id;
             return (
               <li key={s.number}>
-                <button
-                  type="button"
-                  onClick={() => onPlaySurah(i)}
+                <div
                   className={cn(
-                    "flex w-full min-h-[52px] items-center gap-3 rounded-card px-3 py-2 text-left transition-colors",
-                    "hover:bg-card pressable",
+                    "flex w-full min-h-[52px] items-center gap-1 rounded-card pr-1 transition-colors",
+                    "hover:bg-card",
                     isActive && "bg-primary/10",
                   )}
                 >
-                  <span className="w-8 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
-                    {s.number.toString().padStart(3, "0")}
-                  </span>
-                  <span className="flex-1">
-                    <span className="block font-medium leading-tight">
-                      {s.nameEn}
-                    </span>
-                    <span className="block text-xs text-muted-foreground">
-                      {s.ayahs} āyāt
-                    </span>
-                  </span>
-                  <span
-                    className="font-quran text-lg leading-none text-foreground/80"
-                    dir="rtl"
-                    lang="ar"
+                  <button
+                    type="button"
+                    onClick={() => onPlaySurah(i)}
+                    className="flex flex-1 min-h-[52px] items-center gap-3 rounded-card px-3 py-2 text-left pressable"
                   >
-                    {s.nameAr}
-                  </span>
-                  <Play
-                    className={cn(
-                      "h-4 w-4 shrink-0",
-                      isActive ? "text-primary" : "text-muted-foreground",
-                    )}
-                    aria-hidden
-                  />
-                </button>
+                    <span className="w-8 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                      {s.number.toString().padStart(3, "0")}
+                    </span>
+                    <span className="flex-1">
+                      <span className="block font-medium leading-tight">
+                        {s.nameEn}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        {s.ayahs} āyāt
+                      </span>
+                    </span>
+                    <span
+                      className="font-quran text-lg leading-none text-foreground/80"
+                      dir="rtl"
+                      lang="ar"
+                    >
+                      {s.nameAr}
+                    </span>
+                    <Play
+                      className={cn(
+                        "h-4 w-4 shrink-0",
+                        isActive ? "text-primary" : "text-muted-foreground",
+                      )}
+                      aria-hidden
+                    />
+                  </button>
+                  {t && <DownloadTrackButton track={t} className="shrink-0" />}
+                </div>
               </li>
             );
           })}
         </ol>
+
       )}
     </section>
   );
