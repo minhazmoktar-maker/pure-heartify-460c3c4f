@@ -1,8 +1,12 @@
 /**
- * AI-powered query intent detection via Lovable AI Gateway.
+ * AI-powered query intent detection.
+ *
+ * Cost policy: routes through the independent provider chain (own API keys,
+ * zero Lovable runtime credits) when configured, and only falls back to the
+ * Lovable AI Gateway when no BYO provider is available.
  *
  * Hardening:
- *  - Uses a cheaper model (gemini-2.5-flash-lite) — 4x cheaper, same latency budget.
+ *  - Cheap model tier — same latency budget.
  *  - Delimited user content + explicit injection rule (query is DATA, not instruction).
  *  - Length cap raised to 500 (arabic normalization can push short queries over 200).
  *  - Fails soft with `{ rewrittenQuery: query }` so downstream never gets `null`
@@ -12,9 +16,11 @@
  *    otherwise hallucinated names silently narrow results to zero.
  */
 import type { SearchIntent } from "./types.ts";
+import { chatWithFailover, isInferenceConfigured } from "../support/providers.ts";
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash-lite";
+
 
 const SYSTEM = `You classify Islamic-content video search queries.
 
@@ -40,10 +46,31 @@ function softFallback(query: string): SearchIntent {
 }
 
 export async function detectIntent(query: string): Promise<SearchIntent | null> {
-  const key = Deno.env.get("LOVABLE_API_KEY");
   if (!query || query.length < 3) return null;
   if (query.length > 500) return softFallback(query.slice(0, 500));
+
+  const wrappedQuery = `<query>\n${escapeDelimiter(query)}\n</query>`;
+
+  // Preferred: independent provider on our own key (zero Lovable credits).
+  if (isInferenceConfigured()) {
+    try {
+      const result = await chatWithFailover(
+        "cheap",
+        [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: wrappedQuery },
+        ],
+        { maxTokens: 200, timeoutMs: 1500, jsonMode: true },
+      );
+      return normalizeIntent(JSON.parse(result.text), query);
+    } catch {
+      return softFallback(query);
+    }
+  }
+
+  const key = Deno.env.get("LOVABLE_API_KEY");
   if (!key) return softFallback(query);
+
 
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 1200);
@@ -70,20 +97,25 @@ export async function detectIntent(query: string): Promise<SearchIntent | null> 
     const data = await res.json();
     const raw = data?.choices?.[0]?.message?.content;
     if (!raw) return softFallback(query);
-    const parsed = JSON.parse(raw);
-    return {
-      rewrittenQuery: typeof parsed.rewrittenQuery === "string" && parsed.rewrittenQuery.trim().length > 0
-        ? parsed.rewrittenQuery.slice(0, 500)
-        : query,
-      topic: typeof parsed.topic === "string" ? parsed.topic : undefined,
-      category: parsed.category ?? undefined,
-      channel: parsed.channel ?? undefined,
-      entities: Array.isArray(parsed.entities) ? parsed.entities.slice(0, 8).map(String) : undefined,
-      language: typeof parsed.language === "string" ? parsed.language : undefined,
-    };
+    return normalizeIntent(JSON.parse(raw), query);
   } catch {
     return softFallback(query);
   } finally {
     clearTimeout(t);
   }
 }
+
+function normalizeIntent(parsed: Record<string, unknown>, query: string): SearchIntent {
+  const rewritten = parsed?.rewrittenQuery;
+  return {
+    rewrittenQuery: typeof rewritten === "string" && rewritten.trim().length > 0
+      ? rewritten.slice(0, 500)
+      : query,
+    topic: typeof parsed?.topic === "string" ? parsed.topic : undefined,
+    category: (parsed?.category as string | null) ?? undefined,
+    channel: (parsed?.channel as string | null) ?? undefined,
+    entities: Array.isArray(parsed?.entities) ? parsed.entities.slice(0, 8).map(String) : undefined,
+    language: typeof parsed?.language === "string" ? parsed.language : undefined,
+  };
+}
+
