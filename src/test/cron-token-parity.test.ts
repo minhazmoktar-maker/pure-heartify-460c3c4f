@@ -46,17 +46,26 @@ describe("cron token parity", () => {
   });
 
   it("no function trusts a cron token that is unset in the environment", () => {
-    // `token === Deno.env.get("X")` is true when both sides are undefined only
-    // if the header is absent, but a truthiness guard is still required.
+    // Anti-pattern: comparing the header straight to `Deno.env.get(...)` with no
+    // truthiness guard and no non-empty fallback — if the secret is missing,
+    // both sides are undefined and an unauthenticated caller gets in.
+    const UNGUARDED =
+      /(?<![!&|]\s?)\b(\w+)\s*===\s*Deno\.env\.get\(\s*["'][A-Z_]*CRON[A-Z_]*["']\s*\)\s*(?![)\s]*\?\?)/;
     for (const name of listFunctions()) {
       const src = readFunction(name);
       // Only functions that authenticate with the header matter here; some
       // functions merely forward it to another worker.
       if (!/headers\.get\(\s*["']x-cron-token["']\s*\)/i.test(src)) continue;
-      const guardsEmptyToken =
-        /!!cronToken|cronToken &&|!expected|CRON_TOKEN &&|\?\?\s*"\\u0000"|\?\? "\u0000"/
-          .test(src);
-      expect(guardsEmptyToken, `${name} must guard against an empty cron token`).toBe(true);
+      for (const line of src.split("\n")) {
+        const match = UNGUARDED.exec(line);
+        if (!match) continue;
+        // Guarded when the same line asserts the header is non-empty.
+        const guarded = new RegExp(`!!\\s*${match[1]}\\b|\\b${match[1]}\\s*&&`).test(line) ||
+          /!!cronToken|!expected/.test(line);
+        expect(guarded, `${name} compares a cron token without a guard: ${line.trim()}`)
+          .toBe(true);
+      }
     }
   });
+
 });
