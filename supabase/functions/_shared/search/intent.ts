@@ -91,20 +91,25 @@ export async function detectIntent(query: string): Promise<SearchIntent | null> 
     const data = await res.json();
     const raw = data?.choices?.[0]?.message?.content;
     if (!raw) return softFallback(query);
-    const parsed = JSON.parse(raw);
-    return {
-      rewrittenQuery: typeof parsed.rewrittenQuery === "string" && parsed.rewrittenQuery.trim().length > 0
-        ? parsed.rewrittenQuery.slice(0, 500)
-        : query,
-      topic: typeof parsed.topic === "string" ? parsed.topic : undefined,
-      category: parsed.category ?? undefined,
-      channel: parsed.channel ?? undefined,
-      entities: Array.isArray(parsed.entities) ? parsed.entities.slice(0, 8).map(String) : undefined,
-      language: typeof parsed.language === "string" ? parsed.language : undefined,
-    };
+    return normalizeIntent(JSON.parse(raw), query);
   } catch {
     return softFallback(query);
   } finally {
     clearTimeout(t);
   }
 }
+
+function normalizeIntent(parsed: Record<string, unknown>, query: string): SearchIntent {
+  const rewritten = parsed?.rewrittenQuery;
+  return {
+    rewrittenQuery: typeof rewritten === "string" && rewritten.trim().length > 0
+      ? rewritten.slice(0, 500)
+      : query,
+    topic: typeof parsed?.topic === "string" ? parsed.topic : undefined,
+    category: (parsed?.category as string | null) ?? undefined,
+    channel: (parsed?.channel as string | null) ?? undefined,
+    entities: Array.isArray(parsed?.entities) ? parsed.entities.slice(0, 8).map(String) : undefined,
+    language: typeof parsed?.language === "string" ? parsed.language : undefined,
+  };
+}
+
