@@ -17,6 +17,12 @@ import { isQuotaError, parseIsoDuration, runEmbedSweep, type StatusResult } from
 const YOUTUBE_API_KEYS: string[] = [
   Deno.env.get("YOUTUBE_API_KEY"),
   Deno.env.get("YOUTUBE_API_KEY_2"),
+  Deno.env.get("YOUTUBE_API_KEY_3"),
+  Deno.env.get("YOUTUBE_API_KEY_4"),
+  Deno.env.get("YOUTUBE_API_KEY_5"),
+  Deno.env.get("YOUTUBE_API_KEY_6"),
+  // Generic Google Cloud key (separate project => its own Search-quota budget).
+  Deno.env.get("GOOGLE_API_KEY"),
 ].filter((k): k is string => !!k);
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");

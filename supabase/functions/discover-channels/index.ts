@@ -21,6 +21,12 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const YOUTUBE_API_KEYS: string[] = [
   Deno.env.get('YOUTUBE_API_KEY'),
   Deno.env.get('YOUTUBE_API_KEY_2'),
+  Deno.env.get('YOUTUBE_API_KEY_3'),
+  Deno.env.get('YOUTUBE_API_KEY_4'),
+  Deno.env.get('YOUTUBE_API_KEY_5'),
+  Deno.env.get('YOUTUBE_API_KEY_6'),
+  // Generic Google Cloud key (separate project => its own Search-quota budget).
+  Deno.env.get('GOOGLE_API_KEY'),
 ].filter((k): k is string => !!k && k.length > 0);
 // Kept for URL construction; ytFetch swaps in whichever key is still live.
 const YOUTUBE_API_KEY = YOUTUBE_API_KEYS[0] ?? '';
@@ -261,14 +267,19 @@ interface QuotaCtx {
   /** True once every configured key has answered quotaExceeded this run. */
   quotaExhausted: boolean;
   /**
-   * True once YouTube reports the per-day *Search Queries* quota is spent.
-   * Search quota is metered separately from general units, and all configured
-   * keys usually live in one Google Cloud project (so rotation cannot help).
-   * The run keeps going on the cheap 1-unit playlist / description crawls
-   * instead of halting outright.
+   * Key indices whose per-day *Search Queries* quota is spent. Search quota is
+   * metered per Google Cloud project, so a key from a *different* project still
+   * has its own search budget — we rotate through the pool before giving up.
+   */
+  searchExhaustedKeys: Set<number>;
+  /**
+   * True once every configured key has spent its Search Queries quota. The run
+   * keeps going on the cheap 1-unit playlist / description crawls instead of
+   * halting outright.
    */
   searchExhausted: boolean;
 }
+
 
 async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   const day = new Date().toISOString().slice(0, 10);
@@ -289,6 +300,35 @@ async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   ctx.usedThisRun += cost;
   return true;
 }
+
+/**
+ * Give reserved units back when the call they were reserved for never landed
+ * (quota rejection, network error, HTTP failure). Google does not charge quota
+ * for a rejected request, so keeping the reservation silently burned the whole
+ * 4000-unit daily budget on failures — after which the cheap 1-unit
+ * playlist/description lanes could not run at all and discovery enqueued zero
+ * candidates every hour.
+ */
+async function refundQuota(ctx: QuotaCtx, cost: number): Promise<void> {
+  if (cost <= 0) return;
+  const day = new Date().toISOString().slice(0, 10);
+  const { data } = await ctx.admin
+    .from('discovery_quota_ledger')
+    .select('units_used')
+    .eq('day', day)
+    .eq('api_name', 'youtube_v3')
+    .maybeSingle();
+  const current = (data?.units_used as number | undefined) ?? 0;
+  const next = Math.max(0, current - cost);
+  await ctx.admin
+    .from('discovery_quota_ledger')
+    .upsert(
+      { day, api_name: 'youtube_v3', units_used: next, updated_at: new Date().toISOString() },
+      { onConflict: 'day,api_name' },
+    );
+  ctx.usedThisRun = Math.max(0, ctx.usedThisRun - cost);
+}
+
 
 const QUOTA_PATTERN =
   /quotaExceeded|dailyLimitExceeded|rateLimitExceeded|userRateLimitExceeded|exceeded your .*quota/i;
@@ -318,14 +358,26 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
 
       const isSearchOnly = /\/v3\/search\?/.test(url) && /Search Queries/i.test(body);
       if (isQuota && isSearchOnly) {
-        // Per-day Search quota is project-scoped, so rotating keys inside the
-        // same Cloud project cannot recover it. Disable search for this run and
-        // let the cheap non-search crawls continue.
+        // Search quota is metered per Google Cloud project. A key from another
+        // project therefore still has its own search budget — rotate through the
+        // pool before disabling search for the run.
+        ctx.searchExhaustedKeys.add(ctx.keyIndex);
+        const nextKey = YOUTUBE_API_KEYS.findIndex((_, i) => !ctx.searchExhaustedKeys.has(i));
+        if (nextKey >= 0) {
+          ctx.keyIndex = nextKey;
+          console.warn(
+            `youtube search quota spent on key #${ctx.searchExhaustedKeys.size} — rotating to key #${nextKey + 1}`,
+          );
+          continue; // retry the same search URL on a key with its own search budget
+        }
         ctx.searchExhausted = true;
         ctx.apiFailures++;
-        console.warn(`youtube search quota exhausted — continuing without search: ${body}`);
+        console.warn(
+          `youtube search quota exhausted on all ${YOUTUBE_API_KEYS.length} key(s) — continuing without search: ${body}`,
+        );
         return null;
       }
+
 
       if (isQuota) {
         // Rotate to the next configured key; if none remain, stop the run.
@@ -590,6 +642,16 @@ async function loadTopicQueries(admin: Admin): Promise<Array<{ id: string; query
 }
 
 async function loadApprovedSeeds(admin: Admin, limit: number): Promise<Array<{ youtube_channel_id: string }>> {
+  // Launch-market bias: the cheap 1-unit lanes (playlist_collab /
+  // description_mention) are the only lanes that survive Search-quota
+  // exhaustion, so crawl Bengali/Urdu/Hindi/Malay channels first instead of
+  // letting the ~766 English channels monopolise them.
+  const { data: fair, error } = await admin.rpc('next_discovery_seeds', { p_limit: limit });
+  if (!error && Array.isArray(fair) && fair.length > 0) {
+    return (fair as Array<{ youtube_channel_id: string }>).map((r) => ({
+      youtube_channel_id: r.youtube_channel_id,
+    }));
+  }
   const { data } = await admin
     .from('approved_channels')
     .select('youtube_channel_id')
@@ -598,6 +660,7 @@ async function loadApprovedSeeds(admin: Admin, limit: number): Promise<Array<{ y
     .limit(limit);
   return (data as any[] | null) ?? [];
 }
+
 
 interface AllocationRow { source: string; share_percent: number; enabled: boolean }
 
@@ -662,7 +725,16 @@ interface JobParams { targetSeedId?: string; requestedMethod?: string }
 
 async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
   const started = Date.now();
-  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0, keyIndex: 0, quotaExhausted: false, searchExhausted: false };
+  const ctx: QuotaCtx = {
+    admin,
+    usedThisRun: 0,
+    apiFailures: 0,
+    keyIndex: 0,
+    quotaExhausted: false,
+    searchExhaustedKeys: new Set<number>(),
+    searchExhausted: false,
+  };
+
   let totalEnqueued = 0;
   let totalSkipped = 0;
   let seedsProcessed = 0;

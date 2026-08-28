@@ -9,7 +9,7 @@ const EXCLUSION_KEYWORDS = [
   'twerk', 'lingerie', 'nightclub', 'lip sync', 'tiktok dance',
 ];
 
-const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2');
+const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2') ?? Deno.env.get('YOUTUBE_API_KEY_3') ?? Deno.env.get('YOUTUBE_API_KEY_4') ?? Deno.env.get('YOUTUBE_API_KEY_5') ?? Deno.env.get('YOUTUBE_API_KEY_6') ?? Deno.env.get('GOOGLE_API_KEY');
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });

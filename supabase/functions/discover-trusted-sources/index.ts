@@ -21,7 +21,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const YOUTUBE_API_KEY =
-  Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2') ?? '';
+  Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2') ?? Deno.env.get('YOUTUBE_API_KEY_3') ?? Deno.env.get('YOUTUBE_API_KEY_4') ?? Deno.env.get('YOUTUBE_API_KEY_5') ?? Deno.env.get('YOUTUBE_API_KEY_6') ?? Deno.env.get('GOOGLE_API_KEY') ?? '';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
