@@ -31,12 +31,15 @@ export type StopReason = "completed" | "exhausted_corpus" | "quota" | "yt_error"
 export type EmbedSweepResult = {
   checked: number;
   hidden: number;
+  /** Rows whose real duration was written this run. */
+  durationsWritten: number;
   batchesRun: number;
   quotaExhausted: boolean;
   /** Batch ids fetched but intentionally left unwritten (re-claimed next run). */
   deferred: string[];
   stopReason: StopReason;
 };
+
 
 /** True for the non-transient "quota exceeded" family of YouTube errors. */
 export function isQuotaError(status: number, body: string): boolean {
