@@ -133,15 +133,23 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const dryRun: boolean = typeof body.dry_run === "boolean" ? body.dry_run : DRY_RUN_DEFAULT;
     const limit: number = Math.min(BATCH_SIZE, Number(body.limit ?? BATCH_SIZE));
+    // `retier` lets an admin deliberately re-run classification over rows that
+    // already carry a tier (e.g. after a weight change).
+    const retier: boolean = body.retier === true;
 
+    // Untiered candidates FIRST. Ordering by created_at alone made the job
+    // re-classify the same newest pending rows on every tick while older
+    // never-classified candidates starved forever (1.2k-row permanent backlog).
+    let q = admin.from("channel_candidates")
+      .select("id, youtube_channel_id, title, handle, description, category, subscriber_count, language_detected, confidence, duplicate_risk, status, tier, auto_action, moderation_summary, evidence")
+      .eq("status", "pending");
+    if (!retier) q = q.is("tier", null);
     const [{ data: candidates }, { data: institutions }] = await Promise.all([
-      admin.from("channel_candidates")
-        .select("id, youtube_channel_id, title, handle, description, category, subscriber_count, language_detected, confidence, duplicate_risk, status, tier, auto_action, moderation_summary, evidence")
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(limit),
+      q.order("created_at", { ascending: false }).limit(limit),
       admin.from("trusted_institutions").select("id, name, organization_type, match_pattern, weight"),
     ]);
+
+
 
     const inst = (institutions ?? []) as Institution[];
     const stats = { processed: 0, tierA: 0, tierB: 0, tierC: 0, tierD: 0, auto_approved: 0, auto_rejected: 0, summaries_requested: 0 };
@@ -179,13 +187,17 @@ Deno.serve(async (req) => {
       const clusterId = await ensureCluster(admin, raw, institution);
       const riskScore = Math.max(0, Math.min(100, 100 - confidence + exclusionHits * 15 + (musicSignal ? 25 : 0) + (femaleSignal ? 25 : 0)));
 
-      // NEW POLICY (safety invariant #1 + #7):
-      //   Tier S/A ─► `pre_approved`; a channel MUST clear the video sampling
-      //               pipeline before it becomes `approved`.
-      //   Tier B/C ─► human queue (fast / full review).
-      //   Tier D   ─► auto_rejected.
+      // POLICY (safety invariant #1 + #7):
+      //   Tier S/A/B/C ─► `pre_approved`; a channel MUST clear the video
+      //               sampling gate before it can ever become `approved`. The
+      //               evidence bar scales with tier (S/A: 1x clean samples,
+      //               B: 2x, C: 3x) and ANY violating sample rejects outright.
+      //   Tier D   ─► stays pending for human review (hard-blocked signals).
+      // Routing B/C here replaces an unstaffed human queue that had stalled
+      // channel growth at 0/day: 4.3k candidates were waiting on nobody.
       // We never mirror rows into `approved_channels` from here — that only
       // happens when the sampling trigger promotes the candidate.
+      const gated = tier === "S" || tier === "A" || tier === "B" || tier === "C";
       const autoAction:
         "queued_pre_approve" | "queued_fast" | "queued_full" | "auto_rejected" =
           tier === "S" || tier === "A" ? "queued_pre_approve"
@@ -194,15 +206,13 @@ Deno.serve(async (req) => {
           : "auto_rejected";
 
       let newStatus = raw.status;
-      if (!dryRun) {
-        if (tier === "S" || tier === "A") { newStatus = "pre_approved"; stats.auto_approved++; }
-        // Tier D is NOT auto-rejected — leave it pending for human review via magic link.
-      }
+      if (!dryRun && gated) { newStatus = "pre_approved"; stats.auto_approved++; }
+      // Tier D is NOT auto-rejected — leave it pending for human review via magic link.
 
       await admin.from("channel_candidates").update({
         tier, tier_reason: reasons, auto_action: autoAction, risk_score: riskScore,
         cluster_id: clusterId, status: newStatus,
-        pre_approved_at: !dryRun && (tier === "S" || tier === "A") ? new Date().toISOString() : null,
+        pre_approved_at: !dryRun && gated ? new Date().toISOString() : null,
       }).eq("id", raw.id);
 
       await admin.from("channel_moderation_decisions").insert({
@@ -215,18 +225,20 @@ Deno.serve(async (req) => {
         previous_status: raw.status, new_status: newStatus, reversible: true,
       });
 
-      // Kick off video sampling for pre-approved candidates. Fire-and-forget;
-      // the DB trigger promotes them only after enough clean samples land.
+      // Kick off video sampling for the highest-trust tiers immediately; B/C are
+      // picked up by `channel_pipeline_tick` so we don't burst YouTube quota.
       if (!dryRun && (tier === "S" || tier === "A")) {
         fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/sample-channel-videos`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-cron-secret": Deno.env.get("CRON_SECRET") ?? "",
+            "x-cron-token": Deno.env.get("INGEST_CRON_TOKEN") ?? "",
           },
           body: JSON.stringify({ candidate_id: raw.id }),
         }).catch(() => {});
       }
+
 
       if (!summary && tier !== "D") {
         stats.summaries_requested++;
