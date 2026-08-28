@@ -263,12 +263,17 @@ async function dispatch(cands: Candidate[]): Promise<number> {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Authorization: shared cron token OR admin JWT.
+  // Authorization: shared cron token OR admin JWT. Accept every internal cron
+  // token the scheduler uses — a mismatch here silently disables all push
+  // notifications, so keep this list in sync with the other pipeline workers.
   const cronToken = req.headers.get("x-cron-token") ?? req.headers.get("X-Cron-Secret");
   const isCron =
     !!cronToken &&
-    (cronToken === Deno.env.get("AUDIT_CRON_TOKEN") ||
-      cronToken === Deno.env.get("CRON_SECRET"));
+    [
+      Deno.env.get("AUDIT_CRON_TOKEN"),
+      Deno.env.get("CRON_SECRET"),
+      Deno.env.get("INGEST_CRON_TOKEN"),
+    ].some((t) => !!t && t === cronToken);
   if (!isCron) {
     const authHeader = req.headers.get("Authorization") ?? "";
     const asUser = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
