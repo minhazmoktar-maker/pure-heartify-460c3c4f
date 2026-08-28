@@ -12,7 +12,7 @@
  * then keep re-verifying the corpus.
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { isQuotaError, runEmbedSweep, type StatusResult } from "./sweep.ts";
+import { isQuotaError, parseIsoDuration, runEmbedSweep, type StatusResult } from "./sweep.ts";
 
 const YOUTUBE_API_KEYS: string[] = [
   Deno.env.get("YOUTUBE_API_KEY"),
