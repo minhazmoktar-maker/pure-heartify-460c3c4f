@@ -7,6 +7,8 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useAuth } from "@/contexts/AuthContext";
 import TrustBadges from "@/components/TrustBadges";
 import NotInterestedMenu from "@/components/NotInterestedMenu";
+import { preferLatinSegment } from "@/lib/displayText";
+import { useLocaleOptional } from "@/contexts/LocaleContext";
 
 interface YouTubeVideoCardProps {
   video: YouTubeVideo;
@@ -18,6 +20,11 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const timeAgo = formatTimeAgo(video.publishedAt);
+  // Bilingual titles ("বাংলা … | English …") fold to their English side while
+  // the interface language is English, so feed chrome reads in one language.
+  const uiLocale = useLocaleOptional()?.locale ?? "en";
+  const displayTitle = preferLatinSegment(video.title, uiLocale) || video.title;
+  const displayChannel = preferLatinSegment(video.channelTitle, uiLocale) || video.channelTitle;
   const liked = isFavorite(video.id);
   const isEmbeddableVideo = /^[a-zA-Z0-9_-]{11}$/.test(video.id);
   // Thumbnail chain using only URLs that YouTube guarantees to resolve.
@@ -105,13 +112,13 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         style={{ viewTransitionName: `video-${video.id}` } as React.CSSProperties}
       >
         {thumbFailed ? (
-          <div className="aspect-video w-full bg-muted" aria-label={`${video.title} thumbnail unavailable`} />
+          <div className="aspect-video w-full bg-muted" aria-label={`${displayTitle} thumbnail unavailable`} />
         ) : (
           <img
             src={thumbnailSrc}
             onError={handleThumbError}
             onLoad={handleThumbLoad}
-            alt={`${video.title} — ${video.channelTitle} thumbnail`}
+            alt={`${displayTitle} — ${displayChannel} thumbnail`}
             loading={index < 4 ? "eager" : "lazy"}
             decoding="async"
             width={1280}
@@ -121,7 +128,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
           />
         )}
         <div className="absolute bottom-2 left-2 right-2">
-          <TrustBadges channelTitle={video.channelTitle} halalScore={video.halalScore} />
+          <TrustBadges channelTitle={displayChannel} halalScore={video.halalScore} />
         </div>
         <span className="absolute right-2 top-2 rounded-card bg-foreground/70 px-1.5 py-0.5 text-micro font-medium text-background">
           {video.category}
@@ -154,17 +161,17 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
 
       <div className="mt-3 flex gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-pill bg-primary text-micro font-bold text-primary-foreground">
-          {video.channelTitle[0]}
+          {displayChannel[0]}
         </div>
         <div className="min-w-0">
           <h3
             className="line-clamp-2 font-sans text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-primary"
             style={{ textWrap: "balance" } as React.CSSProperties}
           >
-            {video.title}
+            {displayTitle}
           </h3>
           <div className="mt-1 flex flex-wrap items-center gap-1.5 text-micro text-muted-foreground">
-            <span className="truncate">{video.channelTitle}</span>
+            <span className="truncate">{displayChannel}</span>
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--gold))]" />
             {/* Reviewed pill — Heartify's single biggest differentiator vs
                 YouTube. Every card in the pool has passed moderation, so

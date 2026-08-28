@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEntitlement } from "@/hooks/useEntitlement";
 import { useNotifications } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
+import { notificationTarget, notificationCta } from "@/lib/notificationRoutes";
 
 
 interface UserReport {
@@ -171,8 +172,11 @@ export default function NotificationsBell({ isAdmin }: Props) {
 
               {/* Server-side in-app notifications (streaks, referrals, khatm, badges) */}
               {notif.items.map((n) => {
-                const ctaUrl = (n.data?.cta_url as string) || (n.data?.url as string) || "";
-                const ctaLabel = (n.data?.cta_label as string) || "Open";
+                // Every notification is actionable: `notificationTarget` maps
+                // kind + payload to the screen where the user can respond
+                // (e.g. a connection request opens the Requests tab).
+                const ctaUrl = notificationTarget(n.kind, n.data);
+                const ctaLabel = notificationCta(n.kind, n.data);
                 const Wrapper: any = ctaUrl ? Link : "button";
                 const wrapperProps: any = ctaUrl
                   ? { to: ctaUrl }

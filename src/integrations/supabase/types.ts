@@ -7026,6 +7026,7 @@ export type Database = {
           data: Json
           id: string
           kind: string
+          pushed_at: string | null
           read_at: string | null
           title: string
           user_id: string
@@ -7036,6 +7037,7 @@ export type Database = {
           data?: Json
           id?: string
           kind: string
+          pushed_at?: string | null
           read_at?: string | null
           title: string
           user_id: string
@@ -7046,6 +7048,7 @@ export type Database = {
           data?: Json
           id?: string
           kind?: string
+          pushed_at?: string | null
           read_at?: string | null
           title?: string
           user_id?: string
