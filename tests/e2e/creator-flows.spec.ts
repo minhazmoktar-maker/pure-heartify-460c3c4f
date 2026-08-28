@@ -77,16 +77,10 @@ test.describe("creator profile is reachable from content surfaces", () => {
   });
 });
 
-test.describe("feed lane transparency", () => {
-  test("home feed shows the native vs diversified toggle with counts", async ({ page }) => {
+test.describe("feed lane policy", () => {
+  test("home feed keeps the language lane mix internal (no filter chips)", async ({ page }) => {
     await open(page, "/");
-    const toggle = page.getByTestId("lane-toggle");
-    // The toggle only mounts once the infinite grid has items.
-    if ((await toggle.count()) === 0) test.skip(true, "feed grid not populated in this env");
-    await expect(toggle).toBeVisible();
-    await expect(page.getByTestId("lane-native")).toBeVisible();
-    await expect(page.getByTestId("lane-diversified")).toBeVisible();
-    await page.getByTestId("lane-diversified").click();
-    await expect(page.getByTestId("lane-diversified")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByTestId("lane-toggle")).toHaveCount(0);
+    await expect(page.getByTestId("lane-diversified")).toHaveCount(0);
   });
 });

@@ -20,7 +20,12 @@ interface Props {
   limit?: number;
   sort?: FeedSort;
   fallbackMessage?: string;
-  /** Show the native vs diversified language lane control above the grid. */
+  /**
+   * Show the native vs diversified language lane control above the grid.
+   * Off by default: the language mix is an internal serving policy, so the
+   * viewer never sees lane chips or their counts. Language choice belongs in
+   * Settings, not as a filter bar on top of every feed.
+   */
   showLaneToggle?: boolean;
 }
 
@@ -31,7 +36,7 @@ const InfiniteVideoGrid = ({
   limit = 20,
   sort = "fresh",
   fallbackMessage = "No halal-compliant content found.",
-  showLaneToggle = true,
+  showLaneToggle = false,
 }: Props) => {
   const { preferences, locale } = useLocale();
   const primaryLanguage = preferences.content_languages?.[0];
