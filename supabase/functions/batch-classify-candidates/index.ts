@@ -133,19 +133,22 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const dryRun: boolean = typeof body.dry_run === "boolean" ? body.dry_run : DRY_RUN_DEFAULT;
     const limit: number = Math.min(BATCH_SIZE, Number(body.limit ?? BATCH_SIZE));
+    // `retier` lets an admin deliberately re-run classification over rows that
+    // already carry a tier (e.g. after a weight change).
+    const retier: boolean = body.retier === true;
 
     // Untiered candidates FIRST. Ordering by created_at alone made the job
     // re-classify the same newest pending rows on every tick while older
     // never-classified candidates starved forever (1.2k-row permanent backlog).
+    let q = admin.from("channel_candidates")
+      .select("id, youtube_channel_id, title, handle, description, category, subscriber_count, language_detected, confidence, duplicate_risk, status, tier, auto_action, moderation_summary, evidence")
+      .eq("status", "pending");
+    if (!retier) q = q.is("tier", null);
     const [{ data: candidates }, { data: institutions }] = await Promise.all([
-      admin.from("channel_candidates")
-        .select("id, youtube_channel_id, title, handle, description, category, subscriber_count, language_detected, confidence, duplicate_risk, status, tier, auto_action, moderation_summary, evidence")
-        .eq("status", "pending")
-        .is("tier", null)
-        .order("created_at", { ascending: false })
-        .limit(limit),
+      q.order("created_at", { ascending: false }).limit(limit),
       admin.from("trusted_institutions").select("id, name, organization_type, match_pattern, weight"),
     ]);
+
 
 
     const inst = (institutions ?? []) as Institution[];
