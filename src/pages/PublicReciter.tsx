@@ -12,6 +12,8 @@ import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
 import DownloadTrackButton from "@/components/DownloadTrackButton";
 import ReciterDownloadAllButton from "@/components/offline/ReciterDownloadAllButton";
+import { OfflineBadge, OfflineCountBadge } from "@/components/offline/OfflineBadge";
+import { useOfflineAvailability } from "@/hooks/useOfflineAvailability";
 
 
 /**
@@ -28,6 +30,7 @@ export default function PublicReciter() {
 
   const hasAudio = useMemo(() => (r ? reciterHasAudio(r) : false), [r]);
   const quranTracks = useMemo(() => (r ? reciterQuranTracks(r.id) : []), [r]);
+  const offlineAvail = useOfflineAvailability(useMemo(() => quranTracks.map((t) => t.id), [quranTracks]));
 
 
   if (!r) return <Navigate to="/listen" replace />;
@@ -125,15 +128,22 @@ export default function PublicReciter() {
               <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 114 surahs
               </h2>
-              <ReciterDownloadAllButton
-                reciterId={r.id}
-                reciterName={r.name}
-                tracks={quranTracks}
-              />
+              <div className="flex items-center gap-2">
+                <OfflineCountBadge
+                  available={offlineAvail.availableCount}
+                  total={quranTracks.length}
+                />
+                <ReciterDownloadAllButton
+                  reciterId={r.id}
+                  reciterName={r.name}
+                  tracks={quranTracks}
+                />
+              </div>
             </div>
             <ol className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
               {SURAHS.map((s, i) => {
                 const t = quranTracks[i];
+                const offline = Boolean(t && offlineAvail.isOffline(t.id));
                 return (
                   <li key={s.number}>
                     <div className="flex items-center gap-1 rounded-md border border-border/60 bg-card/40 pr-1 hover:border-primary/40 hover:bg-card">
@@ -145,6 +155,7 @@ export default function PublicReciter() {
                           {s.number}
                         </span>
                         <span className="flex-1 truncate">{s.nameEn}</span>
+                        <OfflineBadge offline={offline} />
                         <span
                           dir="rtl"
                           lang="ar"

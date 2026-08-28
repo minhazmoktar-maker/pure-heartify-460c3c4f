@@ -13,6 +13,8 @@ import {
   persistPositionRemote, useCrossDevicePlayback,
 } from "@/hooks/useCrossDevicePlayback";
 import { resolvePlaybackSource, applyResumePosition } from "@/lib/offlinePlayback";
+import { attachBluetoothResilience } from "@/lib/bluetoothResume";
+import { startBackgroundDownloads } from "@/lib/offlineBackground";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -50,6 +52,8 @@ interface PlayerState {
   shuffle: boolean;
   repeat: RepeatMode;
   playbackRate: number;
+  /** Where the current audio is coming from: on-device blob or the network. */
+  playbackSource: "offline" | "stream" | null;
   /** True while playing a gated 30s preview for a non-entitled listener. */
   isPreview: boolean;
   /** Fixed length (s) of gated previews. */
@@ -131,8 +135,11 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  /** Mirror of `currentTrack` readable from long-lived listeners (Bluetooth). */
+  const currentTrackRef = useRef<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSource, setPlaybackSource] = useState<"offline" | "stream" | null>(null);
   const [isBuffering, setIsBuffering] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -346,6 +353,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     (async () => {
       const resolved = await resolvePlaybackSource(currentTrack);
       if (cancelled || !resolved) return;
+      setPlaybackSource(resolved.offline ? "offline" : "stream");
       if (a.src !== resolved.src) {
         // Release the previous blob URL (if any) before swapping sources.
         if (objectUrlRef.current && objectUrlRef.current !== resolved.src) {
@@ -371,6 +379,34 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
     return () => { cancelled = true; detachResume(); };
   }, [currentTrack, attemptPlay]);
+
+  useEffect(() => { currentTrackRef.current = currentTrack; }, [currentTrack]);
+
+  // Keep bulk/per-surah downloads moving while the app is backgrounded or the
+  // phone is locked (WebViews suspend timers and can drop in-flight fetches).
+  useEffect(() => startBackgroundDownloads(), []);
+
+  // Bluetooth / headset route changes: remember the position on disconnect and
+  // restore it (and playback) when the device reconnects.
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    return attachBluetoothResilience(a, {
+      platform: isIOS() ? "ios" : isAndroid() ? "android" : "web",
+      savePosition: (seconds) => {
+        const id = currentTrackRef.current?.id;
+        if (!id) return;
+        const map = readJson<Record<string, number>>(RESUME_KEY, {});
+        map[id] = seconds;
+        writeJson(RESUME_KEY, map);
+      },
+      getSavedPosition: () => {
+        const id = currentTrackRef.current?.id;
+        if (!id) return 0;
+        return readJson<Record<string, number>>(RESUME_KEY, {})[id] ?? 0;
+      },
+    });
+  }, []);
 
   // Release the last offline blob URL when the provider unmounts.
   useEffect(() => () => {
@@ -802,6 +838,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo<PlayerState>(() => ({
     currentTrack, queue, isPlaying, isBuffering, isPremiumUser, isPremiumLoading,
     progress, duration, volume, muted, shuffle, repeat, playbackRate,
+    playbackSource,
     isPreview, previewCapSeconds: PREVIEW_SECONDS,
     recent, playCounts, lastError, needsUserGesture, resumePlayback,
     play, playQueue, togglePlay,
@@ -812,7 +849,7 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
   }), [
     currentTrack, queue, isPlaying, isBuffering, isPremiumUser, isPremiumLoading,
     progress, duration, volume, muted, shuffle, repeat, playbackRate,
-    isPreview, recent, playCounts, lastError, needsUserGesture, resumePlayback,
+    playbackSource, isPreview, recent, playCounts, lastError, needsUserGesture, resumePlayback,
     play, playQueue, togglePlay, next, goPrev, seek, setVolume, toggleMute,
     toggleShuffle, cycleRepeat, setPlaybackRate, togglePremium, addToQueue, clearQueue,
   ]);

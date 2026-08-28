@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import DownloadTrackButton from "@/components/DownloadTrackButton";
 import ReciterDownloadAllButton from "@/components/offline/ReciterDownloadAllButton";
+import { OfflineBadge, OfflineCountBadge } from "@/components/offline/OfflineBadge";
+import { useOfflineAvailability } from "@/hooks/useOfflineAvailability";
 
 
 /**
@@ -356,6 +358,9 @@ function ReciterDetail({
   onPlayAll,
   onPlaySurah,
 }: ReciterDetailProps) {
+  const trackIds = useMemo(() => tracks.map((t) => t.id), [tracks]);
+  const offlineAvail = useOfflineAvailability(trackIds);
+  const { playbackSource } = usePlayer();
   if (!reciter) return null;
   const hasAudio = tracks.length > 0;
 
@@ -396,6 +401,13 @@ function ReciterDetail({
             {hasAudio ? "Play whole Qur'an" : "Recording coming soon"}
           </button>
           {hasAudio && (
+            <OfflineCountBadge
+              available={offlineAvail.availableCount}
+              total={tracks.length}
+              className="self-end"
+            />
+          )}
+          {hasAudio && (
             <ReciterDownloadAllButton
               reciterId={reciter.id}
               reciterName={reciter.name}
@@ -416,6 +428,7 @@ function ReciterDetail({
         <ol className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-3">
           {SURAHS.map((s, i) => {
             const t = tracks[i];
+            const offline = Boolean(t && offlineAvail.isOffline(t.id));
             const isActive = t && currentId === t.id;
             return (
               <li key={s.number}>
@@ -438,8 +451,12 @@ function ReciterDetail({
                       <span className="block font-medium leading-tight">
                         {s.nameEn}
                       </span>
-                      <span className="block text-xs text-muted-foreground">
+                      <span className="flex items-center gap-2 text-xs text-muted-foreground">
                         {s.ayahs} āyāt
+                        <OfflineBadge
+                          offline={isActive && playbackSource ? playbackSource === "offline" : offline}
+                          showStreaming={Boolean(isActive && playbackSource)}
+                        />
                       </span>
                     </span>
                     <span

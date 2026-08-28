@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Trash2, Download, Clock, Crown } from "lucide-react";
+import { Trash2, Download, Clock, Crown, HardDrive } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
@@ -78,15 +78,23 @@ export default function OfflineLibrary() {
           icon={Download}
           backHref="/"
           actions={
-            !loading && !isPremium ? (
-              <Button asChild size="sm" variant="default">
-                <Link to="/plus">
-                  <Crown className="w-4 h-4" /> Upgrade
+            <div className="flex items-center gap-2">
+              <Button asChild size="sm" variant="outline">
+                <Link to="/offline/storage">
+                  <HardDrive className="h-4 w-4" /> Storage
                 </Link>
               </Button>
-            ) : undefined
+              {!loading && !isPremium ? (
+                <Button asChild size="sm" variant="default">
+                  <Link to="/plus">
+                    <Crown className="w-4 h-4" /> Upgrade
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
           }
         />
+
 
         {items.length === 0 ? (
           <EmptyState
