@@ -601,18 +601,41 @@ async function sbFetch(path: string, init: RequestInit = {}) {
  * On API failure we fail open (keep the rows) — the client-side reporter and
  * the nightly sweep will catch stragglers.
  */
+/** ISO-8601 (`PT1H2M3S`) → seconds; null for live/unparsable values. */
+function parseIsoDuration(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const m = /^P(?:(\d+)D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?$/.exec(iso);
+  if (!m) return null;
+  const [, d, h, mi, s] = m;
+  const secs = (Number(d ?? 0) * 86400) + (Number(h ?? 0) * 3600) +
+    (Number(mi ?? 0) * 60) + Math.round(Number(s ?? 0));
+  return secs > 0 ? secs : null;
+}
+
 async function filterEmbeddable(rows: Record<string, unknown>[]): Promise<Record<string, unknown>[]> {
   if (!rows.length) return rows;
   const out: Record<string, unknown>[] = [];
   for (let i = 0; i < rows.length; i += 50) {
     const slice = rows.slice(i, i + 50);
     const ids = slice.map((r) => String(r.video_id));
-    const r = await ytFetch("videos", new URLSearchParams({ part: "status", id: ids.join(",") }));
+    // `contentDetails` rides along on the same 1-unit call as `status`, so every
+    // newly ingested video arrives with its real length already known — the
+    // Daily Dose never has to assume one for fresh rows.
+    const r = await ytFetch(
+      "videos",
+      new URLSearchParams({ part: "status,contentDetails", id: ids.join(",") }),
+    );
     if (!r.ok) {
       out.push(...slice);
       continue;
     }
-    const items = (r.data as { items?: Array<{ id: string; status?: Record<string, unknown> }> }).items ?? [];
+    const items = (r.data as {
+      items?: Array<{
+        id: string;
+        status?: Record<string, unknown>;
+        contentDetails?: { duration?: string };
+      }>;
+    }).items ?? [];
     const good = new Set(
       items
         .filter((it) =>
@@ -622,12 +645,27 @@ async function filterEmbeddable(rows: Record<string, unknown>[]): Promise<Record
         )
         .map((it) => it.id),
     );
-    for (const row of slice) if (good.has(String(row.video_id))) out.push(row);
+    const durations = new Map<string, number>();
+    for (const it of items) {
+      const secs = parseIsoDuration(it.contentDetails?.duration);
+      if (secs !== null) durations.set(it.id, secs);
+    }
+    for (const row of slice) {
+      const id = String(row.video_id);
+      if (!good.has(id)) continue;
+      const secs = durations.get(id);
+      if (secs !== undefined) {
+        row.duration_seconds = secs;
+        row.duration_checked_at = new Date().toISOString();
+      }
+      out.push(row);
+    }
     const dropped = slice.length - slice.filter((row) => good.has(String(row.video_id))).length;
     if (dropped > 0) console.log(`[ingest] dropped ${dropped} non-embeddable/private videos`);
   }
   return out;
 }
+
 
 async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
 
