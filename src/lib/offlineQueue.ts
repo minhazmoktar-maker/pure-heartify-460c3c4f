@@ -175,6 +175,30 @@ export function cancelAll(): void {
   }
 }
 
+/**
+ * Re-pumps the queue after the app was backgrounded / the device was locked.
+ *
+ * WebViews on iOS and Android suspend timers and can silently kill an in-flight
+ * fetch while the screen is off. Any item that claims to be `downloading` but
+ * has no live controller is re-queued so it resumes (from its partial bytes)
+ * with the normal retry/backoff ladder.
+ */
+export function nudgeQueue(): number {
+  let revived = 0;
+  for (const [id, item] of items) {
+    const stalled =
+      (item.status === "downloading" || item.status === "retrying") && !controllers.has(id);
+    if (stalled) {
+      update(id, { status: "queued", nextAttemptAt: undefined, error: undefined, errorCode: undefined });
+      revived++;
+    }
+  }
+  void pump();
+  return revived;
+}
+
+
+
 async function pump(): Promise<void> {
   const { concurrency } = getOfflineSettings();
   while (running < concurrency) {

@@ -504,4 +504,62 @@ export async function getOfflineBlobUrlGated(id: string): Promise<string | null>
   return getOfflineBlobUrl(id);
 }
 
+/* --------------------------------------------------------------- storage use */
+
+export interface OfflineUsageRow extends OfflineMeta {
+  /** Bytes the cached blob occupies in IndexedDB. */
+  bytes: number;
+}
+
+/** Byte size of one cached track (0 when not cached). */
+export async function getOfflineSize(id: string): Promise<number> {
+  try {
+    return await withStores("readonly", async (tracks) => {
+      const blob = await req(tracks, tracks.get(id) as IDBRequest<Blob | undefined>);
+      return blob?.size ?? 0;
+    });
+  } catch { return 0; }
+}
+
+/**
+ * Per-track storage usage for the Storage screen. Tracks without a meta row
+ * (saved by an older build) are reported as free-tier with no expiry data.
+ */
+export async function listOfflineUsage(): Promise<OfflineUsageRow[]> {
+  try {
+    return await withStores("readonly", async (tracks, meta) => {
+      const keys = (await req(tracks, tracks.getAllKeys() as IDBRequest<IDBValidKey[]>)).map(String);
+      const blobs = await req(tracks, tracks.getAll() as IDBRequest<Blob[]>);
+      const metas = await req(meta, meta.getAll() as IDBRequest<OfflineMeta[]>);
+      const byId = new Map(metas.map((m) => [m.id, m]));
+      return keys.map((id, i) => {
+        const m = byId.get(id);
+        return {
+          id,
+          bytes: blobs[i]?.size ?? 0,
+          savedAt: m?.savedAt ?? 0,
+          expiresAt: m?.expiresAt ?? null,
+          plan: m?.plan ?? "free",
+        } satisfies OfflineUsageRow;
+      });
+    });
+  } catch { return []; }
+}
+
+/** Deletes every cached track, meta row and partial buffer. */
+export async function clearAllOffline(): Promise<number> {
+  const ids = await listOfflineIds();
+  for (const id of ids) await removeOfflineTrack(id);
+  return ids.length;
+}
+
+/** Browser storage quota estimate (null when the API is unavailable). */
+export async function offlineQuotaEstimate(): Promise<{ usage: number; quota: number } | null> {
+  try {
+    const est = await navigator.storage?.estimate?.();
+    if (!est || typeof est.quota !== "number") return null;
+    return { usage: est.usage ?? 0, quota: est.quota };
+  } catch { return null; }
+}
+
 export const OFFLINE_LIMITS = { FREE_LIMIT, FREE_TTL_MS } as const;
