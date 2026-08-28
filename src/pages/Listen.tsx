@@ -380,21 +380,31 @@ function ReciterDetail({
             {reciter.location}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onPlayAll}
-          disabled={!hasAudio}
-          className={cn(
-            "inline-flex min-h-[48px] items-center gap-2 rounded-pill px-6 text-sm font-bold shadow-card-hover transition-transform",
-            hasAudio
-              ? "bg-primary text-primary-foreground hover:scale-[1.02]"
-              : "cursor-not-allowed bg-muted text-muted-foreground",
+        <div className="flex flex-col gap-3 md:items-end">
+          <button
+            type="button"
+            onClick={onPlayAll}
+            disabled={!hasAudio}
+            className={cn(
+              "inline-flex min-h-[48px] items-center gap-2 rounded-pill px-6 text-sm font-bold shadow-card-hover transition-transform",
+              hasAudio
+                ? "bg-primary text-primary-foreground hover:scale-[1.02]"
+                : "cursor-not-allowed bg-muted text-muted-foreground",
+            )}
+          >
+            <Play className="h-4 w-4" />
+            {hasAudio ? "Play whole Qur'an" : "Recording coming soon"}
+          </button>
+          {hasAudio && (
+            <ReciterDownloadAllButton
+              reciterId={reciter.id}
+              reciterName={reciter.name}
+              tracks={tracks}
+            />
           )}
-        >
-          <Play className="h-4 w-4" />
-          {hasAudio ? "Play whole Qur'an" : "Recording coming soon"}
-        </button>
+        </div>
       </div>
+
 
       {!hasAudio ? (
         <div className="rounded-card border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
