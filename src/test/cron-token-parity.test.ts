@@ -50,7 +50,9 @@ describe("cron token parity", () => {
     // if the header is absent, but a truthiness guard is still required.
     for (const name of listFunctions()) {
       const src = readFunction(name);
-      if (!src.includes("x-cron-token")) continue;
+      // Only functions that authenticate with the header matter here; some
+      // functions merely forward it to another worker.
+      if (!/headers\.get\(\s*["']x-cron-token["']\s*\)/i.test(src)) continue;
       const guardsEmptyToken =
         /!!cronToken|cronToken &&|!expected|\?\?\s*"\\u0000"|\?\? "\u0000"/.test(src);
       expect(guardsEmptyToken, `${name} must guard against an empty cron token`).toBe(true);
