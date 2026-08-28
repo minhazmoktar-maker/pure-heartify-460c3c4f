@@ -12,6 +12,7 @@ import {
   detectPlatform, isIOS, isAndroid,
   persistPositionRemote, useCrossDevicePlayback,
 } from "@/hooks/useCrossDevicePlayback";
+import { resolvePlaybackSource, applyResumePosition } from "@/lib/offlinePlayback";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -152,6 +153,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryRef = useRef(0);
+  /** Object URL for the currently loaded offline blob (revoked on swap). */
+  const objectUrlRef = useRef<string | null>(null);
+
   const lastRemoteSaveRef = useRef<number>(0);
   /** When set, current playback is a 30s premium sample for a non-entitled user. */
   const previewCapRef = useRef<number | null>(null);
@@ -325,7 +329,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [currentTrack]);
 
-  // Load/play when currentTrack changes
+  // Load/play when currentTrack changes.
+  // Offline-first: a downloaded surah plays from its IndexedDB blob so it works
+  // with no network and while the phone is locked.
   useEffect(() => {
     const a = audioRef.current;
     if (!a || !currentTrack) return;
@@ -333,28 +339,49 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setIsPlaying(false);
       return;
     }
-    if (a.src !== currentTrack.url) {
-      a.src = currentTrack.url;
-      // iOS Safari won't fire loadedmetadata until it actually starts loading,
-      // so call load() explicitly. Harmless on other browsers.
-      try { a.load(); } catch { /* noop */ }
 
-      // Restore resume position (local first — remote is merged into local by
-      // useCrossDevicePlayback).
-      const resume = readJson<Record<string, number>>(RESUME_KEY, {});
-      const savedAt = resume[currentTrack.id];
-      if (savedAt && savedAt > 5) {
-        const onLoaded = () => {
-          try { a.currentTime = savedAt; } catch { /* noop */ }
-          a.removeEventListener("loadedmetadata", onLoaded);
-        };
-        a.addEventListener("loadedmetadata", onLoaded);
+    let cancelled = false;
+    let detachResume: () => void = () => {};
+
+    (async () => {
+      const resolved = await resolvePlaybackSource(currentTrack);
+      if (cancelled || !resolved) return;
+      if (a.src !== resolved.src) {
+        // Release the previous blob URL (if any) before swapping sources.
+        if (objectUrlRef.current && objectUrlRef.current !== resolved.src) {
+          try { URL.revokeObjectURL(objectUrlRef.current); } catch { /* noop */ }
+          objectUrlRef.current = null;
+        }
+        objectUrlRef.current = resolved.offline ? resolved.src : null;
+        a.src = resolved.src;
+        // iOS Safari won't fire loadedmetadata until it actually starts loading,
+        // so call load() explicitly. Harmless on other browsers.
+        try { a.load(); } catch { /* noop */ }
+
+        // Restore resume position (local first — remote is merged into local by
+        // useCrossDevicePlayback).
+        const resume = readJson<Record<string, number>>(RESUME_KEY, {});
+        detachResume = applyResumePosition(a, resume[currentTrack.id] ?? 0);
       }
-    }
-    setIsBuffering(true);
-    retryRef.current = 0;
-    attemptPlay(a);
+      if (cancelled) return;
+      setIsBuffering(true);
+      retryRef.current = 0;
+      attemptPlay(a);
+    })();
+
+    return () => { cancelled = true; detachResume(); };
   }, [currentTrack, attemptPlay]);
+
+  // Release the last offline blob URL when the provider unmounts.
+  useEffect(() => () => {
+    if (objectUrlRef.current) {
+      try { URL.revokeObjectURL(objectUrlRef.current); } catch { /* noop */ }
+      objectUrlRef.current = null;
+    }
+  }, []);
+
+
+
 
   // Play/pause sync
   useEffect(() => {
