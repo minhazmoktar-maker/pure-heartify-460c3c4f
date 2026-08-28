@@ -13,7 +13,7 @@ import { test, expect } from "@playwright/test";
 
 const PUBLIC_ROUTES = [
   "/",
-  "/browse",
+  "/explore", // `/browse` was retired and now resolves to the 404 screen.
   "/quran",
   "/dhikr",
   "/adhkar",
