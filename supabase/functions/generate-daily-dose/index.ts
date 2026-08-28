@@ -18,6 +18,25 @@ const DEFAULT_INTERESTS = {
 
 const ASSUMED_MIN_PER_VIDEO = 6;
 
+/** Columns every dose read needs. */
+const VID_COLS =
+  "video_id,title,channel_title,thumbnail_url,section_id,halal_score,content_language";
+
+/**
+ * Only videos that can actually play inside Heartify may enter a dose.
+ *
+ * Without this filter a dose could contain an archived / hidden / embed-blocked
+ * id; the watch page (which enforces the same rules) then resolves no metadata
+ * and dead-ends on "Video unavailable".
+ */
+function servable(q: any) {
+  return q
+    .eq("moderation_state", "approved")
+    .eq("is_archived", false)
+    .eq("is_hidden", false)
+    .not("embeddable", "is", false);
+}
+
 interface Vid {
   video_id: string;
   title: string;
@@ -34,10 +53,9 @@ async function pickFromSection(
   n: number,
   preferredLanguages: string[] = [],
 ): Promise<Vid[]> {
-  const q = admin
-    .from("curated_videos")
-    .select("video_id,title,channel_title,thumbnail_url,section_id,halal_score,content_language")
-    .eq("section_id", sectionId)
+  const q = servable(
+    admin.from("curated_videos").select(VID_COLS).eq("section_id", sectionId),
+  )
     .order("halal_score", { ascending: false })
     .limit(80);
   const { data } = await q;
@@ -172,11 +190,11 @@ Deno.serve(async (req) => {
 
       // Fallback if pools were thin — still honour regional language preference.
       if (picks.length < 3) {
-        const { data: top } = await admin
-          .from("curated_videos")
-          .select("video_id,title,channel_title,thumbnail_url,section_id,halal_score,content_language")
+        const { data: top } = await servable(
+          admin.from("curated_videos").select(VID_COLS),
+        )
           .order("halal_score", { ascending: false })
-          .limit(80);
+          .limit(120);
         const remaining: Vid[] = (top ?? []).filter(
           (v: Vid) => !exclude.includes(v.video_id) && !picks.find((p) => p.video_id === v.video_id),
         );
@@ -213,15 +231,80 @@ Deno.serve(async (req) => {
       dose = inserted;
     }
 
-    // 5. Hydrate video objects
-    const { data: videos } = await admin
-      .from("curated_videos")
-      .select("video_id,title,channel_title,thumbnail_url,section_id,halal_score,category")
-      .in("video_id", dose.video_ids);
+    // 5. Hydrate video objects — only ones that are still playable today.
+    async function hydrate(ids: string[]) {
+      const { data } = await servable(
+        admin
+          .from("curated_videos")
+          .select(`${VID_COLS},category`)
+          .in("video_id", ids),
+      );
+      return ids
+        .map((id) => (data ?? []).find((v: any) => v.video_id === id))
+        .filter(Boolean);
+    }
 
-    const orderedVideos = (dose.video_ids as string[])
-      .map((id) => (videos ?? []).find((v: any) => v.video_id === id))
-      .filter(Boolean);
+    let orderedVideos = await hydrate(dose.video_ids as string[]);
+
+    // 5b. Self-heal: a video can be removed by its owner or flagged unplayable
+    // AFTER the dose was created. Swap the dead ids for fresh picks so the user
+    // never taps into a "Video unavailable" dead end, and keep already-completed
+    // ids so progress is never lost.
+    if (orderedVideos.length < (dose.video_ids as string[]).length) {
+      const alive = new Set(orderedVideos.map((v: any) => v.video_id));
+      const { data: completed } = await admin
+        .from("dose_completions")
+        .select("video_id")
+        .eq("dose_id", dose.id);
+      const completedIds = new Set((completed ?? []).map((c: any) => c.video_id));
+      const keep = (dose.video_ids as string[]).filter(
+        (id) => alive.has(id) || completedIds.has(id),
+      );
+      const missing = (dose.video_ids as string[]).length - keep.length;
+
+      const preferredLangs = await resolvePreferredLanguages(admin, userId);
+      const { data: interests } = await admin
+        .from("user_interests")
+        .select("primary_interest")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const section = interests?.primary_interest || DEFAULT_INTERESTS.primary;
+      let replacements = await pickFromSection(
+        admin,
+        section,
+        [...keep, ...(dose.video_ids as string[])],
+        missing,
+        preferredLangs,
+      );
+      if (replacements.length < missing) {
+        const { data: top } = await servable(
+          admin.from("curated_videos").select(VID_COLS),
+        )
+          .order("halal_score", { ascending: false })
+          .limit(120);
+        for (const v of (top ?? []) as Vid[]) {
+          if (replacements.length >= missing) break;
+          if (keep.includes(v.video_id)) continue;
+          if (replacements.find((r) => r.video_id === v.video_id)) continue;
+          replacements.push(v);
+        }
+      }
+
+      const healedIds = [...keep, ...replacements.map((v) => v.video_id)];
+      if (healedIds.length) {
+        const { data: updated } = await admin
+          .from("daily_dose")
+          .update({
+            video_ids: healedIds,
+            total_minutes: healedIds.length * ASSUMED_MIN_PER_VIDEO,
+          })
+          .eq("id", dose.id)
+          .select()
+          .single();
+        if (updated) dose = updated;
+        orderedVideos = await hydrate(healedIds);
+      }
+    }
 
     // 6. Completions + streak
     const { data: completions } = await admin
