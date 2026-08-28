@@ -630,6 +630,8 @@ const Watch = () => {
                     category={currentVideo.category}
                     size="md"
                   />
+                  <BenefitSignal videoId={videoId} />
+
                   {videoId && (
                     <Link
                       to={`/verify/${videoId}`}
