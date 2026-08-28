@@ -9022,6 +9022,7 @@ export type Database = {
         }
         Returns: Json
       }
+      my_benefit_summary: { Args: never; Returns: Json }
       my_progress_summary: { Args: never; Returns: Json }
       next_topic_queries: {
         Args: { p_limit?: number; p_target?: number }
@@ -9604,6 +9605,15 @@ export type Database = {
           expires_at: string
           id: string
           purpose: string
+        }[]
+      }
+      video_benefit_signal: {
+        Args: { _video_ids: string[] }
+        Returns: {
+          acted_on_rate: number
+          responses: number
+          video_id: string
+          worth_it_rate: number
         }[]
       }
       video_report_queue_summary: {
