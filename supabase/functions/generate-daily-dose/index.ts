@@ -16,11 +16,25 @@ const DEFAULT_INTERESTS = {
   exploration: "short-reminders",
 };
 
+/** Fallback only — used until the sweep has verified a video's real length. */
 const ASSUMED_MIN_PER_VIDEO = 6;
+
+/** Real dose length from verified durations, falling back per-video. */
+function doseMinutes(vids: Array<{ duration_seconds?: number | null }>): number {
+  const secs = vids.reduce(
+    (sum, v) =>
+      sum +
+      (typeof v.duration_seconds === "number" && v.duration_seconds > 0
+        ? v.duration_seconds
+        : ASSUMED_MIN_PER_VIDEO * 60),
+    0,
+  );
+  return Math.max(1, Math.round(secs / 60));
+}
 
 /** Columns every dose read needs. */
 const VID_COLS =
-  "video_id,title,channel_title,thumbnail_url,section_id,halal_score,content_language";
+  "video_id,title,channel_title,thumbnail_url,section_id,halal_score,content_language,duration_seconds";
 
 /**
  * Only videos that can actually play inside Heartify may enter a dose.
@@ -44,6 +58,7 @@ interface Vid {
   thumbnail_url: string;
   section_id: string | null;
   halal_score: number | null;
+  duration_seconds?: number | null;
 }
 
 async function pickFromSection(
@@ -215,7 +230,7 @@ Deno.serve(async (req) => {
 
 
       const videoIds = picks.map((v) => v.video_id);
-      const totalMinutes = picks.length * ASSUMED_MIN_PER_VIDEO;
+      const totalMinutes = doseMinutes(picks);
 
       const { data: inserted, error: insErr } = await admin
         .from("daily_dose")
