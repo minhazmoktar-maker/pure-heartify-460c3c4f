@@ -40,10 +40,31 @@ function softFallback(query: string): SearchIntent {
 }
 
 export async function detectIntent(query: string): Promise<SearchIntent | null> {
-  const key = Deno.env.get("LOVABLE_API_KEY");
   if (!query || query.length < 3) return null;
   if (query.length > 500) return softFallback(query.slice(0, 500));
+
+  const wrappedQuery = `<query>\n${escapeDelimiter(query)}\n</query>`;
+
+  // Preferred: independent provider on our own key (zero Lovable credits).
+  if (isInferenceConfigured()) {
+    try {
+      const result = await chatWithFailover(
+        "cheap",
+        [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: wrappedQuery },
+        ],
+        { maxTokens: 200, timeoutMs: 1500, jsonMode: true },
+      );
+      return normalizeIntent(JSON.parse(result.text), query);
+    } catch {
+      return softFallback(query);
+    }
+  }
+
+  const key = Deno.env.get("LOVABLE_API_KEY");
   if (!key) return softFallback(query);
+
 
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 1200);
