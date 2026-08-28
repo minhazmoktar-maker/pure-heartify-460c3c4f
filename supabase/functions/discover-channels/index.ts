@@ -301,6 +301,35 @@ async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
   return true;
 }
 
+/**
+ * Give reserved units back when the call they were reserved for never landed
+ * (quota rejection, network error, HTTP failure). Google does not charge quota
+ * for a rejected request, so keeping the reservation silently burned the whole
+ * 4000-unit daily budget on failures — after which the cheap 1-unit
+ * playlist/description lanes could not run at all and discovery enqueued zero
+ * candidates every hour.
+ */
+async function refundQuota(ctx: QuotaCtx, cost: number): Promise<void> {
+  if (cost <= 0) return;
+  const day = new Date().toISOString().slice(0, 10);
+  const { data } = await ctx.admin
+    .from('discovery_quota_ledger')
+    .select('units_used')
+    .eq('day', day)
+    .eq('api_name', 'youtube_v3')
+    .maybeSingle();
+  const current = (data?.units_used as number | undefined) ?? 0;
+  const next = Math.max(0, current - cost);
+  await ctx.admin
+    .from('discovery_quota_ledger')
+    .upsert(
+      { day, api_name: 'youtube_v3', units_used: next, updated_at: new Date().toISOString() },
+      { onConflict: 'day,api_name' },
+    );
+  ctx.usedThisRun = Math.max(0, ctx.usedThisRun - cost);
+}
+
+
 const QUOTA_PATTERN =
   /quotaExceeded|dailyLimitExceeded|rateLimitExceeded|userRateLimitExceeded|exceeded your .*quota/i;
 
