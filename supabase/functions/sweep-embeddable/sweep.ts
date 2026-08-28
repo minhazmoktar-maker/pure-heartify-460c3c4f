@@ -53,9 +53,18 @@ export async function runEmbedSweep(opts: {
   ytStatus: (ids: string[]) => Promise<StatusResult>;
   markGood: (ids: string[]) => Promise<void>;
   markBad: (ids: string[]) => Promise<boolean>;
+  /**
+   * Persists real durations for a verified batch. Called with EVERY id in the
+   * batch (durations only for the ones YouTube reported), so unparsable ids are
+   * still stamped as checked and never re-claimed forever.
+   */
+  writeDurations?: (
+    rows: Array<{ video_id: string; duration_seconds: number | null }>,
+  ) => Promise<number>;
 }): Promise<EmbedSweepResult> {
   let checked = 0;
   let hidden = 0;
+  let durationsWritten = 0;
   let batchesRun = 0;
   let quotaExhausted = false;
   const deferred: string[] = [];
@@ -89,7 +98,38 @@ export async function runEmbedSweep(opts: {
 
     if (good.length) await opts.markGood(good);
     if (bad.length && (await opts.markBad(bad))) hidden += bad.length;
+
+    // Durations come from the same YouTube call (`part=status,contentDetails`),
+    // so recording them costs no extra quota.
+    if (opts.writeDurations) {
+      durationsWritten += await opts.writeDurations(
+        ids.map((id) => ({
+          video_id: id,
+          duration_seconds: status.durations?.get(id) ?? null,
+        })),
+      );
+    }
   }
 
-  return { checked, hidden, batchesRun, quotaExhausted, deferred, stopReason };
+  return {
+    checked,
+    hidden,
+    durationsWritten,
+    batchesRun,
+    quotaExhausted,
+    deferred,
+    stopReason,
+  };
 }
+
+/** ISO-8601 (`PT1H2M3S`) → seconds. Returns null for live/unparsable values. */
+export function parseIsoDuration(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const m = /^P(?:(\d+)D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?$/.exec(iso);
+  if (!m) return null;
+  const [, d, h, mi, s] = m;
+  const secs = (Number(d ?? 0) * 86400) + (Number(h ?? 0) * 3600) +
+    (Number(mi ?? 0) * 60) + Math.round(Number(s ?? 0));
+  return secs > 0 ? secs : null;
+}
+
