@@ -21,6 +21,7 @@ import {
   defaultPipeline,
   loadThresholds,
   persistDecision,
+  remapBacklogOutcome,
   runPipeline,
   type VideoContext,
 } from "../_shared/moderation/index.ts";
@@ -118,7 +119,10 @@ Deno.serve(async (req) => {
       };
 
       try {
-        const outcome = await runPipeline(ctx, stages, thresholds);
+        // Backlog policy: hard rule hits block, trusted low-risk channels
+        // auto-approve, everything else escalates. Nothing is ever rejected
+        // on sparse legacy metadata alone.
+        const outcome = remapBacklogOutcome(await runPipeline(ctx, stages, thresholds));
         const res = await persistDecision(
           SUPABASE_URL!,
           SERVICE_KEY!,

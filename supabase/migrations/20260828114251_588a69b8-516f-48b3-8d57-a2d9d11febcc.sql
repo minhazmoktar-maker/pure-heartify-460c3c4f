@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.check_corpus_coverage_health(integer, integer, integer, numeric, numeric) FROM anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.check_corpus_coverage_health(integer, integer, integer, numeric, numeric) TO service_role;
