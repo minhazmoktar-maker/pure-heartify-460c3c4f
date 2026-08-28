@@ -89,9 +89,16 @@ export async function runPipeline(
 }
 
 /**
+ * Risk score (0-100) at or above which a low-confidence verdict counts as real
+ * evidence against a video rather than plain uncertainty.
+ */
+export const RISK_EVIDENCE_FLOOR = 50;
+
+/**
  * Policy function — the single place where thresholds become a state.
  * Conservative by design: uncertainty escalates, never auto-approves.
  */
+
 export function decideState(
   confidence: number,
   risk: number,
@@ -114,13 +121,23 @@ export function decideState(
     return "human_review_required";
   }
 
-  if (confidence < t.reject_below_confidence) return "rejected";
+  // Rejection requires EVIDENCE, never mere uncertainty. A soft rule hit or a
+  // materially elevated risk score is evidence; a low confidence score only
+  // means "we could not tell", which must escalate for a visual/human check.
+  // Treating low confidence as a verdict is what mass-rejected ~150k clean
+  // videos (confidence 40, risk 25, "No rule violations detected").
+  const hasEvidence = ruleHits.length > 0 || risk >= RISK_EVIDENCE_FLOOR;
+
+  if (confidence < t.reject_below_confidence) {
+    return hasEvidence ? "rejected" : "human_review_required";
+  }
   if (confidence >= t.auto_approve_min_confidence && risk <= t.auto_approve_max_risk) {
     return "auto_approved";
   }
   if (confidence >= t.ai_review_min_confidence) return "ai_review_required";
   if (confidence >= t.human_review_min_confidence) return "human_review_required";
-  return "rejected";
+  return hasEvidence ? "rejected" : "human_review_required";
+
 }
 
 function aggregateSignals(results: StageResult[]): Record<string, unknown> {

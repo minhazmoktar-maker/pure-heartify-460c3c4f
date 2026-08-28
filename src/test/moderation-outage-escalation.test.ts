@@ -2,10 +2,12 @@ import { describe, it, expect } from "vitest";
 import { decideState } from "../../supabase/functions/_shared/moderation/engine";
 
 const thresholds = {
-  reject_below_confidence: 0.5,
+  reject_below_confidence: 60,
   block_above_risk: 90,
-  human_review_above_risk: 60,
-  auto_approve_above_confidence: 0.9,
+  human_review_min_confidence: 60,
+  auto_approve_min_confidence: 98,
+  auto_approve_max_risk: 5,
+  ai_review_min_confidence: 90,
 } as never;
 
 /**
@@ -34,5 +36,29 @@ describe("moderation decideState — provider outage", () => {
       [],
     );
     expect(state).toBe("blocked");
+  });
+});
+
+/**
+ * Second false-positive class: the AI returned a *usable* verdict with low
+ * confidence and low risk and no rule hits. That is "we don't know", not a
+ * policy violation, and must never be a rejection.
+ */
+describe("moderation decideState — uncertainty is not evidence", () => {
+  it("escalates low confidence with low risk and no rule hits", () => {
+    expect(decideState(40, 25, thresholds, [], [])).toBe("human_review_required");
+    expect(decideState(40, 30, thresholds, [], [])).toBe("human_review_required");
+    expect(decideState(10, 49, thresholds, [], [])).toBe("human_review_required");
+  });
+
+  it("still rejects low confidence when risk is elevated", () => {
+    expect(decideState(40, 50, thresholds, [], [])).toBe("rejected");
+    expect(decideState(40, 80, thresholds, [], [])).toBe("rejected");
+  });
+
+  it("still rejects low confidence when a soft rule fired", () => {
+    expect(
+      decideState(40, 10, thresholds, [{ rule: "suspect_title", severity: "soft" } as never], []),
+    ).toBe("rejected");
   });
 });
