@@ -8,6 +8,7 @@ import TrustBadges from "@/components/TrustBadges";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import YouTubeVideoCard from "@/components/YouTubeVideoCard";
+import BenefitSignal from "@/components/BenefitSignal";
 import { AdminVideoRemoveButton } from "@/components/AdminVideoRemoveButton";
 import { ReportButton } from "@/components/ReportButton";
 import CommentThread from "@/components/CommentThread";
@@ -629,6 +630,8 @@ const Watch = () => {
                     category={currentVideo.category}
                     size="md"
                   />
+                  <BenefitSignal videoId={videoId} />
+
                   {videoId && (
                     <Link
                       to={`/verify/${videoId}`}

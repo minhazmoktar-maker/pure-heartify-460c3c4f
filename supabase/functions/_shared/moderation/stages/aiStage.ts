@@ -16,15 +16,20 @@ export function aiStage(): Stage {
       );
 
       if ("error" in outcome) {
+        // Provider outage is an INFRASTRUCTURE failure, never evidence against
+        // the video. The `ai_unavailable` flag makes the engine escalate to
+        // human review — without it the zero confidence below would be read as
+        // policy signal and mass-reject clean content.
         return {
           stage: "ai_reasoning",
           state: "human_review_required",
           confidence: 0,
           risk: 80,
           reasoning: "AI providers unavailable — escalating for human review",
-          signals: { error: outcome.error },
+          signals: { error: outcome.error, flags: ["ai_unavailable"] },
         };
       }
+
 
       const v = outcome.result;
       return {

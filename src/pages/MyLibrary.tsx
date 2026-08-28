@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
 import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
+import BenefitJournalCard from "@/components/BenefitJournalCard";
 
 type Tile = {
   to: string;
@@ -51,10 +52,12 @@ export default function MyLibrary() {
         )}
 
         {user && (
-          <div className="mb-6">
+          <div className="mb-6 space-y-3">
             <BenefitLabelPrompt />
+            <BenefitJournalCard />
           </div>
         )}
+
 
 
 
