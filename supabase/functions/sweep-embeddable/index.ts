@@ -125,17 +125,26 @@ Deno.serve(async (req) => {
   const result = await runEmbedSweep({
     batches,
     fetchBatch: async () => {
-      const res = await sbFetch(
-        "curated_videos?select=video_id" +
-          "&embeddable=eq.true&is_archived=eq.false&is_hidden=eq.false" +
-          "&order=embed_checked_at.asc.nullsfirst&limit=50",
-      );
-      if (!res.ok) {
-        console.error(`[sweep-embeddable] fetch failed ${res.status}`);
-        return null;
+      const servable =
+        "&embeddable=eq.true&is_archived=eq.false&is_hidden=eq.false&limit=50";
+      // Priority 1: rows that have never had their real duration verified —
+      // the Daily Dose falls back to an assumed length for those, so drain them
+      // first. Priority 2: the normal oldest-embed-check rotation.
+      for (
+        const query of [
+          `curated_videos?select=video_id&duration_checked_at=is.null${servable}`,
+          `curated_videos?select=video_id${servable}&order=embed_checked_at.asc.nullsfirst`,
+        ]
+      ) {
+        const res = await sbFetch(query);
+        if (!res.ok) {
+          console.error(`[sweep-embeddable] fetch failed ${res.status}`);
+          return null;
+        }
+        const rows = await res.json() as Array<{ video_id: string }>;
+        if (rows.length) return rows.map((r) => r.video_id);
       }
-      const rows = await res.json() as Array<{ video_id: string }>;
-      return rows.map((r) => r.video_id);
+      return [];
     },
     ytStatus,
     markGood: async (ids) => {
@@ -158,21 +167,38 @@ Deno.serve(async (req) => {
       if (!r.ok) console.error(`[sweep-embeddable] hide failed ${r.status}: ${(await r.text()).slice(0, 200)}`);
       return r.ok;
     },
+    // One RPC per 50-id batch instead of 50 PATCHes; always stamps
+    // duration_checked_at so live streams don't loop in the priority queue.
+    writeDurations: async (rows) => {
+      const r = await sbFetch("rpc/apply_video_durations", {
+        method: "POST",
+        body: JSON.stringify({ _payload: rows }),
+      });
+      if (!r.ok) {
+        console.error(
+          `[sweep-embeddable] duration write failed ${r.status}: ${(await r.text()).slice(0, 200)}`,
+        );
+        return 0;
+      }
+      return rows.filter((x) => x.duration_seconds !== null).length;
+    },
   });
 
-  const { checked, hidden, quotaExhausted, deferred, stopReason } = result;
+  const { checked, hidden, durationsWritten, quotaExhausted, deferred, stopReason } = result;
 
   console.log(
-    `[sweep-embeddable] checked=${checked} hidden=${hidden} deferred=${deferred.length} ` +
-      `stop=${stopReason} quota_exhausted=${quotaExhausted}`,
+    `[sweep-embeddable] checked=${checked} hidden=${hidden} durations=${durationsWritten} ` +
+      `deferred=${deferred.length} stop=${stopReason} quota_exhausted=${quotaExhausted}`,
   );
   return json({
     ok: true,
     checked,
     hidden,
+    durations_written: durationsWritten,
     deferred: deferred.length,
     stop_reason: stopReason,
     quota_exhausted: quotaExhausted,
   });
 
 });
+
