@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { recordRecentTopic } from "@/lib/recentTopics";
 import { ArrowLeft, ChevronRight, Heart, Play, ShieldCheck } from "lucide-react";
@@ -82,6 +82,7 @@ const Watch = () => {
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const completeDose = useCompleteDoseVideo();
+  const qc = useQueryClient();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [autoNextIn, setAutoNextIn] = useState<number | null>(null);
