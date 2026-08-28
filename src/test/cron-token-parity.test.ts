@@ -54,7 +54,8 @@ describe("cron token parity", () => {
       // functions merely forward it to another worker.
       if (!/headers\.get\(\s*["']x-cron-token["']\s*\)/i.test(src)) continue;
       const guardsEmptyToken =
-        /!!cronToken|cronToken &&|!expected|\?\?\s*"\\u0000"|\?\? "\u0000"/.test(src);
+        /!!cronToken|cronToken &&|!expected|CRON_TOKEN &&|\?\?\s*"\\u0000"|\?\? "\u0000"/
+          .test(src);
       expect(guardsEmptyToken, `${name} must guard against an empty cron token`).toBe(true);
     }
   });
