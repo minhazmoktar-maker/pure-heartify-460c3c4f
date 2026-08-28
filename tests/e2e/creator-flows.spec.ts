@@ -40,10 +40,13 @@ test.describe("creator routes are reachable", () => {
     await expect(page.locator("body")).not.toContainText(/page not found/i);
   });
 
-  test("/settings/languages renders the 80/20 mix explainer", async ({ page }) => {
+  test("/settings/languages explains the mix without leaking serving ratios", async ({ page }) => {
     await open(page, "/settings/languages");
-    await expect(page.getByTestId("language-mix-explainer")).toBeVisible();
-    await expect(page.getByTestId("language-mix-explainer")).toContainText(/80% native/i);
+    const explainer = page.getByTestId("language-mix-explainer");
+    await expect(explainer).toBeVisible();
+    await expect(explainer).toContainText(/language mix/i);
+    // Internal serving policy must never be quoted to viewers.
+    await expect(explainer).not.toContainText(/80\s*\/?\s*20|80%|20%/);
   });
 });
 

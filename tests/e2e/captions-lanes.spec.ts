@@ -59,7 +59,7 @@ test.describe("language lanes", () => {
   // The language mix is an internal serving policy. The lane chips (and their
   // counts) must never surface to viewers — language choice lives in Settings.
   test("feed never exposes lane filter chips to the viewer", async ({ page }) => {
-    await open(page, "/explore");
+    await open(page, "/");
     await expect
       .poll(async () => page.locator("[data-video-id]").count())
       .toBeGreaterThan(0);
