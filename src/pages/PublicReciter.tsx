@@ -6,10 +6,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Share2, Mic, MapPin, PlayCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { RECITERS, reciterById } from "@/data/reciters";
-import { reciterHasAudio } from "@/data/reciterCatalog";
+import { reciterHasAudio, reciterQuranTracks } from "@/data/reciterCatalog";
 import { SURAHS } from "@/data/surahs";
 import { shareContent } from "@/lib/share";
 import { track } from "@/lib/analytics";
+import DownloadTrackButton from "@/components/DownloadTrackButton";
+import ReciterDownloadAllButton from "@/components/offline/ReciterDownloadAllButton";
+
 
 /**
  * R4 — Programmatic-SEO landing for every reciter in the catalog.
