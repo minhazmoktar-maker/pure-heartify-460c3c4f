@@ -16,8 +16,15 @@
 export type StatusResult = {
   /** video_id → playable. `null` when the batch could not be classified. */
   map: Map<string, boolean> | null;
+  /**
+   * video_id → real length in seconds, for ids YouTube reported a parsable
+   * duration for. Absent entries (live streams / premieres) are still stamped
+   * as "checked" by the writer so they drain out of the priority queue.
+   */
+  durations?: Map<string, number>;
   quotaExhausted?: boolean;
 };
+
 
 export type StopReason = "completed" | "exhausted_corpus" | "quota" | "yt_error" | "fetch_error";
 
