@@ -134,14 +134,19 @@ Deno.serve(async (req) => {
     const dryRun: boolean = typeof body.dry_run === "boolean" ? body.dry_run : DRY_RUN_DEFAULT;
     const limit: number = Math.min(BATCH_SIZE, Number(body.limit ?? BATCH_SIZE));
 
+    // Untiered candidates FIRST. Ordering by created_at alone made the job
+    // re-classify the same newest pending rows on every tick while older
+    // never-classified candidates starved forever (1.2k-row permanent backlog).
     const [{ data: candidates }, { data: institutions }] = await Promise.all([
       admin.from("channel_candidates")
         .select("id, youtube_channel_id, title, handle, description, category, subscriber_count, language_detected, confidence, duplicate_risk, status, tier, auto_action, moderation_summary, evidence")
         .eq("status", "pending")
+        .is("tier", null)
         .order("created_at", { ascending: false })
         .limit(limit),
       admin.from("trusted_institutions").select("id, name, organization_type, match_pattern, weight"),
     ]);
+
 
     const inst = (institutions ?? []) as Institution[];
     const stats = { processed: 0, tierA: 0, tierB: 0, tierC: 0, tierD: 0, auto_approved: 0, auto_rejected: 0, summaries_requested: 0 };
