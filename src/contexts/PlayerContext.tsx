@@ -12,6 +12,7 @@ import {
   detectPlatform, isIOS, isAndroid,
   persistPositionRemote, useCrossDevicePlayback,
 } from "@/hooks/useCrossDevicePlayback";
+import { resolvePlaybackSource, applyResumePosition } from "@/lib/offlinePlayback";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
