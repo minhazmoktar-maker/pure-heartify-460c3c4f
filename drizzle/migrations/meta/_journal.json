@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1787939439436,
+      "tag": "0000_harden_creator_uploads_moderation_fields",
+      "breakpoints": true
+    }
+  ]
+}
