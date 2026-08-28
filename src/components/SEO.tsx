@@ -1,4 +1,6 @@
 import { Helmet } from "react-helmet-async";
+import { RTL_LANGUAGES } from "@/i18n";
+import { useLocaleOptional } from "@/contexts/LocaleContext";
 
 interface SEOProps {
   title: string;
@@ -15,7 +17,7 @@ interface SEOProps {
   noAutoArticle?: boolean;
   /** Extra <meta> keywords (comma-separated). */
   keywords?: string;
-  /** Locale of the current page (defaults to "en"). */
+  /** Locale of the current page. Defaults to the active UI language. */
   locale?: string;
   /** Force noindex. Private/operational routes are noindexed automatically. */
   noindex?: boolean;
@@ -107,9 +109,15 @@ export default function SEO({
   noBreadcrumbs,
   noAutoArticle,
   keywords,
-  locale = "en",
+  locale: localeProp,
   noindex,
 }: SEOProps) {
+  // Helmet owns <html lang>, so a hardcoded "en" here silently overwrote the
+  // UI language LocaleContext had already applied — every device-language
+  // visitor saw lang="en"/dir="ltr" no matter what they were reading in.
+  const localeCtx = useLocaleOptional();
+  const locale = localeProp ?? localeCtx?.locale ?? "en";
+  const isRtl = localeCtx?.isRtl ?? RTL_LANGUAGES.has(locale as never);
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   const isPrivateRoute = NOINDEX_PREFIXES.some(
     (prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`),
@@ -170,7 +178,7 @@ export default function SEO({
 
   return (
     <Helmet>
-      <html lang={locale} />
+      <html lang={locale} dir={isRtl ? "rtl" : "ltr"} />
       <title>{clampedTitle}</title>
       <meta name="description" content={clampedDesc} />
       {keywords ? <meta name="keywords" content={keywords} /> : null}

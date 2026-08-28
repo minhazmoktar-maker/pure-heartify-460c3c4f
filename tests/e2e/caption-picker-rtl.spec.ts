@@ -93,7 +93,9 @@ for (const locale of RTL_LOCALES) {
     });
 
     test("infinite grid cells render cleanly under RTL", async ({ page }) => {
-      await open(page, "/browse");
+      // `/browse` was retired: it resolves to the 404 screen (zero grid cells).
+      // The infinite video grid lives on the Home feed.
+      await open(page, "/");
       await expect
         .poll(async () => {
           const cards = await page.locator("[data-video-id]").count();

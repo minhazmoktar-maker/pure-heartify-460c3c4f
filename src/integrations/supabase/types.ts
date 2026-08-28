@@ -8255,6 +8255,16 @@ export type Database = {
           youtube_channel_id: string
         }[]
       }
+      check_corpus_coverage_health: {
+        Args: {
+          p_coverage_drop_critical_pct?: number
+          p_coverage_drop_pct?: number
+          p_pending_warn?: number
+          p_stall_hours?: number
+          p_unchecked_warn?: number
+        }
+        Returns: Json
+      }
       check_dedup_backfill_lag: {
         Args: { p_canonical_max_pending?: number; p_min_per_hour?: number }
         Returns: Json

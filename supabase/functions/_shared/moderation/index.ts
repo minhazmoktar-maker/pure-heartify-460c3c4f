@@ -16,6 +16,11 @@ export * from "./types.ts";
 export { runPipeline, decideState } from "./engine.ts";
 export { loadThresholds, THRESHOLD_DEFAULTS } from "./thresholds.ts";
 export { persistDecision } from "./persistence.ts";
+export {
+  remapBacklogOutcome,
+  isTrustedChannel,
+  TRUSTED_AUTO_APPROVE_MAX_RISK,
+} from "./backlogPolicy.ts";
 
 import type { Stage } from "./types.ts";
 import { ruleStage } from "./stages/ruleStage.ts";
