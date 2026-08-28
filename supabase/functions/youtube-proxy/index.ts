@@ -9,6 +9,12 @@ const corsHeaders = {
 const YOUTUBE_API_KEYS: string[] = [
   Deno.env.get("YOUTUBE_API_KEY"),
   Deno.env.get("YOUTUBE_API_KEY_2"),
+  Deno.env.get("YOUTUBE_API_KEY_3"),
+  Deno.env.get("YOUTUBE_API_KEY_4"),
+  Deno.env.get("YOUTUBE_API_KEY_5"),
+  Deno.env.get("YOUTUBE_API_KEY_6"),
+  // Generic Google Cloud key (separate project => its own Search-quota budget).
+  Deno.env.get("GOOGLE_API_KEY"),
 ].filter((k): k is string => !!k && k.length > 0);
 const BASE_URL = "https://www.googleapis.com/youtube/v3";
 

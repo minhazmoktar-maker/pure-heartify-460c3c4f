@@ -6,7 +6,7 @@ const EXCLUSION_KEYWORDS = [
   'gambling', 'casino', 'gaming', 'prank', 'reaction', 'meme',
 ];
 
-const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2');
+const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY') ?? Deno.env.get('YOUTUBE_API_KEY_2') ?? Deno.env.get('YOUTUBE_API_KEY_3') ?? Deno.env.get('YOUTUBE_API_KEY_4') ?? Deno.env.get('YOUTUBE_API_KEY_5') ?? Deno.env.get('YOUTUBE_API_KEY_6') ?? Deno.env.get('GOOGLE_API_KEY');
 const CRON_TOKEN = Deno.env.get('AUDIT_CRON_TOKEN');
 
 Deno.serve(async (req) => {

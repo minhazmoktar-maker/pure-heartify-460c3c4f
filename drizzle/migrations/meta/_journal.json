@@ -8,6 +8,20 @@
       "when": 1787939439436,
       "tag": "0000_harden_creator_uploads_moderation_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787940303892,
+      "tag": "0001_next_discovery_seeds_launch_language_bias",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787940356892,
+      "tag": "0002_topic_query_launch_set_add_ms",
+      "breakpoints": true
     }
   ]
 }

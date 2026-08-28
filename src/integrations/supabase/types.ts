@@ -9040,6 +9040,14 @@ export type Database = {
       }
       my_benefit_summary: { Args: never; Returns: Json }
       my_progress_summary: { Args: never; Returns: Json }
+      next_discovery_seeds: {
+        Args: { p_limit?: number }
+        Returns: {
+          is_launch: boolean
+          language: string
+          youtube_channel_id: string
+        }[]
+      }
       next_topic_queries: {
         Args: { p_limit?: number; p_target?: number }
         Returns: {
