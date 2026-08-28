@@ -56,33 +56,18 @@ test.describe("captions on native uploads", () => {
 });
 
 test.describe("language lanes", () => {
-  test("browse exposes the lane toggle and filtering keeps the grid coherent", async ({ page }) => {
-    await open(page, "/browse");
-    const toggle = page.getByTestId("lane-toggle");
-    if ((await toggle.count()) === 0) {
-      test.skip(true, "feed empty in this environment");
-    }
-    await expect(toggle).toBeVisible();
-
-    const native = page.getByTestId("lane-native");
-    await native.click();
-    // Either the native lane has cards, or the explicit empty-lane message.
+  // The language mix is an internal serving policy. The lane chips (and their
+  // counts) must never surface to viewers — language choice lives in Settings.
+  test("feed never exposes lane filter chips to the viewer", async ({ page }) => {
+    await open(page, "/");
     await expect
-      .poll(async () => {
-        const cards = await page.locator("[data-video-id]").count();
-        const empty = await page.getByText(/nothing in this lane yet/i).count();
-        return cards + empty;
-      })
+      .poll(async () => page.locator("[data-video-id]").count())
       .toBeGreaterThan(0);
 
-    await page.getByTestId("lane-diversified").click();
-    await expect
-      .poll(async () => {
-        const cards = await page.locator("[data-video-id]").count();
-        const empty = await page.getByText(/nothing in this lane yet/i).count();
-        return cards + empty;
-      })
-      .toBeGreaterThan(0);
+    await expect(page.getByTestId("lane-toggle")).toHaveCount(0);
+    await expect(page.getByTestId("lane-native")).toHaveCount(0);
+    await expect(page.getByTestId("lane-diversified")).toHaveCount(0);
+    await expect(page.getByText(/other languages/i)).toHaveCount(0);
   });
 });
 

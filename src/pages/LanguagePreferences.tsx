@@ -43,13 +43,15 @@ export default function LanguagePreferences() {
       <div className="container mx-auto max-w-2xl space-y-4 px-4 pb-24">
         <Card data-testid="language-mix-explainer">
           <CardContent className="space-y-2 pt-6">
+            {/* Viewer-facing wording only — the serving ratio behind the mix is
+                internal policy and is deliberately never quoted in the UI. */}
             <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Globe className="h-4 w-4 text-primary" /> Your 80/20 language balance
+              <Globe className="h-4 w-4 text-primary" /> Your language mix
             </p>
             <p className="text-xs text-muted-foreground">
               {primaryLabel
-                ? `About 80% of your feed stays in ${primaryLabel} and content made for your region. The other 20% brings in the other languages you understand${others.length ? "" : " and beneficial content from around the world"}.`
-                : "About 80% of your feed stays in your main language and content made for your region. The other 20% brings in the other languages you understand."}
+                ? `Your feed mostly stays in ${primaryLabel} and content made for your region, with some beneficial content in the other languages you understand${others.length ? "" : " and from around the world"}.`
+                : "Your feed mostly stays in your main language and content made for your region, with some beneficial content in the other languages you understand."}
             </p>
           </CardContent>
         </Card>
