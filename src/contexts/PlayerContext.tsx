@@ -325,7 +325,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [currentTrack]);
 
-  // Load/play when currentTrack changes
+  // Load/play when currentTrack changes.
+  // Offline-first: a downloaded surah plays from its IndexedDB blob so it works
+  // with no network and while the phone is locked.
   useEffect(() => {
     const a = audioRef.current;
     if (!a || !currentTrack) return;
@@ -333,28 +335,39 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
       setIsPlaying(false);
       return;
     }
-    if (a.src !== currentTrack.url) {
-      a.src = currentTrack.url;
-      // iOS Safari won't fire loadedmetadata until it actually starts loading,
-      // so call load() explicitly. Harmless on other browsers.
-      try { a.load(); } catch { /* noop */ }
 
-      // Restore resume position (local first — remote is merged into local by
-      // useCrossDevicePlayback).
-      const resume = readJson<Record<string, number>>(RESUME_KEY, {});
-      const savedAt = resume[currentTrack.id];
-      if (savedAt && savedAt > 5) {
-        const onLoaded = () => {
-          try { a.currentTime = savedAt; } catch { /* noop */ }
-          a.removeEventListener("loadedmetadata", onLoaded);
-        };
-        a.addEventListener("loadedmetadata", onLoaded);
+    let cancelled = false;
+    let detachResume: () => void = () => {};
+
+    (async () => {
+      const resolved = await resolvePlaybackSource(currentTrack);
+      if (cancelled || !resolved) return;
+      if (a.src !== resolved.src) {
+        // Release the previous blob URL (if any) before swapping sources.
+        if (objectUrlRef.current && objectUrlRef.current !== resolved.src) {
+          try { URL.revokeObjectURL(objectUrlRef.current); } catch { /* noop */ }
+          objectUrlRef.current = null;
+        }
+        objectUrlRef.current = resolved.offline ? resolved.src : null;
+        a.src = resolved.src;
+        // iOS Safari won't fire loadedmetadata until it actually starts loading,
+        // so call load() explicitly. Harmless on other browsers.
+        try { a.load(); } catch { /* noop */ }
+
+        // Restore resume position (local first — remote is merged into local by
+        // useCrossDevicePlayback).
+        const resume = readJson<Record<string, number>>(RESUME_KEY, {});
+        detachResume = applyResumePosition(a, resume[currentTrack.id] ?? 0);
       }
-    }
-    setIsBuffering(true);
-    retryRef.current = 0;
-    attemptPlay(a);
+      if (cancelled) return;
+      setIsBuffering(true);
+      retryRef.current = 0;
+      attemptPlay(a);
+    })();
+
+    return () => { cancelled = true; detachResume(); };
   }, [currentTrack, attemptPlay]);
+
 
   // Play/pause sync
   useEffect(() => {
