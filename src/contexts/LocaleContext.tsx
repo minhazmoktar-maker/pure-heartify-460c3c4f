@@ -260,3 +260,11 @@ export function useLocale(): LocaleContextValue {
   if (!ctx) throw new Error("useLocale must be used within LocaleProvider");
   return ctx;
 }
+
+/**
+ * Non-throwing variant for components that may render outside the provider
+ * (isolated unit tests, storybook-style previews).
+ */
+export function useLocaleOptional(): LocaleContextValue | null {
+  return useContext(LocaleContext);
+}
