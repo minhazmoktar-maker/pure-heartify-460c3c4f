@@ -17,7 +17,7 @@ interface SEOProps {
   noAutoArticle?: boolean;
   /** Extra <meta> keywords (comma-separated). */
   keywords?: string;
-  /** Locale of the current page (defaults to "en"). */
+  /** Locale of the current page. Defaults to the active UI language. */
   locale?: string;
   /** Force noindex. Private/operational routes are noindexed automatically. */
   noindex?: boolean;
