@@ -101,14 +101,19 @@ export function decideState(
 ): PipelineOutcome["final_state"] {
   if (ruleHits.some((h) => h.severity === "hard")) return "blocked";
   // Adversarial / low-quality / stage-error output — never reject silently, always escalate.
+  // `ai_unavailable` belongs here for the same reason: a provider outage yields
+  // confidence 0, which the threshold below would otherwise turn into a
+  // rejection of perfectly clean content.
   if (
     flags.includes("prompt_injection_attempt") ||
     flags.includes("parse_failed") ||
     flags.includes("low_quality_reasoning") ||
-    flags.includes("stage_error")
+    flags.includes("stage_error") ||
+    flags.includes("ai_unavailable")
   ) {
     return "human_review_required";
   }
+
   if (confidence < t.reject_below_confidence) return "rejected";
   if (confidence >= t.auto_approve_min_confidence && risk <= t.auto_approve_max_risk) {
     return "auto_approved";
