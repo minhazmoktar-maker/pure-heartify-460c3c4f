@@ -372,6 +372,16 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     return () => { cancelled = true; detachResume(); };
   }, [currentTrack, attemptPlay]);
 
+  // Release the last offline blob URL when the provider unmounts.
+  useEffect(() => () => {
+    if (objectUrlRef.current) {
+      try { URL.revokeObjectURL(objectUrlRef.current); } catch { /* noop */ }
+      objectUrlRef.current = null;
+    }
+  }, []);
+
+
+
 
   // Play/pause sync
   useEffect(() => {
