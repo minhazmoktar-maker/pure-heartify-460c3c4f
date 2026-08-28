@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext";
 import BenefitLabelPrompt from "@/components/BenefitLabelPrompt";
+import BenefitJournalCard from "@/components/BenefitJournalCard";
 
 type Tile = {
   to: string;
