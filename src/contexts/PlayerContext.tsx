@@ -659,26 +659,82 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
     a.play().catch(() => setNeedsUserGesture(true));
   }, []);
 
-  // Media Session
+  // ---------------------------------------------------------------- Media Session
+  // Drives the OS lock-screen / notification-shade controls on iOS and Android
+  // (and the native shells, where UIBackgroundModes:audio +
+  // FOREGROUND_SERVICE_MEDIA_PLAYBACK keep the audio alive while locked).
   useEffect(() => {
     if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
     if (!currentTrack) return;
-    const artwork = typeof currentTrack.cover === "string"
-      ? [{ src: currentTrack.cover, sizes: "512x512", type: "image/jpeg" }]
+    const cover = typeof currentTrack.cover === "string" ? currentTrack.cover : null;
+    const artwork = cover
+      ? [
+          { src: cover, sizes: "192x192", type: "image/jpeg" },
+          { src: cover, sizes: "512x512", type: "image/jpeg" },
+        ]
       : [];
     (navigator as any).mediaSession.metadata = new (window as any).MediaMetadata({
       title: currentTrack.title, artist: currentTrack.artist,
       album: currentTrack.album, artwork,
     });
     const ms = navigator.mediaSession;
-    ms.setActionHandler("play", () => setIsPlaying(true));
-    ms.setActionHandler("pause", () => setIsPlaying(false));
-    ms.setActionHandler("previoustrack", goPrev);
-    ms.setActionHandler("nexttrack", () => goNext(false));
-    ms.setActionHandler("seekto", (details) => {
-      if (details.seekTime != null) seek(details.seekTime);
+    const safe = (
+      action: MediaSessionAction,
+      handler: MediaSessionActionHandler | null,
+    ) => {
+      // Unsupported actions throw on some engines (notably older WebKit).
+      try { ms.setActionHandler(action, handler); } catch { /* not supported */ }
+    };
+    safe("play", () => { setIsPlaying(true); void audioRef.current?.play().catch(() => {}); });
+    safe("pause", () => { setIsPlaying(false); audioRef.current?.pause(); });
+    safe("stop", () => { setIsPlaying(false); audioRef.current?.pause(); });
+    safe("previoustrack", () => goPrev());
+    safe("nexttrack", () => goNext(false));
+    safe("seekbackward", (d) => {
+      const by = (d as { seekOffset?: number })?.seekOffset ?? 10;
+      seek(Math.max(0, (audioRef.current?.currentTime ?? 0) - by));
     });
+    safe("seekforward", (d) => {
+      const by = (d as { seekOffset?: number })?.seekOffset ?? 10;
+      const a = audioRef.current;
+      if (a) seek(Math.min(a.duration || Infinity, a.currentTime + by));
+    });
+    safe("seekto", (details) => {
+      if ((details as { seekTime?: number }).seekTime != null) {
+        seek((details as { seekTime: number }).seekTime);
+      }
+    });
+    return () => {
+      for (const a of [
+        "play", "pause", "stop", "previoustrack", "nexttrack",
+        "seekbackward", "seekforward", "seekto",
+      ] as MediaSessionAction[]) safe(a, null);
+    };
   }, [currentTrack, goPrev, goNext, seek]);
+
+  // Keep the OS widget's play/pause state and scrubber in sync, otherwise the
+  // lock screen shows a stale button or a frozen progress bar.
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    navigator.mediaSession.playbackState = currentTrack
+      ? isPlaying ? "playing" : "paused"
+      : "none";
+  }, [isPlaying, currentTrack]);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    if (!("setPositionState" in navigator.mediaSession)) return;
+    if (!currentTrack || !Number.isFinite(duration) || duration <= 0) return;
+    try {
+      navigator.mediaSession.setPositionState({
+        duration,
+        position: Math.min(Math.max(progress, 0), duration),
+        playbackRate: playbackRate || 1,
+      });
+    } catch { /* invalid state windows during track swaps */ }
+  }, [currentTrack, duration, progress, playbackRate]);
+
+
 
   // Keyboard shortcuts
   useEffect(() => {
