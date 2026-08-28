@@ -152,6 +152,9 @@ export const PlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryRef = useRef(0);
+  /** Object URL for the currently loaded offline blob (revoked on swap). */
+  const objectUrlRef = useRef<string | null>(null);
+
   const lastRemoteSaveRef = useRef<number>(0);
   /** When set, current playback is a 30s premium sample for a non-entitled user. */
   const previewCapRef = useRef<number | null>(null);
