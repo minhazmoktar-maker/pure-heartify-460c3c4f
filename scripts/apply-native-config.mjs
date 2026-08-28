@@ -107,6 +107,10 @@ export const ANDROID_PERMISSIONS = [
   'android.permission.ACCESS_COARSE_LOCATION',
   'android.permission.ACCESS_FINE_LOCATION',
   'android.permission.VIBRATE',
+  // Lock-screen / background Qur'an playback (media notification + audio focus).
+  'android.permission.FOREGROUND_SERVICE',
+  'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
+  'android.permission.WAKE_LOCK',
   'com.android.vending.BILLING',
 ];
 
@@ -183,6 +187,20 @@ function patchIos() {
         `\t<key>${key}</key>\n\t<string>${value}</string>\n</dict>\n</plist>\n`,
       );
     }
+  }
+  // Background + lock-screen audio: the WKWebView keeps decoding Qur'an audio
+  // when the app is backgrounded or the phone is locked only when the `audio`
+  // background mode is declared.
+  if (!/<key>UIBackgroundModes<\/key>/.test(next)) {
+    next = next.replace(
+      /<\/dict>\s*<\/plist>\s*$/,
+      '\t<key>UIBackgroundModes</key>\n\t<array>\n\t\t<string>audio</string>\n\t</array>\n</dict>\n</plist>\n',
+    );
+  } else if (!/<string>audio<\/string>/.test(next)) {
+    next = next.replace(
+      /(<key>UIBackgroundModes<\/key>\s*<array>)/,
+      '$1\n\t\t<string>audio</string>',
+    );
   }
   if (!next.includes('ITSAppUsesNonExemptEncryption')) {
     next = next.replace(
