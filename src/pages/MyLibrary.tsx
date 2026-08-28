@@ -51,10 +51,12 @@ export default function MyLibrary() {
         )}
 
         {user && (
-          <div className="mb-6">
+          <div className="mb-6 space-y-3">
             <BenefitLabelPrompt />
+            <BenefitJournalCard />
           </div>
         )}
+
 
 
 
