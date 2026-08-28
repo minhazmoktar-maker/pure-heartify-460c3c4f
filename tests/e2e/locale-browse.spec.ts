@@ -81,13 +81,16 @@ for (const c of CASES) {
 
       // Drill into a category from the browse surface; the language must
       // survive client-side navigation with no reload.
+      // Skip in-page anchors (the "skip to main content" a11y link) and
+      // sr-only links — they are not viewport-clickable and would hang the
+      // click retry loop instead of navigating.
       const link = page
-        .getByRole("link")
+        .locator('main a[href^="/"]:not([href="/"]):not(.sr-only)')
         .filter({ hasNot: page.locator("[aria-hidden=true]") })
         .first();
       if (await link.count()) {
         const before = page.url();
-        await link.click({ trial: false }).catch(() => undefined);
+        await link.click({ timeout: 10_000 }).catch(() => undefined);
         await page.waitForTimeout(1500);
         if (page.url() !== before) {
           await expectLocale(page, c.lang, c.dir);

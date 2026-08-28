@@ -1,0 +1,1 @@
+ALTER TABLE public.discovery_jobs ADD COLUMN IF NOT EXISTS quota_exhausted BOOLEAN NOT NULL DEFAULT false;

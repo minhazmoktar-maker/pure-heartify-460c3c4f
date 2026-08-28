@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Home, Compass, Library, User } from "lucide-react";
 import { SPINES, shouldShowBottomBar, resolveSpine, type SpineId } from "@/lib/navigation";
 import { soundTap } from "@/lib/soundHaptics";
+import { useLocaleOptional } from "@/contexts/LocaleContext";
 import { cn } from "@/lib/utils";
 
 /**
@@ -21,6 +22,8 @@ const ICONS: Record<SpineId, React.ComponentType<{ className?: string }>> = {
 
 export default function BottomTabBar() {
   const { pathname } = useLocation();
+  // Optional so the bar still renders (in English) outside LocaleProvider.
+  const locale = useLocaleOptional();
   const visible = shouldShowBottomBar(pathname);
   useEffect(() => {
     if (visible) {
@@ -44,13 +47,14 @@ export default function BottomTabBar() {
       <ul className="mx-auto flex max-w-md items-stretch justify-around">
         {SPINES.map((spine) => {
           const Icon = ICONS[spine.id];
+          const label = locale ? locale.t(spine.labelKey, undefined, spine.label) : spine.label;
           const isActive = spine.id === activeSpine;
           return (
             <li key={spine.id} className="flex-1">
               <NavLink
                 to={spine.path}
                 aria-current={isActive ? "page" : undefined}
-                aria-label={spine.label}
+                aria-label={label}
                 onClick={() => { if (!isActive) soundTap(); }}
                 className={cn(
                   "flex min-h-[56px] flex-col items-center justify-center gap-0.5 px-ds-xs py-ds-sm text-micro font-medium pressable",
@@ -65,7 +69,7 @@ export default function BottomTabBar() {
                   )}
                   aria-hidden
                 />
-                <span>{spine.label}</span>
+                <span>{label}</span>
                 {isActive && (
                   <span
                     aria-hidden

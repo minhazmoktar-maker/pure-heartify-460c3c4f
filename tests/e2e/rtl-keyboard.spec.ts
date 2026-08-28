@@ -26,6 +26,10 @@ interface FocusInfo {
   w: number;
   h: number;
   ring: boolean;
+  /** Label is pure Latin script (an LTR run inside the RTL page). */
+  latin: boolean;
+  /** Identity of the nearest inline-text block (paragraph / label), if any. */
+  textBlock: string | null;
 }
 
 async function waitRtl(page: Page) {
@@ -48,12 +52,14 @@ async function tabWalk(page: Page, steps: number): Promise<FocusInfo[]> {
         cs.outlineStyle !== "none" ||
         parseFloat(cs.outlineWidth || "0") > 0 ||
         (cs.boxShadow ?? "none") !== "none";
+      const block = el.closest("p,label,li,figcaption");
+      const label =
+        el.getAttribute("aria-label") ?? el.textContent?.trim().slice(0, 40) ?? "";
       return {
         tag: el.tagName.toLowerCase(),
-        label:
-          el.getAttribute("aria-label") ??
-          el.textContent?.trim().slice(0, 40) ??
-          "",
+        label,
+        latin: /^[A-Za-z0-9\s.,'&()\-–—/:!?]+$/.test(label),
+        textBlock: block ? (block.textContent ?? "").trim().slice(0, 60) : null,
         x: r.x,
         y: r.y,
         w: r.width,
@@ -86,10 +92,20 @@ function assertReadingOrder(stops: FocusInfo[], where: string) {
       );
       continue;
     }
+    // Two Latin-script links inside the same sentence form a single LTR run.
+    // The Unicode bidi algorithm renders such a run left→right *inside* the
+    // mirrored page, so DOM order is the correct reading order there — the
+    // right-to-left expectation only applies to mirrored layout boxes.
+    const sameBidiRun =
+      a.latin && b.latin && a.textBlock !== null && a.textBlock === b.textBlock;
+    if (sameBidiRun) continue;
+    // Compare inline-START edges (the right edge in RTL). Left edges are
+    // misleading for overlapping boxes of different widths — e.g. the wide
+    // skip-link pill vs the narrow icon button it sits above.
     expect(
-      b.x,
+      b.x + b.w,
       `${where}: RTL focus order moved rightward within a row ("${a.label}" → "${b.label}")`,
-    ).toBeLessThanOrEqual(a.x + 4);
+    ).toBeLessThanOrEqual(a.x + a.w + 4);
   }
 }
 

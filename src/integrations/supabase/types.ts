@@ -2622,6 +2622,7 @@ export type Database = {
           heartbeat_at: string | null
           id: string
           mode: string
+          quota_exhausted: boolean
           quota_used: number
           requested_by: string | null
           seeds_processed: number
@@ -2641,6 +2642,7 @@ export type Database = {
           heartbeat_at?: string | null
           id?: string
           mode?: string
+          quota_exhausted?: boolean
           quota_used?: number
           requested_by?: string | null
           seeds_processed?: number
@@ -2660,6 +2662,7 @@ export type Database = {
           heartbeat_at?: string | null
           id?: string
           mode?: string
+          quota_exhausted?: boolean
           quota_used?: number
           requested_by?: string | null
           seeds_processed?: number
