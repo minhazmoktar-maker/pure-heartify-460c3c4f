@@ -1,4 +1,6 @@
 import { Helmet } from "react-helmet-async";
+import { RTL_LANGUAGES } from "@/i18n";
+import { useLocaleOptional } from "@/contexts/LocaleContext";
 
 interface SEOProps {
   title: string;
