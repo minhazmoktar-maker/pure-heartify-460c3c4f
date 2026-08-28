@@ -494,20 +494,86 @@ function InstallStep({
   );
 }
 
+/**
+ * Payoff step. Instead of promising personalization, it *shows* it: the real
+ * first Daily Dose is generated here and the actual picks are previewed with
+ * titles, thumbnails and verified minutes. A blank home feed was the single
+ * biggest first-session letdown, so nobody leaves onboarding empty-handed.
+ */
 function DoneStep() {
+  const { data, isLoading, isError } = useDailyDose();
+  const videos = data?.videos?.slice(0, 3) ?? [];
+  const minutes = data?.dose?.total_minutes ?? null;
+
   return (
     <>
       <StepHeader
         icon={<PartyPopper className="h-4 w-4" />}
         stepLabel="You're all set"
         title="Your first Daily Dose is ready"
-        subtitle="One tap and you're in — mabrūk 🌿"
+        subtitle={
+          minutes
+            ? `${minutes} minutes, picked for what you just told us — mabrūk 🌿`
+            : "One tap and you're in — mabrūk 🌿"
+        }
       />
-      <div className="mt-8 rounded-card border border-primary/30 bg-primary/5 p-6 text-sm text-foreground">
-        Personalization is live. We'll refine your feed as you watch.
+
+      <div className="mt-8 rounded-card border border-primary/30 bg-primary/5 p-4">
+        {isLoading && (
+          <ul className="space-y-3" aria-label="Preparing your picks">
+            {[0, 1, 2].map((i) => (
+              <li key={i} className="flex items-center gap-3">
+                <div className="h-14 w-24 shrink-0 animate-pulse rounded-card bg-muted" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="h-3 w-3/4 animate-pulse rounded-pill bg-muted" />
+                  <div className="h-3 w-1/3 animate-pulse rounded-pill bg-muted" />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {!isLoading && videos.length > 0 && (
+          <>
+            <p className="text-micro font-semibold uppercase tracking-wider text-primary">
+              Waiting for you
+            </p>
+            <ul className="mt-3 space-y-3">
+              {videos.map((v) => {
+                const len = formatDuration(v.duration_seconds);
+                return (
+                  <li key={v.video_id} className="flex items-center gap-3">
+                    <img
+                      src={v.thumbnail_url}
+                      alt=""
+                      loading="lazy"
+                      className="h-14 w-24 shrink-0 rounded-card object-cover"
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground">{v.title}</p>
+                      <p className="truncate text-micro text-muted-foreground">
+                        {v.channel_title}
+                        {len ? ` · ${len}` : ""}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+
+        {!isLoading && videos.length === 0 && (
+          <p className="text-sm text-foreground">
+            {isError
+              ? "Personalization is live. Your Daily Dose will be waiting on the home screen."
+              : "Personalization is live. We'll refine your feed as you watch."}
+          </p>
+        )}
       </div>
     </>
   );
 }
+
 
 export default Onboarding;
