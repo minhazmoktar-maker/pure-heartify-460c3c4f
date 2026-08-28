@@ -109,9 +109,15 @@ export default function SEO({
   noBreadcrumbs,
   noAutoArticle,
   keywords,
-  locale = "en",
+  locale: localeProp,
   noindex,
 }: SEOProps) {
+  // Helmet owns <html lang>, so a hardcoded "en" here silently overwrote the
+  // UI language LocaleContext had already applied — every device-language
+  // visitor saw lang="en"/dir="ltr" no matter what they were reading in.
+  const localeCtx = useLocaleOptional();
+  const locale = localeProp ?? localeCtx?.locale ?? "en";
+  const isRtl = localeCtx?.isRtl ?? RTL_LANGUAGES.has(locale as never);
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   const isPrivateRoute = NOINDEX_PREFIXES.some(
     (prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`),
