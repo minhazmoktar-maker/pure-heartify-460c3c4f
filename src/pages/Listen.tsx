@@ -10,6 +10,9 @@ import { SURAHS } from "@/data/surahs";
 import { SPEAKERS, speakerSearchPath } from "@/data/speakers";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import DownloadTrackButton from "@/components/DownloadTrackButton";
+import ReciterDownloadAllButton from "@/components/offline/ReciterDownloadAllButton";
+
 
 /**
  * The Listen destination.
