@@ -307,18 +307,21 @@ Deno.serve(async (req) => {
 
       const healedIds = [...keep, ...replacements.map((v) => v.video_id)];
       if (healedIds.length) {
+        // Hydrate first so the healed dose reports the real length of the
+        // videos it now actually contains.
+        orderedVideos = await hydrate(healedIds);
         const { data: updated } = await admin
           .from("daily_dose")
           .update({
             video_ids: healedIds,
-            total_minutes: healedIds.length * ASSUMED_MIN_PER_VIDEO,
+            total_minutes: doseMinutes(orderedVideos as Vid[]),
           })
           .eq("id", dose.id)
           .select()
           .single();
         if (updated) dose = updated;
-        orderedVideos = await hydrate(healedIds);
       }
+
     }
 
     // 6. Completions + streak
