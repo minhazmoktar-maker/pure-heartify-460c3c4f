@@ -116,34 +116,48 @@ export default function PublicReciter() {
 
         {hasAudio && (
           <section className="mt-8">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              114 surahs
-            </h2>
-            <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-              {SURAHS.map((s) => (
-                <li key={s.number}>
-                  <Link
-                    to={`/listen?reciter=${r.id}&surah=${s.number}`}
-                    className="flex items-center justify-between rounded-md border border-border/60 bg-card/40 px-3 py-2 text-sm hover:border-primary/40 hover:bg-card"
-                  >
-                    <span className="tabular-nums text-muted-foreground w-8">
-                      {s.number}
-                    </span>
-                    <span className="flex-1 truncate">{s.nameEn}</span>
-                    <span
-                      dir="rtl"
-                      lang="ar"
-                      className="ml-2 text-primary/80"
-                      style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
-                    >
-                      {s.nameAr}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                114 surahs
+              </h2>
+              <ReciterDownloadAllButton
+                reciterId={r.id}
+                reciterName={r.name}
+                tracks={quranTracks}
+              />
+            </div>
+            <ol className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+              {SURAHS.map((s, i) => {
+                const t = quranTracks[i];
+                return (
+                  <li key={s.number}>
+                    <div className="flex items-center gap-1 rounded-md border border-border/60 bg-card/40 pr-1 hover:border-primary/40 hover:bg-card">
+                      <Link
+                        to={`/listen?reciter=${r.id}&surah=${s.number}`}
+                        className="flex min-h-[44px] flex-1 items-center gap-2 px-3 py-2 text-sm"
+                      >
+                        <span className="w-8 tabular-nums text-muted-foreground">
+                          {s.number}
+                        </span>
+                        <span className="flex-1 truncate">{s.nameEn}</span>
+                        <span
+                          dir="rtl"
+                          lang="ar"
+                          className="ml-2 text-primary/80"
+                          style={{ fontFamily: "'Amiri', 'Scheherazade New', serif" }}
+                        >
+                          {s.nameAr}
+                        </span>
+                      </Link>
+                      {t && <DownloadTrackButton track={t} className="shrink-0" />}
+                    </div>
+                  </li>
+                );
+              })}
             </ol>
           </section>
         )}
+
 
         <div className="mt-8 flex items-center justify-between">
           <Button asChild variant="ghost" size="sm" disabled={!prev}>
