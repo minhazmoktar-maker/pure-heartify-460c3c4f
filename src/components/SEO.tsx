@@ -178,7 +178,7 @@ export default function SEO({
 
   return (
     <Helmet>
-      <html lang={locale} />
+      <html lang={locale} dir={isRtl ? "rtl" : "ltr"} />
       <title>{clampedTitle}</title>
       <meta name="description" content={clampedDesc} />
       {keywords ? <meta name="keywords" content={keywords} /> : null}
