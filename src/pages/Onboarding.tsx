@@ -10,6 +10,8 @@ import { INTEREST_OPTIONS } from "@/data/interestOptions";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { growth } from "@/lib/growthEvents";
+import { useDailyDose } from "@/hooks/useDailyDose";
+import { formatDuration } from "@/lib/formatDuration";
 import SEO from "@/components/SEO";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
