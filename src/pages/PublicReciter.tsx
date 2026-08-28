@@ -27,6 +27,8 @@ export default function PublicReciter() {
   const next = idx >= 0 && idx < RECITERS.length - 1 ? RECITERS[idx + 1] : null;
 
   const hasAudio = useMemo(() => (r ? reciterHasAudio(r) : false), [r]);
+  const quranTracks = useMemo(() => (r ? reciterQuranTracks(r.id) : []), [r]);
+
 
   if (!r) return <Navigate to="/listen" replace />;
 
