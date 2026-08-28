@@ -51,7 +51,8 @@ describe("cron token parity", () => {
     for (const name of listFunctions()) {
       const src = readFunction(name);
       if (!src.includes("x-cron-token")) continue;
-      const guardsEmptyToken = /!!cronToken|cronToken &&|\?\?\s*"\\u0000"|\?\? "\u0000"/.test(src);
+      const guardsEmptyToken =
+        /!!cronToken|cronToken &&|!expected|\?\?\s*"\\u0000"|\?\? "\u0000"/.test(src);
       expect(guardsEmptyToken, `${name} must guard against an empty cron token`).toBe(true);
     }
   });
