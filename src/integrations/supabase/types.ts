@@ -2215,6 +2215,8 @@ export type Database = {
           content_language: string | null
           duplicate_group_id: string | null
           duplicate_grouped_at: string | null
+          duration_checked_at: string | null
+          duration_seconds: number | null
           embed_checked_at: string | null
           embeddable: boolean
           embedding: string | null
@@ -2263,6 +2265,8 @@ export type Database = {
           content_language?: string | null
           duplicate_group_id?: string | null
           duplicate_grouped_at?: string | null
+          duration_checked_at?: string | null
+          duration_seconds?: number | null
           embed_checked_at?: string | null
           embeddable?: boolean
           embedding?: string | null
@@ -2311,6 +2315,8 @@ export type Database = {
           content_language?: string | null
           duplicate_group_id?: string | null
           duplicate_grouped_at?: string | null
+          duration_checked_at?: string | null
+          duration_seconds?: number | null
           embed_checked_at?: string | null
           embeddable?: boolean
           embedding?: string | null
@@ -8196,6 +8202,7 @@ export type Database = {
         }
         Returns: Json
       }
+      apply_video_durations: { Args: { _payload: Json }; Returns: number }
       apply_video_embeddings: {
         Args: { _model: string; _rows: Json }
         Returns: number

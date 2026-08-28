@@ -7,6 +7,8 @@ import { useUserInterests } from "@/hooks/useUserInterests";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { shareContent } from "@/lib/share";
+import { formatDuration } from "@/lib/formatDuration";
+
 
 const DailyDoseHero = () => {
   const { user } = useAuth();
@@ -157,6 +159,11 @@ const DailyDoseHero = () => {
                     <span className="absolute left-1.5 top-1.5 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-semibold text-white">
                       {i + 1}
                     </span>
+                    {formatDuration(v.duration_seconds) && (
+                      <span className="absolute bottom-1.5 right-1.5 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-white">
+                        {formatDuration(v.duration_seconds)}
+                      </span>
+                    )}
                   </div>
                   <div className="min-w-0 flex-1 py-0.5">
                     <p className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
@@ -194,7 +201,8 @@ const DailyDoseHero = () => {
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Your streak is now <strong className="text-foreground">{streak.current_streak} {streak.current_streak === 1 ? "day" : "days"}</strong>.
-                    Come back tomorrow for a fresh dose — ~18 minutes, no scrolling.
+                    Come back tomorrow for a fresh dose — about {dose.total_minutes} minutes, no
+                    scrolling.
                   </p>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <button
