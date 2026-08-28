@@ -5,7 +5,7 @@
  *  1. Auth screens rendering a placeholder glyph instead of the official
  *     Heartify mark (`src/assets/heartify-mark.png` via <Logomark />).
  *  2. AuthField leading icons / password toggle overlapping the input text
- *     (icon present without the `!pl-10` inset, or toggle without `pr-10`).
+ *     (icon present without the `!ps-10` inset, or toggle without `pe-10`).
  */
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -29,14 +29,14 @@ describe("AuthField — icon/text overlap contract", () => {
   it("insets the input when a leading icon is present", () => {
     render(<AuthField icon={Mail} label="Email" placeholder="you@example.com" />);
     const input = screen.getByPlaceholderText("you@example.com");
-    expect(input.className).toContain("!pl-10");
+    expect(input.className).toContain("!ps-10");
   });
 
   it("reserves room for the password toggle and keeps a 44px tap target", () => {
     render(<AuthField icon={Lock} passwordToggle placeholder="Password" />);
     const input = screen.getByPlaceholderText("Password");
-    expect(input.className).toContain("pr-10");
-    expect(input.className).toContain("!pl-10");
+    expect(input.className).toContain("pe-10");
+    expect(input.className).toContain("!ps-10");
 
     const toggle = screen.getByRole("button", { name: "Show password" });
     expect(toggle.className).toContain("h-11");

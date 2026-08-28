@@ -38,7 +38,7 @@ export const AuthField = React.forwardRef<HTMLInputElement, AuthFieldProps>(
             <Icon
               aria-hidden
               className={cn(
-                "pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
+                "pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors",
                 invalid ? "text-destructive" : "text-muted-foreground",
               )}
             />
@@ -52,8 +52,8 @@ export const AuthField = React.forwardRef<HTMLInputElement, AuthFieldProps>(
             aria-describedby={cn(error && errId, hint && hintId) || undefined}
             className={cn(
               "field-input w-full",
-              Icon && "!pl-10",
-              passwordToggle && "pr-10",
+              Icon && "!ps-10",
+              passwordToggle && "pe-10",
               invalid && "field-input--invalid",
               className,
             )}
@@ -63,7 +63,7 @@ export const AuthField = React.forwardRef<HTMLInputElement, AuthFieldProps>(
               type="button"
               onClick={() => setVisible((v) => !v)}
               aria-label={visible ? "Hide password" : "Show password"}
-              className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:text-foreground"
+              className="absolute end-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:text-foreground"
             >
               {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>

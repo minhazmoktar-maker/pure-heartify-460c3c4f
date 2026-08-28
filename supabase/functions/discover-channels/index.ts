@@ -260,6 +260,14 @@ interface QuotaCtx {
   keyIndex: number;
   /** True once every configured key has answered quotaExceeded this run. */
   quotaExhausted: boolean;
+  /**
+   * True once YouTube reports the per-day *Search Queries* quota is spent.
+   * Search quota is metered separately from general units, and all configured
+   * keys usually live in one Google Cloud project (so rotation cannot help).
+   * The run keeps going on the cheap 1-unit playlist / description crawls
+   * instead of halting outright.
+   */
+  searchExhausted: boolean;
 }
 
 async function reserveQuota(ctx: QuotaCtx, cost: number): Promise<boolean> {
@@ -307,6 +315,17 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
       const body = (await res.text()).slice(0, 300);
       const isQuota =
         res.status === 429 || (res.status === 403 && QUOTA_PATTERN.test(body)) || QUOTA_PATTERN.test(body);
+
+      const isSearchOnly = /\/v3\/search\?/.test(url) && /Search Queries/i.test(body);
+      if (isQuota && isSearchOnly) {
+        // Per-day Search quota is project-scoped, so rotating keys inside the
+        // same Cloud project cannot recover it. Disable search for this run and
+        // let the cheap non-search crawls continue.
+        ctx.searchExhausted = true;
+        ctx.apiFailures++;
+        console.warn(`youtube search quota exhausted — continuing without search: ${body}`);
+        return null;
+      }
 
       if (isQuota) {
         // Rotate to the next configured key; if none remain, stop the run.
@@ -601,8 +620,37 @@ async function loadAllocations(admin: Admin): Promise<AllocationRow[]> {
 
 // ─────────────────────────── Job worker ─────────────────────────────────────
 
+/**
+ * Writes job progress and always refreshes the heartbeat.
+ *
+ * Never swallow the write error: a rejected PATCH (e.g. an unknown column)
+ * used to leave the row frozen in `running`, so the 10-minute watchdog marked
+ * every run `stuck: heartbeat timeout` and the `already_running` guard blocked
+ * the next cron tick — discovery throughput went to zero silently. On failure
+ * we retry with a minimal, schema-stable payload so the job can still finalize.
+ */
 async function updateJob(admin: Admin, jobId: string, patch: Record<string, unknown>) {
-  await admin.from('discovery_jobs').update({ ...patch, heartbeat_at: new Date().toISOString() }).eq('id', jobId);
+  const heartbeat_at = new Date().toISOString();
+  const { error } = await admin
+    .from('discovery_jobs')
+    .update({ ...patch, heartbeat_at })
+    .eq('id', jobId);
+  if (!error) return;
+  console.error('discovery job update failed', { jobId, message: error.message });
+  const minimal: Record<string, unknown> = { heartbeat_at };
+  for (const k of ['status', 'started_at', 'finished_at', 'error']) {
+    if (k in patch) minimal[k] = patch[k];
+  }
+  const { error: retryErr } = await admin
+    .from('discovery_jobs')
+    .update(minimal)
+    .eq('id', jobId);
+  if (retryErr) console.error('discovery job minimal update failed', retryErr.message);
+  await admin.from('ops_metrics').insert({
+    metric: 'discovery.job.update_failed',
+    value: 1,
+    tags: { job: jobId, message: error.message.slice(0, 200) },
+  });
 }
 
 async function isCancelled(admin: Admin, jobId: string): Promise<boolean> {
@@ -614,7 +662,7 @@ interface JobParams { targetSeedId?: string; requestedMethod?: string }
 
 async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
   const started = Date.now();
-  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0, keyIndex: 0, quotaExhausted: false };
+  const ctx: QuotaCtx = { admin, usedThisRun: 0, apiFailures: 0, keyIndex: 0, quotaExhausted: false, searchExhausted: false };
   let totalEnqueued = 0;
   let totalSkipped = 0;
   let seedsProcessed = 0;
@@ -681,10 +729,10 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
       const track = (src: string, cost: number) => { spend[src] = (spend[src] ?? 0) + cost; };
 
       // 1) topic_search (each query costs ~COST_SEARCH + hydration).
-      if ((budgets.topic_search ?? 0) > 0) {
+      if ((budgets.topic_search ?? 0) > 0 && !ctx.searchExhausted) {
         const queries = await loadTopicQueries(admin);
         for (const q of queries) {
-          if (overBudget() || overDeadline() || await isCancelled(admin, jobId)) break;
+          if (overBudget() || overDeadline() || ctx.searchExhausted || await isCancelled(admin, jobId)) break;
           if (!canSpend('topic_search', COST_SEARCH + COST_CHANNEL_BATCH)) break;
           const before = ctx.usedThisRun;
           const r = await crawlTopicSearch(admin, ctx, q.query, q.language);
@@ -857,11 +905,15 @@ Deno.serve(async (req) => {
       return json({ ok: true, cancelled: body.job });
     }
 
-    // Idempotency: reject if a job is already running unless force=true.
+    // Idempotency: reject if a LIVE job is already running unless force=true.
+    // A job whose heartbeat has gone quiet is treated as dead so a single hung
+    // run can't block every following cron tick until the watchdog reaps it.
     if (!body?.force) {
+      const staleBefore = new Date(Date.now() - 2 * SOFT_DEADLINE_MS).toISOString();
       const { data: running } = await admin
         .from('discovery_jobs').select('id')
         .in('status', ['queued', 'running'])
+        .gt('heartbeat_at', staleBefore)
         .order('created_at', { ascending: false }).limit(1);
       if (running && running.length > 0) {
         return json({ ok: true, already_running: true, job: (running[0] as any).id }, 202);

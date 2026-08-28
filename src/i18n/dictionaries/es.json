@@ -2,6 +2,7 @@
   "app.name": "Heartify",
   "nav.home": "Inicio",
   "nav.browse": "Explorar",
+  "nav.library": "Biblioteca",
   "nav.listen": "Escuchar",
   "nav.profile": "Perfil",
   "nav.search": "Buscar",

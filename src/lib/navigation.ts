@@ -18,7 +18,10 @@ export type SpineId = "home" | "explore" | "library" | "profile";
 
 export interface SpineDefinition {
   id: SpineId;
+  /** English fallback label. Never render this directly — use `labelKey`. */
   label: string;
+  /** Dictionary key so the tab bar follows the device / UI language. */
+  labelKey: string;
   path: string;             // canonical entry route for the spine
   /** Route patterns owned by this spine. String = exact, RegExp = matcher. */
   owns: Array<string | RegExp>;
@@ -33,6 +36,7 @@ export const SPINES: readonly SpineDefinition[] = [
   {
     id: "home",
     label: "Home",
+    labelKey: "nav.home",
     path: "/",
     owns: [
       "/",
@@ -47,6 +51,7 @@ export const SPINES: readonly SpineDefinition[] = [
   {
     id: "explore",
     label: "Explore",
+    labelKey: "nav.browse",
     path: "/explore",
     owns: [
       "/explore",
@@ -99,6 +104,7 @@ export const SPINES: readonly SpineDefinition[] = [
   {
     id: "library",
     label: "Library",
+    labelKey: "nav.library",
     path: "/me",
     owns: [
       "/me",
@@ -115,6 +121,7 @@ export const SPINES: readonly SpineDefinition[] = [
   {
     id: "profile",
     label: "Profile",
+    labelKey: "nav.profile",
     path: "/profile",
     owns: [
       "/profile", "/achievements", "/recap", "/onboarding",

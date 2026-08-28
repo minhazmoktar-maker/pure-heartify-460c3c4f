@@ -63,7 +63,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <Suspense fallback={null}><StreakMilestoneDialog /></Suspense>
       <Suspense fallback={null}><StreakFreezeUsedToast /></Suspense>
       <Suspense fallback={null}><WelcomeBackDialog /></Suspense>
-      <BottomTabBar />
       <EdgeSwipeBack />
       <KeyboardFocusScroller />
       <FeedDiversityProvider>
@@ -71,6 +70,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <RouteTransition>{children}</RouteTransition>
         </Suspense>
       </FeedDiversityProvider>
+      {/* Rendered after the route tree so Tab order follows visual reading
+          order (content first, then the fixed bottom navigation). */}
+      <BottomTabBar />
     </>
   );
 }
