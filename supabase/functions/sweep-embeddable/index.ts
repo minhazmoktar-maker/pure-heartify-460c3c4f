@@ -48,8 +48,12 @@ const sbFetch = (path: string, init: RequestInit = {}) =>
 async function ytStatus(ids: string[]): Promise<StatusResult> {
   let sawQuotaError = false;
   for (const key of YOUTUBE_API_KEYS) {
+    // `status` + `contentDetails` cost the same 1 quota unit per 50 ids as
+    // `status` alone, so real durations come along for free.
     const url =
-      `https://www.googleapis.com/youtube/v3/videos?part=status&id=${ids.join(",")}&key=${key}`;
+      `https://www.googleapis.com/youtube/v3/videos?part=status,contentDetails&id=${
+        ids.join(",")
+      }&key=${key}`;
     const res = await fetch(url);
     if (!res.ok) {
       const body = (await res.text()).slice(0, 300);
@@ -65,9 +69,14 @@ async function ytStatus(ids: string[]): Promise<StatusResult> {
       continue;
     }
     const data = await res.json() as {
-      items?: Array<{ id: string; status?: Record<string, unknown> }>;
+      items?: Array<{
+        id: string;
+        status?: Record<string, unknown>;
+        contentDetails?: { duration?: string };
+      }>;
     };
     const map = new Map<string, boolean>();
+    const durations = new Map<string, number>();
     // Missing ids = deleted/private videos → not playable.
     for (const id of ids) map.set(id, false);
     for (const it of data.items ?? []) {
@@ -75,11 +84,14 @@ async function ytStatus(ids: string[]): Promise<StatusResult> {
         it.status?.privacyStatus === "public" &&
         it.status?.uploadStatus !== "rejected";
       map.set(it.id, ok);
+      const secs = parseIsoDuration(it.contentDetails?.duration);
+      if (secs !== null) durations.set(it.id, secs);
     }
-    return { map };
+    return { map, durations };
   }
   return { map: null, quotaExhausted: sawQuotaError };
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
