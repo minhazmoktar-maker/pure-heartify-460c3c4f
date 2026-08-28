@@ -124,11 +124,24 @@ export const MORE_NAV_ITEMS: readonly NavItem[] = [
   { to: "/offline", label: "Offline downloads", icon: Download },
 ];
 
-/** Everything reachable from the menu (used by the filter sheet). */
+/**
+ * Items that are just deep links into Profile tabs. They stay in the More grid
+ * (where Profile is the surrounding context) but are removed from the global
+ * menu sheet: duplicating them there made the menu read like a directory and
+ * sent people to the same screen three different ways.
+ */
+export const PROFILE_TAB_ITEMS: readonly string[] = [
+  "/profile?tab=favorites",
+  "/profile?tab=history",
+  "/profile?tab=streak",
+];
+
+/** Everything reachable from the menu sheet (deduped against Profile tabs). */
 export const ALL_NAV_ITEMS: readonly NavItem[] = [
   ...MAIN_NAV_ITEMS,
-  ...MORE_NAV_ITEMS,
+  ...MORE_NAV_ITEMS.filter((i) => !PROFILE_TAB_ITEMS.includes(i.to)),
 ];
+
 
 /** Admin-only section. `/admin/users` is gated to owners only. */
 export const ADMIN_NAV_ITEMS: readonly NavItem[] = [

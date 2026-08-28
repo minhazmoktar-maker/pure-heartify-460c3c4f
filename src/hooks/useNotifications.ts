@@ -53,9 +53,17 @@ export function useNotifications() {
         () => { void qc.invalidateQueries({ queryKey: key }); },
       )
       .subscribe();
-    return () => { void supabase.removeChannel(ch); };
+    // Foreground native/web pushes also nudge the cache so the bell badge is
+    // correct the instant a push arrives while the app is open.
+    const onPush = () => { void qc.invalidateQueries({ queryKey: key }); };
+    window.addEventListener("heartify:notifications-refresh", onPush);
+    return () => {
+      void supabase.removeChannel(ch);
+      window.removeEventListener("heartify:notifications-refresh", onPush);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
 
   const setItems = useCallback(
     (updater: (prev: AppNotification[]) => AppNotification[]) => {
