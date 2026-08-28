@@ -7,6 +7,8 @@ import { useUserInterests } from "@/hooks/useUserInterests";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { shareContent } from "@/lib/share";
+import { formatDuration } from "@/lib/formatDuration";
+
 
 const DailyDoseHero = () => {
   const { user } = useAuth();
