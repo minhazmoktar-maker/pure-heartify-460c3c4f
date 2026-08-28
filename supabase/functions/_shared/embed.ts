@@ -1,15 +1,22 @@
 /**
- * Embedding helper — routes text through the Lovable AI Gateway.
+ * Embedding helper — cost-preserving provider ladder.
  *
- * Uses openai/text-embedding-3-small (1536 dims) to match the
- * curated_videos.embedding column shape.
+ * 1. Independent provider first (own API key, no Lovable runtime credits):
+ *    SUPPORT_EMBED_PROVIDER / SUPPORT_EMBED_API_KEY / SUPPORT_EMBED_BASE_URL /
+ *    SUPPORT_EMBED_MODEL (falls back to SUPPORT_AI_API_KEY).
+ * 2. Lovable AI Gateway (LOVABLE_API_KEY) only when no independent provider
+ *    is configured, so credits are never spent on bulk corpus embedding once
+ *    a BYO key exists.
  *
- * Never called from the browser: consumers are edge functions with access to
- * LOVABLE_API_KEY.
+ * Uses 1536-dim embeddings to match the curated_videos.embedding column shape.
+ * Never called from the browser: consumers are edge functions.
  */
+import { embedSupportText, isEmbeddingConfigured } from "./support/providers.ts";
+
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/embeddings";
 const MODEL = "openai/text-embedding-3-small";
 export const EMBED_DIMS = 1536;
+
 
 async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   const controller = new AbortController();
