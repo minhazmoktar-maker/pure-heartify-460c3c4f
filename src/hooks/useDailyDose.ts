@@ -10,6 +10,8 @@ export interface DoseVideo {
   section_id: string | null;
   halal_score: number | null;
   category: string | null;
+  /** Verified real length in seconds; null until the sweep has checked it. */
+  duration_seconds?: number | null;
 }
 
 export interface DailyDoseData {
