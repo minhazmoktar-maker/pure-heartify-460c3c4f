@@ -39,10 +39,15 @@ export async function resolvePlaybackSource(track: {
  * `loadedmetadata` (and for blob sources metadata can already be present, in
  * which case we seek immediately). Returns a cleanup function.
  */
+export interface ResumableAudio {
+  currentTime: number;
+  readonly readyState: number;
+  addEventListener(type: string, listener: () => void): void;
+  removeEventListener(type: string, listener: () => void): void;
+}
+
 export function applyResumePosition(
-  audio: Pick<HTMLAudioElement, "addEventListener" | "removeEventListener" | "readyState"> & {
-    currentTime: number;
-  },
+  audio: ResumableAudio,
   seconds: number,
 ): () => void {
   if (!Number.isFinite(seconds) || seconds <= RESUME_MIN_SECONDS) return () => {};
