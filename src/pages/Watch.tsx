@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { recordRecentTopic } from "@/lib/recentTopics";
 import { ArrowLeft, ChevronRight, Heart, Play, ShieldCheck } from "lucide-react";
@@ -82,6 +82,7 @@ const Watch = () => {
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const completeDose = useCompleteDoseVideo();
+  const qc = useQueryClient();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [autoNextIn, setAutoNextIn] = useState<number | null>(null);
@@ -153,6 +154,9 @@ const Watch = () => {
   // Once the lookup has settled with nothing, stop showing a loading
   // placeholder — a bad/removed id must degrade to an explicit empty state.
   const metaResolved = !!currentVideo || metaFetched;
+  // The id resolved to nothing servable: removed by its owner, archived, or
+  // flagged unplayable after it entered a feed/dose. Never dead-end on it.
+  const metaMissing = metaResolved && !currentVideo;
 
 
 
@@ -259,10 +263,18 @@ const Watch = () => {
     };
   }, [playerActivated, videoId]);
 
+  // A dose can point at a video that died after the dose was created. Ask the
+  // server to re-hydrate (it self-heals the dose) so tomorrow's — and this
+  // session's — Daily Dose never shows the dead entry again.
+  useEffect(() => {
+    if (!metaMissing || !user) return;
+    void qc.invalidateQueries({ queryKey: ["daily-dose", user.id] });
+  }, [metaMissing, user, qc]);
+
   // Auto-advance away from a blocked video so the session never dead-ends.
   // Pauses if the viewer interacts with the card (e.g. to file an appeal).
   useEffect(() => {
-    if (!playbackBlocked || !nextVideo || autoAdvancePaused) return;
+    if (!(playbackBlocked || metaMissing) || !nextVideo || autoAdvancePaused) return;
     const t = window.setTimeout(() => {
       navigate(`/watch/${nextVideo.id}`, { state: { video: nextVideo } });
     }, 8000);
@@ -454,7 +466,39 @@ const Watch = () => {
             Back
           </button>
 
-          {playbackBlocked ? (
+          {metaMissing ? (
+            <div
+              className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-card border border-border bg-card px-6 text-center"
+              onPointerDown={() => setAutoAdvancePaused(true)}
+            >
+              <p className="text-heading font-semibold text-foreground">
+                This video is no longer available
+              </p>
+              <p className="max-w-md text-sm text-muted-foreground">
+                It was removed from Heartify after review, or taken down by its owner. Your Daily
+                Dose has been refreshed with a replacement
+                {nextVideo && !autoAdvancePaused ? " — taking you to the next video." : "."}
+              </p>
+              <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+                {nextVideo && (
+                  <button
+                    onClick={handleNext}
+                    className="flex min-h-[44px] items-center gap-2 rounded-pill bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    <Play className="h-4 w-4 fill-current" />
+                    Play next now
+                  </button>
+                )}
+                <Link
+                  to="/#daily-dose"
+                  onClick={() => setAutoAdvancePaused(true)}
+                  className="flex min-h-[44px] items-center rounded-pill border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  Back to Daily Dose
+                </Link>
+              </div>
+            </div>
+          ) : playbackBlocked ? (
             <div
               className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-card border border-border bg-card px-6 text-center"
               onPointerDown={() => setAutoAdvancePaused(true)}
@@ -572,7 +616,7 @@ const Watch = () => {
 
           <div className="mt-4 space-y-2">
             <h1 className="text-heading font-bold text-foreground md:text-heading">
-              {currentVideo?.title ?? (metaResolved ? "Video unavailable" : "Loading…")}
+              {currentVideo?.title ?? (metaResolved ? "This video is no longer available" : "Loading…")}
             </h1>
 
             <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
