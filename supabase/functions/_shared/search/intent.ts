@@ -1,8 +1,12 @@
 /**
- * AI-powered query intent detection via Lovable AI Gateway.
+ * AI-powered query intent detection.
+ *
+ * Cost policy: routes through the independent provider chain (own API keys,
+ * zero Lovable runtime credits) when configured, and only falls back to the
+ * Lovable AI Gateway when no BYO provider is available.
  *
  * Hardening:
- *  - Uses a cheaper model (gemini-2.5-flash-lite) — 4x cheaper, same latency budget.
+ *  - Cheap model tier — same latency budget.
  *  - Delimited user content + explicit injection rule (query is DATA, not instruction).
  *  - Length cap raised to 500 (arabic normalization can push short queries over 200).
  *  - Fails soft with `{ rewrittenQuery: query }` so downstream never gets `null`
@@ -12,9 +16,11 @@
  *    otherwise hallucinated names silently narrow results to zero.
  */
 import type { SearchIntent } from "./types.ts";
+import { chatWithFailover, isInferenceConfigured } from "../support/providers.ts";
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash-lite";
+
 
 const SYSTEM = `You classify Islamic-content video search queries.
 
