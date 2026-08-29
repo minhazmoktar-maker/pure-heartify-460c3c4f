@@ -526,6 +526,7 @@ async function hydrateChannelsBatched(
       `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${chunk.join(',')}&key=${YOUTUBE_API_KEY}`,
     );
     if (json?.items) out.push(...json.items);
+    else await refundQuota(ctx, COST_CHANNEL_BATCH);
   }
   return out;
 }
@@ -563,6 +564,7 @@ async function crawlTopicSearch(
     `&q=${encodeURIComponent(query)}&relevanceLanguage=${encodeURIComponent(language)}` +
     `&maxResults=${MAX_CANDIDATES_PER_SEED}&safeSearch=strict&key=${YOUTUBE_API_KEY}`;
   const search = await ytFetch(ctx, url);
+  if (!search) await refundQuota(ctx, COST_SEARCH);
   const ids: string[] = (search?.items ?? [])
     .map((it: any) => it?.snippet?.channelId ?? it?.id?.channelId)
     .filter(Boolean);
@@ -580,6 +582,7 @@ async function crawlPlaylistCollab(
     ctx,
     `https://www.googleapis.com/youtube/v3/playlists?part=id&channelId=${encodeURIComponent(seedId)}&maxResults=5&key=${YOUTUBE_API_KEY}`,
   );
+  if (!pls) await refundQuota(ctx, COST_PLAYLISTS);
   const playlistIds: string[] = (pls?.items ?? []).map((it: any) => it.id).filter(Boolean);
   const collabIds = new Set<string>();
   for (const pid of playlistIds) {
@@ -588,6 +591,7 @@ async function crawlPlaylistCollab(
       ctx,
       `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${encodeURIComponent(pid)}&maxResults=20&key=${YOUTUBE_API_KEY}`,
     );
+    if (!items) await refundQuota(ctx, COST_PLAYLIST_ITEMS);
     for (const it of items?.items ?? []) {
       const chId = it?.snippet?.videoOwnerChannelId;
       if (chId && chId !== seedId) collabIds.add(chId);
@@ -766,6 +770,7 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
             ctx,
             `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${encodeURIComponent(params.targetSeedId)}&key=${YOUTUBE_API_KEY}`,
           );
+          if (!info) await refundQuota(ctx, COST_CHANNEL_BATCH);
           seedDesc = info?.items?.[0]?.snippet?.description ?? '';
         }
       }
