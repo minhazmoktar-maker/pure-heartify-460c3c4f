@@ -22,6 +22,13 @@
       "when": 1787940356892,
       "tag": "0002_topic_query_launch_set_add_ms",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788023825243,
+      "tag": "0003_restrict_transcript_public_read_to_approved_videos",
+      "breakpoints": true
     }
   ]
 }
