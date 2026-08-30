@@ -76,7 +76,9 @@ export const MAIN_NAV_ITEMS: readonly NavItem[] = [
   { to: "/explore", label: "Explore", icon: Compass },
   { to: "/me", label: "Library", icon: Library },
   { to: "/today", label: "Today's Dose", icon: Sunrise },
+  { to: "/live", label: "Live sessions", icon: Radio },
   { to: "/listen", label: "Reciters & Scholars", icon: Radio },
+
   { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
   { to: "/trust", label: "Trust & moderation", icon: ShieldCheck },
   { to: "/help", label: "Help & Support", icon: LifeBuoy },
@@ -113,6 +115,9 @@ export const MORE_NAV_ITEMS: readonly NavItem[] = [
   { to: "/challenges", label: "Daily challenges", icon: Target },
   { to: "/reminders", label: "Habit reminders", icon: Bell },
   { to: "/recap", label: "Weekly recap", icon: LineChart },
+  { to: "/digest", label: "Weekly digest", icon: LineChart },
+  { to: "/certificates", label: "Certificates", icon: Award },
+
   { to: "/playlists", label: "Playlists", icon: ListMusic },
   { to: "/originals", label: "Heartify Originals", icon: Sparkles },
   { to: "/studio", label: "Creator Studio", icon: Upload },

@@ -39,6 +39,8 @@ import {
 import { cn } from "@/lib/utils";
 import SEO from "@/components/SEO";
 import MoreGrid from "@/components/profile/MoreGrid";
+import WeeklyDigestCard from "@/components/digest/WeeklyDigestCard";
+
 
 type ProfileTab = "profile" | "continue" | "favorites" | "history";
 
@@ -349,7 +351,12 @@ const Profile = () => {
               </div>
             </div>
 
+            <div className="pt-4">
+              <WeeklyDigestCard compact />
+            </div>
+
             <MoreGrid />
+
 
             {/* Danger zone — required by Apple App Store guideline 5.1.1(v). */}
             <div className="mt-8 rounded-card border border-destructive/40 bg-destructive/5 p-4">
