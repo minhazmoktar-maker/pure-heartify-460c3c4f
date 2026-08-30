@@ -39,6 +39,8 @@ import {
 import { cn } from "@/lib/utils";
 import SEO from "@/components/SEO";
 import MoreGrid from "@/components/profile/MoreGrid";
+import WeeklyDigestCard from "@/components/digest/WeeklyDigestCard";
+
 
 type ProfileTab = "profile" | "continue" | "favorites" | "history";
 
