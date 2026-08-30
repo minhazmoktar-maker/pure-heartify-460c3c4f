@@ -170,7 +170,8 @@ export default function LiveSession() {
             <Button
               type="button"
               className="min-h-[44px] rounded-full"
-              disabled={join.isPending}
+              hidden={isMember === true}
+              disabled={join.isPending || isMember === true}
               onClick={() =>
                 join.mutate(session.id, {
                   onSuccess: () => toast.success("You're in"),
@@ -185,7 +186,8 @@ export default function LiveSession() {
               type="button"
               variant="outline"
               className="min-h-[44px] rounded-full"
-              disabled={leave.isPending}
+              hidden={!isMember}
+              disabled={leave.isPending || !isMember}
               onClick={() => leave.mutate(session.id)}
             >
               Leave
