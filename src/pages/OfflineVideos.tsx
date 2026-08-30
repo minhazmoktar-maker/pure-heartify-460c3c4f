@@ -95,11 +95,8 @@ export default function OfflineVideos() {
             icon={Film}
             title="No downloaded videos yet"
             description="Open a Heartify Original and tap Download to keep it on this device."
-            action={
-              <Button asChild className="h-11">
-                <Link to="/originals">Browse Heartify Originals</Link>
-              </Button>
-            }
+            actionLabel="Browse Heartify Originals"
+            actionHref="/originals"
           />
         ) : (
           <>
