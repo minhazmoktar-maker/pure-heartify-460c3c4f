@@ -76,7 +76,9 @@ export const MAIN_NAV_ITEMS: readonly NavItem[] = [
   { to: "/explore", label: "Explore", icon: Compass },
   { to: "/me", label: "Library", icon: Library },
   { to: "/today", label: "Today's Dose", icon: Sunrise },
+  { to: "/live", label: "Live sessions", icon: Radio },
   { to: "/listen", label: "Reciters & Scholars", icon: Radio },
+
   { to: "/channels", label: "Trusted channels", icon: ShieldCheck },
   { to: "/trust", label: "Trust & moderation", icon: ShieldCheck },
   { to: "/help", label: "Help & Support", icon: LifeBuoy },
