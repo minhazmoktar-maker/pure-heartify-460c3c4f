@@ -24,6 +24,9 @@ export default function LearningPath() {
   const { data, isLoading, isError } = useLearningPath(slug);
   const { user } = useAuth();
   const setProgress = useSetStepProgress(slug);
+  const issueCertificate = useIssueCertificate();
+  const { data: certificates } = useMyCertificates(Boolean(user));
+  const earned = certificates?.find((c) => c.path_slug === slug);
 
   const steps = data?.steps ?? [];
   const completed = steps.filter((s) => s.completed).length;
