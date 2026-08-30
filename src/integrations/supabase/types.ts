@@ -3971,6 +3971,44 @@ export type Database = {
           },
         ]
       }
+      learning_certificates: {
+        Row: {
+          code: string
+          concepts_completed: number
+          id: string
+          issued_at: string
+          path_id: string
+          recipient_name: string | null
+          user_id: string
+        }
+        Insert: {
+          code: string
+          concepts_completed?: number
+          id?: string
+          issued_at?: string
+          path_id: string
+          recipient_name?: string | null
+          user_id: string
+        }
+        Update: {
+          code?: string
+          concepts_completed?: number
+          id?: string
+          issued_at?: string
+          path_id?: string
+          recipient_name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_certificates_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       learning_path_progress: {
         Row: {
           completed_at: string
@@ -4097,6 +4135,136 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      live_session_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_hidden: boolean
+          is_question: boolean
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          is_question?: boolean
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_hidden?: boolean
+          is_question?: boolean
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_session_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_session_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          left_at: string | null
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          role?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          role?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "live_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      live_sessions: {
+        Row: {
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          host_id: string
+          id: string
+          is_public: boolean
+          kind: string
+          language: string
+          max_participants: number
+          participant_count: number
+          scheduled_at: string
+          started_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          video_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          is_public?: boolean
+          kind?: string
+          language?: string
+          max_participants?: number
+          participant_count?: number
+          scheduled_at?: string
+          started_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          video_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          is_public?: boolean
+          kind?: string
+          language?: string
+          max_participants?: number
+          participant_count?: number
+          scheduled_at?: string
+          started_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          video_id?: string | null
         }
         Relationships: []
       }
@@ -8494,6 +8662,16 @@ export type Database = {
           verified_at: string
         }[]
       }
+      get_certificate: {
+        Args: { _code: string }
+        Returns: {
+          code: string
+          concepts_completed: number
+          issued_at: string
+          path_title: string
+          recipient_name: string
+        }[]
+      }
       get_channel_trust_history: {
         Args: { _channel_id: string; _limit?: number }
         Returns: {
@@ -8804,11 +8982,13 @@ export type Database = {
         Args: { _team_id: string; _user_id: string }
         Returns: boolean
       }
+      issue_learning_certificate: { Args: { _path_id: string }; Returns: Json }
       issue_video_attestation: { Args: { _video_id: string }; Returns: string }
       join_khatm_group: {
         Args: { _group_id: string; _invite_code?: string }
         Returns: undefined
       }
+      join_live_session: { Args: { _session_id: string }; Returns: Json }
       join_team_streak: {
         Args: { _code: string }
         Returns: {
@@ -8869,6 +9049,7 @@ export type Database = {
       launch_monitor: { Args: { p_hours?: number }; Returns: Json }
       learn_from_owner_block: { Args: { _pattern: string }; Returns: number }
       leave_challenge: { Args: { _challenge_id: string }; Returns: Json }
+      leave_live_session: { Args: { _session_id: string }; Returns: Json }
       list_active_categories: {
         Args: never
         Returns: {
@@ -8886,6 +9067,25 @@ export type Database = {
           id: string
           is_anonymous: boolean
           user_id: string
+        }[]
+      }
+      list_live_sessions: {
+        Args: { _kind?: string; _limit?: number }
+        Returns: {
+          description: string
+          host_avatar: string
+          host_id: string
+          host_name: string
+          id: string
+          is_joined: boolean
+          kind: string
+          language: string
+          max_participants: number
+          participant_count: number
+          scheduled_at: string
+          status: string
+          title: string
+          video_id: string
         }[]
       }
       list_my_challenges: { Args: never; Returns: Json }
@@ -9039,7 +9239,19 @@ export type Database = {
         Returns: Json
       }
       my_benefit_summary: { Args: never; Returns: Json }
+      my_learning_certificates: {
+        Args: never
+        Returns: {
+          code: string
+          concepts_completed: number
+          issued_at: string
+          path_id: string
+          path_slug: string
+          path_title: string
+        }[]
+      }
       my_progress_summary: { Args: never; Returns: Json }
+      my_weekly_digest: { Args: never; Returns: Json }
       next_discovery_seeds: {
         Args: { p_limit?: number }
         Returns: {
