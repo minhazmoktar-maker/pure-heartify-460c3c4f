@@ -386,13 +386,18 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
 
 
       if (isQuota) {
-        // Rotate to the next configured key; if none remain, stop the run.
-        if (ctx.keyIndex + 1 < YOUTUBE_API_KEYS.length) {
-          ctx.keyIndex++;
+        // Try *every* key before halting. Search rotation may already have moved
+        // keyIndex to the end of the pool, so a forward-only scan would skip
+        // keys that still have general (non-search) budget.
+        ctx.generalExhaustedKeys.add(ctx.keyIndex);
+        const nextGeneral = YOUTUBE_API_KEYS.findIndex((_, i) => !ctx.generalExhaustedKeys.has(i));
+        if (nextGeneral >= 0) {
+          ctx.keyIndex = nextGeneral;
           console.warn(
-            `youtube quota exhausted on key #${ctx.keyIndex} — rotating to key #${ctx.keyIndex + 1}`,
+            `youtube quota exhausted on ${ctx.generalExhaustedKeys.size} key(s) — rotating to key #${nextGeneral + 1}`,
           );
-          continue; // retry same URL with the next key (does not consume `i` budget meaningfully)
+          i--; // key rotation is not a transient retry; don't burn the backoff budget
+          continue;
         }
         ctx.quotaExhausted = true;
         ctx.apiFailures++;
@@ -401,6 +406,7 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
         );
         return null;
       }
+
 
       if (res.status === 403 || res.status === 400 || res.status === 404) {
         console.error('youtube api error', res.status, body);
