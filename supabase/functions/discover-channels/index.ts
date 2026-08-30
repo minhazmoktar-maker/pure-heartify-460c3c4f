@@ -278,6 +278,8 @@ interface QuotaCtx {
    * halting outright.
    */
   searchExhausted: boolean;
+  /** Key indices whose general (non-search) daily quota answered quotaExceeded. */
+  generalExhaustedKeys: Set<number>;
 }
 
 
@@ -356,8 +358,12 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
       const isQuota =
         res.status === 429 || (res.status === 403 && QUOTA_PATTERN.test(body)) || QUOTA_PATTERN.test(body);
 
-      const isSearchOnly = /\/v3\/search\?/.test(url) && /Search Queries/i.test(body);
-      if (isQuota && isSearchOnly) {
+      // Any quota rejection on the search endpoint is search-scoped: search is
+      // metered per project on its own budget, and the 1-unit crawl lanes
+      // (playlists / playlistItems / channels) usually still have budget left.
+      // Never let a search rejection halt the whole run.
+      const isSearchEndpoint = /\/v3\/search\?/.test(url);
+      if (isQuota && isSearchEndpoint) {
         // Search quota is metered per Google Cloud project. A key from another
         // project therefore still has its own search budget — rotate through the
         // pool before disabling search for the run.
@@ -380,13 +386,18 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
 
 
       if (isQuota) {
-        // Rotate to the next configured key; if none remain, stop the run.
-        if (ctx.keyIndex + 1 < YOUTUBE_API_KEYS.length) {
-          ctx.keyIndex++;
+        // Try *every* key before halting. Search rotation may already have moved
+        // keyIndex to the end of the pool, so a forward-only scan would skip
+        // keys that still have general (non-search) budget.
+        ctx.generalExhaustedKeys.add(ctx.keyIndex);
+        const nextGeneral = YOUTUBE_API_KEYS.findIndex((_, i) => !ctx.generalExhaustedKeys.has(i));
+        if (nextGeneral >= 0) {
+          ctx.keyIndex = nextGeneral;
           console.warn(
-            `youtube quota exhausted on key #${ctx.keyIndex} — rotating to key #${ctx.keyIndex + 1}`,
+            `youtube quota exhausted on ${ctx.generalExhaustedKeys.size} key(s) — rotating to key #${nextGeneral + 1}`,
           );
-          continue; // retry same URL with the next key (does not consume `i` budget meaningfully)
+          i--; // key rotation is not a transient retry; don't burn the backoff budget
+          continue;
         }
         ctx.quotaExhausted = true;
         ctx.apiFailures++;
@@ -395,6 +406,7 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
         );
         return null;
       }
+
 
       if (res.status === 403 || res.status === 400 || res.status === 404) {
         console.error('youtube api error', res.status, body);
@@ -737,6 +749,7 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
     quotaExhausted: false,
     searchExhaustedKeys: new Set<number>(),
     searchExhausted: false,
+    generalExhaustedKeys: new Set<number>(),
   };
 
   let totalEnqueued = 0;

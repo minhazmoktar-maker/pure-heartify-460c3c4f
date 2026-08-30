@@ -29,6 +29,13 @@
       "when": 1788023825243,
       "tag": "0003_restrict_transcript_public_read_to_approved_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788063776591,
+      "tag": "0004_restrict_transcript_translations_read",
+      "breakpoints": true
     }
   ]
 }
