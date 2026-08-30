@@ -97,6 +97,8 @@ export function useJoinLiveSession() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["live-sessions"] });
+      qc.invalidateQueries({ queryKey: ["live-session-member"] });
+      qc.invalidateQueries({ queryKey: ["live-messages"] });
     },
   });
 }
@@ -112,6 +114,8 @@ export function useLeaveLiveSession() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["live-sessions"] });
+      qc.invalidateQueries({ queryKey: ["live-session-member"] });
+      qc.invalidateQueries({ queryKey: ["live-messages"] });
     },
   });
 }
