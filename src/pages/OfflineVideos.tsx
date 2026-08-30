@@ -5,7 +5,6 @@
  * airplane mode. Object URLs are revoked when the selection changes.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { Film, Play, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
