@@ -4,7 +4,7 @@
  *
  * Uses the google_search_console connector gateway to:
  *   1. List verified sites.
- *   2. For the primary site (SITE_URL env, default https://pure-heartify.lovable.app/):
+ *   2. For the primary site (SITE_URL env, default https://heartifyapp.com/):
  *      - Fetch sitemap submission status.
  *      - Inspect the homepage indexing state.
  *   3. Fail (exit 1) if any sitemap has errors > 0 OR homepage isn't INDEXED.
@@ -13,7 +13,7 @@
  */
 const KEY = process.env.LOVABLE_API_KEY;
 const CONN = process.env.GOOGLE_SEARCH_CONSOLE_API_KEY;
-const SITE = process.env.SITE_URL ?? "https://pure-heartify.lovable.app/";
+const SITE = process.env.SITE_URL ?? "https://heartifyapp.com/";
 
 if (!KEY || !CONN) {
   console.error("Missing LOVABLE_API_KEY or GOOGLE_SEARCH_CONSOLE_API_KEY");

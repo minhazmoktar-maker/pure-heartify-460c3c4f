@@ -15,7 +15,7 @@ const CRON_SECRET = Deno.env.get("GSC_CRON_SECRET") ?? "";
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const GSC_KEY = Deno.env.get("GOOGLE_SEARCH_CONSOLE_API_KEY")!;
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
-const SITE = "https://pure-heartify.lovable.app/";
+const SITE = Deno.env.get("GSC_SITE_URL") ?? "https://heartifyapp.com/";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",

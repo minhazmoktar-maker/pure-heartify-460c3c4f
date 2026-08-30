@@ -13,6 +13,6 @@ Weekly manual sanity check (5 min):
 
 On alert (issue auto-opened by `gsc-monitor.yml`):
 1. Read the failing run log for the specific sitemap / URL.
-2. Reproduce locally: `SITE_URL=https://pure-heartify.lovable.app/ node scripts/gsc-monitor.mjs`.
+2. Reproduce locally: `SITE_URL=https://heartifyapp.com/ node scripts/gsc-monitor.mjs`.
 3. Fix + re-submit sitemap via `PUT /webmasters/v3/sites/<encoded>/sitemaps/<encoded>`.
 4. Close the issue with a link to the fix PR.
