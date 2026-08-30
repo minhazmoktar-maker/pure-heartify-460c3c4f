@@ -164,6 +164,48 @@ export default function LearningPath() {
           ) : null}
         </div>
 
+        {user && steps.length > 0 && completed === steps.length ? (
+          <div className="mt-4 rounded-2xl border border-primary/30 bg-card p-4">
+            <div className="flex items-start gap-3">
+              <Award className="mt-0.5 h-6 w-6 shrink-0 text-primary" aria-hidden />
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base font-semibold text-foreground">Path complete</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {earned
+                    ? "Your certificate is ready to share."
+                    : "Claim a verifiable certificate for this path."}
+                </p>
+                <div className="mt-3">
+                  {earned ? (
+                    <Link
+                      to={`/certificate/${earned.code}`}
+                      className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground"
+                    >
+                      View certificate
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={issueCertificate.isPending}
+                      onClick={() =>
+                        issueCertificate.mutate(slug!, {
+                          onSuccess: () => toast.success("Certificate issued"),
+                          onError: () => toast.error("Could not issue your certificate"),
+                        })
+                      }
+                      className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground disabled:opacity-60"
+                    >
+                      {issueCertificate.isPending ? "Issuing…" : "Claim certificate"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+
+
         <ol className="mt-8 space-y-3">
           {steps.map((step, i) => {
             const isNext = i === nextIndex;
