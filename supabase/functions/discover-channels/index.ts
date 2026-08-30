@@ -749,6 +749,7 @@ async function runDiscoveryJob(admin: Admin, jobId: string, params: JobParams) {
     quotaExhausted: false,
     searchExhaustedKeys: new Set<number>(),
     searchExhausted: false,
+    generalExhaustedKeys: new Set<number>(),
   };
 
   let totalEnqueued = 0;
