@@ -43,6 +43,13 @@
       "when": 1788067385981,
       "tag": "0005_live_sessions_certificates_digest",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788067436048,
+      "tag": "0006_certificate_by_slug",
+      "breakpoints": true
     }
   ]
 }

@@ -8983,6 +8983,10 @@ export type Database = {
         Returns: boolean
       }
       issue_learning_certificate: { Args: { _path_id: string }; Returns: Json }
+      issue_learning_certificate_by_slug: {
+        Args: { _slug: string }
+        Returns: Json
+      }
       issue_video_attestation: { Args: { _video_id: string }; Returns: string }
       join_khatm_group: {
         Args: { _group_id: string; _invite_code?: string }
