@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Check, ChevronRight, Lock } from "lucide-react";
+import { Award, Check, ChevronRight, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
@@ -11,6 +11,7 @@ import {
   useSetStepProgress,
   type LearningPathStep,
 } from "@/hooks/useLearningPaths";
+import { useIssueCertificate, useMyCertificates } from "@/hooks/useBenefitDigest";
 
 const BASE = "https://heartifyapp.com";
 
