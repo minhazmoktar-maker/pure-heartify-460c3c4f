@@ -33,6 +33,8 @@ import { resolveCaptionTrack } from "@/lib/captionFallback";
 import { isNativeItem, languageLabel } from "@/components/LaneToggle";
 import { trackLaneEvent, flushLaneEvents } from "@/lib/laneTelemetry";
 import { toast } from "@/hooks/use-toast";
+import VideoDownloadButton from "@/components/offline/VideoDownloadButton";
+import { getOfflineVideoUrl } from "@/lib/offlineVideo";
 
 interface Row {
   id: string;
@@ -55,6 +57,29 @@ export default function WatchUpload() {
   const telemetry = useUploadTelemetry(id);
   const { preferences, locale: uiLanguage } = useLocale();
   const primaryLanguage = preferences.content_languages?.[0];
+
+  // Downloaded copies win over the network: a cached blob plays instantly and
+  // works with no connection at all. The object URL is revoked on unmount.
+  const [offlineUrl, setOfflineUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!id) return;
+    let revoked = false;
+    let created: string | null = null;
+    void (async () => {
+      const url = await getOfflineVideoUrl(id);
+      if (revoked) {
+        if (url) URL.revokeObjectURL(url);
+        return;
+      }
+      created = url;
+      setOfflineUrl(url);
+    })();
+    return () => {
+      revoked = true;
+      setOfflineUrl(null);
+      if (created) URL.revokeObjectURL(created);
+    };
+  }, [id]);
 
   const captions = useUploadCaptions(id);
   const requestCaptions = useRequestCaptions(id);
@@ -104,6 +129,8 @@ export default function WatchUpload() {
     !primaryLanguage ||
     tracks.some((t) => t.language.split("-")[0] === primaryLanguage);
 
+
+  const sourceUrl = offlineUrl ?? playback.url;
 
   const lane = useMemo(
     () => (isNativeItem(row?.language, primaryLanguage) ? "native" : "diversified") as
@@ -184,14 +211,14 @@ export default function WatchUpload() {
       />
       <div className="container mx-auto max-w-3xl px-4 pb-24 pt-4">
         <div className="relative overflow-hidden rounded-xl border border-border bg-black">
-          {playback.loading ? (
+          {!offlineUrl && playback.loading ? (
             <div className="flex aspect-video items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : playback.url ? (
+          ) : sourceUrl ? (
             <video
-              key={playback.url}
-              src={playback.url}
+              key={sourceUrl}
+              src={sourceUrl}
               controls
               playsInline
               preload="metadata"
@@ -225,7 +252,7 @@ export default function WatchUpload() {
 
             </video>
           ) : null}
-          {playback.url ? (
+          {sourceUrl ? (
             <CaptionOverlay
               segments={activeCaption ? tracks.find((t) => t.language === activeCaption.language)?.segments : undefined}
               language={activeCaption?.language}
@@ -264,6 +291,21 @@ export default function WatchUpload() {
           {row.status === "approved" && (
             <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="h-3.5 w-3.5" /> Halal reviewed
+            </span>
+          )}
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <VideoDownloadButton
+            uploadId={row.id}
+            title={row.title}
+            url={playback.url}
+            creator={row.creator?.display_name ?? null}
+            language={row.language}
+          />
+          {offlineUrl && (
+            <span data-testid="watch-upload-offline-badge" className="text-xs text-muted-foreground">
+              Playing your downloaded copy
             </span>
           )}
         </div>
