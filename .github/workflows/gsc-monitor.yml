@@ -14,7 +14,7 @@ jobs:
         env:
           LOVABLE_API_KEY: ${{ secrets.LOVABLE_API_KEY }}
           GOOGLE_SEARCH_CONSOLE_API_KEY: ${{ secrets.GOOGLE_SEARCH_CONSOLE_API_KEY }}
-          SITE_URL: https://pure-heartify.lovable.app/
+          SITE_URL: https://heartifyapp.com/
         run: node scripts/gsc-monitor.mjs
       - name: Open issue on failure
         if: failure()
