@@ -120,6 +120,11 @@ const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const HalalTopic = lazy(() => import("./pages/HalalTopic.tsx"));
 const Concept = lazy(() => import("./pages/Concept.tsx"));
 const LearningPath = lazy(() => import("./pages/LearningPath.tsx"));
+const Live = lazy(() => import("./pages/Live.tsx"));
+const LiveSession = lazy(() => import("./pages/LiveSession.tsx"));
+const WeeklyDigestPage = lazy(() => import("./pages/WeeklyDigest.tsx"));
+const Certificates = lazy(() => import("./pages/Certificates.tsx"));
+const CertificateVerify = lazy(() => import("./pages/CertificateVerify.tsx"));
 
 const Hifz = lazy(() => import("./pages/Hifz.tsx"));
 const HijriCalendar = lazy(() => import("./pages/HijriCalendar.tsx"));
