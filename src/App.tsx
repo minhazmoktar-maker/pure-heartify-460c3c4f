@@ -115,6 +115,7 @@ const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn.tsx"));
 const Invite = lazy(() => import("./pages/Invite.tsx"));
 const OfflineLibrary = lazy(() => import("./pages/OfflineLibrary.tsx"));
 const OfflineStorage = lazy(() => import("./pages/OfflineStorage.tsx"));
+const OfflineVideos = lazy(() => import("./pages/OfflineVideos.tsx"));
 const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const HalalTopic = lazy(() => import("./pages/HalalTopic.tsx"));
 const Concept = lazy(() => import("./pages/Concept.tsx"));
