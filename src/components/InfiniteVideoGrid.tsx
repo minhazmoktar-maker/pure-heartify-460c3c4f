@@ -67,12 +67,34 @@ const InfiniteVideoGrid = ({
   );
 
   const rawVideos = data?.pages.flatMap((p) => p.items) ?? [];
+
+  // Ids this grid has already put on screen. Dedup must be decided ONCE per id,
+  // when the page arrives — re-deciding on every render made cards vanish (a
+  // rail could own an id in the persisted seen-set, so `claim` returned false on
+  // a later render and the appended page rendered nothing, which read as
+  // "endless scroll stopped").
+  const renderedIds = useRef<Set<string>>(new Set());
+  const lastResetKey = useRef(resetKey);
+  if (lastResetKey.current !== resetKey) {
+    lastResetKey.current = resetKey;
+    renderedIds.current = new Set();
+  }
+
   const allVideos = useMemo(() => {
     const out: typeof rawVideos = [];
-    for (const v of rawVideos) if (claim(v.id, "infinite_grid")) out.push(v);
+    const seenOnPage = new Set<string>();
+    for (const v of rawVideos) {
+      if (seenOnPage.has(v.id)) continue;
+      seenOnPage.add(v.id);
+      if (renderedIds.current.has(v.id) || claim(v.id, "infinite_grid")) {
+        renderedIds.current.add(v.id);
+        out.push(v);
+      }
+    }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawVideos, resetKey, claim]);
+
 
   // Native (primary-language) vs diversified lanes. Counts come from what is
   // actually on screen, so the numbers always match what the viewer can see.
