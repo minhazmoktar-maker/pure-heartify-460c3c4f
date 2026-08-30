@@ -278,6 +278,8 @@ interface QuotaCtx {
    * halting outright.
    */
   searchExhausted: boolean;
+  /** Key indices whose general (non-search) daily quota answered quotaExceeded. */
+  generalExhaustedKeys: Set<number>;
 }
 
 
