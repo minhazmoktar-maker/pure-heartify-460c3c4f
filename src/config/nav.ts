@@ -115,6 +115,9 @@ export const MORE_NAV_ITEMS: readonly NavItem[] = [
   { to: "/challenges", label: "Daily challenges", icon: Target },
   { to: "/reminders", label: "Habit reminders", icon: Bell },
   { to: "/recap", label: "Weekly recap", icon: LineChart },
+  { to: "/digest", label: "Weekly digest", icon: LineChart },
+  { to: "/certificates", label: "Certificates", icon: Award },
+
   { to: "/playlists", label: "Playlists", icon: ListMusic },
   { to: "/originals", label: "Heartify Originals", icon: Sparkles },
   { to: "/studio", label: "Creator Studio", icon: Upload },
