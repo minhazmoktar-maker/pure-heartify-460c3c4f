@@ -8977,6 +8977,10 @@ export type Database = {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
       }
+      is_live_session_member: {
+        Args: { _session_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_owner: { Args: { _user_id: string }; Returns: boolean }
       is_team_streak_member: {
         Args: { _team_id: string; _user_id: string }

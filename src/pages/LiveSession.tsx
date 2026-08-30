@@ -16,6 +16,7 @@ import {
   useSendLiveMessage,
   useJoinLiveSession,
   useLeaveLiveSession,
+  useIsLiveSessionMember,
 } from "@/hooks/useLiveSessions";
 
 const KIND_LABEL: Record<string, string> = {
@@ -30,6 +31,7 @@ export default function LiveSession() {
   const qc = useQueryClient();
   const { data: session, isLoading } = useLiveSession(id);
   const { data: messages } = useLiveMessages(id);
+  const { data: isMember } = useIsLiveSessionMember(id);
   const send = useSendLiveMessage(id);
   const join = useJoinLiveSession();
   const leave = useLeaveLiveSession();
@@ -168,7 +170,8 @@ export default function LiveSession() {
             <Button
               type="button"
               className="min-h-[44px] rounded-full"
-              disabled={join.isPending}
+              hidden={isMember === true}
+              disabled={join.isPending || isMember === true}
               onClick={() =>
                 join.mutate(session.id, {
                   onSuccess: () => toast.success("You're in"),
@@ -183,7 +186,8 @@ export default function LiveSession() {
               type="button"
               variant="outline"
               className="min-h-[44px] rounded-full"
-              disabled={leave.isPending}
+              hidden={!isMember}
+              disabled={leave.isPending || !isMember}
               onClick={() => leave.mutate(session.id)}
             >
               Leave
@@ -202,7 +206,9 @@ export default function LiveSession() {
           <div className="max-h-[52vh] space-y-2 overflow-y-auto rounded-2xl border border-border bg-card p-3">
             {(messages ?? []).length === 0 ? (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                No messages yet — say salaam.
+                {user && isMember
+                  ? "No messages yet — say salaam."
+                  : "Join the session to see and take part in the conversation."}
               </p>
             ) : (
               (messages ?? []).map((m) => (
@@ -230,7 +236,7 @@ export default function LiveSession() {
             <div ref={endRef} />
           </div>
 
-          {user ? (
+          {user && isMember ? (
             <form
               className="mt-3 flex items-center gap-2"
               onSubmit={(e) => {
