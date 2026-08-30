@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Trash2, Download, Clock, Crown, HardDrive } from "lucide-react";
+import { Trash2, Download, Clock, Crown, HardDrive, Film } from "lucide-react";
 import { toast } from "sonner";
 import SEO from "@/components/SEO";
 import PageHeader from "@/components/PageHeader";
