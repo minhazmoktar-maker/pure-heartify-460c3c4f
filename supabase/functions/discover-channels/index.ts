@@ -356,8 +356,12 @@ async function ytFetch(ctx: QuotaCtx, url: string, attempts = 3): Promise<any | 
       const isQuota =
         res.status === 429 || (res.status === 403 && QUOTA_PATTERN.test(body)) || QUOTA_PATTERN.test(body);
 
-      const isSearchOnly = /\/v3\/search\?/.test(url) && /Search Queries/i.test(body);
-      if (isQuota && isSearchOnly) {
+      // Any quota rejection on the search endpoint is search-scoped: search is
+      // metered per project on its own budget, and the 1-unit crawl lanes
+      // (playlists / playlistItems / channels) usually still have budget left.
+      // Never let a search rejection halt the whole run.
+      const isSearchEndpoint = /\/v3\/search\?/.test(url);
+      if (isQuota && isSearchEndpoint) {
         // Search quota is metered per Google Cloud project. A key from another
         // project therefore still has its own search budget — rotate through the
         // pool before disabling search for the run.
