@@ -24,6 +24,11 @@ Disallow: /admin
 Disallow: /diagnostics
 Disallow: /settings
 Disallow: /onboarding
+# Account-scoped progress surfaces. /certificate/:code (public verification)
+# stays crawlable so shared certificates can be validated.
+Disallow: /digest
+Disallow: /certificates
+
 # Session-scoped query strings on watch links (share attribution, timestamps)
 # create infinite duplicate URLs; the clean /watch/:id form is the indexable one.
 Disallow: /watch/*?

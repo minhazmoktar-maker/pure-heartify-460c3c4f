@@ -64,6 +64,11 @@ const NOINDEX_PREFIXES = [
   "/plus-invite",
   "/connections",
   "/notifications",
+  // Personal progress surfaces (account-scoped, nothing useful in search).
+  // NOTE: "/certificate/:code" (public verification) is intentionally NOT here.
+  "/digest",
+  "/certificates",
+
   "/404",
   "/not-found",
 ] as const;
