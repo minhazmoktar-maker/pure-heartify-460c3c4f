@@ -804,13 +804,20 @@ Deno.serve(observed("feed", async (req) => {
     // Keyset cursor must be the *oldest* ingested_at on the page: interleaving
     // and top-ups can place a newer row last, which would skip rows (stall) or
     // re-serve them (repeat) on the next page.
-    const nextCursor = items.length === limit
+    //
+    // A *short* page is NOT the end of the feed: exclude_ids, dedup collapse and
+    // per-channel caps routinely trim a page below `limit` while plenty of older
+    // rows remain. Gating the cursor on `items.length === limit` ended the feed
+    // early ("You've reached the end" after one screen). Only a genuinely empty
+    // page means the keyset is exhausted.
+    const nextCursor = items.length > 0
       ? (items.reduce<string | null>((min, v) => {
         const t = (v as Record<string, unknown>).ingested_at as string | null;
         if (!t) return min;
         return min === null || t < min ? t : min;
       }, null))
       : null;
+
 
     // Serving telemetry for /admin/feed-ab: latency, page size and cache-hit
     // rate attributed to the arm that actually produced this page. Fire-and-
