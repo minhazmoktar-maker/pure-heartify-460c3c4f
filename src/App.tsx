@@ -115,6 +115,7 @@ const CheckoutReturn = lazy(() => import("./pages/CheckoutReturn.tsx"));
 const Invite = lazy(() => import("./pages/Invite.tsx"));
 const OfflineLibrary = lazy(() => import("./pages/OfflineLibrary.tsx"));
 const OfflineStorage = lazy(() => import("./pages/OfflineStorage.tsx"));
+const OfflineVideos = lazy(() => import("./pages/OfflineVideos.tsx"));
 const HalalCheck = lazy(() => import("./pages/HalalCheck.tsx"));
 const HalalTopic = lazy(() => import("./pages/HalalTopic.tsx"));
 const Concept = lazy(() => import("./pages/Concept.tsx"));
@@ -359,6 +360,7 @@ const App = () => (
                 <Route path="/invite" element={<Invite />} />
                 <Route path="/offline" element={<OfflineLibrary />} />
                 <Route path="/offline/storage" element={<OfflineStorage />} />
+                <Route path="/offline/videos" element={<OfflineVideos />} />
                 <Route path="/premium" element={<Navigate to="/plus" replace />} />
                 {/* /pricing redirect removed (W1/M3) — zero traffic, zero internal refs. Now 404s. */}
                 <Route path="/profile" element={<Profile />} />

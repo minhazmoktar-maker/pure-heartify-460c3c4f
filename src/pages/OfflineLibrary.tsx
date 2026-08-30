@@ -80,6 +80,11 @@ export default function OfflineLibrary() {
           actions={
             <div className="flex items-center gap-2">
               <Button asChild size="sm" variant="outline">
+                <Link to="/offline/videos">
+                  <Film className="h-4 w-4" /> Videos
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
                 <Link to="/offline/storage">
                   <HardDrive className="h-4 w-4" /> Storage
                 </Link>
