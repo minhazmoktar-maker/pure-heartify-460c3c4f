@@ -62,6 +62,27 @@ export function useLiveSession(id: string | undefined) {
   });
 }
 
+/** Whether the signed-in user has joined this session (rosters are member-only). */
+export function useIsLiveSessionMember(id: string | undefined) {
+  return useQuery({
+    queryKey: ["live-session-member", id],
+    enabled: Boolean(id),
+    queryFn: async (): Promise<boolean> => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) return false;
+      const { data, error } = await supabase
+        .from("live_session_participants")
+        .select("session_id")
+        .eq("session_id", id!)
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (error) return false;
+      return Boolean(data);
+    },
+  });
+}
+
 export function useJoinLiveSession() {
   const qc = useQueryClient();
   return useMutation({
