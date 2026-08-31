@@ -49,6 +49,24 @@ interface LocaleContextValue {
 }
 
 const STORAGE_KEY = "heartify-locale-prefs";
+/** Set once the user hand-picks languages/region, so geo never overrides it. */
+const PINNED_KEY = "heartify-locale-pinned";
+
+function isPinned(): boolean {
+  try {
+    return localStorage.getItem(PINNED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markPinned() {
+  try {
+    localStorage.setItem(PINNED_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
 
 function loadLocal(): Partial<LocalePreferences> | null {
   try {
@@ -127,8 +145,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       if (cancelled || !country) return;
       setPreferences((prev) => {
         if (country === prev.detected_country && country === prev.country_code) return prev;
+        // Never re-derive languages for a signed-in user (Cloud prefs are
+        // authoritative) or for anyone who hand-picked languages/region.
         const untouched =
-          prev.country_code === null || prev.country_code === prev.detected_country;
+          !user &&
+          !isPinned() &&
+          (prev.country_code === null || prev.country_code === prev.detected_country);
         return {
           ...prev,
           detected_country: country,
@@ -142,6 +164,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+    // Mount-only: geo is a one-shot refinement.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist locally.
