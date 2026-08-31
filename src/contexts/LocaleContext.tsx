@@ -49,6 +49,24 @@ interface LocaleContextValue {
 }
 
 const STORAGE_KEY = "heartify-locale-prefs";
+/** Set once the user hand-picks languages/region, so geo never overrides it. */
+const PINNED_KEY = "heartify-locale-pinned";
+
+function isPinned(): boolean {
+  try {
+    return localStorage.getItem(PINNED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markPinned() {
+  try {
+    localStorage.setItem(PINNED_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+}
 
 function loadLocal(): Partial<LocalePreferences> | null {
   try {
