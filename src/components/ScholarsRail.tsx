@@ -23,9 +23,10 @@ export default function ScholarsRail({ className }: { className?: string }) {
         </div>
         <Link
           to="/scholars"
+          aria-label="See all verified scholars"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
-          See all <ArrowRight className="h-3.5 w-3.5" />
+          See all <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>
       </div>
       <p className="mb-2 px-1 text-sm text-muted-foreground">

@@ -102,6 +102,7 @@ const Index = () => {
     <div className="mx-auto max-w-[1800px] px-4 pt-2 md:px-6">
       <button
         onClick={() => setShowMoreRails(true)}
+        aria-label="Show more content rails on the home feed"
         className="w-full rounded-card border border-border bg-card px-4 py-3 text-caption font-semibold text-foreground shadow-e1 transition-colors hover:bg-secondary"
       >
         Show more rails

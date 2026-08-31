@@ -217,6 +217,7 @@ function RecitersSection({
           type="search"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
+          aria-label="Search reciters or cities"
           placeholder="Search reciters or cities"
           className="min-h-[44px] w-full max-w-xs rounded-pill border border-border bg-card px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
         />
@@ -306,6 +307,7 @@ function SpeakersSection({
           type="search"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
+          aria-label="Search speakers"
           placeholder="Search speakers"
           className="min-h-[44px] w-full max-w-xs rounded-pill border border-border bg-card px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
         />

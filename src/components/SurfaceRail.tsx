@@ -135,7 +135,7 @@ const SurfaceRail = ({
 
         <div className="hidden items-center gap-1 md:flex">
           {seeAllHref && (
-            <Link to={seeAllHref} className="mr-2 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+            <Link to={seeAllHref} aria-label={`See all in ${title}`} className="mr-2 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
               See all
             </Link>
           )}
