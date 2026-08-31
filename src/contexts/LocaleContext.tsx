@@ -164,6 +164,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+    // Mount-only: geo is a one-shot refinement.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist locally.
