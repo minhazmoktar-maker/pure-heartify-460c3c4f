@@ -36,8 +36,15 @@ const CaptionReviewPanel = ({ uploadId, durationSeconds, initialLanguage }: Prop
   // Per-upload UI state (track, editor open, RTL mirroring, text scale, high
   // contrast) is remembered across close/reopen and across switching uploads.
   const { panelState, updatePanelState } = useCaptionPanelState(uploadId);
-  const language = initialLanguage ?? panelState.language;
-  const setLanguage = (next: string) => updatePanelState({ language: next });
+  // A deep link only seeds the initial track; once the creator picks another
+  // language their choice wins (otherwise the panel stayed stuck on the
+  // linked track).
+  const [deepLinkConsumed, setDeepLinkConsumed] = useState(false);
+  const language = !deepLinkConsumed && initialLanguage ? initialLanguage : panelState.language;
+  const setLanguage = (next: string) => {
+    setDeepLinkConsumed(true);
+    updatePanelState({ language: next });
+  };
   const editing = panelState.editing;
   const setEditing = (next: boolean) => updatePanelState({ editing: next });
   const [currentTime, setCurrentTime] = useState(0);

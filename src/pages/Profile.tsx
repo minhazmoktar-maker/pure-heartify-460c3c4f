@@ -292,14 +292,16 @@ const Profile = () => {
               </p>
             </div>
 
-
-
-
-
-
             <div className="pt-4">
-              <ThemeModeSetting />
+              <FeedCountryDiversity />
+              <p className="mt-2 text-center text-xs text-muted-foreground">
+                Your feed keeps a roughly 80/20 mix: mostly your own region's
+                languages, with a fifth reserved for beneficial content from
+                elsewhere.
+              </p>
             </div>
+
+
 
             <div className="pt-4">
               <KidsModeSetting />

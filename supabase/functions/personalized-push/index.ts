@@ -190,7 +190,7 @@ async function pickCandidate(p: UserPrefs): Promise<Candidate | null> {
   const { data: follows } = await admin
     .from("channel_follows")
     .select("channel_id")
-    .eq("user_id", userId)
+    .eq("follower_id", userId)
     .limit(50);
   if (follows && follows.length) {
     const since = new Date(Date.now() - 6 * 3_600_000).toISOString();
