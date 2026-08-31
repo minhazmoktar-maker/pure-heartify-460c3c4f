@@ -145,8 +145,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       if (cancelled || !country) return;
       setPreferences((prev) => {
         if (country === prev.detected_country && country === prev.country_code) return prev;
+        // Never re-derive languages for a signed-in user (Cloud prefs are
+        // authoritative) or for anyone who hand-picked languages/region.
         const untouched =
-          prev.country_code === null || prev.country_code === prev.detected_country;
+          !user &&
+          !isPinned() &&
+          (prev.country_code === null || prev.country_code === prev.detected_country);
         return {
           ...prev,
           detected_country: country,
