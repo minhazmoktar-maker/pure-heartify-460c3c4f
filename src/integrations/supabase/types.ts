@@ -7981,6 +7981,33 @@ export type Database = {
         }
         Relationships: []
       }
+      evidence_free_rejections: {
+        Row: {
+          channel_id: string | null
+          channel_title: string | null
+          content_language: string | null
+          moderation_reasoning: string | null
+          moderation_risk: number | null
+          video_id: string | null
+        }
+        Insert: {
+          channel_id?: string | null
+          channel_title?: string | null
+          content_language?: string | null
+          moderation_reasoning?: string | null
+          moderation_risk?: number | null
+          video_id?: string | null
+        }
+        Update: {
+          channel_id?: string | null
+          channel_title?: string | null
+          content_language?: string | null
+          moderation_reasoning?: string | null
+          moderation_risk?: number | null
+          video_id?: string | null
+        }
+        Relationships: []
+      }
       language_corpus_health: {
         Row: {
           language: string | null
@@ -8592,6 +8619,10 @@ export type Database = {
       end_dhikr_circle: { Args: { _circle_id: string }; Returns: undefined }
       enforce_retention_policies: { Args: never; Returns: Json }
       enqueue_benefit_labels: { Args: { _limit?: number }; Returns: Json }
+      enqueue_rejection_backlog_channels: {
+        Args: { p_limit?: number }
+        Returns: number
+      }
       enqueue_transcript_backlog: { Args: { _limit?: number }; Returns: number }
       enqueue_transcript_job: {
         Args: { _language_hint?: string; _video_id: string }
@@ -9533,6 +9564,10 @@ export type Database = {
       report_video_unplayable: {
         Args: { _reason?: string; _video_id: string }
         Returns: boolean
+      }
+      requeue_stale_channel_rejections: {
+        Args: { p_limit?: number }
+        Returns: number
       }
       requeue_stale_transcript_jobs: {
         Args: { _minutes?: number }
