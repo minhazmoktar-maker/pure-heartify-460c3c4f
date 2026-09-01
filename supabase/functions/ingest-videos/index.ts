@@ -1116,6 +1116,16 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
     if (!nextToken) break;
   }
 
+  // A channel whose uploads playlist is fully walked (or that yielded nothing
+  // new this run) must not be re-walked every 4 hours — that burns the daily
+  // quota re-reading videos we already have instead of pulling fresh channels.
+  if (!pageToken || totalAdded === 0) {
+    const cooldownHours = !pageToken ? 72 : 24;
+    await updateChannelState(state.id, {
+      next_attempt_at: new Date(Date.now() + cooldownHours * 3_600_000).toISOString(),
+    });
+  }
+
   await logIngestion(`channel:${state.channel_name}`, null, totalSeen, totalAdded, quota);
   return { added: totalAdded, quota };
 }
