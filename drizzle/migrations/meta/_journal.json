@@ -127,6 +127,13 @@
       "when": 1788272144174,
       "tag": "0017_recovery_exclude_blocked_creators",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788274832202,
+      "tag": "0018_institution_cosign_trust_weight",
+      "breakpoints": true
     }
   ]
 }
