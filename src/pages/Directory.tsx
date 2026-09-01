@@ -42,7 +42,7 @@ export default function Directory() {
     queryFn: async (): Promise<DirectoryChannel[]> => {
       const { data, error } = await supabase.rpc("list_directory_channels", {
         _q: q.trim() || null,
-        _limit: 100,
+        _limit: 60,
         _offset: 0,
       });
       if (error) throw error;
@@ -116,7 +116,7 @@ export default function Directory() {
           <ul className="grid gap-3 sm:grid-cols-2">
             {channels.map((c) => (
               <li key={c.channel_id}>
-                <Card className="flex h-full items-start gap-3 p-4">
+                <Card className="flex h-full items-start gap-3 overflow-hidden p-4">
                   {c.thumbnail_url ? (
                     <img
                       src={c.thumbnail_url}
