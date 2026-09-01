@@ -241,6 +241,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   const updatePreferences = useCallback(
     async (patch: Partial<LocalePreferences>) => {
+      // A hand-picked language/region must never be re-derived by geo later.
+      if ("content_languages" in patch || "country_code" in patch) markPinned();
       setPreferences((prev) => ({ ...prev, ...patch }));
       if (user) {
         await supabase
