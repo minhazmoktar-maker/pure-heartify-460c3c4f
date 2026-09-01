@@ -16,11 +16,12 @@ describe('watch companion prayer contract', () => {
     expect(next).toMatchObject({ name: 'asr', at: '09:26', is_tomorrow: false });
   });
 
-  it('wraps to the first prayer of the next day after the last one', () => {
+  it('wraps to the earliest prayer of the next day after the last one', () => {
     const next = resolveNextPrayer(TIMES, clockToMinutes('23:50'));
-    expect(next?.name).toBe('fajr');
+    // Times are UTC; for Dhaka the earliest UTC slot of the cycle is Dhuhr.
+    expect(next?.name).toBe('dhuhr');
     expect(next?.is_tomorrow).toBe(true);
-    expect(next?.in_minutes).toBe(10 + clockToMinutes('22:22'));
+    expect(next?.in_minutes).toBe(10 + clockToMinutes('05:58'));
   });
 
   it('returns null when no prayer times are present', () => {
