@@ -99,8 +99,11 @@ Deno.serve(async (req) => {
   const sunrise = noon - T(0.833, latR, decl);
   const dhuhr = noon;
   const asrShadow = 1;
+  // Asr altitude is ABOVE the horizon (positive). `T()` expects a depression
+  // angle (it uses `-sin(alpha)`), so the negative altitude is passed straight
+  // through. Passing `-asrAlt` here produced an Asr time after Maghrib.
   const asrAlt = -Math.atan(1 / (asrShadow + Math.tan(Math.abs(latR - decl)))) * 180 / Math.PI;
-  const asr = noon + T(-asrAlt, latR, decl);
+  const asr = noon + T(asrAlt, latR, decl);
   const maghrib = noon + T(0.833, latR, decl);
   const isha = typeof angles.isha === "object"
     ? maghrib + angles.isha.minutes / 60

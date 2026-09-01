@@ -52,6 +52,13 @@ verify_jwt = false
 [functions.client-bootstrap]
 verify_jwt = false
 
+# Watch / widget companion payload. Anonymous callers get prayer data only;
+# the function verifies any bearer token itself before touching account rows.
+[functions.watch-companion]
+verify_jwt = false
+
+
+
 
 
 
