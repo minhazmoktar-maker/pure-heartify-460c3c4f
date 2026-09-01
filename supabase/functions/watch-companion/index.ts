@@ -48,22 +48,23 @@ function resolveNextPrayer(
   times: Record<string, string>,
   localMinutes: number,
 ): { name: PrayerName; at: string; in_minutes: number; is_tomorrow: boolean } | null {
-  const known = PRAYER_ORDER.filter((p) => typeof times[p] === "string");
+  // Sorted by clock, not by canonical prayer order: times are UTC, so for
+  // eastern longitudes Fajr can carry the largest minute-of-day value.
+  const known = PRAYER_ORDER.filter((p) => typeof times[p] === "string")
+    .map((name) => ({ name, at: times[name], mins: toMinutes(times[name]) }))
+    .sort((a, b) => a.mins - b.mins);
   if (known.length === 0) return null;
 
-  for (const name of known) {
-    const at = times[name];
-    const mins = toMinutes(at);
-    if (mins > localMinutes) {
-      return { name, at, in_minutes: mins - localMinutes, is_tomorrow: false };
-    }
+  const upcoming = known.find((p) => p.mins > localMinutes);
+  if (upcoming) {
+    return { name: upcoming.name, at: upcoming.at, in_minutes: upcoming.mins - localMinutes, is_tomorrow: false };
   }
+
   const first = known[0];
-  const at = times[first];
   return {
-    name: first,
-    at,
-    in_minutes: 24 * 60 - localMinutes + toMinutes(at),
+    name: first.name,
+    at: first.at,
+    in_minutes: 24 * 60 - localMinutes + first.mins,
     is_tomorrow: true,
   };
 }

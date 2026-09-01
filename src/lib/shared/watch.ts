@@ -55,21 +55,23 @@ export function resolveNextPrayer(
   times: Partial<Record<string, string>>,
   nowMinutes: number,
 ): WatchNextPrayer | null {
-  const known = PRAYER_ORDER.filter((p) => typeof times[p] === 'string');
+  // Sorted by clock, not by canonical prayer order: the payload is in UTC, so
+  // for eastern longitudes Fajr can carry the largest minute-of-day value.
+  const known = PRAYER_ORDER.filter((p) => typeof times[p] === 'string')
+    .map((name) => ({ name, at: times[name] as string, mins: clockToMinutes(times[name] as string) }))
+    .sort((a, b) => a.mins - b.mins);
   if (known.length === 0) return null;
 
-  for (const name of known) {
-    const at = times[name] as string;
-    const mins = clockToMinutes(at);
-    if (mins > nowMinutes) return { name, at, in_minutes: mins - nowMinutes, is_tomorrow: false };
+  const upcoming = known.find((p) => p.mins > nowMinutes);
+  if (upcoming) {
+    return { name: upcoming.name, at: upcoming.at, in_minutes: upcoming.mins - nowMinutes, is_tomorrow: false };
   }
 
   const first = known[0];
-  const at = times[first] as string;
   return {
-    name: first,
-    at,
-    in_minutes: 24 * 60 - nowMinutes + clockToMinutes(at),
+    name: first.name,
+    at: first.at,
+    in_minutes: 24 * 60 - nowMinutes + first.mins,
     is_tomorrow: true,
   };
 }
