@@ -120,6 +120,13 @@
       "when": 1788272102973,
       "tag": "0016_recovery_include_approved_candidates",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788272144174,
+      "tag": "0017_recovery_exclude_blocked_creators",
+      "breakpoints": true
     }
   ]
 }
