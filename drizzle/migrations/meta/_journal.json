@@ -85,6 +85,48 @@
       "when": 1788269046120,
       "tag": "0011_index_curated_videos_channel_published",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1788271897555,
+      "tag": "0012_recover_evidence_free_rejections",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1788271971885,
+      "tag": "0013_recovery_include_archived_rejections",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788272005276,
+      "tag": "0014_recovery_fix_visual_flags_default",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1788272052578,
+      "tag": "0015_recovery_use_valid_candidate_source",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1788272102973,
+      "tag": "0016_recovery_include_approved_candidates",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788272144174,
+      "tag": "0017_recovery_exclude_blocked_creators",
+      "breakpoints": true
     }
   ]
 }
