@@ -150,17 +150,46 @@ Deno.serve(async (req) => {
     );
 
     // Move to sampling state up front.
+    const priorStatus = cand.status;
     await admin.from("channel_candidates").update({
       status: cand.status === "approved" ? cand.status : "sampling",
       required_samples: size,
     }).eq("id", cand.id);
 
+    // Anything that aborts before samples are recorded must hand the candidate
+    // back to its previous state — otherwise a YouTube quota failure freezes it
+    // in 'sampling' forever and moderators never see it again.
+    let released = false;
+    const releaseCandidate = async () => {
+      if (released || priorStatus === "approved") return;
+      released = true;
+      await admin.from("channel_candidates")
+        .update({ status: priorStatus })
+        .eq("id", cand.id)
+        .eq("status", "sampling");
+    };
+
     // 1. Fetch uploads playlist.
     const chRes = await ytFetch("channels", { part: "contentDetails,statistics,snippet", id: cand.youtube_channel_id });
-    if (!chRes.ok) return json({ error: "youtube_channel_lookup_failed", status: chRes.status }, 502);
+    if (!chRes.ok) {
+      await releaseCandidate();
+      // Quota exhaustion across every key is transient — tell the caller to
+      // back off and retry later rather than treating the channel as broken.
+      const quota = chRes.status === 429 || chRes.status === 403;
+      return json({
+        error: "youtube_channel_lookup_failed",
+        status: chRes.status,
+        retryable: true,
+        reason: quota ? "youtube_quota_exhausted" : "youtube_error",
+        retry_after_seconds: quota ? 3600 : 300,
+      }, quota ? 429 : 502);
+    }
     const chJson = await chRes.json();
     const uploadsPlaylist = chJson?.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-    if (!uploadsPlaylist) return json({ error: "no_uploads_playlist" }, 422);
+    if (!uploadsPlaylist) {
+      await releaseCandidate();
+      return json({ error: "no_uploads_playlist" }, 422);
+    }
 
     // 2. Pull recent uploads (newest first). YouTube playlistItems returns
     //    up to 50 per page.
