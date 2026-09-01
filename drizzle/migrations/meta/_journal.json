@@ -71,6 +71,13 @@
       "when": 1788268391290,
       "tag": "0009_benefit_label_immediate_and_channel_directory",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788268926368,
+      "tag": "0010_fix_list_directory_channels_schema",
+      "breakpoints": true
     }
   ]
 }
