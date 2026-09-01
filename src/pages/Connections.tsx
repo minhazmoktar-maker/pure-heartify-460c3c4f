@@ -101,6 +101,7 @@ export default function Connections() {
         <SEO title="Your Circle — Heartify" description="Connect with friends and stay accountable on Heartify." path="/connections" />
         <Navbar />
         <main className="mx-auto max-w-2xl px-4 py-12 md:px-6">
+          <h1 className="mb-4 text-center text-title font-bold">Your Circle</h1>
           <EmptyState
             icon={Users}
             title="Sign in to build your circle"
@@ -108,6 +109,7 @@ export default function Connections() {
             actionLabel="Sign in"
             actionHref="/login"
           />
+
         </main>
       </div>
     );

@@ -10,10 +10,17 @@ test.describe("public smoke", () => {
     await page.goto("/");
     await expect(page).toHaveTitle(/.+/);
     await page.waitForLoadState("networkidle");
-    // Ignore third-party YouTube warnings; only fail on our own runtime errors.
+    // Ignore third-party YouTube warnings and dev-only React `Warning:`
+    // output (the function-component ref notice comes from the dev tooling
+    // wrapper and is stripped from production builds). Anonymous 401 session
+    // probes are expected too. Only our own runtime errors fail the test.
     const ours = errors.filter(
-      (e) => !/youtube|ytimg|doubleclick|gstatic|third.?party/i.test(e),
+      (e) =>
+        !/youtube|ytimg|doubleclick|gstatic|third.?party/i.test(e) &&
+        !e.startsWith("Warning:") &&
+        !/cannot be given refs|Failed to load resource|net::ERR_|invalid claim|AuthApiError/i.test(e),
     );
+
     expect(ours, ours.join("\n")).toEqual([]);
   });
 

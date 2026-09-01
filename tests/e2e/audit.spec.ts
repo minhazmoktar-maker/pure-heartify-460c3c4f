@@ -39,29 +39,29 @@ test.describe("Heartify platform audit", () => {
     (page as Page & { __errors?: string[] }).__errors = errors;
   });
 
-  test("home (For You) renders, thumbs load, no banned text", async ({ page }) => {
+  test("home feed renders, thumbs load, no banned text", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("text=For You").first()).toBeVisible();
+    await expect(page.locator("text=Today's Top Pick").first()).toBeVisible();
+
     await page.waitForTimeout(2500);
     await assertThumbnailsLoad(page);
     await assertNoBannedText(page);
     expect((page as Page & { __errors?: string[] }).__errors ?? []).toHaveLength(0);
   });
 
-  test("Browse tab renders an infinite grid", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: /Browse/i }).click();
+  test("Explore renders an infinite grid", async ({ page }) => {
+    await page.goto("/explore");
     await page.waitForTimeout(2000);
     await assertThumbnailsLoad(page, 2);
     await assertNoBannedText(page);
   });
 
-  test("Listen tab renders", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: /Listen/i }).click();
+  test("Listen surface renders", async ({ page }) => {
+    await page.goto("/listen");
     await page.waitForTimeout(1500);
     await assertNoBannedText(page);
   });
+
 
   test("search returns halal-only results", async ({ page }) => {
     await page.goto("/search?q=quran");

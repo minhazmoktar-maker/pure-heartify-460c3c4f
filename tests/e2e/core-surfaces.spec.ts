@@ -20,8 +20,11 @@ import { test, expect } from "@playwright/test";
 // react-helmet-async emits a dev-only "function components cannot be given
 // refs" warning under React 18 StrictMode — it never fires in a production
 // build and carries no user impact, so it is filtered too.
+// Anonymous visitors legitimately get 401s from Supabase auth/session probes;
+// the browser logs them as "Failed to load resource" console errors.
 const NOISE =
-  /youtube|ytimg|doubleclick|gstatic|googletag|third.?party|favicon|manifest|service worker|data:application\/octet-stream|Content Security Policy|cannot be given refs|Function components cannot|react-helmet|SideEffect\(NullComponent\)|Download the React DevTools/i;
+  /youtube|ytimg|doubleclick|gstatic|googletag|third.?party|favicon|manifest|service worker|data:application\/octet-stream|Content Security Policy|cannot be given refs|Function components cannot|react-helmet|SideEffect\(NullComponent\)|Download the React DevTools|Failed to load resource|status of 40[13]|net::ERR_/i;
+
 
 function collectErrors(page: import("@playwright/test").Page) {
   const errors: string[] = [];

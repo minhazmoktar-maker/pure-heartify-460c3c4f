@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import FadeIn from "@/components/FadeIn";
 import { CheckCircle2, Play, Heart } from "lucide-react";
@@ -111,6 +111,20 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         className="relative overflow-hidden rounded-card"
         style={{ viewTransitionName: `video-${video.id}` } as React.CSSProperties}
       >
+        {/* Real anchor so feed cards are crawlable, shareable (open in new
+            tab / copy link) and keyboard-reachable. Rendered first so the
+            later absolutely-positioned controls stay on top and clickable. */}
+        <Link
+          to={`/watch/${video.id}`}
+          state={{ video }}
+          aria-label={`Watch ${displayTitle}`}
+          className="absolute inset-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClick(e);
+          }}
+        />
+
         {thumbFailed ? (
           <div className="aspect-video w-full bg-muted" aria-label={`${displayTitle} thumbnail unavailable`} />
         ) : (
