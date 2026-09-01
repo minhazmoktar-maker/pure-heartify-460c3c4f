@@ -20,6 +20,7 @@ import {
   normalizeWorkerConfig,
   parseVerdict,
   runVisualSweep,
+  unfetchableThumbnailVerdict,
   type Verdict,
   type WorkerConfig,
 } from "./sweep.ts";
