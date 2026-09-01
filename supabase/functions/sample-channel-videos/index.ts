@@ -269,6 +269,9 @@ Deno.serve(async (req) => {
       if (verdict === "violation") { violated = true; break; }
     }
 
+    // Nothing was recorded (empty/blocked responses) — don't leave it stuck.
+    if (outcomes.length === 0) await releaseCandidate();
+
     // Refresh candidate for response.
     const { data: fresh } = await admin
       .from("channel_candidates")
