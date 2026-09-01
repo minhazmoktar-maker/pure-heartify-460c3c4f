@@ -46,6 +46,17 @@ export default function VerifyTrust() {
     },
   });
 
+  const { data: summary } = useQuery({
+    queryKey: ["cosign-trust-summary"],
+    staleTime: 30 * 60 * 1000,
+    queryFn: async (): Promise<CosignSummary | null> => {
+      const { data, error } = await supabase.rpc("get_cosign_trust_summary");
+      if (error) throw error;
+      return ((data as unknown as CosignSummary[]) ?? [])[0] ?? null;
+    },
+  });
+
+
   const institutions = data ?? [];
   const totalCosigned = institutions.reduce((s, i) => s + (i.cosigned ?? 0), 0);
 
