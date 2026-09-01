@@ -115,8 +115,8 @@ export default function Directory() {
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
             {channels.map((c) => (
-              <li key={c.channel_id}>
-                <Card className="flex h-full items-start gap-3 overflow-hidden p-4">
+              <li key={c.channel_id} className="min-w-0">
+                <Card className="flex h-full w-full min-w-0 items-start gap-3 overflow-hidden p-4">
                   {c.thumbnail_url ? (
                     <img
                       src={c.thumbnail_url}
