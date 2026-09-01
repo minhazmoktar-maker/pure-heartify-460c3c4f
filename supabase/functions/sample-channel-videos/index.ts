@@ -100,6 +100,7 @@ function parseDurationSeconds(iso: string): number {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  let release: (() => Promise<void>) | null = null;
   try {
     const admin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -168,6 +169,7 @@ Deno.serve(async (req) => {
         .eq("id", cand.id)
         .eq("status", "sampling");
     };
+    release = releaseCandidate;
 
     // 1. Fetch uploads playlist.
     const chRes = await ytFetch("channels", { part: "contentDetails,statistics,snippet", id: cand.youtube_channel_id });
@@ -288,6 +290,7 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("sample-channel-videos error", e);
+    await release?.();
     return json({ error: String(e) }, 500);
   }
 });
