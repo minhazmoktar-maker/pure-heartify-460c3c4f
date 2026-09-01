@@ -716,16 +716,18 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
     // dropped instead of losing 50 good videos from trusted channels.
     if (body.includes("P0001")) {
       const accepted: Record<string, unknown>[] = [];
+      let acceptedNew = 0;
       for (const row of chunk) {
         const one = await post([row]);
         if (one.ok) {
           accepted.push(row);
+          acceptedNew += await newRowCount(one, 1);
         } else {
           const detail = await one.text();
           console.warn(`[ingest] row rejected (${row.video_id}): ${detail.slice(0, 200)}`);
         }
       }
-      inserted += accepted.length;
+      inserted += acceptedNew;
       if (accepted.length) embedNewVideos(accepted).catch((e) => console.warn("[embed] batch failed:", e));
       continue;
     }
