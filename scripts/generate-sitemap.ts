@@ -139,6 +139,12 @@ const core: Entry[] = [
   { path: "/privacy", changefreq: "yearly", priority: "0.3" },
   { path: "/terms", changefreq: "yearly", priority: "0.3" },
   { path: "/halal", changefreq: "weekly", priority: "0.8" },
+  // Authoritative pillar hubs + public trust and directory surfaces
+  { path: "/islamic-learning", changefreq: "weekly", priority: "0.9" },
+  { path: "/halal-video", changefreq: "weekly", priority: "0.9" },
+  { path: "/quran-listening", changefreq: "weekly", priority: "0.9" },
+  { path: "/directory", changefreq: "daily", priority: "0.8" },
+  { path: "/verify", changefreq: "weekly", priority: "0.7" },
 ];
 
 // Entity families → chunked child sitemaps
