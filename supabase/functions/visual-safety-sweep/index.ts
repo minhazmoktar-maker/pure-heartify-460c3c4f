@@ -49,8 +49,28 @@ Use "female_detected" when any female is visible, "music" for musical/performanc
 "flagged" for other prohibited imagery, "clean" only when clearly safe.
 If the image is unreadable or you are unsure, answer "flagged".`;
 
+/**
+ * The provider fetches image URLs server-side, so a deleted/blocked thumbnail
+ * makes it answer 400 forever. Probing the URL first turns those into a decided
+ * verdict without spending a model call.
+ */
+async function thumbnailIsFetchable(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: "GET", headers: { Range: "bytes=0-0" } });
+    await res.body?.cancel();
+    if (!res.ok && res.status !== 206) return false;
+    return (res.headers.get("content-type") ?? "").startsWith("image/");
+  } catch {
+    // Network hiccup on our side — let the model call decide.
+    return true;
+  }
+}
+
 async function classifyOnce(item: Claimed, key: string, timeoutMs: number): Promise<Verdict> {
   if (!item.thumbnail_url) return fallbackVerdict(item.video_id, "no_thumbnail");
+  if (!(await thumbnailIsFetchable(item.thumbnail_url))) {
+    return unfetchableThumbnailVerdict(item.video_id, "thumbnail_unreachable");
+  }
   return await guardedClassify(item.video_id, async (signal) => {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
