@@ -49,12 +49,20 @@ test.describe("Heartify platform audit", () => {
     expect((page as Page & { __errors?: string[] }).__errors ?? []).toHaveLength(0);
   });
 
-  test("Explore renders an infinite grid", async ({ page }) => {
-    await page.goto("/explore");
+  test("home feed renders an infinite grid of thumbnails", async ({ page }) => {
+    await page.goto("/");
     await page.waitForTimeout(2000);
+    await page.mouse.wheel(0, 3000);
     await assertThumbnailsLoad(page, 2);
     await assertNoBannedText(page);
   });
+
+  test("explore hub renders its discovery entry points", async ({ page }) => {
+    await page.goto("/explore");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await assertNoBannedText(page);
+  });
+
 
   test("Listen surface renders", async ({ page }) => {
     await page.goto("/listen");
