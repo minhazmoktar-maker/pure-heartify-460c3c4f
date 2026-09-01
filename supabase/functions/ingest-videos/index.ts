@@ -682,18 +682,31 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
   const CHUNK = 25;
   let inserted = 0;
 
+  // `return=representation` makes PostgREST echo only the rows it actually
+  // inserted, so duplicates ignored by on_conflict are NOT counted as growth.
+  // Counting the chunk length instead made ingestion look like it added ~11k
+  // videos/hour while the corpus grew by a few hundred a day.
   const post = (batch: Record<string, unknown>[]) =>
-    sbFetch("curated_videos?on_conflict=video_id", {
+    sbFetch("curated_videos?on_conflict=video_id&select=video_id", {
       method: "POST",
-      headers: { "Prefer": "resolution=ignore-duplicates,return=headers-only" },
+      headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
       body: JSON.stringify(batch),
     });
+
+  async function newRowCount(res: Response, fallback: number): Promise<number> {
+    try {
+      const rows = await res.json();
+      return Array.isArray(rows) ? rows.length : fallback;
+    } catch {
+      return fallback;
+    }
+  }
 
   for (let i = 0; i < rows.length; i += CHUNK) {
     const chunk = rows.slice(i, i + CHUNK);
     const res = await post(chunk);
     if (res.ok) {
-      inserted += chunk.length;
+      inserted += await newRowCount(res, chunk.length);
       embedNewVideos(chunk).catch((e) => console.warn("[embed] batch failed:", e));
       continue;
     }
