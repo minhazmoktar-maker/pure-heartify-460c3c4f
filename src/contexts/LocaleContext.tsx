@@ -186,6 +186,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
       if (cancelled) return;
       if (data) {
+        // A saved Cloud row is an explicit choice — pin it against geo.
+        markPinned();
         setPreferences((prev) => ({
           ...prev,
           ui_language: (data.ui_language as LanguageCode) ?? prev.ui_language,
