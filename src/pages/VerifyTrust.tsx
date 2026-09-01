@@ -118,6 +118,42 @@ export default function VerifyTrust() {
           </p>
         </section>
 
+        <section className="mt-8">
+          <h2 className="text-xl font-semibold tracking-tight">
+            Attestation coverage right now
+          </h2>
+          <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { label: "Active institutions", value: summary?.active_institutions ?? 0 },
+              { label: "Co-signed records", value: summary?.cosigned_videos ?? 0 },
+              { label: "Channels covered", value: summary?.cosigned_channels ?? 0 },
+              {
+                label: "Last co-signature",
+                value: summary?.latest_cosign_at
+                  ? new Date(summary.latest_cosign_at).toLocaleDateString()
+                  : "—",
+              },
+            ].map((s) => (
+              <Card key={s.label} className="p-3">
+                <dt className="text-micro uppercase tracking-wide text-muted-foreground">
+                  {s.label}
+                </dt>
+                <dd className="mt-1 text-lg font-semibold text-foreground">
+                  {typeof s.value === "number" ? s.value.toLocaleString() : s.value}
+                </dd>
+              </Card>
+            ))}
+          </dl>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Co-signatures are not decoration. A record co-signed by independent institutions
+            raises that channel's trust standing, so co-signed material is surfaced ahead of
+            unreviewed material — and a signature that no longer matches the current ledger
+            record stops counting until the institution signs again.
+          </p>
+        </section>
+
+
+
         <section className="mt-10">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-xl font-semibold tracking-tight">Co-signing institutions</h2>
