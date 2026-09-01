@@ -77,12 +77,22 @@ Deno.serve(async (req) => {
   if (!parsed.success) return json({ error: "invalid query" }, 400);
   const { lat, lng, method, tz_offset } = parsed.data;
 
-  const identity = await getClientIdentity(req);
-  const limited = await enforceRateLimit(identity, "watch-companion", { limit: 120, windowSeconds: 60 });
-  if (limited) return limited;
-
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+  // Cheap DoS defence. Watch complications refresh every ~15 min, so 120/min
+  // per identity is generous while still bounding invocation spend.
+  if (serviceKey) {
+    const admin = createClient(supabaseUrl, serviceKey);
+    const limited = await enforceRateLimit(admin, {
+      identity: getClientIdentity(req, null),
+      action: "watch-companion",
+      limit: 120,
+      windowSeconds: 60,
+    });
+    if (limited) return json({ error: "rate_limited" }, 429);
+  }
 
   // ---- prayer block (anonymous-safe) -------------------------------------
   let prayer: Record<string, unknown> | null = null;
@@ -94,16 +104,17 @@ Deno.serve(async (req) => {
       });
       if (res.ok) {
         const body = await res.json();
-        const times = (body?.times ?? body) as Record<string, string>;
-        // Local clock: prefer the caller's UTC offset, else derive from longitude.
-        const offsetMinutes =
-          typeof tz_offset === "number" ? tz_offset : Math.round((lng / 15) * 60);
-        const nowUtcMinutes = new Date().getUTCHours() * 60 + new Date().getUTCMinutes();
-        const localMinutes = ((nowUtcMinutes + offsetMinutes) % 1440 + 1440) % 1440;
+        // /prayer-times returns UTC clock strings, so the countdown is computed
+        // in UTC too. tz_offset is echoed back for display formatting only.
+        const times = (body?.times_utc ?? {}) as Record<string, string>;
+        const now = new Date();
+        const nowUtcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
         prayer = {
           method,
-          times,
-          next: resolveNextPrayer(times, localMinutes),
+          date: body?.date ?? null,
+          times_utc: times,
+          tz_offset: typeof tz_offset === "number" ? tz_offset : null,
+          next: resolveNextPrayer(times, nowUtcMinutes),
         };
       }
     } catch {
