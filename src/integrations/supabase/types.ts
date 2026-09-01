@@ -9066,6 +9066,10 @@ export type Database = {
         }[]
       }
       list_cosigning_institutions: { Args: never; Returns: Json }
+      list_directory_channels: {
+        Args: { _limit?: number; _offset?: number; _q?: string }
+        Returns: Json
+      }
       list_dua_wall: {
         Args: { _limit?: number }
         Returns: {
@@ -9405,6 +9409,10 @@ export type Database = {
       purge_feed_impressions: { Args: never; Returns: number }
       purge_feed_serve_samples: { Args: never; Returns: undefined }
       purge_function_metrics: { Args: never; Returns: number }
+      queue_benefit_label_now: {
+        Args: { _video_id: string; _video_title?: string }
+        Returns: string
+      }
       rate_limit_cleanup: {
         Args: { _older_than_minutes?: number }
         Returns: number

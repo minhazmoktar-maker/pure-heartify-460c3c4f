@@ -64,6 +64,13 @@
       "when": 1788096826125,
       "tag": "0008_scope_live_session_roster_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788268391290,
+      "tag": "0009_benefit_label_immediate_and_channel_directory",
+      "breakpoints": true
     }
   ]
 }

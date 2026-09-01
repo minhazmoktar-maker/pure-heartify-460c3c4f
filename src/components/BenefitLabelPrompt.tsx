@@ -54,6 +54,7 @@ function setSessionState(v: "claimed" | "done") {
 }
 
 function horizonLabel(days: number) {
+  if (days === 0) return "just now";
   if (days === 7) return "a week ago";
   if (days === 30) return "a month ago";
   return "three months ago";
@@ -174,7 +175,9 @@ export default function BenefitLabelPrompt() {
           <Sparkles className="mt-0.5 h-4 w-4 text-primary" aria-hidden="true" />
           <div>
             <h2 className="text-sm font-semibold text-foreground">
-              Looking back — was it worth your time?
+              {data.horizon_days === 0
+                ? "Was that worth your time?"
+                : "Looking back — was it worth your time?"}
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
               You watched{" "}

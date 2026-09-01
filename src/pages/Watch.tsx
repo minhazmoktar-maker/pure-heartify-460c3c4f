@@ -349,6 +349,12 @@ const Watch = () => {
             // Mark dose video complete (idempotent server-side)
             if (user && videoId && completedRef.current !== videoId) {
               completedRef.current = videoId;
+              // Queue the immediate (T+0) "was this worth it?" label so the
+              // in-feed one-tap prompt has ground-truth volume for the ranker.
+              void supabase.rpc("queue_benefit_label_now", {
+                _video_id: videoId,
+                _video_title: currentVideo?.title ?? null,
+              });
               completeDose.mutate(videoId, {
                 onSuccess: (res) => {
                   // Fire the RPC that also handles freezes, milestones, badges, and
