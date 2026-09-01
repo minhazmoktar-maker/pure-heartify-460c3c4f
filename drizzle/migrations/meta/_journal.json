@@ -99,6 +99,13 @@
       "when": 1788271971885,
       "tag": "0013_recovery_include_archived_rejections",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788272005276,
+      "tag": "0014_recovery_fix_visual_flags_default",
+      "breakpoints": true
     }
   ]
 }
