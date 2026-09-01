@@ -90,7 +90,13 @@ async function classifyOnce(item: Claimed, key: string, timeoutMs: number): Prom
       }),
     });
     if (!res.ok) {
-      console.error(`[visual-safety-sweep] gateway ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      const detail = (await res.text()).slice(0, 300);
+      console.error(`[visual-safety-sweep] gateway ${res.status}: ${detail}`);
+      // 400 is terminal (bad/unfetchable image URL): retrying re-sends the same
+      // dead link, so decide it now instead of looping it every cron tick.
+      if (res.status === 400) {
+        return unfetchableThumbnailVerdict(item.video_id, "thumbnail_unfetchable_by_model");
+      }
       return fallbackVerdict(item.video_id, `gateway_${res.status}`);
     }
     const json = await res.json();
