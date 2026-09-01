@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="40" viewBox="0 0 180 40" role="img" aria-label="Reviewed on Heartify">
+  <rect width="180" height="40" rx="8" fill="#0F2A22"/>
+  <rect x="0.5" y="0.5" width="179" height="39" rx="7.5" fill="none" stroke="#1F5C48"/>
+  <g transform="translate(12 10)">
+    <path d="M10 19s-8-5.1-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.9-8 11-8 11z" fill="#3FBF8F"/>
+    <path d="M6.5 9.5l2.6 2.6L14 7.2" fill="none" stroke="#0F2A22" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="40" y="17" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="600" fill="#FFFFFF">Reviewed on</text>
+  <text x="40" y="30" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="13" font-weight="700" fill="#3FBF8F">Heartify</text>
+</svg>
