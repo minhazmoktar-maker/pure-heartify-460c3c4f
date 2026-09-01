@@ -203,7 +203,14 @@ const Index = () => {
         )}
 
         <footer className="border-t border-border bg-card py-8">
-          <div className="mx-auto max-w-[1800px] px-4 text-center md:px-6 space-y-2">
+          <div className="mx-auto max-w-[1800px] px-4 text-center md:px-6 space-y-3">
+            <nav aria-label="Learn more about Heartify" className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm">
+              <a href="/islamic-learning" className="text-primary hover:text-foreground underline">Islamic learning online</a>
+              <a href="/halal-video" className="text-primary hover:text-foreground underline">Halal video platform</a>
+              <a href="/quran-listening" className="text-primary hover:text-foreground underline">Listen to the Qur'an</a>
+              <a href="/directory" className="text-primary hover:text-foreground underline">Muslim directory</a>
+              <a href="/verify" className="text-primary hover:text-foreground underline">Verify our review</a>
+            </nav>
             <p className="text-sm text-muted-foreground">© 2026 Heartify — Curated halal content for the Ummah ✦</p>
             <nav className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-micro text-muted-foreground">
               <a href="/privacy" className="hover:text-foreground underline">Privacy</a>

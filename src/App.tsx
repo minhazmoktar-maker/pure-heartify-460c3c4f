@@ -30,6 +30,9 @@ const HijriCalendar2026 = lazy(() => import("./pages/HijriCalendar2026.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
 const Verify = lazy(() => import("./pages/Verify.tsx"));
+const VerifyTrust = lazy(() => import("./pages/VerifyTrust.tsx"));
+const KnowledgeHub = lazy(() => import("./pages/KnowledgeHub.tsx"));
+const Directory = lazy(() => import("./pages/Directory.tsx"));
 const Status = lazy(() => import("./pages/Status.tsx"));
 const Creators = lazy(() => import("./pages/Creators.tsx"));
 const Sources = lazy(() => import("./pages/Sources.tsx"));
@@ -347,7 +350,12 @@ const App = () => (
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
+                <Route path="/verify" element={<VerifyTrust />} />
                 <Route path="/verify/:videoId" element={<Verify />} />
+                <Route path="/directory" element={<Directory />} />
+                <Route path="/islamic-learning" element={<KnowledgeHub />} />
+                <Route path="/halal-video" element={<KnowledgeHub />} />
+                <Route path="/quran-listening" element={<KnowledgeHub />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
                 <Route path="/guides/best-islamic-cartoons" element={<BestIslamicCartoons />} />
                 <Route path="/guides/islamic-calendar-2026" element={<HijriCalendar2026 />} />
