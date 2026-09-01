@@ -1,6 +1,18 @@
 import { lazy } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useParams } from "react-router-dom";
+
+/**
+ * `/u/:id` serves two shapes: a native upload (UUID) and a public member
+ * profile (@handle). One resolver keeps both link forms working — previously
+ * the upload route shadowed every profile URL.
+ */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function UploadOrProfile() {
+  const { id } = useParams();
+  return UUID_RE.test(id ?? "") ? <WatchUpload /> : <PublicProfile />;
+}
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -392,7 +404,7 @@ const App = () => (
                 <Route path="/studio/appeals" element={<CreatorAppealStatus />} />
                 <Route path="/originals" element={<Originals />} />
                 <Route path="/c/:handle" element={<CreatorProfile />} />
-                <Route path="/u/:id" element={<WatchUpload />} />
+                <Route path="/u/:id" element={<UploadOrProfile />} />
                 <Route path="/admin/appeals" element={<AdminRoute><AdminAppeals /></AdminRoute>} />
                 <Route path="/admin/experiments" element={<AdminRoute><AdminExperiments /></AdminRoute>} />
                 <Route path="/admin/institutions" element={<AdminRoute><AdminInstitutions /></AdminRoute>} />
@@ -462,7 +474,7 @@ const App = () => (
                 <Route path="/sign-of-hour/:slug" element={<PublicSignOfHour />} />
                 <Route path="/mosque/:slug" element={<PublicMosque />} />
                 <Route path="/virtue/:slug" element={<PublicVirtue />} />
-                <Route path="/u/:handle" element={<PublicProfile />} />
+                
 
                 <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/fasting" element={<Fasting />} />

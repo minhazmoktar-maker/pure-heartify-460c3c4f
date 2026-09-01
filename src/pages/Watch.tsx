@@ -431,7 +431,17 @@ const Watch = () => {
 
   return (
     <div className="min-h-dvh bg-background">
+      {/* Removed/unavailable videos still need head metadata: shared links and
+          crawlers must never land on a page with no title or description. */}
+      {!currentVideo && videoId && (
+        <SEO
+          title="Video unavailable · Heartify"
+          description="This video is no longer available on Heartify. Browse curated, reviewed halal content instead."
+          path={`/watch/${videoId}`}
+        />
+      )}
       {currentVideo && videoId && (
+
         <SEO
           title={`${currentVideo.title} · Heartify`}
           description={`Watch "${currentVideo.title}" by ${currentVideo.channelTitle} — curated halal content on Heartify.`}

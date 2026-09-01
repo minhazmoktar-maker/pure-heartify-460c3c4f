@@ -123,6 +123,11 @@ export default function PublicProfile() {
       />
       <Navbar />
       <main className="mx-auto max-w-2xl px-4 py-8 md:px-6">
+        {/* Empty/error states still need a page-level H1 for a11y + SEO;
+            the loaded profile renders the member's name as its own H1. */}
+        {!loading && (state !== "ok" || !profile) ? (
+          <h1 className="mb-4 text-center text-title font-bold">@{handle}</h1>
+        ) : null}
         {loading ? (
           <PageSkeleton variant="detail" />
         ) : state === "private" ? (
@@ -134,6 +139,7 @@ export default function PublicProfile() {
             actionHref="/connections?tab=find"
           />
         ) : state === "error" ? (
+
           <EmptyState
             icon={UserX}
             title="Couldn't load this profile"

@@ -39,29 +39,37 @@ test.describe("Heartify platform audit", () => {
     (page as Page & { __errors?: string[] }).__errors = errors;
   });
 
-  test("home (For You) renders, thumbs load, no banned text", async ({ page }) => {
+  test("home feed renders, thumbs load, no banned text", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("text=For You").first()).toBeVisible();
+    await expect(page.locator("text=Today's Top Pick").first()).toBeVisible();
+
     await page.waitForTimeout(2500);
     await assertThumbnailsLoad(page);
     await assertNoBannedText(page);
     expect((page as Page & { __errors?: string[] }).__errors ?? []).toHaveLength(0);
   });
 
-  test("Browse tab renders an infinite grid", async ({ page }) => {
+  test("home feed renders an infinite grid of thumbnails", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: /Browse/i }).click();
     await page.waitForTimeout(2000);
+    await page.mouse.wheel(0, 3000);
     await assertThumbnailsLoad(page, 2);
     await assertNoBannedText(page);
   });
 
-  test("Listen tab renders", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: /Listen/i }).click();
+  test("explore hub renders its discovery entry points", async ({ page }) => {
+    await page.goto("/explore");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await assertNoBannedText(page);
+  });
+
+
+  test("Listen surface renders", async ({ page }) => {
+    await page.goto("/listen");
     await page.waitForTimeout(1500);
     await assertNoBannedText(page);
   });
+
 
   test("search returns halal-only results", async ({ page }) => {
     await page.goto("/search?q=quran");
