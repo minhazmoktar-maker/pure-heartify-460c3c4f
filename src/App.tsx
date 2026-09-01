@@ -350,7 +350,12 @@ const App = () => (
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/trust" element={<Trust />} />
+                <Route path="/verify" element={<VerifyTrust />} />
                 <Route path="/verify/:videoId" element={<Verify />} />
+                <Route path="/directory" element={<Directory />} />
+                <Route path="/islamic-learning" element={<KnowledgeHub />} />
+                <Route path="/halal-video" element={<KnowledgeHub />} />
+                <Route path="/quran-listening" element={<KnowledgeHub />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
                 <Route path="/guides/best-islamic-cartoons" element={<BestIslamicCartoons />} />
                 <Route path="/guides/islamic-calendar-2026" element={<HijriCalendar2026 />} />
