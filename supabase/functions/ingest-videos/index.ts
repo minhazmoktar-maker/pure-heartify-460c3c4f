@@ -682,18 +682,31 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
   const CHUNK = 25;
   let inserted = 0;
 
+  // `return=representation` makes PostgREST echo only the rows it actually
+  // inserted, so duplicates ignored by on_conflict are NOT counted as growth.
+  // Counting the chunk length instead made ingestion look like it added ~11k
+  // videos/hour while the corpus grew by a few hundred a day.
   const post = (batch: Record<string, unknown>[]) =>
-    sbFetch("curated_videos?on_conflict=video_id", {
+    sbFetch("curated_videos?on_conflict=video_id&select=video_id", {
       method: "POST",
-      headers: { "Prefer": "resolution=ignore-duplicates,return=headers-only" },
+      headers: { "Prefer": "resolution=ignore-duplicates,return=representation" },
       body: JSON.stringify(batch),
     });
+
+  async function newRowCount(res: Response, fallback: number): Promise<number> {
+    try {
+      const rows = await res.json();
+      return Array.isArray(rows) ? rows.length : fallback;
+    } catch {
+      return fallback;
+    }
+  }
 
   for (let i = 0; i < rows.length; i += CHUNK) {
     const chunk = rows.slice(i, i + CHUNK);
     const res = await post(chunk);
     if (res.ok) {
-      inserted += chunk.length;
+      inserted += await newRowCount(res, chunk.length);
       embedNewVideos(chunk).catch((e) => console.warn("[embed] batch failed:", e));
       continue;
     }
@@ -703,16 +716,18 @@ async function upsertVideos(rows: Record<string, unknown>[]): Promise<number> {
     // dropped instead of losing 50 good videos from trusted channels.
     if (body.includes("P0001")) {
       const accepted: Record<string, unknown>[] = [];
+      let acceptedNew = 0;
       for (const row of chunk) {
         const one = await post([row]);
         if (one.ok) {
           accepted.push(row);
+          acceptedNew += await newRowCount(one, 1);
         } else {
           const detail = await one.text();
           console.warn(`[ingest] row rejected (${row.video_id}): ${detail.slice(0, 200)}`);
         }
       }
-      inserted += accepted.length;
+      inserted += acceptedNew;
       if (accepted.length) embedNewVideos(accepted).catch((e) => console.warn("[embed] batch failed:", e));
       continue;
     }
@@ -1099,6 +1114,16 @@ async function ingestChannel(state: ChannelStateRow): Promise<{ added: number; q
       total_pulled: state.total_pulled + totalAdded,
     });
     if (!nextToken) break;
+  }
+
+  // A channel whose uploads playlist is fully walked (or that yielded nothing
+  // new this run) must not be re-walked every 4 hours — that burns the daily
+  // quota re-reading videos we already have instead of pulling fresh channels.
+  if (!pageToken || totalAdded === 0) {
+    const cooldownHours = !pageToken ? 72 : 24;
+    await updateChannelState(state.id, {
+      next_attempt_at: new Date(Date.now() + cooldownHours * 3_600_000).toISOString(),
+    });
   }
 
   await logIngestion(`channel:${state.channel_name}`, null, totalSeen, totalAdded, quota);

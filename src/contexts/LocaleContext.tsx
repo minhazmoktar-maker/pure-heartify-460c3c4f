@@ -186,6 +186,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
       if (cancelled) return;
       if (data) {
+        // A saved Cloud row is an explicit choice — pin it against geo.
+        markPinned();
         setPreferences((prev) => ({
           ...prev,
           ui_language: (data.ui_language as LanguageCode) ?? prev.ui_language,
@@ -241,6 +243,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   const updatePreferences = useCallback(
     async (patch: Partial<LocalePreferences>) => {
+      // A hand-picked language/region must never be re-derived by geo later.
+      if ("content_languages" in patch || "country_code" in patch) markPinned();
       setPreferences((prev) => ({ ...prev, ...patch }));
       if (user) {
         await supabase
