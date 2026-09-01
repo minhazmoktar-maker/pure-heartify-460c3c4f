@@ -135,7 +135,7 @@ export default function Directory() {
                         {c.title ?? c.handle ?? "Channel"}
                       </h2>
                       {c.trust_tier && (
-                        <Badge className={TIER_TONE[c.trust_tier] ?? "bg-muted text-muted-foreground"}>
+                        <Badge className={`shrink-0 whitespace-nowrap ${TIER_TONE[c.trust_tier] ?? "bg-muted text-muted-foreground"}`}>
                           Tier {c.trust_tier}
                         </Badge>
                       )}
