@@ -42,3 +42,20 @@ Only these change classes are in scope without re-opening the freeze:
 - copy/localization corrections
 
 Feature work resumes after the store submissions are accepted.
+
+## Freeze addendum — 2026-09-01
+
+- Institutional co-signatures are now a scored trust signal:
+  `channel_trust_weights.w_institution_cosign` (2.0, capped at 5 distinct
+  institutions), `channel_trust_profiles.institution_cosign_count`,
+  `channel_cosign_strength()`, and `get_cosign_trust_summary()` (public).
+  `/verify` shows live attestation coverage and states the ranking effect.
+  Only signatures binding the *current* ledger digest count.
+- `rejection-recovery-hourly` run manually: 322 videos re-opened; moderation +
+  visual sweep workers draining ~845 decisions / 30 min. `evidence_free_rejections`
+  = 14,963 remaining, gated on evidence-based channel review.
+- YouTube key pool: `YOUTUBE_API_KEY`, `_2`, `GOOGLE_API_KEY` live in every
+  quota-consuming function. `YOUTUBE_API_KEY_3..6` remain unset — the real
+  ceiling on 1M+ videos.
+- Owner-only, unchanged: signed Android/iOS builds (Team ID, Play SHA-256),
+  watchOS target, real institution signing keys.

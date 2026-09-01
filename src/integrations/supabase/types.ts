@@ -1299,6 +1299,7 @@ export type Database = {
           false_positive_count: number
           historical_quality: number | null
           id: string
+          institution_cosign_count: number
           last_recomputed_at: string | null
           manual_approval_count: number
           manual_rejection_count: number
@@ -1324,6 +1325,7 @@ export type Database = {
           false_positive_count?: number
           historical_quality?: number | null
           id?: string
+          institution_cosign_count?: number
           last_recomputed_at?: string | null
           manual_approval_count?: number
           manual_rejection_count?: number
@@ -1349,6 +1351,7 @@ export type Database = {
           false_positive_count?: number
           historical_quality?: number | null
           id?: string
+          institution_cosign_count?: number
           last_recomputed_at?: string | null
           manual_approval_count?: number
           manual_rejection_count?: number
@@ -1392,6 +1395,7 @@ export type Database = {
           w_false_negative: number
           w_false_positive: number
           w_historical_quality: number
+          w_institution_cosign: number
           w_manual_approval: number
           w_manual_rejection: number
           w_strike: number
@@ -1415,6 +1419,7 @@ export type Database = {
           w_false_negative?: number
           w_false_positive?: number
           w_historical_quality?: number
+          w_institution_cosign?: number
           w_manual_approval?: number
           w_manual_rejection?: number
           w_strike?: number
@@ -1438,6 +1443,7 @@ export type Database = {
           w_false_negative?: number
           w_false_positive?: number
           w_historical_quality?: number
+          w_institution_cosign?: number
           w_manual_approval?: number
           w_manual_rejection?: number
           w_strike?: number
@@ -8439,6 +8445,10 @@ export type Database = {
         Args: { p_upload_id: string }
         Returns: undefined
       }
+      channel_cosign_strength: {
+        Args: { _youtube_channel_id: string }
+        Returns: number
+      }
       channel_pipeline_tick: { Args: never; Returns: Json }
       check_channel_duplicate: {
         Args: { _handle: string; _title: string; _yt_id: string }
@@ -8718,6 +8728,15 @@ export type Database = {
       }
       get_concept: { Args: { _slug: string }; Returns: Json }
       get_concept_graph_stats: { Args: never; Returns: Json }
+      get_cosign_trust_summary: {
+        Args: never
+        Returns: {
+          active_institutions: number
+          cosigned_channels: number
+          cosigned_videos: number
+          latest_cosign_at: string
+        }[]
+      }
       get_due_benefit_label: { Args: never; Returns: Json }
       get_feed_candidates_diversified: {
         Args: {
