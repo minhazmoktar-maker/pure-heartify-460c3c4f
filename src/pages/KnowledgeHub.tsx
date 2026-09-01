@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SEO from "@/components/SEO";
 import NotFound from "@/pages/NotFound";
@@ -8,9 +8,14 @@ import { KNOWLEDGE_HUBS, hubList } from "@/data/knowledgeHubs";
  * Authoritative pillar hub (`/islamic-learning`, `/halal-video`,
  * `/quran-listening`). Unique title/description per hub, FAQPage + Article
  * JSON-LD, and dense internal links into the matching in-app surfaces.
+ *
+ * Each hub owns a top-level path, so the slug comes from the pathname when the
+ * route is registered without a param.
  */
 export default function KnowledgeHub() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug: paramSlug } = useParams<{ slug: string }>();
+  const { pathname } = useLocation();
+  const slug = paramSlug ?? pathname.replace(/^\/+|\/+$/g, "");
   const hub = slug ? KNOWLEDGE_HUBS[slug] : undefined;
 
   if (!hub) return <NotFound />;
