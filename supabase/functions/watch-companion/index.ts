@@ -135,20 +135,18 @@ Deno.serve(async (req) => {
     if (userId) {
       const today = new Date().toISOString().slice(0, 10);
       const [streaks, dhikr, salah] = await Promise.all([
-        client.from("streaks").select("current_streak,longest_streak,last_active_date").eq("user_id", userId).maybeSingle(),
+        client.from("streaks").select("current_streak,longest_streak,last_completed_date").eq("user_id", userId).maybeSingle(),
         client.from("dhikr_sessions").select("count,target,updated_at").eq("user_id", userId).order("updated_at", { ascending: false }).limit(1),
-        client.from("salah_log").select("prayer,completed").eq("user_id", userId).eq("date", today),
+        client.from("salah_log").select("prayer").eq("user_id", userId).eq("prayer_date", today),
       ]);
 
-      const loggedToday = (salah.data ?? [])
-        .filter((row: { completed?: boolean }) => row.completed !== false)
-        .map((row: { prayer: string }) => row.prayer);
+      const loggedToday = (salah.data ?? []).map((row: { prayer: string }) => row.prayer);
 
       account = {
         streak: {
           current: streaks.data?.current_streak ?? 0,
           longest: streaks.data?.longest_streak ?? 0,
-          last_active_date: streaks.data?.last_active_date ?? null,
+          last_completed_date: streaks.data?.last_completed_date ?? null,
         },
         dhikr: dhikr.data?.[0]
           ? { count: dhikr.data[0].count ?? 0, target: dhikr.data[0].target ?? null }
