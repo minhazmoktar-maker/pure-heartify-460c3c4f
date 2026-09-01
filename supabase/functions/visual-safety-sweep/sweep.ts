@@ -33,6 +33,16 @@ export function fallbackVerdict(videoId: string, reason = "model_error"): Verdic
   return { video_id: videoId, state: "unchecked", confidence: 0, flags: [reason] };
 }
 
+/**
+ * Terminal verdict for an image the model can never fetch (dead/blocked
+ * thumbnail URL). It is a decided verdict — so it is applied and the row is
+ * never re-claimed or retried — and degrades to `flagged`, matching the
+ * "unreadable image => flagged" rule instead of silently serving the video.
+ */
+export function unfetchableThumbnailVerdict(videoId: string, reason = "dead_thumbnail"): Verdict {
+  return { video_id: videoId, state: "flagged", confidence: 0, flags: [reason] };
+}
+
 /** Parses the model's reply. Any malformed/unsafe answer degrades to `flagged`. */
 export function parseVerdict(videoId: string, raw: string): Verdict {
   const match = raw?.match?.(/\{[\s\S]*\}/);
