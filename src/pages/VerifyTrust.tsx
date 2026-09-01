@@ -22,6 +22,14 @@ interface Institution {
   since: string | null;
 }
 
+interface CosignSummary {
+  active_institutions: number | null;
+  cosigned_videos: number | null;
+  cosigned_channels: number | null;
+  latest_cosign_at: string | null;
+}
+
+
 const BADGE_SNIPPET = `<a href="https://heartifyapp.com/verify" rel="noopener">
   <img src="https://heartifyapp.com/badge/reviewed-on-heartify.svg"
        alt="Reviewed on Heartify — halal-first content review"
