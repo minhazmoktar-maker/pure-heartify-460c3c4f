@@ -100,13 +100,25 @@ test.describe("Capacitor smoke", () => {
   test("video playback uses embedded in-app player and never navigates away", async ({ page }) => {
     const guard = installPlaybackOriginGuard(page);
     await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
-    const firstCard = page.locator('a[href^="/watch/"]').first();
-    await firstCard.waitFor({ state: "visible", timeout: 30_000 });
-    await firstCard.click();
-    await page.waitForURL(/\/watch\/.+/, { timeout: 15_000 });
-
+    const cards = page.locator('a[href^="/watch/"]');
+    await cards.first().waitFor({ state: "visible", timeout: 30_000 });
     const iframe = page.locator('iframe[src*="youtube-nocookie.com/embed/"]');
-    await expect(iframe).toBeVisible({ timeout: 15_000 });
+
+    // Individual videos can be taken down upstream between ingestion and this
+    // run, in which case the watch page correctly shows an unavailable notice
+    // instead of an embed. Walk a few cards to find a playable one.
+    let played = false;
+    for (let attempt = 0; attempt < 5 && !played; attempt++) {
+      await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
+      await cards.nth(attempt).waitFor({ state: "visible", timeout: 30_000 });
+      await cards.nth(attempt).click();
+      await page.waitForURL(/\/watch\/.+/, { timeout: 15_000 });
+      played = await iframe
+        .waitFor({ state: "visible", timeout: 15_000 })
+        .then(() => true)
+        .catch(() => false);
+    }
+    expect(played, "no playable embed found in the first 5 feed cards").toBe(true);
     const src = await iframe.getAttribute("src");
     expect(src).toContain("rel=0");
     expect(src).toContain("modestbranding=1");

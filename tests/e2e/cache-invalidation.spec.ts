@@ -28,7 +28,8 @@ async function hardReload(page: Page, url: string) {
   // Cache-buster forces the browser + any CDN edge to revalidate.
   const buster = `_cb=${Date.now()}`;
   const sep = url.includes("?") ? "&" : "?";
-  await page.goto(`${url}${sep}${buster}`, { waitUntil: "networkidle" });
+  // `networkidle` never settles: the app keeps realtime + feed requests open.
+  await page.goto(`${url}${sep}${buster}`, { waitUntil: "domcontentloaded" });
 }
 
 test.describe("nightly re-audit cache invalidation", () => {
