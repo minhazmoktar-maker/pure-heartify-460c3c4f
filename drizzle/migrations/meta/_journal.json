@@ -134,6 +134,13 @@
       "when": 1788274832202,
       "tag": "0018_institution_cosign_trust_weight",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788331242439,
+      "tag": "0019_grant_anon_viewer_entitlement_check",
+      "breakpoints": true
     }
   ]
 }
