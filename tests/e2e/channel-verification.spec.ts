@@ -3,6 +3,8 @@ import { test, expect } from "@playwright/test";
 test.describe("channel verification pipeline", () => {
   test("non-admin cannot access /admin/review", async ({ page }) => {
     await page.goto("/admin/review");
+    // /admin/review redirects into the unified console; wait for it to render.
+    await page.getByRole("heading", { level: 1 }).waitFor({ timeout: 20_000 });
     // Either sign-in prompt or Forbidden message; either satisfies gating.
     const body = await page.locator("body").innerText();
     expect(body.toLowerCase()).toMatch(/sign in|forbidden|admin/);

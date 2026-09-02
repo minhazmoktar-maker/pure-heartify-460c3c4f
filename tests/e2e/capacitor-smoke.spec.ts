@@ -76,8 +76,8 @@ test.describe("Capacitor smoke", () => {
 
   test("home feed loads more videos on scroll without leaving the app", async ({ page }) => {
     const guard = installPlaybackOriginGuard(page);
+    // The home route *is* the browsable feed; there is no separate Browse tab.
     await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
-    await page.getByRole("button", { name: /browse/i }).first().click();
     const thumbSel = 'img[src*="ytimg.com"], img[src*="youtube.com"]';
     await page.locator(thumbSel).first().waitFor({ state: "visible", timeout: 30_000 });
     const initial = await page.locator(thumbSel).count();

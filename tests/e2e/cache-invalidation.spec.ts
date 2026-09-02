@@ -33,6 +33,8 @@ async function hardReload(page: Page, url: string) {
 
 test.describe("nightly re-audit cache invalidation", () => {
   test("stale blocked content never reappears after sweep", async ({ page, request }) => {
+    // Visits ~6 surfaces with hard reloads plus a bfcache round-trip.
+    test.setTimeout(120_000);
     // 1. Baseline visit — populates any HTTP + service-worker caches.
     await page.goto("/");
     await page.waitForTimeout(1500);
