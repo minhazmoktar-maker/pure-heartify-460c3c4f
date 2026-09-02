@@ -98,6 +98,8 @@ test.describe("Capacitor smoke", () => {
   });
 
   test("video playback uses embedded in-app player and never navigates away", async ({ page }) => {
+    // May walk several feed cards before finding one still playable upstream.
+    test.setTimeout(150_000);
     const guard = installPlaybackOriginGuard(page);
     await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
     const cards = page.locator('a[href^="/watch/"]');
