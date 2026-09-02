@@ -112,18 +112,20 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         style={{ viewTransitionName: `video-${video.id}` } as React.CSSProperties}
       >
         {/* Real anchor so feed cards are crawlable, shareable (open in new
-            tab / copy link) and keyboard-reachable. Rendered first so the
-            later absolutely-positioned controls stay on top and clickable. */}
+            tab / copy link) and keyboard-reachable. `z-10` keeps it above the
+            thumbnail that follows it in DOM order; the interactive overlays
+            below sit at `z-20` so they stay clickable. */}
         <Link
           to={`/watch/${video.id}`}
           state={{ video }}
           aria-label={`Watch ${displayTitle}`}
-          className="absolute inset-0"
+          className="absolute inset-0 z-10"
           onClick={(e) => {
             e.stopPropagation();
             handleClick(e);
           }}
         />
+
 
         {thumbFailed ? (
           <div className="aspect-video w-full bg-muted" aria-label={`${displayTitle} thumbnail unavailable`} />
