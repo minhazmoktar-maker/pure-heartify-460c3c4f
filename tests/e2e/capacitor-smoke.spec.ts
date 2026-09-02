@@ -76,8 +76,8 @@ test.describe("Capacitor smoke", () => {
 
   test("home feed loads more videos on scroll without leaving the app", async ({ page }) => {
     const guard = installPlaybackOriginGuard(page);
+    // The home route *is* the browsable feed; there is no separate Browse tab.
     await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
-    await page.getByRole("button", { name: /browse/i }).first().click();
     const thumbSel = 'img[src*="ytimg.com"], img[src*="youtube.com"]';
     await page.locator(thumbSel).first().waitFor({ state: "visible", timeout: 30_000 });
     const initial = await page.locator(thumbSel).count();
@@ -98,15 +98,29 @@ test.describe("Capacitor smoke", () => {
   });
 
   test("video playback uses embedded in-app player and never navigates away", async ({ page }) => {
+    // May walk several feed cards before finding one still playable upstream.
+    test.setTimeout(150_000);
     const guard = installPlaybackOriginGuard(page);
     await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
-    const firstCard = page.locator('a[href^="/watch/"]').first();
-    await firstCard.waitFor({ state: "visible", timeout: 30_000 });
-    await firstCard.click();
-    await page.waitForURL(/\/watch\/.+/, { timeout: 15_000 });
-
+    const cards = page.locator('a[href^="/watch/"]');
+    await cards.first().waitFor({ state: "visible", timeout: 30_000 });
     const iframe = page.locator('iframe[src*="youtube-nocookie.com/embed/"]');
-    await expect(iframe).toBeVisible({ timeout: 15_000 });
+
+    // Individual videos can be taken down upstream between ingestion and this
+    // run, in which case the watch page correctly shows an unavailable notice
+    // instead of an embed. Walk a few cards to find a playable one.
+    let played = false;
+    for (let attempt = 0; attempt < 5 && !played; attempt++) {
+      await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
+      await cards.nth(attempt).waitFor({ state: "visible", timeout: 30_000 });
+      await cards.nth(attempt).click();
+      await page.waitForURL(/\/watch\/.+/, { timeout: 15_000 });
+      played = await iframe
+        .waitFor({ state: "visible", timeout: 15_000 })
+        .then(() => true)
+        .catch(() => false);
+    }
+    expect(played, "no playable embed found in the first 5 feed cards").toBe(true);
     const src = await iframe.getAttribute("src");
     expect(src).toContain("rel=0");
     expect(src).toContain("modestbranding=1");

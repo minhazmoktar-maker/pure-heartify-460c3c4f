@@ -112,18 +112,20 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
         style={{ viewTransitionName: `video-${video.id}` } as React.CSSProperties}
       >
         {/* Real anchor so feed cards are crawlable, shareable (open in new
-            tab / copy link) and keyboard-reachable. Rendered first so the
-            later absolutely-positioned controls stay on top and clickable. */}
+            tab / copy link) and keyboard-reachable. `z-10` keeps it above the
+            thumbnail that follows it in DOM order; the interactive overlays
+            below sit at `z-20` so they stay clickable. */}
         <Link
           to={`/watch/${video.id}`}
           state={{ video }}
           aria-label={`Watch ${displayTitle}`}
-          className="absolute inset-0"
+          className="absolute inset-0 z-10"
           onClick={(e) => {
             e.stopPropagation();
             handleClick(e);
           }}
         />
+
 
         {thumbFailed ? (
           <div className="aspect-video w-full bg-muted" aria-label={`${displayTitle} thumbnail unavailable`} />
@@ -141,14 +143,15 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
             {...({ fetchpriority: index < 2 ? "high" : "low" } as Record<string, string>)}
           />
         )}
-        <div className="absolute bottom-2 left-2 right-2">
+        <div className="pointer-events-none absolute bottom-2 left-2 right-2 z-20">
           <TrustBadges channelTitle={displayChannel} halalScore={video.halalScore} />
         </div>
-        <span className="absolute right-2 top-2 rounded-card bg-foreground/70 px-1.5 py-0.5 text-micro font-medium text-background">
+        <span className="pointer-events-none absolute right-2 top-2 z-20 rounded-card bg-foreground/70 px-1.5 py-0.5 text-micro font-medium text-background">
           {video.category}
         </span>
         <div
-          className="absolute left-2 top-2 flex items-center gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+          className="absolute left-2 top-2 z-20 flex items-center gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+
           onClick={stopBubble}
           onPointerDown={stopBubble}
           onMouseDown={stopBubble}

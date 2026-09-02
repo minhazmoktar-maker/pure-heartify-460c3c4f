@@ -28,11 +28,14 @@ async function hardReload(page: Page, url: string) {
   // Cache-buster forces the browser + any CDN edge to revalidate.
   const buster = `_cb=${Date.now()}`;
   const sep = url.includes("?") ? "&" : "?";
-  await page.goto(`${url}${sep}${buster}`, { waitUntil: "networkidle" });
+  // `networkidle` never settles: the app keeps realtime + feed requests open.
+  await page.goto(`${url}${sep}${buster}`, { waitUntil: "domcontentloaded" });
 }
 
 test.describe("nightly re-audit cache invalidation", () => {
   test("stale blocked content never reappears after sweep", async ({ page, request }) => {
+    // Visits ~6 surfaces with hard reloads plus a bfcache round-trip.
+    test.setTimeout(300_000);
     // 1. Baseline visit — populates any HTTP + service-worker caches.
     await page.goto("/");
     await page.waitForTimeout(1500);
