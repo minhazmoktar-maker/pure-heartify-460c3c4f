@@ -73,10 +73,14 @@ test.describe("nightly re-audit cache invalidation", () => {
       .toHaveLength(0);
 
     // 5. Back-forward cache (bfcache) revisit — most aggressive stale path.
-    await page.goto("/");
-    await page.goBack().catch(() => void 0);
-    await page.goForward().catch(() => void 0);
+    //    History navigations restored from bfcache never re-fire `load`, so they
+    //    must resolve on `commit` with an explicit cap or the test hangs.
+    const nav = { waitUntil: "commit" as const, timeout: 15_000 };
+    await page.goto("/", nav);
+    await page.goBack(nav).catch(() => void 0);
+    await page.goForward(nav).catch(() => void 0);
     await page.waitForTimeout(1000);
     await assertNoBlockedText(page, "bfcache");
+
   });
 });
