@@ -52,13 +52,14 @@ test.describe("Capacitor smoke", () => {
 
   test("home feed loads curated videos", async ({ page }) => {
     await page.goto(`${BASE}/`, { waitUntil: "domcontentloaded" });
-    // Wait for at least one video thumbnail (curated sections or infinite grid)
-    const thumb = page.locator('img[src*="ytimg.com"], img[src*="youtube.com"]').first();
-    await expect(thumb).toBeVisible({ timeout: 30_000 });
-    // Confirm at least a few video cards rendered
-    const count = await page.locator('img[src*="ytimg.com"], img[src*="youtube.com"]').count();
-    expect(count).toBeGreaterThan(3);
+    const thumbs = page.locator('img[src*="ytimg.com"], img[src*="youtube.com"]');
+    // Lanes hydrate progressively (top pick first, then trending/personalized),
+    // so poll instead of asserting the count at the first visible thumbnail.
+    await expect
+      .poll(() => thumbs.count(), { timeout: 45_000, message: "feed never rendered several video cards" })
+      .toBeGreaterThan(3);
   });
+
 
   test("blocked creators never appear on any surface", async ({ page }) => {
     const BLOCKED = ["mia yilin", "leila hormozi", "layla hormozi", "mehreen"];
@@ -115,12 +116,23 @@ test.describe("Capacitor smoke", () => {
       await cards.nth(attempt).waitFor({ state: "visible", timeout: 30_000 });
       await cards.nth(attempt).click();
       await page.waitForURL(/\/watch\/.+/, { timeout: 15_000 });
+      // The player is a lite-YouTube facade: the embed only mounts after the
+      // user signals intent, so the test has to press play like a real user.
+      const playButton = page.getByRole("button", { name: /^Play / });
+      const hasFacade = await playButton
+        .first()
+        .waitFor({ state: "visible", timeout: 15_000 })
+        .then(() => true)
+        .catch(() => false);
+      if (!hasFacade) continue;
+      await playButton.first().click();
       played = await iframe
         .waitFor({ state: "visible", timeout: 15_000 })
         .then(() => true)
         .catch(() => false);
     }
     expect(played, "no playable embed found in the first 5 feed cards").toBe(true);
+
     const src = await iframe.getAttribute("src");
     expect(src).toContain("rel=0");
     expect(src).toContain("modestbranding=1");
