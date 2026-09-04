@@ -176,6 +176,13 @@
       "when": 1788509071473,
       "tag": "0024_search_autocomplete_quality_filters",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788509143644,
+      "tag": "0025_search_autocomplete_word_boundary_phrases",
+      "breakpoints": true
     }
   ]
 }
