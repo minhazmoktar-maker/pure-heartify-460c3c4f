@@ -183,6 +183,13 @@
       "when": 1788509143644,
       "tag": "0025_search_autocomplete_word_boundary_phrases",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1788509229872,
+      "tag": "0026_search_autocomplete_whole_word_phrases",
+      "breakpoints": true
     }
   ]
 }
