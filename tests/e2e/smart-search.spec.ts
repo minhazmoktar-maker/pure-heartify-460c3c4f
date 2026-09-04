@@ -10,7 +10,8 @@ import { test, expect } from "../playwright-fixture";
 /** Search results stream in asynchronously; wait for the loading state to clear. */
 async function waitForResults(page: import("@playwright/test").Page) {
   await page
-    .getByText(/loading content/i)
+    .getByText(/loading[\w\s]*content/i)
+    .first()
     .waitFor({ state: "hidden", timeout: 25_000 })
     .catch(() => {});
   await page.waitForTimeout(1200);
