@@ -22,15 +22,27 @@ interface Short {
   duration_seconds: number | null;
   halal_score: number | null;
   content_language: string | null;
+  reason?: string | null;
 }
+
+const REASON_LABEL: Record<string, string> = {
+  institution_cosigned: "Co-signed by an institution",
+  your_interest: "Matches your interests",
+  channel_you_watch: "From a teacher you follow",
+  found_beneficial: "Others found this beneficial",
+  fresh_pick: "New this week",
+};
 
 /**
  * Shorts — vertical short-form reel of *strictly* moderated halal reminders.
  *
- * Every item comes from `get_shorts_feed`, which only returns videos that
- * passed text moderation AND the visual safety sweep (`visual_state = 'clean'`)
- * — the stage that rejects music, instruments and non-mahram visuals. Nothing
- * unchecked or flagged can reach this surface.
+ * Items come from `get_shorts_recommended`, which applies the same strict
+ * eligibility floor as `get_shorts_feed` (text moderation AND the visual
+ * safety sweep `visual_state = 'clean'` — the stage that rejects music,
+ * instruments and non-mahram visuals) and then ranks by *benefit*: declared
+ * interests, channel affinity, benefit-label yes-rate, institutional
+ * co-signatures and freshness, with a 2-per-channel diversity cap. It falls
+ * back to the unpersonalised feed if the recommender is unavailable.
  *
  * Deliberately *not* an infinite dopamine loop: after every 10 shorts the feed
  * inserts a pause card, and finishing a short queues the "was this worth it?"
@@ -46,23 +58,27 @@ export default function Shorts() {
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ["shorts-feed", locale],
+    queryKey: ["shorts-feed", locale, user?.id ?? "anon"],
     initialPageParam: 0,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam }) => {
-      const { data, error } = await supabase.rpc("get_shorts_feed", {
+      const args = {
         _limit: PAGE,
         _offset: pageParam as number,
         _lang: null,
         _min_seconds: 10,
         _max_seconds: 120,
-      });
+      };
+      const ranked = await supabase.rpc("get_shorts_recommended", args);
+      if (!ranked.error) return (ranked.data as unknown as Short[]) ?? [];
+      const { data, error } = await supabase.rpc("get_shorts_feed", args);
       if (error) throw error;
       return (data as unknown as Short[]) ?? [];
     },
     getNextPageParam: (last, all) => (last.length < PAGE ? undefined : all.length * PAGE),
   });
+
 
   const shorts = useMemo(() => {
     const seen = new Set<string>();
