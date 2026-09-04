@@ -148,6 +148,13 @@
       "when": 1788331330395,
       "tag": "0020_anon_safe_role_entitlement_helpers",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1788493476057,
+      "tag": "0021_get_shorts_feed",
+      "breakpoints": true
     }
   ]
 }

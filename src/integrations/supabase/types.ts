@@ -8889,6 +8889,27 @@ export type Database = {
           d7: number
         }[]
       }
+      get_shorts_feed: {
+        Args: {
+          _lang?: string
+          _limit?: number
+          _max_seconds?: number
+          _min_seconds?: number
+          _offset?: number
+        }
+        Returns: {
+          category: string
+          channel_id: string
+          channel_title: string
+          content_language: string
+          duration_seconds: number
+          halal_score: number
+          published_at: string
+          thumbnail_url: string
+          title: string
+          video_id: string
+        }[]
+      }
       get_transcript_coverage: { Args: never; Returns: Json }
       get_transparency_appeals: {
         Args: never
