@@ -162,6 +162,13 @@
       "when": 1788502549708,
       "tag": "0022_shorts_recommendation_engine",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1788509004132,
+      "tag": "0023_search_autocomplete_related_suggestions",
+      "breakpoints": true
     }
   ]
 }
