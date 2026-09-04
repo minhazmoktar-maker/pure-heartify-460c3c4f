@@ -97,6 +97,23 @@ async function handler(req: Request): Promise<Response> {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
+  // --- authorization -------------------------------------------------------
+  // This endpoint publishes / hides / archives rows, so it is restricted to the
+  // pg_cron caller (shared secret header) or an admin/moderator JWT, matching
+  // the gate used by moderate-backlog, sample-channel-videos, etc.
+  const cronToken = req.headers.get("x-cron-token");
+  const cronSecret = req.headers.get("x-cron-secret");
+  const isCron =
+    (!!cronSecret && cronSecret === Deno.env.get("CRON_SECRET")) ||
+    (!!cronToken && cronToken === Deno.env.get("INGEST_CRON_TOKEN")) ||
+    (!!cronToken && cronToken === Deno.env.get("AUDIT_CRON_TOKEN"));
+  if (!isCron) {
+    const authResult = await authorize(req, "approve_content");
+    if (authResult instanceof Response) return authResult;
+  }
+
+
+
   let body: { language?: string; limit?: number; dry_run?: boolean } = {};
   try {
     body = req.method === "POST" ? await req.json() : {};
