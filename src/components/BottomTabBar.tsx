@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Compass, Library, User } from "lucide-react";
+import { Home, Compass, Library, User, Zap } from "lucide-react";
 import { SPINES, shouldShowBottomBar, resolveSpine, type SpineId } from "@/lib/navigation";
 import { soundTap } from "@/lib/soundHaptics";
 import { useLocaleOptional } from "@/contexts/LocaleContext";
@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 
 const ICONS: Record<SpineId, React.ComponentType<{ className?: string }>> = {
   home: Home,
+  shorts: Zap,
   explore: Compass,
   library: Library,
   profile: User,

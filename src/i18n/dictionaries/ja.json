@@ -1,6 +1,7 @@
 {
   "app.name": "Heartify",
   "nav.home": "ホーム",
+  "nav.shorts": "Shorts",
   "nav.browse": "閲覧",
   "nav.library": "ライブラリ",
   "nav.listen": "聴く",

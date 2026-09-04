@@ -1,6 +1,7 @@
 {
   "app.name": "Heartify",
   "nav.home": "Accueil",
+  "nav.shorts": "Shorts",
   "nav.browse": "Parcourir",
   "nav.library": "Bibliothèque",
   "nav.listen": "Écouter",

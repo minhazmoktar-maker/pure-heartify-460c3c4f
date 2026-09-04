@@ -8,9 +8,9 @@ import {
 } from "@/lib/navigation";
 
 describe("navigation spine map", () => {
-  it("has exactly 4 spines (Home · Explore · Library · Profile)", () => {
-    expect(SPINES).toHaveLength(4);
-    expect(SPINES.map((s) => s.id)).toEqual(["home", "explore", "library", "profile"]);
+  it("has exactly 5 spines (Home · Shorts · Explore · Library · Profile)", () => {
+    expect(SPINES).toHaveLength(5);
+    expect(SPINES.map((s) => s.id)).toEqual(["home", "shorts", "explore", "library", "profile"]);
   });
 
   it("resolves canonical routes to the expected spine", () => {
@@ -18,7 +18,7 @@ describe("navigation spine map", () => {
     expect(resolveSpine("/")).toBe("home");
     expect(resolveSpine("/today")).toBe("home");
     expect(resolveSpine("/watch/abc123")).toBe("home");
-    expect(resolveSpine("/shorts")).toBe("home");
+    expect(resolveSpine("/shorts")).toBe("shorts");
 
     // Explore spine — search, channels, supporting Islamic study surfaces
     expect(resolveSpine("/explore")).toBe("explore");
@@ -65,7 +65,7 @@ describe("navigation spine map", () => {
     expect(shouldShowBottomBar("/")).toBe(true);
     expect(shouldShowBottomBar("/prayer")).toBe(true);
     expect(shouldShowBottomBar("/watch/xyz")).toBe(false);
-    expect(shouldShowBottomBar("/shorts")).toBe(false);
+    expect(shouldShowBottomBar("/shorts")).toBe(true);
     expect(shouldShowBottomBar("/mushaf/12")).toBe(false);
     expect(shouldShowBottomBar("/login")).toBe(false);
     expect(shouldShowBottomBar("/onboarding")).toBe(false);
@@ -73,6 +73,7 @@ describe("navigation spine map", () => {
 
   it("returns canonical entry paths for each spine", () => {
     expect(spinePath("home")).toBe("/");
+    expect(spinePath("shorts")).toBe("/shorts");
     expect(spinePath("explore")).toBe("/explore");
     expect(spinePath("library")).toBe("/me");
     expect(spinePath("profile")).toBe("/profile");

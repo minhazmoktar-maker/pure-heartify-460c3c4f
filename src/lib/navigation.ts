@@ -14,7 +14,7 @@
  *   - Route-owning tests
  */
 
-export type SpineId = "home" | "explore" | "library" | "profile";
+export type SpineId = "home" | "shorts" | "explore" | "library" | "profile";
 
 export interface SpineDefinition {
   id: SpineId;
@@ -41,12 +41,18 @@ export const SPINES: readonly SpineDefinition[] = [
     owns: [
       "/",
       "/today",
-      "/shorts",
       /^\/watch\//,
       /^\/w\//,          // weekly recap shares
       /^\/b\//,          // badge shares
       /^\/s\//,          // streak shares
     ],
+  },
+  {
+    id: "shorts",
+    label: "Shorts",
+    labelKey: "nav.shorts",
+    path: "/shorts",
+    owns: ["/shorts", /^\/shorts\//],
   },
   {
     id: "explore",
@@ -179,7 +185,6 @@ export function isSystemRoute(pathname: string): boolean {
 export function shouldShowBottomBar(pathname: string): boolean {
   const HIDDEN = [
     /^\/watch\//,      // full-bleed video
-    /^\/shorts/,       // vertical feed
     /^\/mushaf/,       // reading immersion
     /^\/login/, /^\/signup/, /^\/onboarding/,
     /^\/forgot-password/, /^\/reset-password/, /^\/verify-email/,

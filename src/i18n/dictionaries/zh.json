@@ -1,6 +1,7 @@
 {
   "app.name": "Heartify",
   "nav.home": "首页",
+  "nav.shorts": "Shorts",
   "nav.browse": "浏览",
   "nav.library": "资料库",
   "nav.listen": "聆听",
