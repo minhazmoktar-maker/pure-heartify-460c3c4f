@@ -101,7 +101,7 @@ export const REGION_CONTENT_LANGUAGES: Record<string, LanguageCode[]> = {
   // language first, then the languages the local Muslim community actually
   // speaks, so a viewer in London or Chicago sees a world-wide feed rather
   // than a thin single-language one.
-  GB: ["en", "ur", "bn", "ar", "tr", "so"].filter(isSupported) as LanguageCode[],
+  GB: ["en", "ur", "bn", "ar", "tr"],
   IE: ["en", "ar", "ur", "fr"],
   FR: ["fr", "ar", "en", "tr", "ha"],
   DE: ["de", "tr", "ar", "en", "fa", "bn"],
@@ -114,7 +114,7 @@ export const REGION_CONTENT_LANGUAGES: Record<string, LanguageCode[]> = {
   PT: ["pt", "ar", "en", "bn"],
   IT: ["en", "ar", "fr", "bn", "ur"],
   MT: ["en", "ar"],
-  SE: ["en", "ar", "fa", "so", "tr"].filter(isSupported) as LanguageCode[],
+  SE: ["en", "ar", "fa", "tr"],
   NO: ["en", "ar", "ur", "tr", "fa"],
   DK: ["en", "ar", "tr", "ur", "bn"],
   FI: ["en", "ar", "sw", "fa"],
