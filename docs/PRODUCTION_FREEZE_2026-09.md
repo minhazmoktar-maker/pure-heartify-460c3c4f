@@ -87,3 +87,54 @@ Spec corrections made alongside the fix:
   the full 300s timeout.
 - Sandbox runs must go through `scripts/playwright.sh` (the downloaded
   `chrome-headless-shell` cannot resolve libglib here).
+
+## Formal freeze entry — 2026-09-04
+
+State at freeze: **228 passed · 33 skipped (auth-gated, need CI test-user
+secrets) · 0 failed** on the full 262-spec Playwright suite via
+`./scripts/playwright.sh`. Typecheck clean (`tsgo -p tsconfig.app.json`),
+unit suite green.
+
+### Shipped in this freeze window
+
+**Shorts / reels (`/shorts`) — strict-halal by construction.**
+New `get_shorts_feed(_limit,_offset,_lang,_min_seconds,_max_seconds)` RPC
+(migration `0021`) is the only data source. Eligibility, all server-side:
+`moderation_state IN ('approved','auto_approved')`, `visual_state = 'clean'`
+(the visual sweep is the stage that rejects music, instruments and non-mahram
+imagery — `unchecked` and `flagged` can never surface here), `halal_score >= 70`,
+embeddable, not hidden/archived/premium-only, dedup-canonical, duration clamped
+to 5–180s. ~46k videos currently qualify. The page no longer guesses shorts from
+title regexes against an external API.
+Anti-addiction guardrails, deliberate: a pause card every 10 shorts pointing to
+Today's Dose, and a T+0 `queue_benefit_label_now` after 15s on screen so shorts
+feed the *benefit* ranker rather than watch time. `/shorts` is now in
+`MAIN_NAV_ITEMS`.
+
+**RTL regression fixed.** `YouTubeVideoCard` overlays used physical
+`left-2`/`right-2`, so the bookmark + feedback action row did not mirror and
+`rtl-keyboard.spec.ts` failed reading-order on the watch page. Converted to
+logical `start-2`/`end-2`; RTL keyboard + snapshot + halal-surface specs pass.
+
+### Known, accepted at freeze
+
+- **Dev-only React ref warning.** `Function components cannot be given refs`
+  cascades from `lovable-tagger` in the Vite dev pipeline (stack bottoms out in
+  `react-helmet-async`/dev tooling, not app code). Absent from production
+  builds; console assertions filter it.
+- **33 skipped specs** are role/auth-gated (`TEST_ADMIN_*`, `TEST_MOD_*`,
+  `TEST_USER_*`) and run only where those CI secrets exist.
+
+### Owner-only — cannot be completed in this environment
+
+1. **Signed Android build / Play submission.** Needs the real Apple Team ID and
+   the Play app-signing SHA-256 fingerprint (never supplied) plus a local
+   Android Studio/keystore. Repo side is ready: `heartify-signing.gradle`,
+   fastlane `internal`/`build_only`, `apply-native-config.mjs`.
+2. **Apple Watch target.** `src/lib/shared/watch.ts` + `docs/WATCHOS_ROADMAP.md`
+   define the contract and complication mapping; producing a watch app requires
+   Xcode and an Apple developer account.
+3. **Real institution signatures.** Code path is live — `institution_cosign`,
+   `attestation_cosignatures`, `channel_trust_weights.w_institution_cosign`
+   boosting rank, and the `/verify` dashboard. Only partner sign-off is missing.
+4. **`YOUTUBE_API_KEY_3..6`** remain unset; ingest rotates whatever keys exist.
