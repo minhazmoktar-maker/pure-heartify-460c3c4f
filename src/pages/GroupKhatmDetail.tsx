@@ -27,8 +27,9 @@ interface Group {
 }
 
 /** Signed-out visitors have no column access to owner_id (privacy). */
+// Anonymous visitors never receive the owner's private `intention` reflection.
 const ANON_GROUP_COLUMNS =
-  "id,name,description,intention,invite_code,is_public,completed_at,created_at";
+  "id,name,description,invite_code,is_public,completed_at,created_at";
 
 
 interface Claim {
