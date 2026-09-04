@@ -155,6 +155,13 @@
       "when": 1788493476057,
       "tag": "0021_get_shorts_feed",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1788502549708,
+      "tag": "0022_shorts_recommendation_engine",
+      "breakpoints": true
     }
   ]
 }

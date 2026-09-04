@@ -22,15 +22,27 @@ interface Short {
   duration_seconds: number | null;
   halal_score: number | null;
   content_language: string | null;
+  reason?: string | null;
 }
+
+const REASON_LABEL: Record<string, string> = {
+  institution_cosigned: "Co-signed by an institution",
+  your_interest: "Matches your interests",
+  channel_you_watch: "From a teacher you follow",
+  found_beneficial: "Others found this beneficial",
+  fresh_pick: "New this week",
+};
 
 /**
  * Shorts — vertical short-form reel of *strictly* moderated halal reminders.
  *
- * Every item comes from `get_shorts_feed`, which only returns videos that
- * passed text moderation AND the visual safety sweep (`visual_state = 'clean'`)
- * — the stage that rejects music, instruments and non-mahram visuals. Nothing
- * unchecked or flagged can reach this surface.
+ * Items come from `get_shorts_recommended`, which applies the same strict
+ * eligibility floor as `get_shorts_feed` (text moderation AND the visual
+ * safety sweep `visual_state = 'clean'` — the stage that rejects music,
+ * instruments and non-mahram visuals) and then ranks by *benefit*: declared
+ * interests, channel affinity, benefit-label yes-rate, institutional
+ * co-signatures and freshness, with a 2-per-channel diversity cap. It falls
+ * back to the unpersonalised feed if the recommender is unavailable.
  *
  * Deliberately *not* an infinite dopamine loop: after every 10 shorts the feed
  * inserts a pause card, and finishing a short queues the "was this worth it?"
@@ -46,23 +58,27 @@ export default function Shorts() {
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ["shorts-feed", locale],
+    queryKey: ["shorts-feed", locale, user?.id ?? "anon"],
     initialPageParam: 0,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
     queryFn: async ({ pageParam }) => {
-      const { data, error } = await supabase.rpc("get_shorts_feed", {
+      const args = {
         _limit: PAGE,
         _offset: pageParam as number,
         _lang: null,
         _min_seconds: 10,
         _max_seconds: 120,
-      });
+      };
+      const ranked = await supabase.rpc("get_shorts_recommended", args);
+      if (!ranked.error) return (ranked.data as unknown as Short[]) ?? [];
+      const { data, error } = await supabase.rpc("get_shorts_feed", args);
       if (error) throw error;
       return (data as unknown as Short[]) ?? [];
     },
     getNextPageParam: (last, all) => (last.length < PAGE ? undefined : all.length * PAGE),
   });
+
 
   const shorts = useMemo(() => {
     const seen = new Set<string>();
@@ -210,8 +226,8 @@ export default function Shorts() {
                     )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="absolute bottom-28 end-3 z-20 flex flex-col items-center gap-4 text-white">
+                  {/* Actions — lifted clear of the overlay text + tab bar */}
+                  <div className="absolute bottom-40 end-3 z-20 flex flex-col items-center gap-4 text-white md:bottom-32">
                     <button
                       type="button"
                       onClick={() =>
@@ -240,7 +256,8 @@ export default function Shorts() {
                     </button>
                   </div>
 
-                  <div className="absolute inset-x-0 bottom-0 z-10 space-y-1.5 bg-gradient-to-t from-black/85 to-transparent p-4 pb-8 text-white">
+                  {/* Overlay text keeps clear of the bottom tab bar + safe area */}
+                  <div className="absolute inset-x-0 bottom-0 z-10 space-y-1.5 bg-gradient-to-t from-black/85 to-transparent p-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-white md:pb-8">
                     <p className="inline-flex items-center gap-1 text-micro font-medium uppercase tracking-wide text-white/70">
                       <ShieldCheck className="h-3 w-3 text-primary" aria-hidden />
                       Moderated · {s.channel_title ?? "Heartify"}
@@ -250,10 +267,16 @@ export default function Shorts() {
                         {s.title}
                       </Link>
                     </h2>
-                    {s.duration_seconds ? (
-                      <p className="text-micro text-white/60">{s.duration_seconds}s</p>
-                    ) : null}
+                    <p className="flex flex-wrap items-center gap-2 text-micro text-white/60">
+                      {s.reason && REASON_LABEL[s.reason] ? (
+                        <span className="rounded-pill bg-white/10 px-2 py-0.5">
+                          {REASON_LABEL[s.reason]}
+                        </span>
+                      ) : null}
+                      {s.duration_seconds ? <span>{s.duration_seconds}s</span> : null}
+                    </p>
                   </div>
+
                 </section>
               </div>
             );
