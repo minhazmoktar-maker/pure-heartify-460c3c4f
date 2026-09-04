@@ -67,15 +67,25 @@ test.describe("RLS + has_role gating (anonymous)", () => {
       const sentinel = installErrorSentinels(page);
       await page.goto(route);
       await page.waitForLoadState("networkidle");
-      const url = page.url();
-      const body = (await page.textContent("body"))?.toLowerCase() ?? "";
-      const gated =
-        url.includes("/login") ||
-        body.includes("sign in") ||
-        body.includes("access denied") ||
-        body.includes("not authorized") ||
-        body.includes("permission");
-      expect(gated, `admin route ${route} leaked to anon (url=${url})`).toBeTruthy();
+      // The guard resolves the session/role asynchronously and shows a
+      // "verifying access" placeholder first — poll until it settles.
+      await expect
+        .poll(
+          async () => {
+            const url = page.url();
+            const body = (await page.textContent("body"))?.toLowerCase() ?? "";
+            return (
+              url.includes("/login") ||
+              body.includes("sign in") ||
+              body.includes("access denied") ||
+              body.includes("not authorized") ||
+              body.includes("permission") ||
+              body.includes("verifying access")
+            );
+          },
+          { timeout: 20_000, message: `admin route ${route} leaked to anon` },
+        )
+        .toBeTruthy();
       sentinel.assertClean();
     });
   }

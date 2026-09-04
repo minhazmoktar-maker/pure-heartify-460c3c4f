@@ -20,8 +20,13 @@ export default function AdminRoute({ children }: { children: ReactNode }) {
   const ok = useRequireAdminMfa();
   if (!ok) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" aria-label="Verifying access" />
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background"
+      >
+        <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />
+        <p className="text-sm text-muted-foreground">Verifying access…</p>
       </div>
     );
   }
