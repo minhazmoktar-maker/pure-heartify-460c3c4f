@@ -1,6 +1,7 @@
 {
   "app.name": "Heartify",
   "nav.home": "Utama",
+  "nav.shorts": "Shorts",
   "nav.browse": "Layari",
   "nav.library": "Perpustakaan",
   "nav.listen": "Dengar",

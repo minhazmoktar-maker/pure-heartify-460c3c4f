@@ -151,14 +151,14 @@ export default function Shorts() {
       </div>
 
       {isLoading ? (
-        <div className="flex h-[calc(100dvh-4rem)] items-center justify-center">
+        <div className="flex h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)] items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-hidden />
           <span className="sr-only">Loading shorts</span>
         </div>
       ) : (
         <div
           ref={containerRef}
-          className="mx-auto h-[calc(100dvh-4rem)] max-w-[420px] snap-y snap-mandatory overflow-y-scroll bg-black"
+          className="mx-auto h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)] max-w-[420px] snap-y snap-mandatory overflow-y-scroll bg-black"
         >
           {shorts.map((s, i) => {
             const isActive = i === active;
@@ -167,7 +167,7 @@ export default function Shorts() {
             return (
               <div key={s.video_id}>
                 {pause && (
-                  <section className="flex h-[calc(100dvh-4rem)] snap-start snap-always flex-col items-center justify-center gap-3 bg-black px-8 text-center text-white">
+                  <section className="flex h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)] snap-start snap-always flex-col items-center justify-center gap-3 bg-black px-8 text-center text-white">
                     <Sprout className="h-8 w-8 text-primary" aria-hidden />
                     <h2 className="text-lg font-semibold">That&apos;s 10 reminders</h2>
                     <p className="text-sm text-white/70">
@@ -185,7 +185,7 @@ export default function Shorts() {
                 <section
                   data-short
                   data-idx={i}
-                  className="relative h-[calc(100dvh-4rem)] snap-start snap-always"
+                  className="relative h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)] snap-start snap-always"
                 >
                   <div className="absolute inset-0 flex items-center justify-center bg-black">
                     {isActive && isEmbeddable ? (

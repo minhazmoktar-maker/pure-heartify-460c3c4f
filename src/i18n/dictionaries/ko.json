@@ -1,6 +1,7 @@
 {
   "app.name": "Heartify",
   "nav.home": "홈",
+  "nav.shorts": "Shorts",
   "nav.browse": "탐색",
   "nav.library": "라이브러리",
   "nav.listen": "듣기",
