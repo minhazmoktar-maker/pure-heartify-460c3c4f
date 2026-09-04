@@ -138,3 +138,41 @@ logical `start-2`/`end-2`; RTL keyboard + snapshot + halal-surface specs pass.
    `attestation_cosignatures`, `channel_trust_weights.w_institution_cosign`
    boosting rank, and the `/verify` dashboard. Only partner sign-off is missing.
 4. **`YOUTUBE_API_KEY_3..6`** remain unset; ingest rotates whatever keys exist.
+
+---
+
+## Freeze entry — 2026-09-04 (search relevance + suggestions)
+
+### Verification
+
+- `bash scripts/playwright.sh` (full suite, system Chromium path): **229 passed,
+  33 skipped (auth-gated), 0 failed** in 17.9m.
+- `bunx vitest run src/lib/__tests__/searchEngine.test.ts`: 14 passed.
+- Autocomplete RPC smoke-tested over the anon REST endpoint for
+  `quran / hadith / ram / salah / dua / tajwe / seerah` — all sub-second.
+
+### Shipped this cycle
+
+- **`search_autocomplete` rebuilt** (migrations `0023`–`0028`). It now blends
+  four sources instead of channel-prefix only: related multi-word phrases mined
+  from serving video titles, word-boundary channel matches, an expanded topic
+  list, and popular past queries. Whole-word phrase mining uses word arrays
+  (never regex slicing), so suggestions can no longer be cut mid-word.
+  `_suggestion_phrase_is_noisy()` drops repeated words, query-swallowing tokens
+  (`quran quranrecitation`) and dangling connectors/initials
+  (`salah assim al`). Every mined title stays inside the strict halal predicate:
+  `approved|auto_approved`, not hidden/archived/premium, `visual_state='clean'`,
+  `halal_score >= 70`.
+- **Spelling normalizer widened** — `muslmah|muslimah|musalman → muslim`,
+  `emaan|eemaan → iman`, plus `iman/faith/belief/aqeedah/tawheed` and
+  `muslim/muslimah/islam/ummah` synonym clusters.
+- **"Searching instead for X"** now renders on `/search` when the canonical
+  query differs from what was typed, so normalized variants are visible rather
+  than silent. Wording deliberately avoids "Results for" to keep the page's
+  single `Results for "<q>"` heading unambiguous for a11y and tests.
+
+### Still open (unchanged, owner-only)
+
+Signed Android build, Apple Watch Xcode target, real partner attestation
+signatures, `YOUTUBE_API_KEY_3..6`. Dev-only `lovable-tagger` ref warning
+remains accepted and filtered.

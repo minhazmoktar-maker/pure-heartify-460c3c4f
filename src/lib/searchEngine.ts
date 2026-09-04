@@ -37,9 +37,11 @@ const ISLAMIC_SPELLING: Record<string, string> = {
   quraan: "quran", qur_an: "quran", koran: "quran", "qur-an": "quran",
   muhammed: "muhammad", mohammad: "muhammad", mohammed: "muhammad", muhamad: "muhammad",
   ramadhan: "ramadan", ramadhaan: "ramadan", ramzan: "ramadan", ramadaan: "ramadan",
-  eeman: "iman", imaan: "iman", eman: "iman",
+  eeman: "iman", imaan: "iman", eman: "iman", emaan: "iman", eemaan: "iman",
   dua: "dua", duaa: "dua", duas: "dua",
   islaam: "islam", isalm: "islam",
+  muslmah: "muslim", muslimah: "muslim", musalman: "muslim", musulman: "muslim",
+
   shariah: "sharia", shareeah: "sharia",
   hadeeth: "hadith", ahadith: "hadith",
   seerat: "seerah", sirah: "seerah",
@@ -76,6 +78,9 @@ const SYNONYM_CLUSTERS: string[][] = [
   ["startup", "business", "entrepreneur", "founder"],
   ["islam", "muslim", "islamic", "deen"],
   ["quran", "koran", "quraan", "recitation", "tilawah", "tilawa"],
+  ["iman", "faith", "belief", "aqeedah", "tawheed"],
+  ["muslim", "muslimah", "islam", "ummah"],
+
   ["nasheed", "islamic song", "anasheed", "naat"],
   ["lecture", "bayan", "khutbah", "khutba", "sermon", "talk"],
   ["motivation", "productivity", "self improvement", "self-help"],

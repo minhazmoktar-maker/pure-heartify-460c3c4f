@@ -11,6 +11,7 @@ import ReciterResults from "@/components/ReciterResults";
 import MomentResults from "@/components/MomentResults";
 import { addRecentSearch } from "@/lib/recentSearches";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
+import { normalize } from "@/lib/searchEngine";
 import { growth } from "@/lib/growthEvents";
 import type { YouTubeVideo } from "@/services/youtube";
 
@@ -47,7 +48,12 @@ const SearchResults = () => {
   }, [query, blocked]);
 
   const activeQuery = blocked ? "" : query || liveInput;
+  const canonicalQuery = useMemo(
+    () => (query ? normalize(query) : ""),
+    [query],
+  );
   const smart = useSmartSearch(activeQuery);
+
 
   useEffect(() => {
     if (!query || blocked || smart.isLoading) return;
@@ -134,6 +140,15 @@ const SearchResults = () => {
                 </p>
               </div>
             </div>
+
+            {canonicalQuery && canonicalQuery !== query.toLowerCase() && (
+              <p className="mb-4 text-sm text-muted-foreground">
+                Searching instead for{" "}
+                <span className="font-semibold text-foreground">{canonicalQuery}</span>
+              </p>
+
+            )}
+
 
             {smart.didYouMean && (
               <div className="mb-4 flex items-center gap-2 rounded-card border border-border bg-card px-3 py-2 text-sm">

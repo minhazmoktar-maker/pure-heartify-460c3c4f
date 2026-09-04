@@ -8104,6 +8104,10 @@ export type Database = {
       _inappropriate_pattern: { Args: never; Returns: string }
       _run_channel_id_backfill: { Args: { _batch?: number }; Returns: number }
       _suggestion_is_blocked: { Args: { _text: string }; Returns: boolean }
+      _suggestion_phrase_is_noisy: {
+        Args: { _qhead: string; _suggestion: string }
+        Returns: boolean
+      }
       _user_scoped_columns: {
         Args: never
         Returns: {
