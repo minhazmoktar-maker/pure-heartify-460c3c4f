@@ -265,11 +265,21 @@ async function handler(req: Request): Promise<Response> {
         .in("video_id", publish.slice(i, i + 200));
     }
   }
+  // Group hides by reason so identical reasons apply in one bulk UPDATE
+  // instead of one statement per row.
+  const hideByReason = new Map<string, string[]>();
   for (const h of hide) {
-    await admin
-      .from("curated_videos")
-      .update({ is_hidden: true, hidden_reason: h.reason })
-      .eq("video_id", h.video_id);
+    const list = hideByReason.get(h.reason) ?? [];
+    list.push(h.video_id);
+    hideByReason.set(h.reason, list);
+  }
+  for (const [reason, ids] of hideByReason) {
+    for (let i = 0; i < ids.length; i += 200) {
+      await admin
+        .from("curated_videos")
+        .update({ is_hidden: true, hidden_reason: reason })
+        .in("video_id", ids.slice(i, i + 200));
+    }
   }
   if (archive.length) {
     for (let i = 0; i < archive.length; i += 200) {
