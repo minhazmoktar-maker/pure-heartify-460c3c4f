@@ -65,7 +65,8 @@ interface Showcase {
  * decides what is shareable.
  */
 export default function PublicProfile() {
-  const { handle = "" } = useParams();
+  const params = useParams();
+  const handle = params.handle ?? params.id ?? "";
   const [profile, setProfile] = useState<Showcase | null>(null);
   const [loading, setLoading] = useState(true);
   const [state, setState] = useState<"ok" | "not_found" | "private" | "error">("ok");
