@@ -22,6 +22,7 @@ export default function AdminRoute({ children }: { children: ReactNode }) {
     return (
       <div
         role="status"
+        aria-label="Verifying access"
         aria-live="polite"
         className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background"
       >
