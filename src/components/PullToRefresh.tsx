@@ -94,10 +94,36 @@ export default function PullToRefresh({
     }
   }, [onRefresh, threshold, refreshKey]);
 
+  /**
+   * Timestamp of the last scroll event. Scrolling back *up* to the top of a
+   * long feed used to hand the browser a finger that was already at
+   * scrollTop 0, which fired a refresh nobody asked for — the feed reloaded
+   * the same videos and every thumbnail flashed. A pull now only arms after
+   * the page has been still at the top for a moment, so returning to the top
+   * leaves the feed exactly as it was.
+   */
+  const lastScrollAt = useRef(0);
+  const SETTLE_MS = 450;
+
+  useEffect(() => {
+    const onScroll = () => {
+      lastScrollAt.current = Date.now();
+      if (active.current) {
+        active.current = false;
+        startY.current = null;
+        setPull(0);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const onTouchStart = useCallback(
     (e: TouchEvent) => {
       if (!enabled || refreshing || isRefreshing(refreshKey)) return;
       if (scrollTop() > 0) return;
+      // Momentum from an upward scroll is still settling — not a pull.
+      if (Date.now() - lastScrollAt.current < SETTLE_MS) return;
       startY.current = e.touches[0].clientY;
       active.current = true;
     },
@@ -108,7 +134,8 @@ export default function PullToRefresh({
     (e: TouchEvent) => {
       if (!active.current || startY.current == null) return;
       const dy = e.touches[0].clientY - startY.current;
-      if (dy <= 0) {
+      // Dead zone: ignore incidental drag so only a deliberate pull counts.
+      if (dy <= 24) {
         setPull(0);
         return;
       }
