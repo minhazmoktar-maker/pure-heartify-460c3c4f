@@ -169,6 +169,13 @@
       "when": 1788509004132,
       "tag": "0023_search_autocomplete_related_suggestions",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788509071473,
+      "tag": "0024_search_autocomplete_quality_filters",
+      "breakpoints": true
     }
   ]
 }
