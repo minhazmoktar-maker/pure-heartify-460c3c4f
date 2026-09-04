@@ -7,26 +7,36 @@
  */
 import { test, expect } from "../playwright-fixture";
 
+/** Search results stream in asynchronously; wait for the loading state to clear. */
+async function waitForResults(page: import("@playwright/test").Page) {
+  await page
+    .getByText(/loading content/i)
+    .waitFor({ state: "hidden", timeout: 25_000 })
+    .catch(() => {});
+  await page.waitForTimeout(1200);
+}
+
+
 test.describe("smart search — typo tolerance & normalization", () => {
   test("typo 'quraan' still surfaces Quran results", async ({ page }) => {
     await page.goto("/search?q=quraan");
     await expect(page.getByText(/Results for/i)).toBeVisible();
     // Give the debounced client search + corpus load a moment.
-    await page.waitForTimeout(1800);
+    await waitForResults(page);
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/quran|qur['’]?an|recitation|surah/);
   });
 
   test("diacritics + punctuation are normalized ('qur’ān' ≈ 'quran')", async ({ page }) => {
     await page.goto(`/search?q=${encodeURIComponent("qur’ān")}`);
-    await page.waitForTimeout(1800);
+    await waitForResults(page);
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/quran|recitation|surah/);
   });
 
   test("casing + trailing whitespace are normalized", async ({ page }) => {
     await page.goto(`/search?q=${encodeURIComponent("  RAMADAN  ")}`);
-    await page.waitForTimeout(1800);
+    await waitForResults(page);
     const body = (await page.locator("body").innerText()).toLowerCase();
     expect(body).toMatch(/ramadan|fasting|iftar|taraweeh/);
   });
@@ -101,7 +111,7 @@ test.describe("smart search — Islamic spelling variants", () => {
     test(`variant "${input}" normalizes and returns relevant results`, async ({ page }) => {
       await page.goto(`/search?q=${encodeURIComponent(input)}`);
       await expect(page.getByText(/Results for/i)).toBeVisible();
-      await page.waitForTimeout(1800);
+      await waitForResults(page);
       const body = (await page.locator("body").innerText()).toLowerCase();
       // If the corpus has zero matches we still expect either a "Did you mean"
       // hint OR a fallback trending grid — never a broken empty screen.
@@ -131,7 +141,7 @@ test.describe("smart search — long mixed-whitespace queries", () => {
     }) => {
       await page.goto(`/search?q=${encodeURIComponent(q)}`);
       await expect(page.getByText(/Results for/i)).toBeVisible();
-      await page.waitForTimeout(1800);
+      await waitForResults(page);
 
       // The displayed heading must not crash on whitespace/unicode.
       const heading = await page.locator("h1").first().innerText();
@@ -160,7 +170,7 @@ test.describe("smart search — long mixed-whitespace queries", () => {
 
   test("Did-you-mean still surfaces for a heavily-typo'd long query", async ({ page }) => {
     await page.goto(`/search?q=${encodeURIComponent("  qraaan\trecitaion\tby\tsheikh  ")}`);
-    await page.waitForTimeout(2200);
+    await waitForResults(page);
     // Either results OR a Did-you-mean hint — never a bare crash.
     const body = (await page.locator("body").innerText()).toLowerCase();
     const acceptable =
