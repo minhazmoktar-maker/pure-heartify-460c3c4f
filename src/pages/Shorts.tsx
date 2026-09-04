@@ -226,8 +226,8 @@ export default function Shorts() {
                     )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="absolute bottom-28 end-3 z-20 flex flex-col items-center gap-4 text-white">
+                  {/* Actions — lifted clear of the overlay text + tab bar */}
+                  <div className="absolute bottom-40 end-3 z-20 flex flex-col items-center gap-4 text-white md:bottom-32">
                     <button
                       type="button"
                       onClick={() =>
@@ -256,7 +256,8 @@ export default function Shorts() {
                     </button>
                   </div>
 
-                  <div className="absolute inset-x-0 bottom-0 z-10 space-y-1.5 bg-gradient-to-t from-black/85 to-transparent p-4 pb-8 text-white">
+                  {/* Overlay text keeps clear of the bottom tab bar + safe area */}
+                  <div className="absolute inset-x-0 bottom-0 z-10 space-y-1.5 bg-gradient-to-t from-black/85 to-transparent p-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-white md:pb-8">
                     <p className="inline-flex items-center gap-1 text-micro font-medium uppercase tracking-wide text-white/70">
                       <ShieldCheck className="h-3 w-3 text-primary" aria-hidden />
                       Moderated · {s.channel_title ?? "Heartify"}
@@ -266,10 +267,16 @@ export default function Shorts() {
                         {s.title}
                       </Link>
                     </h2>
-                    {s.duration_seconds ? (
-                      <p className="text-micro text-white/60">{s.duration_seconds}s</p>
-                    ) : null}
+                    <p className="flex flex-wrap items-center gap-2 text-micro text-white/60">
+                      {s.reason && REASON_LABEL[s.reason] ? (
+                        <span className="rounded-pill bg-white/10 px-2 py-0.5">
+                          {REASON_LABEL[s.reason]}
+                        </span>
+                      ) : null}
+                      {s.duration_seconds ? <span>{s.duration_seconds}s</span> : null}
+                    </p>
                   </div>
+
                 </section>
               </div>
             );
