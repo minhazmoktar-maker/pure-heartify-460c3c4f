@@ -106,20 +106,16 @@ async function handler(req: Request): Promise<Response> {
   const language = typeof body.language === "string" && /^[a-z]{2}$/.test(body.language)
     ? body.language
     : "bn";
-  const limit = Math.min(Math.max(Number(body.limit) || 500, 1), 2000);
+  // Small batches: each invocation must finish well inside the edge worker
+  // budget and the Postgres statement timeout. The cron runs often enough that
+  // the backlog drains across runs instead of in one oversized run.
+  const limit = Math.min(Math.max(Number(body.limit) || 150, 1), 300);
   const dryRun = body.dry_run === true;
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
-  // Candidate set: language rows that have never been verified, oldest first so
-  // the backlog drains deterministically.
-  const { data: checked } = await admin
-    .from("bn_ingest_verifications")
-    .select("video_id")
-    .eq("content_language", language)
-    .limit(20000);
-  const alreadyChecked = new Set((checked ?? []).map((r) => r.video_id as string));
-
+  // Candidate set: newest language rows; verification state is checked with a
+  // bounded anti-join over just these candidates (never the full 20k table).
   const { data: rows, error } = await admin
     .from("curated_videos")
     .select(
@@ -128,34 +124,44 @@ async function handler(req: Request): Promise<Response> {
     .eq("content_language", language)
     .eq("is_archived", false)
     .order("ingested_at", { ascending: false })
-    .limit(limit * 3);
+    .limit(limit * 2);
 
   if (error) return json({ error: error.message }, 500);
 
-  const queue = (rows ?? []).filter((r) => !alreadyChecked.has(r.video_id)).slice(0, limit) as Row[];
+  const candidates = (rows ?? []) as Row[];
+  const candidateIds = candidates.map((r) => r.video_id);
+  const alreadyChecked = new Set<string>();
+  for (let i = 0; i < candidateIds.length; i += 150) {
+    const { data: checked } = await admin
+      .from("bn_ingest_verifications")
+      .select("video_id")
+      .eq("content_language", language)
+      .in("video_id", candidateIds.slice(i, i + 150));
+    for (const r of checked ?? []) alreadyChecked.add(r.video_id as string);
+  }
+
+  const queue = candidates.filter((r) => !alreadyChecked.has(r.video_id)).slice(0, limit);
   if (!queue.length) {
     return json({ language, checked: 0, message: "no unverified rows" });
   }
 
-  // Duplicate corpus: published rows in the same language keyed by channel, so
-  // a near-duplicate title only collides inside its own channel (re-uploads),
+  // Duplicate corpus: rows in the same channel keyed by channel, so a
+  // near-duplicate title only collides inside its own channel (re-uploads),
   // never across two scholars covering the same topic.
   const channelIds = [...new Set(queue.map((r) => r.channel_id).filter(Boolean))] as string[];
   const existingByChannel = new Map<string, { video_id: string; title: string }[]>();
-  for (let i = 0; i < channelIds.length; i += 50) {
-    const slice = channelIds.slice(i, i + 50);
+  for (const channelId of channelIds) {
     const { data: existing } = await admin
       .from("curated_videos")
-      .select("video_id, title, channel_id")
-      .in("channel_id", slice)
+      .select("video_id, title")
+      .eq("channel_id", channelId)
       .eq("is_archived", false)
-      .limit(5000);
-    for (const e of existing ?? []) {
-      const key = e.channel_id as string;
-      const list = existingByChannel.get(key) ?? [];
-      list.push({ video_id: e.video_id as string, title: (e.title as string) ?? "" });
-      existingByChannel.set(key, list);
-    }
+      .order("ingested_at", { ascending: false })
+      .limit(200);
+    existingByChannel.set(
+      channelId,
+      (existing ?? []).map((e) => ({ video_id: e.video_id as string, title: (e.title as string) ?? "" })),
+    );
   }
 
   const verifications: Record<string, unknown>[] = [];
