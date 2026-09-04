@@ -37,7 +37,7 @@ const DEEP_LINK_ROUTES: Array<{ pattern: string; sample: string; label: string }
   { pattern: "/surah/:number", sample: "/surah/1", label: "surah" },
   { pattern: "/ayah/:surah/:verse", sample: "/ayah/2/255", label: "ayah" },
   { pattern: "/hadith/:collection/:number", sample: "/hadith/bukhari/1", label: "hadith" },
-  { pattern: "/u/:handle", sample: "/u/ali", label: "profile" },
+  { pattern: "/u/:id", sample: "/u/ali", label: "profile" },
   { pattern: "/section/:sectionId", sample: "/section/foryou", label: "section" },
   { pattern: "/khatm/join/:code", sample: "/khatm/join/ABC123", label: "khatm-join" },
 ];
