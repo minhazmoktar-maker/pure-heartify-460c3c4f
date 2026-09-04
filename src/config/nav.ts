@@ -54,6 +54,7 @@ import {
   Flame,
   Users,
   Upload,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -74,6 +75,7 @@ export type NavItem = {
 export const MAIN_NAV_ITEMS: readonly NavItem[] = [
   { to: "/", label: "Home", icon: Home },
   { to: "/explore", label: "Explore", icon: Compass },
+  { to: "/shorts", label: "Shorts", icon: Zap },
   { to: "/me", label: "Library", icon: Library },
   { to: "/today", label: "Today's Dose", icon: Sunrise },
   { to: "/live", label: "Live sessions", icon: Radio },

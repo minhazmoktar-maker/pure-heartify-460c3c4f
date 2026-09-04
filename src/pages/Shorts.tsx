@@ -214,7 +214,14 @@ export default function Shorts() {
                   <div className="absolute bottom-28 end-3 z-20 flex flex-col items-center gap-4 text-white">
                     <button
                       type="button"
-                      onClick={() => toggleFavorite(s.video_id)}
+                      onClick={() =>
+                        toggleFavorite.mutate({
+                          videoId: s.video_id,
+                          title: s.title,
+                          channel: s.channel_title ?? "",
+                          thumbnail: s.thumbnail_url ?? "",
+                        })
+                      }
                       aria-label={isFavorite(s.video_id) ? "Remove from favorites" : "Save to favorites"}
                       className="flex min-h-11 min-w-11 items-center justify-center rounded-pill bg-white/10 backdrop-blur hover:bg-white/20"
                     >
