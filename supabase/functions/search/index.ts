@@ -251,22 +251,7 @@ Deno.serve(async (req) => {
     const related = relatedRes.status === "fulfilled" ? relatedRes.value.data : [];
 
 
-    // Log the search (fire-and-forget).
-    if (q) {
-      admin
-        .from("search_queries")
-        .insert({
-          user_id: userId,
-          query: q,
-          normalized_query: NORMALIZE(q),
-          result_count: filteredHits.length,
-          intent: intent ?? null,
-        })
-        .then(() => {})
-        .catch(() => {});
-    }
-
-    return json({
+    return {
       hits: filteredHits,
       intent,
       trending: trending ?? [],
@@ -275,7 +260,30 @@ Deno.serve(async (req) => {
       viewer: { isPremium: viewerIsPremium },
       degraded: providerDegraded,
       fallback: providerDegraded && filteredHits.length === 0,
-    });
+    };
+    };
+
+    const payload = userId
+      ? await compute()
+      : (await readThroughShared(admin, cacheKey, 120, compute)).value;
+
+    // Log the search (fire-and-forget) — outside the cache so trending keeps
+    // reflecting real demand even when the results themselves were cached.
+    if (q) {
+      admin
+        .from("search_queries")
+        .insert({
+          user_id: userId,
+          query: q,
+          normalized_query: NORMALIZE(q),
+          result_count: Array.isArray(payload.hits) ? payload.hits.length : 0,
+          intent: payload.intent ?? null,
+        })
+        .then(() => {})
+        .catch(() => {});
+    }
+
+    return json(payload);
   } catch (e) {
     console.error("search handler unrecoverable error:", (e as Error).message);
     // Return 200 with a fallback signal so the client UI never crashes.
