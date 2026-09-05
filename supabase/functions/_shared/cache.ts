@@ -48,7 +48,92 @@ export async function readThrough<T>(
 ): Promise<{ value: T; hit: boolean }> {
   const cached = cacheGet<T>(key);
   if (cached !== null) return { value: cached, hit: true };
-  const value = await producer();
+  const value = await singleFlight(key, producer);
   cacheSet(key, value, ttlSeconds);
   return { value, hit: false };
 }
+
+/**
+ * Stampede guard: concurrent callers of the same key inside one isolate share a
+ * single producer run instead of each hammering the database.
+ */
+const inflight = new Map<string, Promise<unknown>>();
+
+async function singleFlight<T>(key: string, producer: () => Promise<T>): Promise<T> {
+  const existing = inflight.get(key) as Promise<T> | undefined;
+  if (existing) return await existing;
+  const p = (async () => {
+    try {
+      return await producer();
+    } finally {
+      inflight.delete(key);
+    }
+  })();
+  inflight.set(key, p);
+  return await p;
+}
+
+interface SharedCacheClient {
+  from(table: string): {
+    select(cols: string): {
+      eq(col: string, val: string): {
+        gt(col: string, val: string): {
+          maybeSingle(): Promise<{ data: { payload: unknown } | null; error: unknown }>;
+        };
+      };
+    };
+    upsert(row: Record<string, unknown>, opts: { onConflict: string }): Promise<{ error: unknown }>;
+  };
+}
+
+/**
+ * Cross-instance read-through cache backed by public.edge_response_cache.
+ *
+ * Deno Deploy runs many isolates, so the in-process cache alone leaves most
+ * anonymous requests cold under real traffic. This layers a single indexed
+ * primary-key lookup (~1ms) in front of the expensive pipelines, so a burst of
+ * thousands of simultaneous anonymous visitors costs one heavy computation per
+ * TTL window globally instead of one per isolate.
+ *
+ * Only use for responses that do not depend on a userId, entitlement, or
+ * session. Fails open: any cache error falls back to computing the value.
+ */
+export async function readThroughShared<T>(
+  admin: SharedCacheClient,
+  key: string,
+  ttlSeconds: number,
+  producer: () => Promise<T>,
+): Promise<{ value: T; hit: boolean }> {
+  const local = cacheGet<T>(key);
+  if (local !== null) return { value: local, hit: true };
+
+  try {
+    const { data } = await admin
+      .from("edge_response_cache")
+      .select("payload")
+      .eq("cache_key", key)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+    if (data?.payload) {
+      const value = data.payload as T;
+      cacheSet(key, value, Math.min(ttlSeconds, 60));
+      return { value, hit: true };
+    }
+  } catch {
+    // fail open
+  }
+
+  const value = await singleFlight(key, producer);
+  cacheSet(key, value, Math.min(ttlSeconds, 60));
+  try {
+    await admin.from("edge_response_cache").upsert({
+      cache_key: key,
+      payload: value,
+      expires_at: new Date(Date.now() + ttlSeconds * 1000).toISOString(),
+    }, { onConflict: "cache_key" });
+  } catch {
+    // fail open
+  }
+  return { value, hit: false };
+}
+
