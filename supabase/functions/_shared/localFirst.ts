@@ -49,20 +49,91 @@ export function derivePrimaryLanguage(
  */
 export const PRIMARY_LANGUAGE_SHARE = 0.8;
 
+/**
+ * Per-language tuning of that share.
+ *
+ * Two forces are balanced here:
+ *  - **Local relevance**: a Dhaka or Jakarta user must see their own language
+ *    lead the page, so deep corpora (bn, ur, id, tr, ar…) keep the full 80%.
+ *  - **Not crowding out the rest**: languages whose live corpus is thin, or
+ *    whose speakers routinely consume across languages (fr, de, es, zh, ja…),
+ *    get a lower floor so the page still carries a genuine spread instead of
+ *    recycling the same handful of local videos.
+ *
+ * Unlisted languages fall back to `PRIMARY_LANGUAGE_SHARE`. English never gets
+ * a floor (it is abundant and `derivePrimaryLanguage` never returns it).
+ */
+export const LANGUAGE_SHARE: Readonly<Record<string, number>> = {
+  // Deep local corpora — full local-first majority.
+  bn: 0.8,
+  ur: 0.8,
+  id: 0.8,
+  tr: 0.8,
+  ar: 0.7,
+  hi: 0.7,
+  fa: 0.7,
+  ms: 0.7,
+  // Growing corpora — strong but not saturating.
+  ps: 0.6,
+  ha: 0.55,
+  sw: 0.55,
+  // Multilingual-by-habit markets — local lead, broad remainder.
+  fr: 0.6,
+  de: 0.55,
+  es: 0.6,
+  pt: 0.6,
+  ru: 0.55,
+  zh: 0.5,
+  ja: 0.5,
+  ko: 0.5,
+};
+
+/** Never let the local share drop so low that the page stops feeling local. */
+export const MIN_PRIMARY_LANGUAGE_SHARE = 0.35;
+
+/**
+ * No single *non-primary* language may take more than this fraction of the
+ * minority slots. Without the cap, English (17:1 supply) refills every
+ * remainder slot and the "diversified 20%" is English-only in practice.
+ */
+export const MAX_SINGLE_OTHER_SHARE = 0.5;
+
+/**
+ * The share of a page a given primary language should hold.
+ *
+ * `localSupply` / `window` (when known) clamp the target down so a thin
+ * language asks only for what it can actually fill — the same request never
+ * over-promises and never blanks slots.
+ */
+export function shareForLanguage(
+  primary: string | null | undefined,
+  opts: { localSupply?: number; window?: number } = {},
+): number {
+  if (!primary) return PRIMARY_LANGUAGE_SHARE;
+  const target = LANGUAGE_SHARE[primary.toLowerCase()] ?? PRIMARY_LANGUAGE_SHARE;
+  const { localSupply, window } = opts;
+  if (typeof localSupply === "number" && typeof window === "number" && window > 0) {
+    const affordable = localSupply / window;
+    if (affordable < target) return Math.max(Math.min(target, affordable), 0);
+  }
+  return Math.max(target, MIN_PRIMARY_LANGUAGE_SHARE);
+}
 
 /**
  * Interleave so that ~`share` of the first `limit` positions carry the
  * primary language, preserving the relative order inside each group.
  * Degrades gracefully: with no primary-language supply the input order is
- * returned untouched.
+ * returned untouched. When `share` is omitted the per-language tuned share
+ * (`shareForLanguage`) is used.
  */
 export function interleavePrimaryLanguage<T>(
   items: T[],
   getLang: (v: T) => string | null,
   primary: string | null,
   limit: number,
-  share = PRIMARY_LANGUAGE_SHARE,
+  share?: number,
 ): T[] {
+
   if (!primary || items.length === 0) return items;
 
   const local: T[] = [];
