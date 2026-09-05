@@ -7,7 +7,7 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
 
-const BASE = __ENV.BASE_URL || "https://pure-heartify.lovable.app";
+const BASE = __ENV.BASE_URL || "https://www.heartifyapp.com";
 
 export const options = {
   scenarios: {

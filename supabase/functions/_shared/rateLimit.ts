@@ -25,7 +25,15 @@ export interface RateLimitOptions {
   action: string;
   limit: number;
   windowSeconds: number;
+  /**
+   * Count every request in the shared counter instead of sampling.
+   * Use for low-volume paths that guard real spend (paid AI calls), where an
+   * approximate per-isolate ceiling would let a client multiply its quota by
+   * the number of isolates it happens to land on.
+   */
+  precise?: boolean;
 }
+
 
 // In-isolate counters. Under heavy traffic the database round-trip for every
 // single request is itself the bottleneck (one hot-row write per request), so
@@ -62,8 +70,9 @@ export async function enforceRateLimit(
     const localCount = bumpLocal(localKey, bucketStart);
     if (localCount > opts.limit) return true;
     // Sample only: keeps the shared counter useful for abuse analytics without
-    // a database write on every request.
-    if (localCount % DB_SAMPLE_EVERY !== 1) return false;
+    // a database write on every request. Precise callers always write.
+    if (!opts.precise && localCount % DB_SAMPLE_EVERY !== 1) return false;
+
 
 
     // Upsert atomic increment. Requires the rate_limit_counters table

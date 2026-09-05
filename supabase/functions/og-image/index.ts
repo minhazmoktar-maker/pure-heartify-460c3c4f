@@ -68,7 +68,7 @@ Deno.serve((req) => {
     <text x="80" y="120" font-size="28" letter-spacing="6" fill="#5eead4" font-weight="600">${kicker.toUpperCase()}</text>
     <text x="80" y="260" font-size="80" font-weight="800">${titleSvg}</text>
     <text x="80" y="560" font-size="32" fill="#a7f3d0" font-weight="700">${brand}</text>
-    <text x="80" y="595" font-size="22" fill="#94a3b8">pure-heartify.lovable.app</text>
+    <text x="80" y="595" font-size="22" fill="#94a3b8">heartifyapp.com</text>
   </g>
 </svg>`;
 
