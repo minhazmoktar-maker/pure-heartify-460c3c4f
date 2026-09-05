@@ -9,6 +9,7 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Loader2, Volume2, VolumeX, Heart, Share2, ShieldCheck, Sprout, Play } from "lucide-react";
 import { toast } from "sonner";
+import { balanceByLanguage, derivePrimaryLanguage } from "@/lib/languageBalance";
 
 const PAGE = 12;
 
@@ -61,7 +62,7 @@ export default function Shorts() {
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ["shorts-feed", locale, user?.id ?? "anon"],
+    queryKey: ["shorts-feed", locale, contentLanguages.join(","), user?.id ?? "anon"],
     initialPageParam: 0,
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
@@ -85,10 +86,13 @@ export default function Shorts() {
 
   const shorts = useMemo(() => {
     const seen = new Set<string>();
-    return (data?.pages.flat() ?? []).filter((s) =>
+    const unique = (data?.pages.flat() ?? []).filter((s) =>
       seen.has(s.video_id) ? false : (seen.add(s.video_id), true),
     );
-  }, [data]);
+    // Local-first reel: the viewer's own language leads, and no single other
+    // language may take more than half of the remaining slots.
+    return balanceByLanguage(unique, (s) => s.content_language, primaryLanguage, PAGE);
+  }, [data, primaryLanguage]);
 
   // Queue the T+0 benefit label once a short has been on screen long enough
   // to have actually been watched. This is the ranker's ground truth.
