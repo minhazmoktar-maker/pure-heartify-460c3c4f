@@ -50,7 +50,10 @@ const REASON_LABEL: Record<string, string> = {
  */
 export default function Shorts() {
   const { user } = useAuth();
-  const { locale } = useLocale();
+  const { locale, preferences } = useLocale();
+  const contentLanguages = preferences.content_languages ?? [];
+  const primaryLanguage = derivePrimaryLanguage(contentLanguages);
+
   const [muted, setMuted] = useState(true);
   const [active, setActive] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
