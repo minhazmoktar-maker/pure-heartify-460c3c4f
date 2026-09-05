@@ -35,7 +35,7 @@ falls back to the next eligible language rather than emptying the feed.
 
 ## Tests
 
-`src/lib/__tests__/languageRelevance*.test.ts` covers Bangladesh, India,
+`src/test/language-relevance-global.test.ts` and `src/test/language-balance.test.ts` covers Bangladesh, India,
 Pakistan, Indonesia, Malaysia, Turkey, Saudi Arabia, UAE, United States and
 United Kingdom, with multiple profiles per market (default prefs, explicit
 multilingual prefs, cross-language behaviour, subtitled content, low- and

@@ -39,7 +39,7 @@ caps (`languageBalance.ts`), and semantic dedupe on assembly.
 
 ## Validated behaviour (1,000-user simulation)
 
-`scripts/` simulation harness, production-like language retrieval, 1,000
+`src/test/recommendationSimulation.ts` harness (`recommendation-simulation-1000.test.ts`, `feed-uniqueness-1000.test.ts`), production-like language retrieval, 1,000
 synthetic users differing in language prefs, interests, creators, watch
 history, engagement, negative feedback, exploration appetite:
 
