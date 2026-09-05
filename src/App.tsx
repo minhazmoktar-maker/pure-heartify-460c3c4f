@@ -375,6 +375,7 @@ const App = () => (
                 <Route path="/status" element={<Status />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/help" element={<Help />} />
+                <Route path="/support" element={<Navigate to="/help" replace />} />
                 <Route path="/account/export-data" element={<ExportData />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/creators" element={<Creators />} />
