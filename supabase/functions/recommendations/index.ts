@@ -114,7 +114,7 @@ Deno.serve(observed("recommendations", async (req) => {
       const poolSize = Math.min(limit * 4, 60);
       const cacheKey =
         `rec:anon:pool:${surface}:${poolSize}:${excludeWatched ? 1 : 0}:${bodyPrimary ?? "-"}:${categoryFilter ?? "-"}:${(bodyLanguages ?? []).join("|")}`;
-      const { value, hit } = await readThrough(cacheKey, 60, async () => {
+      const { value, hit } = await readThroughShared(admin, cacheKey, 60, async () => {
         return await computeRecommendations({
           userId, limit: poolSize, surface, categoryFilter, excludeWatched,
           sessionId: null, bodyPrimary, bodyLanguages,
