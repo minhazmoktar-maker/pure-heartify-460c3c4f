@@ -46,7 +46,7 @@ const config: CapacitorConfig = {
         server: {
           url: liveReloadUrl,
           cleartext: true,
-          allowNavigation: ['heartify.app', '*.heartify.app', 'pure-heartify.lovable.app'],
+          allowNavigation: ['heartifyapp.com', '*.heartifyapp.com', 'heartify.app', '*.heartify.app'],
         },
       }
     : {}),
