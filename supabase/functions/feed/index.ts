@@ -9,7 +9,7 @@ import { getCallerUserId, hasActivePremium } from "../_shared/entitlements.ts";
 import { assessStrict } from "../_shared/halalGuard.ts";
 
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
-import { readThrough } from "../_shared/cache.ts";
+import { readThrough, readThroughShared } from "../_shared/cache.ts";
 import { gatherSignals } from "../_shared/recommendations/signals.ts";
 import {
   loadImpressions,
@@ -82,7 +82,11 @@ Deno.serve(observed("feed", async (req) => {
     const limited = await enforceRateLimit(admin, {
       identity: getClientIdentity(req, callerId),
       action: "feed",
-      limit: callerId ? 240 : 60,
+      // Anonymous callers are keyed by IP, and in our biggest markets carrier
+      // NAT puts thousands of real people behind a single address — so the
+      // anonymous ceiling has to be generous. Anonymous feeds are served from
+      // the shared cache, so the cost per extra request is a single row read.
+      limit: callerId ? 240 : 600,
       windowSeconds: 60,
     });
     if (limited) return json({ error: "rate_limited" }, 429);
@@ -386,7 +390,7 @@ Deno.serve(observed("feed", async (req) => {
 
     const tStage = Date.now();
     const { value: payload, hit } = cacheable
-      ? await readThrough(cacheKey, 180, produce)
+      ? await readThroughShared(admin, cacheKey, 180, produce)
       : { value: await produce(), hit: false };
     console.log(`[feed] section=${sectionId ?? "-"} cache=${hit ? "HIT" : "MISS"} produce=${Date.now() - tStage}ms`);
 

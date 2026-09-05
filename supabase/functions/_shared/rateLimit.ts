@@ -27,6 +27,27 @@ export interface RateLimitOptions {
   windowSeconds: number;
 }
 
+// In-isolate counters. Under heavy traffic the database round-trip for every
+// single request is itself the bottleneck (one hot-row write per request), so
+// each isolate counts locally, blocks abusers immediately without touching the
+// database, and only samples a fraction of requests into the shared counter to
+// keep global visibility. Effective ceiling is per-isolate, which is fine: the
+// limits exist to stop abuse and budget drain, not to be an exact quota.
+const localCounts = new Map<string, { bucket: number; count: number }>();
+const LOCAL_MAX_KEYS = 20_000;
+const DB_SAMPLE_EVERY = 10;
+
+function bumpLocal(key: string, bucket: number): number {
+  const cur = localCounts.get(key);
+  if (!cur || cur.bucket !== bucket) {
+    if (localCounts.size > LOCAL_MAX_KEYS) localCounts.clear();
+    localCounts.set(key, { bucket, count: 1 });
+    return 1;
+  }
+  cur.count += 1;
+  return cur.count;
+}
+
 export async function enforceRateLimit(
   admin: RateLimitClient,
   opts: RateLimitOptions,
@@ -34,7 +55,16 @@ export async function enforceRateLimit(
   try {
     const now = Date.now();
     const bucketMs = opts.windowSeconds * 1000;
-    const bucket = new Date(Math.floor(now / bucketMs) * bucketMs).toISOString();
+    const bucketStart = Math.floor(now / bucketMs);
+    const bucket = new Date(bucketStart * bucketMs).toISOString();
+
+    const localKey = `${opts.action}:${opts.identity}`;
+    const localCount = bumpLocal(localKey, bucketStart);
+    if (localCount > opts.limit) return true;
+    // Sample only: keeps the shared counter useful for abuse analytics without
+    // a database write on every request.
+    if (localCount % DB_SAMPLE_EVERY !== 1) return false;
+
 
     // Upsert atomic increment. Requires the rate_limit_counters table
     // (see migration). Returns the current count for this bucket.

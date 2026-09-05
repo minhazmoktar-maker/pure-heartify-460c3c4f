@@ -21,7 +21,7 @@ import { fetchCandidates } from "../_shared/recommendations/candidates.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
 import { toPgVector } from "../_shared/embed.ts";
-import { readThrough } from "../_shared/cache.ts";
+import { readThrough, readThroughShared } from "../_shared/cache.ts";
 import { observed } from "../_shared/observe.ts";
 import {
   derivePrimaryLanguage,
@@ -57,7 +57,7 @@ Deno.serve(observed("recommendations", async (req) => {
     const limited = await enforceRateLimit(admin, {
       identity,
       action: isEvent ? "rec_event" : "rec_query",
-      limit: isEvent ? 600 : 60,
+      limit: isEvent ? 600 : (userId ? 120 : 600),
       windowSeconds: 60,
     });
     if (limited) {
@@ -104,19 +104,33 @@ Deno.serve(observed("recommendations", async (req) => {
     const bodyPrimary =
       derivePrimaryLanguage([body.primaryLanguage]) ?? derivePrimaryLanguage(bodyLanguages);
 
-    // Read-through cache — anonymous cold-start only (no userId, no session,
-    // no category filter). Keeps the hottest global surface warm without
-    // leaking per-user signals across callers. 60s TTL.
-    const cacheable = !userId && !sessionId && !categoryFilter;
-    if (cacheable) {
-      const cacheKey = `rec:anon:${surface}:${limit}:${excludeWatched ? 1 : 0}:${bodyPrimary ?? "-"}`;
-      const { value, hit } = await readThrough(cacheKey, 60, async () => {
+    // Read-through cache for every anonymous caller (signed-in users keep the
+    // fully personalized path). A single warm pool of `limit * 4` candidates is
+    // computed per (surface, language, category) and each session gets its own
+    // deterministic rotation of that pool, so thousands of simultaneous
+    // visitors still see varied feeds while the database does one query per
+    // minute instead of one per visitor. 60s TTL.
+    if (!userId) {
+      const poolSize = Math.min(limit * 4, 60);
+      const cacheKey =
+        `rec:anon:pool:${surface}:${poolSize}:${excludeWatched ? 1 : 0}:${bodyPrimary ?? "-"}:${categoryFilter ?? "-"}:${(bodyLanguages ?? []).join("|")}`;
+      const { value, hit } = await readThroughShared(admin, cacheKey, 60, async () => {
         return await computeRecommendations({
-          userId, limit, surface, categoryFilter, excludeWatched, sessionId,
-          bodyPrimary, bodyLanguages,
+          userId, limit: poolSize, surface, categoryFilter, excludeWatched,
+          sessionId: null, bodyPrimary, bodyLanguages,
         });
       });
-      return json(value, 200, { "X-Cache": hit ? "HIT" : "MISS" });
+      const pool = (value as { recommendations?: unknown[] })?.recommendations ?? [];
+      if (!Array.isArray(pool) || pool.length <= limit) {
+        return json(value, 200, { "X-Cache": hit ? "HIT" : "MISS" });
+      }
+      let h = 2166136261;
+      for (const ch of sessionId ?? "anon") h = (h ^ ch.charCodeAt(0)) * 16777619 >>> 0;
+      const offset = h % pool.length;
+      const rotated = Array.from({ length: limit }, (_, i) => pool[(offset + i) % pool.length]);
+      return json({ ...(value as Record<string, unknown>), recommendations: rotated }, 200, {
+        "X-Cache": hit ? "HIT" : "MISS",
+      });
     }
 
     const value = await computeRecommendations({
