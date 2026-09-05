@@ -112,13 +112,29 @@ function personalize(user: RecSimUser, items: SurfaceVideo[]): SurfaceVideo[] {
   return balanceByLanguage(ranked, (v) => v.content_language ?? null, primary, 24);
 }
 
+/**
+ * Language-aware retrieval, mirroring production: the retriever narrows to the
+ * languages the user can actually follow, and falls back to the full corpus
+ * when that supply is too thin to fill a page (never a hard block).
+ */
+const MIN_POOL = 400;
+function retrievalPool(user: RecSimUser, corpus: SurfaceVideo[]): SurfaceVideo[] {
+  const eligible = corpus.filter(
+    (v) =>
+      languageRelevance({ language: v.content_language, languageConfidence: 0.9 }, user.resolved) >
+      0.25,
+  );
+  return eligible.length >= MIN_POOL ? eligible : corpus;
+}
+
 /** One recommendation page for a user, honouring session rotation. */
 export function recommendFor(
   user: RecSimUser,
   corpus: SurfaceVideo[],
   session = user.sessionId,
 ): SurfaceVideo[] {
-  const base = simulateForYou({ ...user, sessionId: session }, corpus).items;
+  const pool = retrievalPool(user, corpus);
+  const base = simulateForYou({ ...user, sessionId: session }, pool).items;
   return personalize(user, base);
 }
 
@@ -322,3 +338,28 @@ export function simulateHeavyUser(
 }
 
 export { buildCorpus };
+
+/**
+ * Corpus for the market simulation: the shared synthetic corpus relabelled
+ * across the languages the ten test markets actually speak (the base corpus
+ * carries no Hindi or Malay supply, which would make those markets look
+ * mismatched for a reason that does not exist in the real catalog).
+ */
+export const REC_LANGUAGES = [
+  "en",
+  "ar",
+  "bn",
+  "ur",
+  "id",
+  "tr",
+  "hi",
+  "ms",
+  "fr",
+] as const;
+
+export function buildRecCorpus(channels = 120, perChannel = 40): SurfaceVideo[] {
+  return buildCorpus(channels, perChannel).map((v, i) => ({
+    ...v,
+    content_language: REC_LANGUAGES[(i * 3 + (i % 7)) % REC_LANGUAGES.length],
+  }));
+}
