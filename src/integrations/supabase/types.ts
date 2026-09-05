@@ -2947,6 +2947,27 @@ export type Database = {
         }
         Relationships: []
       }
+      edge_response_cache: {
+        Row: {
+          cache_key: string
+          expires_at: string
+          payload: Json
+          updated_at: string
+        }
+        Insert: {
+          cache_key: string
+          expires_at: string
+          payload: Json
+          updated_at?: string
+        }
+        Update: {
+          cache_key?: string
+          expires_at?: string
+          payload?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       entitlements: {
         Row: {
           created_at: string

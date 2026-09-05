@@ -232,6 +232,13 @@
       "when": 1788605129693,
       "tag": "0032_index_language_category_serving_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1788612490183,
+      "tag": "0033_create_edge_response_cache",
+      "breakpoints": true
     }
   ]
 }
