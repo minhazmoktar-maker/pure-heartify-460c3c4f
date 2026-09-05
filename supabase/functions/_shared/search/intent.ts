@@ -17,9 +17,10 @@
  */
 import type { SearchIntent } from "./types.ts";
 import { chatWithFailover, isInferenceConfigured } from "../support/providers.ts";
+import { aiApiKey, chatCompletionsUrl } from "../aiGateway.ts";
 
-const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash-lite";
+
 
 
 const SYSTEM = `You classify Islamic-content video search queries.
