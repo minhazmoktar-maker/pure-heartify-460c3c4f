@@ -112,13 +112,29 @@ function personalize(user: RecSimUser, items: SurfaceVideo[]): SurfaceVideo[] {
   return balanceByLanguage(ranked, (v) => v.content_language ?? null, primary, 24);
 }
 
+/**
+ * Language-aware retrieval, mirroring production: the retriever narrows to the
+ * languages the user can actually follow, and falls back to the full corpus
+ * when that supply is too thin to fill a page (never a hard block).
+ */
+const MIN_POOL = 400;
+function retrievalPool(user: RecSimUser, corpus: SurfaceVideo[]): SurfaceVideo[] {
+  const eligible = corpus.filter(
+    (v) =>
+      languageRelevance({ language: v.content_language, languageConfidence: 0.9 }, user.resolved) >
+      0.25,
+  );
+  return eligible.length >= MIN_POOL ? eligible : corpus;
+}
+
 /** One recommendation page for a user, honouring session rotation. */
 export function recommendFor(
   user: RecSimUser,
   corpus: SurfaceVideo[],
   session = user.sessionId,
 ): SurfaceVideo[] {
-  const base = simulateForYou({ ...user, sessionId: session }, corpus).items;
+  const pool = retrievalPool(user, corpus);
+  const base = simulateForYou({ ...user, sessionId: session }, pool).items;
   return personalize(user, base);
 }
 
