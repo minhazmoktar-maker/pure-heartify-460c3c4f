@@ -187,10 +187,15 @@ export function interleavePrimaryLanguage<T>(
  * Round-robin a list across its distinct languages, preserving each
  * language's internal order. Used for the diversified 20% of a page so the
  * minority slots are not all one language.
+ *
+ * No single language may hold more than `MAX_SINGLE_OTHER_SHARE` of the lead
+ * portion; once a lane hits that cap its remaining items are deferred to the
+ * tail so English (or any over-supplied language) cannot crowd the others out.
  */
 export function diversifyByLanguage<T>(
   items: T[],
   getLang: (v: T) => string | null,
+  maxSingleShare = MAX_SINGLE_OTHER_SHARE,
 ): T[] {
   if (items.length < 3) return items;
   const buckets = new Map<string, T[]>();
@@ -203,16 +208,25 @@ export function diversifyByLanguage<T>(
   if (buckets.size < 2) return items;
   // Larger supplies lead so the head of the page stays dense.
   const lanes = Array.from(buckets.values()).sort((a, b) => b.length - a.length);
+  const cap = Math.max(1, Math.ceil(items.length * maxSingleShare));
   const out: T[] = [];
-  for (let i = 0; out.length < items.length; i++) {
+  const deferred: T[] = [];
+  const taken = new Array(lanes.length).fill(0);
+  for (let i = 0; out.length + deferred.length < items.length; i++) {
     let progressed = false;
-    for (const lane of lanes) {
-      if (i < lane.length) {
+    for (let l = 0; l < lanes.length; l++) {
+      const lane = lanes[l];
+      if (i >= lane.length) continue;
+      progressed = true;
+      if (taken[l] < cap) {
         out.push(lane[i]);
-        progressed = true;
+        taken[l]++;
+      } else {
+        deferred.push(lane[i]);
       }
     }
     if (!progressed) break;
   }
-  return out;
+  return [...out, ...deferred];
 }
+
