@@ -25,7 +25,15 @@ export interface RateLimitOptions {
   action: string;
   limit: number;
   windowSeconds: number;
+  /**
+   * Count every request in the shared counter instead of sampling.
+   * Use for low-volume paths that guard real spend (paid AI calls), where an
+   * approximate per-isolate ceiling would let a client multiply its quota by
+   * the number of isolates it happens to land on.
+   */
+  precise?: boolean;
 }
+
 
 // In-isolate counters. Under heavy traffic the database round-trip for every
 // single request is itself the bottleneck (one hot-row write per request), so
