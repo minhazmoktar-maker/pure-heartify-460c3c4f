@@ -338,3 +338,28 @@ export function simulateHeavyUser(
 }
 
 export { buildCorpus };
+
+/**
+ * Corpus for the market simulation: the shared synthetic corpus relabelled
+ * across the languages the ten test markets actually speak (the base corpus
+ * carries no Hindi or Malay supply, which would make those markets look
+ * mismatched for a reason that does not exist in the real catalog).
+ */
+export const REC_LANGUAGES = [
+  "en",
+  "ar",
+  "bn",
+  "ur",
+  "id",
+  "tr",
+  "hi",
+  "ms",
+  "fr",
+] as const;
+
+export function buildRecCorpus(channels = 120, perChannel = 40): SurfaceVideo[] {
+  return buildCorpus(channels, perChannel).map((v, i) => ({
+    ...v,
+    content_language: REC_LANGUAGES[(i * 3 + (i % 7)) % REC_LANGUAGES.length],
+  }));
+}

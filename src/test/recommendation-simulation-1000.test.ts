@@ -8,13 +8,13 @@
 
 import { describe, expect, it } from "vitest";
 import {
-  buildCorpus,
+  buildRecCorpus,
   buildRecUsers,
   runRecommendationSimulation,
   simulateHeavyUser,
 } from "./recommendationSimulation";
 
-const corpus = buildCorpus(120, 40); // 4,800 videos / 120 channels
+const corpus = buildRecCorpus(120, 40); // 4,800 videos / 120 channels
 const users = buildRecUsers(1000);
 
 describe("recommendations — 1,000 diverse synthetic users", () => {
