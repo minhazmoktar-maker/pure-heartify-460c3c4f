@@ -214,9 +214,75 @@ async function recordProviderHealth(admin: SupabaseClient, provider: string, ok:
   }
 }
 
+/**
+ * Last-resort deterministic reply.
+ *
+ * Under burst traffic the platform can drop a request mid-flight (database
+ * contention, cold start, a provider socket) and the caller would otherwise
+ * receive a raw 5xx — a dead end in the middle of a help conversation. This
+ * answers the question anyway from the in-process FAQ/static layer at zero
+ * cost, in the caller's own language, and never leaks why the normal path
+ * failed.
+ */
+async function degradedReply(req: Request): Promise<Response> {
+  let message = "";
+  let locale = "en";
+  try {
+    const raw = await req.json();
+    message = typeof raw?.message === "string" ? raw.message : "";
+    locale = typeof raw?.locale === "string" ? raw.locale.slice(0, 12) : "en";
+  } catch { /* body already consumed or malformed — generic reply below */ }
+
+  let answer: string | null = null;
+  let topic: string | null = null;
+  try {
+    const question = sanitizeUserText(message);
+    if (question) {
+      const { canonical } = canonicalizeQuestion(question);
+      const canned = staticAnswer(canonical, { signedIn: false });
+      if (canned) {
+        answer = canned.answer;
+        topic = canned.topic ?? null;
+      }
+    }
+  } catch { /* fall through to the generic message */ }
+
+  const body = {
+    conversation_id: null,
+    message_id: null,
+    answer: safeOutboundAnswer(answer ?? ESCALATION_MESSAGE),
+    topic,
+    confidence: answer ? 0.6 : 0.2,
+    grounded: !!answer,
+    sources: [],
+    actions: resolveActions(["open_help", "open_contact"], { signedIn: false }),
+    escalated: !answer,
+    clarifying_question: null,
+    resolution_layer: "degraded",
+    llm_used: false,
+    latency_ms: 0,
+    locale,
+  };
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "30" },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method not allowed" }, 405);
+  // Read once so the degraded path can still see the question after a failure.
+  const fallbackSource = req.clone();
+  try {
+    return await handleSupport(req);
+  } catch (e) {
+    console.error("[support-agent] unhandled failure — serving degraded reply", (e as Error)?.message);
+    return await degradedReply(fallbackSource);
+  }
+});
+
+async function handleSupport(req: Request): Promise<Response> {
 
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -1018,5 +1084,4 @@ Deno.serve(async (req) => {
     llmCalled: true,
     validationFailed: !validation.ok,
   });
-
-});
+}

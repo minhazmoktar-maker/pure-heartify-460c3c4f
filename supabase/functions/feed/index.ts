@@ -23,7 +23,7 @@ import { observed } from "../_shared/observe.ts";
 import {
   derivePrimaryLanguage,
   interleavePrimaryLanguage,
-  PRIMARY_LANGUAGE_SHARE,
+  shareForLanguage,
 } from "../_shared/localFirst.ts";
 import { loadFeedRankingFlags } from "../_shared/feedRankingFlags.ts";
 import { collapseDuplicateGroups } from "../_shared/recommendations/semanticDedup.ts";
@@ -728,7 +728,8 @@ Deno.serve(observed("feed", async (req) => {
     // with primary-language rows when supply inside it is short of the quota,
     // then interleave so ~45% of the visible page is local.
     if (primaryLanguage) {
-      const wanted = Math.max(1, Math.round(limit * PRIMARY_LANGUAGE_SHARE));
+      // Per-language tuned target (deep corpora lead harder, thin ones less).
+      const wanted = Math.max(1, Math.round(limit * shareForLanguage(primaryLanguage)));
       const have = diversified
         .slice(0, limit)
         .filter((v) => ((v.content_language as string | null) ?? "").toLowerCase() === primaryLanguage)
