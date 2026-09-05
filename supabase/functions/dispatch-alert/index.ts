@@ -9,7 +9,7 @@
 //   ALERT_EMAIL_MIN_SEVERITY optional, default "error" (info|warn|error|critical)
 //   SLACK_WEBHOOK_URL        optional
 //   ADMIN_ALERTS_URL         optional, deep link shown in emails
-//                            defaults to https://pure-heartify.lovable.app/admin/alerts
+//                            defaults to https://www.heartifyapp.com/admin/alerts
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -58,7 +58,7 @@ const ALERT_EMAIL_MIN_SEVERITY =
   (Deno.env.get("ALERT_EMAIL_MIN_SEVERITY") ?? "error").toLowerCase();
 const SLACK_WEBHOOK_URL = Deno.env.get("SLACK_WEBHOOK_URL");
 const ADMIN_ALERTS_URL =
-  Deno.env.get("ADMIN_ALERTS_URL") ?? "https://pure-heartify.lovable.app/admin/alerts";
+  Deno.env.get("ADMIN_ALERTS_URL") ?? "https://www.heartifyapp.com/admin/alerts";
 
 const SEV_RANK: Record<string, number> = { info: 0, warn: 1, error: 2, critical: 3 };
 const SEV_EMOJI: Record<string, string> = {

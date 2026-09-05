@@ -20,7 +20,7 @@ const SEV_COLOR: Record<string, string> = {
   info: "#3b82f6", warn: "#f59e0b", warning: "#f59e0b", error: "#ef4444", critical: "#b91c1c",
 };
 const ADMIN_BASE = Deno.env.get("ADMIN_ALERTS_URL")?.replace(/\/admin\/alerts$/, "") ??
-  "https://pure-heartify.lovable.app";
+  "https://www.heartifyapp.com";
 
 type Alert = {
   id: string;
