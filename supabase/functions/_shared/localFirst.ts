@@ -155,9 +155,16 @@ export function interleavePrimaryLanguage<T>(
 
 
   const window = Math.max(1, Math.min(limit, items.length));
+  // Per-language tuned target, clamped to the supply we actually hold, so a
+  // deep corpus leads the page and a thin one never asks for empty slots.
+  const effectiveShare = share ?? shareForLanguage(primary, {
+    localSupply: local.length,
+    window,
+  });
   // Never promise more local slots than we actually have supply for.
-  const quota = Math.min(local.length, Math.max(1, Math.round(window * share)));
+  const quota = Math.min(local.length, Math.max(1, Math.round(window * effectiveShare)));
   if (quota === 0) return items;
+
 
   // Slot positions spread evenly through the window (e.g. quota 9 / window 20
   // → roughly every other card is local, starting at position 0).
