@@ -70,8 +70,9 @@ export async function enforceRateLimit(
     const localCount = bumpLocal(localKey, bucketStart);
     if (localCount > opts.limit) return true;
     // Sample only: keeps the shared counter useful for abuse analytics without
-    // a database write on every request.
-    if (localCount % DB_SAMPLE_EVERY !== 1) return false;
+    // a database write on every request. Precise callers always write.
+    if (!opts.precise && localCount % DB_SAMPLE_EVERY !== 1) return false;
+
 
 
     // Upsert atomic increment. Requires the rate_limit_counters table
