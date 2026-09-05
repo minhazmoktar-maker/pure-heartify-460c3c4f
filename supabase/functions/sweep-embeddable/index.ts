@@ -153,15 +153,19 @@ Deno.serve(async (req) => {
       return [];
     },
     ytStatus,
+    // Row locks are always taken in the same (sorted) id order so parallel
+    // sweep runs queue behind each other instead of deadlocking.
     markGood: async (ids) => {
-      await sbFetch(`curated_videos?video_id=in.(${ids.join(",")})`, {
+      const ordered = [...ids].sort();
+      await sbFetch(`curated_videos?video_id=in.(${ordered.join(",")})`, {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
         body: JSON.stringify({ embed_checked_at: new Date().toISOString() }),
       });
     },
     markBad: async (ids) => {
-      const r = await sbFetch(`curated_videos?video_id=in.(${ids.join(",")})`, {
+      const ordered = [...ids].sort();
+      const r = await sbFetch(`curated_videos?video_id=in.(${ordered.join(",")})`, {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
         body: JSON.stringify({
@@ -176,9 +180,10 @@ Deno.serve(async (req) => {
     // One RPC per 50-id batch instead of 50 PATCHes; always stamps
     // duration_checked_at so live streams don't loop in the priority queue.
     writeDurations: async (rows) => {
+      const ordered = [...rows].sort((a, b) => a.video_id < b.video_id ? -1 : a.video_id > b.video_id ? 1 : 0);
       const r = await sbFetch("rpc/apply_video_durations", {
         method: "POST",
-        body: JSON.stringify({ _payload: rows }),
+        body: JSON.stringify({ _payload: ordered }),
       });
       if (!r.ok) {
         console.error(
@@ -186,8 +191,9 @@ Deno.serve(async (req) => {
         );
         return 0;
       }
-      return rows.filter((x) => x.duration_seconds !== null).length;
+      return ordered.filter((x) => x.duration_seconds !== null).length;
     },
+
   });
 
   const { checked, hidden, durationsWritten, quotaExhausted, deferred, stopReason } = result;
