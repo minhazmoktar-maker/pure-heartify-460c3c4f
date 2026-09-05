@@ -288,8 +288,23 @@ async function computeRecommendations(args: ComputeArgs) {
 }
 
 function json(body: unknown, status = 200, extra: Record<string, string> = {}) {
+  const cacheable = status === 200;
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json", ...extra },
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+      // Personalized, so browser-only caching. Repeat navigations paint from
+      // cache instantly and refresh in the background, which keeps the
+      // database out of the loop under heavy concurrent traffic.
+      ...(cacheable
+        ? {
+          "Cache-Control": "private, max-age=90, stale-while-revalidate=300",
+          "Vary": "Authorization",
+        }
+        : { "Cache-Control": "no-store" }),
+      ...extra,
+    },
   });
 }
+
