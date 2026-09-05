@@ -253,6 +253,13 @@
       "when": 1788613563621,
       "tag": "0035_schedule_edge_cache_warmup",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788618633365,
+      "tag": "0036_warm_serving_edge_functions",
+      "breakpoints": true
     }
   ]
 }
