@@ -12,8 +12,9 @@
  * Never called from the browser: consumers are edge functions.
  */
 import { embedSupportText, isEmbeddingConfigured } from "./support/providers.ts";
+import { embeddingsUrl } from "./aiGateway.ts";
 
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/embeddings";
+const GATEWAY_URL = embeddingsUrl();
 const MODEL = "openai/text-embedding-3-small";
 export const EMBED_DIMS = 1536;
 

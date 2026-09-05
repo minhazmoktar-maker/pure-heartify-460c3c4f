@@ -14,6 +14,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
+import { aiApiKey, chatCompletionsUrl } from "../_shared/aiGateway.ts";
   classifyWithRetries,
   fallbackVerdict,
   guardedClassify,
@@ -72,7 +73,7 @@ async function classifyOnce(item: Claimed, key: string, timeoutMs: number): Prom
     return unfetchableThumbnailVerdict(item.video_id, "thumbnail_unreachable");
   }
   return await guardedClassify(item.video_id, async (signal) => {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch(chatCompletionsUrl(), {
       method: "POST",
       signal,
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -126,7 +127,7 @@ Deno.serve(async (req) => {
 
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
   const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const AI_KEY = Deno.env.get("LOVABLE_API_KEY");
+  const AI_KEY = aiApiKey();
   if (!SUPABASE_URL || !SERVICE_KEY) return json({ error: "server misconfigured" }, 500);
 
   const cronSecret = req.headers.get("x-cron-secret");
@@ -163,7 +164,7 @@ Deno.serve(async (req) => {
     const { data: esc } = await admin.rpc("escalate_visually_unsafe_channels");
     return json({ scanned: 0, escalation: esc ?? null }, 200);
   }
-  if (!AI_KEY) return json({ error: "LOVABLE_API_KEY not configured", claimed: items.length }, 500);
+  if (!AI_KEY) return json({ error: "AI gateway not configured (set AI_GATEWAY_API_KEY or LOVABLE_API_KEY)", claimed: items.length }, 500);
 
   // Stop claiming new waves once we approach the edge budget and apply what we
   // already have; unscanned rows keep visual_state = 'unchecked' and are
