@@ -82,7 +82,11 @@ Deno.serve(observed("feed", async (req) => {
     const limited = await enforceRateLimit(admin, {
       identity: getClientIdentity(req, callerId),
       action: "feed",
-      limit: callerId ? 240 : 60,
+      // Anonymous callers are keyed by IP, and in our biggest markets carrier
+      // NAT puts thousands of real people behind a single address — so the
+      // anonymous ceiling has to be generous. Anonymous feeds are served from
+      // the shared cache, so the cost per extra request is a single row read.
+      limit: callerId ? 240 : 600,
       windowSeconds: 60,
     });
     if (limited) return json({ error: "rate_limited" }, 429);

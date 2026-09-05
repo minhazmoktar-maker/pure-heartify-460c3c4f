@@ -57,7 +57,7 @@ Deno.serve(observed("recommendations", async (req) => {
     const limited = await enforceRateLimit(admin, {
       identity,
       action: isEvent ? "rec_event" : "rec_query",
-      limit: isEvent ? 600 : 60,
+      limit: isEvent ? 600 : (userId ? 120 : 600),
       windowSeconds: 60,
     });
     if (limited) {
