@@ -18,7 +18,7 @@
  * never chose it) from dominating the page.
  */
 
-import { REGION_CONTENT_LANGUAGES, type LanguageCode } from "@/i18n/region";
+import { REGION_CONTENT_LANGUAGES } from "@/i18n/region";
 import { sanitizeLang } from "@/lib/languageBalance";
 
 export type LanguageSource = "explicit" | "behavior" | "device" | "region";
@@ -54,9 +54,7 @@ const UNIVERSAL = ["en", "ar"] as const;
 /** Ordered languages for a country, or null when unknown. */
 function regionLanguages(country: string | null | undefined): string[] | null {
   if (!country) return null;
-  const list = REGION_CONTENT_LANGUAGES[country.toUpperCase() as string] as
-    | LanguageCode[]
-    | undefined;
+  const list = REGION_CONTENT_LANGUAGES[country.toUpperCase()] as string[] | undefined;
   return list ? [...list] : null;
 }
 
