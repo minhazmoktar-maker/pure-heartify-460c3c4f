@@ -17,6 +17,7 @@
  */
 
 import { observed } from "../_shared/observe.ts";
+import { aiApiKey, chatCompletionsUrl } from "../_shared/aiGateway.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -450,13 +451,13 @@ function evaluateText(title: string, description: string, channelTitle: string, 
 
 // === Optional vision-based thumbnail check (Lovable AI) ===
 // Only used for DISCOVERY items (not for trusted-channel pulls) to keep cost low.
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const LOVABLE_API_KEY = aiApiKey();
 const ENABLE_VISION_CHECK = Deno.env.get("ENABLE_VISION_CHECK") !== "false"; // on by default if key present
 
 async function thumbnailIsSafe(thumbnailUrl: string): Promise<{ ok: boolean; rule?: string }> {
   if (!LOVABLE_API_KEY || !ENABLE_VISION_CHECK || !thumbnailUrl) return { ok: true };
   try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch(chatCompletionsUrl(), {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`,

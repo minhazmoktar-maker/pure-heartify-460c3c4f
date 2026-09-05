@@ -172,61 +172,61 @@ Deno.serve(async (req) => {
       console.error("premium check failed:", (err as Error).message);
     }
     let filteredHits = hits;
-    if (!viewerIsPremium && hits.length > 0) {
-      const ids = hits.map((h: Record<string, unknown>) => h.video_id ?? h.id).filter(Boolean);
-      if (ids.length > 0) {
-        try {
-          const { data: premiumRows } = await admin
-            .from("curated_videos")
-            .select("video_id")
-            .in("video_id", ids as string[])
-            .eq("is_premium_only", true);
-          const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
-          filteredHits = hits.filter((h: Record<string, unknown>) =>
-            !premiumSet.has((h.video_id ?? h.id) as string),
-          );
-        } catch (err) {
-          console.error("premium filter failed:", (err as Error).message);
+
+    // Single metadata hydration for every downstream gate. The premium,
+    // locale and strict-halal gates all need columns the search RPC does not
+    // return; hydrating them once keeps the page to one extra round trip and
+    // guarantees `visual_state` is present (a missing value is treated as
+    // `unchecked` by the halal guard, which would drop every result).
+    const hitIds = filteredHits
+      .map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string)
+      .filter(Boolean);
+    const metaById = new Map<
+      string,
+      { is_premium_only: boolean; visual_state: string | null; content_language: string | null }
+    >();
+    if (hitIds.length > 0) {
+      try {
+        const { data: metaRows } = await admin
+          .from("curated_videos")
+          .select("video_id, is_premium_only, visual_state, content_language")
+          .in("video_id", hitIds);
+        for (const r of metaRows ?? []) {
+          metaById.set(r.video_id as string, {
+            is_premium_only: (r as { is_premium_only?: boolean }).is_premium_only === true,
+            visual_state: ((r as { visual_state?: string | null }).visual_state ?? null),
+            content_language:
+              ((r as { content_language?: string | null }).content_language ?? null)?.toLowerCase() ?? null,
+          });
         }
+      } catch (err) {
+        console.error("metadata hydration failed:", (err as Error).message);
       }
     }
 
-    // Locale-aware HARD language gate: hydrate content_language for the
-    // current page and drop off-language rows entirely. A user who picked
-    // English must never be served Indonesian/Arabic/Malay results. Untagged
-    // rows are treated as neutral (kept after on-language matches) and
-    // off-language rows are only ever used when nothing else can fill the
-    // page, so results never render empty.
+    if (!viewerIsPremium && metaById.size > 0) {
+      filteredHits = filteredHits.filter((h: Record<string, unknown>) =>
+        metaById.get((h.video_id ?? h.id) as string)?.is_premium_only !== true,
+      );
+    }
+
+    // Locale-aware language gate. A user who picked English must never be
+    // served Indonesian/Arabic/Malay results. Untagged rows are neutral (kept
+    // after on-language matches) and off-language rows are only used when
+    // nothing else can fill the page, so results never render empty.
     if (contentLanguages.length && filteredHits.length > 0) {
-      try {
-        const ids = filteredHits
-          .map((h: Record<string, unknown>) => (h.video_id ?? h.id) as string)
-          .filter(Boolean);
-        const { data: langRows } = await admin
-          .from("curated_videos")
-          .select("video_id, content_language")
-          .in("video_id", ids);
-        const langById = new Map(
-          (langRows ?? []).map((r) => [r.video_id as string, (r.content_language as string | null)?.toLowerCase() ?? null]),
-        );
-        const langSet = new Set(contentLanguages);
-        const matches: typeof filteredHits = [];
-        const untagged: typeof filteredHits = [];
-        const others: typeof filteredHits = [];
-        for (const h of filteredHits) {
-          const id = (h.video_id ?? h.id) as string;
-          const cl = langById.get(id) ?? null;
-          if (!cl) untagged.push(h);
-          else if (langSet.has(cl)) matches.push(h);
-          else others.push(h);
-        }
-        const onLanguage = [...matches, ...untagged];
-        // Only fall back to off-language rows when the gate would otherwise
-        // leave the searcher with nothing at all.
-        filteredHits = onLanguage.length > 0 ? onLanguage : others;
-      } catch (err) {
-        console.error("locale gate failed:", (err as Error).message);
+      const langSet = new Set(contentLanguages);
+      const matches: typeof filteredHits = [];
+      const untagged: typeof filteredHits = [];
+      const others: typeof filteredHits = [];
+      for (const h of filteredHits) {
+        const cl = metaById.get((h.video_id ?? h.id) as string)?.content_language ?? null;
+        if (!cl) untagged.push(h);
+        else if (langSet.has(cl)) matches.push(h);
+        else others.push(h);
       }
+      const onLanguage = [...matches, ...untagged];
+      filteredHits = onLanguage.length > 0 ? onLanguage : others;
     }
 
 
@@ -240,12 +240,21 @@ Deno.serve(async (req) => {
           .eq("user_id", userId).maybeSingle();
         strictHalal = (shPref as { strict_halal?: boolean } | null)?.strict_halal !== false;
       }
-      filteredHits = filteredHits.filter((h: Record<string, unknown>) =>
-        assessStrict(
-          { title: h.title as string | null, channel_title: (h.channel_title ?? h.channelTitle) as string | null },
+      filteredHits = filteredHits.filter((h: Record<string, unknown>) => {
+        const id = (h.video_id ?? h.id) as string;
+        const visual = metaById.get(id)?.visual_state
+          ?? (h.visual_state as string | null | undefined)
+          ?? null;
+        return assessStrict(
+          {
+            title: h.title as string | null,
+            channel_title: (h.channel_title ?? h.channelTitle) as string | null,
+            visual_state: visual,
+          },
           strictHalal,
-        ).allowed,
-      );
+        ).allowed;
+      });
+
     }
 
 

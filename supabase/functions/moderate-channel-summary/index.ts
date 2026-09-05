@@ -4,9 +4,10 @@
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { aiApiKey, chatCompletionsUrl } from "../_shared/aiGateway.ts";
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const LOVABLE_API_KEY = aiApiKey();
+const GATEWAY_URL = chatCompletionsUrl();
 
 type Candidate = {
   id: string;

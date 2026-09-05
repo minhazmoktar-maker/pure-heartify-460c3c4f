@@ -13,6 +13,7 @@
  */
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { aiApiKey, chatCompletionsUrl } from "../_shared/aiGateway.ts";
 
 const MODEL = "google/gemini-2.5-flash";
 const MAX_SEGMENTS = 1200;
@@ -33,9 +34,9 @@ function json(body: unknown, status = 200) {
 }
 
 async function translateChunk(texts: string[], target: string, sourceName: string): Promise<string[]> {
-  const key = Deno.env.get("LOVABLE_API_KEY");
+  const key = aiApiKey();
   if (!key) throw new Error("translation is not configured");
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const res = await fetch(chatCompletionsUrl(), {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
