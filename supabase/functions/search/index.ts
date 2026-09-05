@@ -80,6 +80,13 @@ Deno.serve(async (req) => {
       : [];
 
 
+    // Anonymous searches are identical for every caller with the same query,
+    // so they read through the shared cache (measured cold: 3.8-6.1s, warm:
+    // ~0.3s). Signed-in searches stay uncached: they are personalised and
+    // entitlement-gated.
+    const cacheKey = `search:v1:${NORMALIZE(q)}|${category ?? ""}|${channel ?? ""}|${limit}|${offset}|${useAi}|${contentLanguages.join(",")}`;
+
+    const compute = async () => {
     let intent = useAi ? await detectIntent(q) : null;
 
     // H2: validate AI-suggested channel/entities against real channels.
