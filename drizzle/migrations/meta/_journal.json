@@ -239,6 +239,13 @@
       "when": 1788612490183,
       "tag": "0033_create_edge_response_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1788612541053,
+      "tag": "0034_schedule_edge_cache_cleanup_hourly",
+      "breakpoints": true
     }
   ]
 }
