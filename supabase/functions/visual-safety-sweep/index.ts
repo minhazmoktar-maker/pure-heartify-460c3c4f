@@ -13,8 +13,8 @@
  */
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import {
 import { aiApiKey, chatCompletionsUrl } from "../_shared/aiGateway.ts";
+import {
   classifyWithRetries,
   fallbackVerdict,
   guardedClassify,
