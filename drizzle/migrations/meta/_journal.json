@@ -211,6 +211,27 @@
       "when": 1788521461824,
       "tag": "0029_harden_selected_security_findings",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1788604928090,
+      "tag": "0030_scale_curated_videos_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1788605021032,
+      "tag": "0031_extend_retention_for_log_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1788605129693,
+      "tag": "0032_index_language_category_serving_reads",
+      "breakpoints": true
     }
   ]
 }
