@@ -17,9 +17,10 @@
  */
 import type { SearchIntent } from "./types.ts";
 import { chatWithFailover, isInferenceConfigured } from "../support/providers.ts";
+import { aiApiKey, chatCompletionsUrl } from "../aiGateway.ts";
 
-const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash-lite";
+
 
 
 const SYSTEM = `You classify Islamic-content video search queries.
@@ -68,7 +69,7 @@ export async function detectIntent(query: string): Promise<SearchIntent | null> 
     }
   }
 
-  const key = Deno.env.get("LOVABLE_API_KEY");
+  const key = aiApiKey();
   if (!key) return softFallback(query);
 
 
@@ -76,13 +77,14 @@ export async function detectIntent(query: string): Promise<SearchIntent | null> 
   const t = setTimeout(() => controller.abort(), 1200);
   try {
     const wrapped = `<query>\n${escapeDelimiter(query)}\n</query>`;
-    const res = await fetch(GATEWAY, {
+    const res = await fetch(chatCompletionsUrl(), {
       method: "POST",
       signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
-        "Lovable-API-Key": key,
+        Authorization: `Bearer ${key}`,
       },
+
       body: JSON.stringify({
         model: MODEL,
         temperature: 0,

@@ -10000,6 +10000,7 @@ export type Database = {
       }
       viewer_has_active_entitlement: { Args: never; Returns: boolean }
       warm_edge_caches: { Args: never; Returns: undefined }
+      warm_serving_functions: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
