@@ -148,7 +148,11 @@ export async function enforceSupportLimits(
         action: rule.action,
         limit: rule.limit,
         windowSeconds: rule.windowSeconds,
+        // Each allowed turn can cost a paid AI call, so the shared counter must
+        // see every request rather than a sample.
+        precise: true,
       });
+
     } catch {
       // Fail open: a counter outage must not take the Help assistant down.
       limited = false;
