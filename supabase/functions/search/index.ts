@@ -16,6 +16,7 @@ import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
 import { embedOne, toPgVector } from "../_shared/embed.ts";
 import { assessStrict } from "../_shared/halalGuard.ts";
+import { readThroughShared } from "../_shared/cache.ts";
 
 
 const NORMALIZE = (s: string) =>
@@ -58,7 +59,12 @@ Deno.serve(async (req) => {
       const prefix = url.searchParams.get("prefix") ?? "";
       const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? 8), 1), 20);
       if (!prefix) return json({ autocomplete: [] });
-      const autocomplete = await provider.autocomplete(prefix, limit);
+      const { value: autocomplete } = await readThroughShared(
+        admin,
+        `autocomplete:v1:${prefix.toLowerCase()}|${limit}`,
+        300,
+        () => provider.autocomplete(prefix, limit),
+      );
       return json({ autocomplete });
     }
 
