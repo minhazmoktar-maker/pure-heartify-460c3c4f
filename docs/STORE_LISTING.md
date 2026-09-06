@@ -17,7 +17,7 @@ English (`en-US`) canonical is included here — other locales pull from
 | App name                | Heartify                                                 |
 | Subtitle (iOS, 30 char) | Halal streaming, curated                                 |
 | Short desc (Play, 80)   | Halal-first video, calmly curated for focus & family.    |
-| Bundle ID / App ID      | `app.lovable.6731527d4fb54e95bb9e47de8bea4363`           |
+| Bundle ID / App ID      | `com.heartifyapp.app`           |
 | Primary category        | Lifestyle                                                |
 | Secondary category      | Entertainment                                            |
 | Age rating (Apple)      | 4+ (no objectionable content by design)                  |

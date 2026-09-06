@@ -187,7 +187,7 @@ Expected result: **4+ (Apple)** / **Everyone (Play)**.
 - [ ] Repo: `bun run build` produces `dist/` (Repo — automated in CI).
 - [ ] Repo: no `SERVICE_ROLE_KEY` referenced in `src/` (Repo — verified).
 - [ ] Repo: `CAP_LIVE_RELOAD_URL` is unset in the build environment.
-- [ ] Console: bundle ID matches `app.lovable.6731527d4fb54e95bb9e47de8bea4363`.
+- [ ] Console: bundle ID matches `com.heartifyapp.app`.
 - [ ] Console: privacy manifest and Info.plist strings pasted from §1–§2.
 - [ ] Console: Data safety form matches §3 exactly.
 - [ ] Console: association files updated with real Team ID + SHA-256 (§4).

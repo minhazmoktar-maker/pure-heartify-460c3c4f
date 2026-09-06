@@ -22,7 +22,7 @@ const MIN_DAYS_BETWEEN_PROMPTS = 90;
 
 const APP_STORE_URL = "https://apps.apple.com/app/idPLACEHOLDER";
 const PLAY_STORE_URL =
-  "https://play.google.com/store/apps/details?id=app.lovable.6731527d4fb54e95bb9e47de8bea4363";
+  "https://play.google.com/store/apps/details?id=com.heartifyapp.app";
 
 function daysSince(ts: number): number {
   return (Date.now() - ts) / (24 * 3600 * 1000);

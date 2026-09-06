@@ -38,7 +38,7 @@ const APP_LOCALE_TAGS = [
 const liveReloadUrl = process.env.CAP_LIVE_RELOAD_URL?.trim();
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.6731527d4fb54e95bb9e47de8bea4363',
+  appId: 'com.heartifyapp.app',
   appName: 'heartify',
   webDir: 'dist',
   ...(liveReloadUrl

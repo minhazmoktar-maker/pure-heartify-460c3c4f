@@ -70,7 +70,7 @@ describe('capacitor config', () => {
   });
 
   it('keeps the app id and name stable', () => {
-    expect(config).toContain("appId: 'app.lovable.6731527d4fb54e95bb9e47de8bea4363'");
+    expect(config).toContain("appId: 'com.heartifyapp.app'");
     expect(config).toContain("appName: 'heartify'");
   });
 });

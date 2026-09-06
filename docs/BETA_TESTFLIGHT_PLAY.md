@@ -16,7 +16,7 @@ Related docs: `docs/STORE_LISTING.md` (copy), `docs/play-data-safety.md`
 | Item | Value / location |
 |---|---|
 | App name | `heartify` (`capacitor.config.ts`) |
-| Bundle / package id | `app.lovable.6731527d4fb54e95bb9e47de8bea4363` |
+| Bundle / package id | `com.heartifyapp.app` |
 | Web assets | bundled `dist/` — **never** a remote `server.url` in release builds |
 | iOS scheme | `App` (workspace `ios/App/App.xcworkspace`) |
 | Android artifact | `android/app/build/outputs/bundle/release/app-release.aab` |
