@@ -42,7 +42,7 @@ select jobname, schedule, active from cron.job order by jobname;
 
 ```bash
 npm i @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android
-npx cap init          # appId app.lovable.6731527d4fb54e95bb9e47de8bea4363
+npx cap init          # appId com.heartifyapp.app
 npm run build && npx cap sync
 npx cap run ios | android
 ```

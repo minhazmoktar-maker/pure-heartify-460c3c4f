@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">heartify</string>
+    <string name="title_activity_main">heartify</string>
+    <string name="package_name">com.heartifyapp.app</string>
+    <string name="custom_url_scheme">com.heartifyapp.app</string>
+</resources>

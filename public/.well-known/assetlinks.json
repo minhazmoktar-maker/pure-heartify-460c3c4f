@@ -6,7 +6,7 @@
     ],
     "target": {
       "namespace": "android_app",
-      "package_name": "app.lovable.6731527d4fb54e95bb9e47de8bea4363",
+      "package_name": "com.heartifyapp.app",
       "sha256_cert_fingerprints": [
         "REPLACE_WITH_PLAY_APP_SIGNING_SHA256_FINGERPRINT",
         "REPLACE_WITH_UPLOAD_KEY_SHA256_FINGERPRINT"
