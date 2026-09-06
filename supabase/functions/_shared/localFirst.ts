@@ -40,6 +40,24 @@ export function derivePrimaryLanguage(
 }
 
 /**
+ * The language that should *lead* a page — index 0 of the caller's ordered
+ * content languages, English included.
+ *
+ * `derivePrimaryLanguage` answers "which language needs protecting from being
+ * out-supplied", which English never does. This answers the different question
+ * every surface actually needs: "which language should most of this page be
+ * in?". For English-first markets that is English, and skipping the interleave
+ * entirely there left the page order to raw corpus ranking — producing feeds
+ * led by languages the viewer never asked for.
+ */
+export function deriveLeadLanguage(
+  contentLanguages: readonly unknown[] | null | undefined,
+): string | null {
+  const list = (contentLanguages ?? []).map(sanitizeLang).filter(Boolean) as string[];
+  return list[0] ?? null;
+}
+
+/**
  * Target share of a page reserved for the primary (local) language.
  *
  * Heartify's launch standard is **80/20**: 80% native/local language, 20%
@@ -68,6 +86,13 @@ export const PRIMARY_LANGUAGE_SHARE = 0.8;
  * a floor (it is abundant and `derivePrimaryLanguage` never returns it).
  */
 export const LANGUAGE_SHARE: Readonly<Record<string, number>> = {
+  // English-led markets (US, GB, CA, AU, NG…). English is abundant, so it never
+  // needed a *floor* to fill slots — but without a lead share the page order is
+  // whatever the corpus ranks highest, which meant a Chicago or London viewer
+  // could open Heartify to Turkish and Bengali cards they cannot understand.
+  // A 0.6 lead keeps the page comprehensible while leaving 40% of the slots for
+  // the deliberately wide diaspora tail (Arabic, Urdu, Bangla, Indonesian…).
+  en: 0.6,
   // Deep local corpora — full local-first majority.
   bn: 0.8,
   ur: 0.8,
