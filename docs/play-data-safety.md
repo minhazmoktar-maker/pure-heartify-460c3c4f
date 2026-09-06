@@ -111,7 +111,7 @@ None.
 ## 5. Data-deletion URL (required for account-based apps)
 
 ```
-https://pure-heartify.lovable.app/legal/delete-account
+https://heartifyapp.com/legal/delete-account
 ```
 
 (Replace with custom domain URL once live.)
@@ -121,7 +121,7 @@ https://pure-heartify.lovable.app/legal/delete-account
 ## 6. Privacy policy URL
 
 ```
-https://pure-heartify.lovable.app/legal/privacy
+https://heartifyapp.com/legal/privacy
 ```
 
 ---
