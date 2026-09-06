@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   balanceByLanguage,
   derivePrimaryLanguage,
+  deriveLeadLanguage,
   diversifyByLanguage,
   LANGUAGE_SHARE,
   MIN_PRIMARY_LANGUAGE_SHARE,
@@ -39,6 +40,19 @@ describe("per-language share tuning", () => {
     expect(derivePrimaryLanguage(["en", "bn"])).toBeNull();
     expect(derivePrimaryLanguage(["bn", "en"])).toBe("bn");
     expect(derivePrimaryLanguage(["id"])).toBe("id");
+  });
+
+  it("leads English-first markets with English instead of an arbitrary language", () => {
+    expect(deriveLeadLanguage(["en", "ar", "ur", "bn"])).toBe("en");
+    expect(deriveLeadLanguage(["bn", "en"])).toBe("bn");
+    expect(deriveLeadLanguage([])).toBeNull();
+    // A US/GB viewer sees a comprehensible majority-English page whose
+    // remaining slots still carry the wide diaspora tail.
+    const out = balanceByLanguage(pool({ tr: 40, bn: 40, ar: 20, en: 40 }), langOf, "en", 20);
+    const window = out.slice(0, 20);
+    const english = window.filter((i) => i.lang === "en").length;
+    expect(english).toBeGreaterThanOrEqual(11); // ~60%
+    expect(new Set(window.map((i) => i.lang)).size).toBeGreaterThan(1);
   });
 });
 
