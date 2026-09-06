@@ -31,8 +31,12 @@ export function derivePrimaryLanguage(
 ): string | null {
   const list = (contentLanguages ?? []).map(sanitizeLang).filter(Boolean) as string[];
   if (list.length === 0) return null;
-  if (list[0] !== "en") return list[0];
-  return list.find((l) => l !== "en" && l !== "ar") ?? null;
+  // English-led lists (English-speaking markets and English-first users) get no
+  // reserved share at all: reserving 80% for the *second* entry filled Dublin,
+  // Auckland or Chicago feeds with a language the viewer never asked for. Those
+  // languages stay eligible and rankable, they just do not get a floor.
+  if (list[0] === "en") return null;
+  return list[0];
 }
 
 /**

@@ -208,9 +208,9 @@ export function primaryContentLanguage(
   const list = (contentLanguages ?? []).filter(Boolean);
   if (list.length === 0) return null;
   const first = list[0].toLowerCase();
-  if (first !== "en") return first;
-  const nonEnglish = list.map((l) => l.toLowerCase()).find((l) => l !== "en" && l !== "ar");
-  return nonEnglish ?? null;
+  // English-led markets reserve nothing: the tail languages stay eligible but
+  // must earn their place by relevance instead of holding a guaranteed share.
+  return first === "en" ? null : first;
 }
 
 /**

@@ -113,7 +113,14 @@ export async function readThroughShared<T>(
   key: string,
   ttlSeconds: number,
   producer: () => Promise<T>,
+  /**
+   * Optional gate: return false for a degraded/failed payload so a transient
+   * outage is never persisted and handed to every other anonymous caller for
+   * the next ~12 minutes.
+   */
+  isCacheable?: (value: T) => boolean,
 ): Promise<{ value: T; hit: boolean }> {
+  const cacheable = (v: T) => (isCacheable ? isCacheable(v) : true);
   const local = cacheGet<T>(key);
   if (local !== null) return { value: local, hit: true };
 
@@ -148,6 +155,7 @@ export async function readThroughShared<T>(
         if (!inflight.has(key)) {
           void singleFlight(key, producer)
             .then((fresh) => {
+              if (!cacheable(fresh)) return;
               cacheSet(key, fresh, Math.min(ttlSeconds, 60));
               return write(fresh);
             })
@@ -162,6 +170,7 @@ export async function readThroughShared<T>(
 
 
   const value = await singleFlight(key, producer);
+  if (!cacheable(value)) return { value, hit: false };
   cacheSet(key, value, Math.min(ttlSeconds, 60));
   try {
     await admin.from("edge_response_cache").upsert({
