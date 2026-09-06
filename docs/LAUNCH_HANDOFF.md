@@ -117,9 +117,9 @@ absent).
 You already have `/privacy`, `/terms`, `/cookies`, `/appeals` routes
 live. When submitting to either store, use:
 
-- Privacy policy URL: `https://pure-heartify.lovable.app/privacy`
-- Terms URL: `https://pure-heartify.lovable.app/terms`
-- Support URL: `https://pure-heartify.lovable.app/contact`
+- Privacy policy URL: `https://heartifyapp.com/privacy`
+- Terms URL: `https://heartifyapp.com/terms`
+- Support URL: `https://heartifyapp.com/contact`
 
 Replace the domain with your custom domain once connected in
 Project Settings → Domains.

@@ -41,7 +41,7 @@ the first store submission.
 5. Merge `docs/ios-info-plist-additions.xml` keys into `ios/App/App/Info.plist`
    (purpose strings + `UIBackgroundModes: audio, remote-notification, fetch`).
 6. Enable capabilities in Xcode: Push Notifications, Background Modes (Audio,
-   Remote notifications), Associated Domains (`applinks:pure-heartify.lovable.app`).
+   Remote notifications), Associated Domains (`applinks:heartifyapp.com`).
 7. Fill App Privacy (Nutrition Label) to match `docs/play-data-safety.md`.
 8. Add the Team ID and SHA-256 App ID to `public/.well-known/apple-app-site-association`.
 
@@ -70,7 +70,7 @@ the first store submission.
    package it has never seen.
 6. Complete: Data safety (`docs/play-data-safety.md`), Content rating
    questionnaire, Target audience (13+, not "designed for children"), Ads
-   declaration = **No ads**, Privacy policy URL `https://pure-heartify.lovable.app/legal/privacy`.
+   declaration = **No ads**, Privacy policy URL `https://heartifyapp.com/legal/privacy`.
 7. Put the release signing SHA-256 into `public/.well-known/assetlinks.json`.
 
 ### GitHub secrets — Android
