@@ -21,7 +21,7 @@ import {
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { observed } from "../_shared/observe.ts";
 import {
-  derivePrimaryLanguage,
+  deriveLeadLanguage,
   interleavePrimaryLanguage,
   shareForLanguage,
 } from "../_shared/localFirst.ts";
@@ -121,8 +121,8 @@ Deno.serve(observed("feed", async (req) => {
     // regional language at index 0 (see src/i18n/region.ts); an explicit
     // primary_language in the body wins when provided.
     const primaryLanguage =
-      derivePrimaryLanguage([body?.primary_language]) ??
-      derivePrimaryLanguage(contentLanguages);
+      deriveLeadLanguage([body?.primary_language]) ??
+      deriveLeadLanguage(contentLanguages);
     // Sanitize search: strip PostgREST-significant chars (, ( ) * . : & =)
     // to prevent filter injection into the or=(...) clause.
     const rawSearch = typeof body?.search === "string" ? body.search.trim() : "";

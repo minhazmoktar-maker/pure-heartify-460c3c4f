@@ -9,7 +9,7 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Loader2, Volume2, VolumeX, Heart, Share2, ShieldCheck, Sprout, Play } from "lucide-react";
 import { toast } from "sonner";
-import { balanceByLanguage, derivePrimaryLanguage } from "@/lib/languageBalance";
+import { balanceByLanguage, deriveLeadLanguage } from "@/lib/languageBalance";
 
 const PAGE = 12;
 
@@ -53,7 +53,7 @@ export default function Shorts() {
   const { user } = useAuth();
   const { locale, preferences } = useLocale();
   const contentLanguages = preferences.content_languages ?? [];
-  const primaryLanguage = derivePrimaryLanguage(contentLanguages);
+  const primaryLanguage = deriveLeadLanguage(contentLanguages);
 
   const [muted, setMuted] = useState(true);
   const [active, setActive] = useState(0);
