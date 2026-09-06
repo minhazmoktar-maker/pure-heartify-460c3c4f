@@ -9402,6 +9402,7 @@ export type Database = {
         }[]
       }
       nightly_reaudit_sweep: { Args: never; Returns: Json }
+      owns_creator_account: { Args: { _creator_id: string }; Returns: boolean }
       pipeline_health: { Args: never; Returns: Json }
       pool_because_you_watched: {
         Args: { _exclude_premium?: boolean; _limit?: number; _user_id: string }
