@@ -280,7 +280,17 @@ Deno.serve(async (req) => {
 
     const payload = userId
       ? await compute()
-      : (await readThroughShared(admin, cacheKey, 120, compute)).value;
+      : (
+          await readThroughShared(
+            admin,
+            cacheKey,
+            120,
+            compute,
+            // Never persist a degraded (provider-timeout) payload: it would be
+            // served stale to every other anonymous searcher for minutes.
+            (v) => !v.degraded && Array.isArray(v.hits) && v.hits.length > 0,
+          )
+        ).value;
 
     // Log the search (fire-and-forget) — outside the cache so trending keeps
     // reflecting real demand even when the results themselves were cached.
