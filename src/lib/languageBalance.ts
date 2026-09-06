@@ -19,6 +19,9 @@ export const PRIMARY_LANGUAGE_SHARE = 0.8;
 
 /** Per-language tuned share; unlisted languages use the default. */
 export const LANGUAGE_SHARE: Readonly<Record<string, number>> = {
+  // English-led markets get a 0.6 lead share (see localFirst.ts): enough for
+  // the page to be comprehensible, loose enough for a wide diaspora tail.
+  en: 0.6,
   bn: 0.8,
   ur: 0.8,
   id: 0.8,
@@ -63,6 +66,14 @@ export function derivePrimaryLanguage(
   // English-led lists get no reserved share — see localFirst.ts.
   if (list[0] === "en") return null;
   return list[0];
+}
+
+/** Language that should lead the page — index 0, English included. */
+export function deriveLeadLanguage(
+  contentLanguages: readonly unknown[] | null | undefined,
+): string | null {
+  const list = (contentLanguages ?? []).map(sanitizeLang).filter(Boolean) as string[];
+  return list[0] ?? null;
 }
 
 export function shareForLanguage(

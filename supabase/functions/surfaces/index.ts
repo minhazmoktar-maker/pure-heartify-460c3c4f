@@ -21,7 +21,7 @@ import { enforceContract, computeStats, checkGuarantees } from "../_shared/surfa
 import { loadFeedConfig } from "../_shared/surfaces/config.ts";
 import type { SurfaceContext, SurfaceResponse, SurfaceVideo } from "../_shared/surfaces/types.ts";
 import { observed } from "../_shared/observe.ts";
-import { derivePrimaryLanguage, interleavePrimaryLanguage } from "../_shared/localFirst.ts";
+import { deriveLeadLanguage, interleavePrimaryLanguage } from "../_shared/localFirst.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -290,8 +290,8 @@ Deno.serve(observed("surfaces", async (req) => {
     // rail. Without this the English-dominant corpus makes a Dhaka/Karachi
     // user's Home feel foreign even though their language is selected.
     const primaryLanguage =
-      derivePrimaryLanguage([body?.primary_language]) ??
-      derivePrimaryLanguage(effectiveLanguages);
+      deriveLeadLanguage([body?.primary_language]) ??
+      deriveLeadLanguage(effectiveLanguages);
     const picked = interleavePrimaryLanguage(
       enforceContract(filtered, effectiveContract),
       (v) => v.content_language ?? null,

@@ -24,7 +24,7 @@ import { toPgVector } from "../_shared/embed.ts";
 import { readThrough, readThroughShared } from "../_shared/cache.ts";
 import { observed } from "../_shared/observe.ts";
 import {
-  derivePrimaryLanguage,
+  deriveLeadLanguage,
   interleavePrimaryLanguage,
   sanitizeLang,
 } from "../_shared/localFirst.ts";
@@ -102,7 +102,7 @@ Deno.serve(observed("recommendations", async (req) => {
       .filter((l: string | null): l is string => !!l)
       .slice(0, 8);
     const bodyPrimary =
-      derivePrimaryLanguage([body.primaryLanguage]) ?? derivePrimaryLanguage(bodyLanguages);
+      deriveLeadLanguage([body.primaryLanguage]) ?? deriveLeadLanguage(bodyLanguages);
 
     // Read-through cache for every anonymous caller (signed-in users keep the
     // fully personalized path). A single warm pool of `limit * 4` candidates is
@@ -165,7 +165,7 @@ async function computeRecommendations(args: ComputeArgs) {
       signals.contentLanguages = bodyLanguages;
     }
     const primaryLanguage =
-      derivePrimaryLanguage([bodyPrimary]) ?? derivePrimaryLanguage(signals.contentLanguages);
+      deriveLeadLanguage([bodyPrimary]) ?? deriveLeadLanguage(signals.contentLanguages);
     const candidates = await fetchCandidates(admin, signals, categoryFilter, primaryLanguage);
 
     // Semantic recall: expand the candidate pool with videos similar to the
