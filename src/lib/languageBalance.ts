@@ -60,8 +60,9 @@ export function derivePrimaryLanguage(
 ): string | null {
   const list = (contentLanguages ?? []).map(sanitizeLang).filter(Boolean) as string[];
   if (list.length === 0) return null;
-  if (list[0] !== "en") return list[0];
-  return list.find((l) => l !== "en" && l !== "ar") ?? null;
+  // English-led lists get no reserved share — see localFirst.ts.
+  if (list[0] === "en") return null;
+  return list[0];
 }
 
 export function shareForLanguage(

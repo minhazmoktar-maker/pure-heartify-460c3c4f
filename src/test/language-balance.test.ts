@@ -36,7 +36,8 @@ describe("per-language share tuning", () => {
 
   it("never floors English or Arabic as a primary language", () => {
     expect(derivePrimaryLanguage(["en", "ar"])).toBeNull();
-    expect(derivePrimaryLanguage(["en", "bn"])).toBe("bn");
+    expect(derivePrimaryLanguage(["en", "bn"])).toBeNull();
+    expect(derivePrimaryLanguage(["bn", "en"])).toBe("bn");
     expect(derivePrimaryLanguage(["id"])).toBe("id");
   });
 });
