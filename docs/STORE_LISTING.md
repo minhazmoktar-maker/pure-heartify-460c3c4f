@@ -23,10 +23,10 @@ English (`en-US`) canonical is included here — other locales pull from
 | Age rating (Apple)      | 4+ (no objectionable content by design)                  |
 | Content rating (Play)   | Everyone                                                 |
 | Kids category           | **Not enrolled.** Content is family-friendly but the app is not filed under Apple's "Made for Kids" or Google's Designed for Families programme. Revisit only after COPPA / kids-privacy audit. |
-| Support URL             | `https://pure-heartify.lovable.app/`                     |
-| Marketing URL           | `https://pure-heartify.lovable.app/`                     |
-| Privacy policy URL      | `https://pure-heartify.lovable.app/privacy`              |
-| Terms URL               | `https://pure-heartify.lovable.app/terms`                |
+| Support URL             | `https://heartifyapp.com/contact`                     |
+| Marketing URL           | `https://heartifyapp.com/`                     |
+| Privacy policy URL      | `https://heartifyapp.com/privacy`              |
+| Terms URL               | `https://heartifyapp.com/terms`                |
 
 ## 2. App description (long form, ≤4000 char)
 
@@ -63,6 +63,20 @@ English (`en-US`) canonical is included here — other locales pull from
 ## 3. Keywords (Apple, 100-char limit)
 
 `halal,islam,quran,muslim,nasheed,streaming,family,kids-safe,dua,lecture,arabic,islamic`
+
+### 3a. Google Play keyword set (no keyword field — use in listing copy)
+
+Play ranks on the title, short description and long description. Use this
+prioritised set; each term already appears in the long description above or in
+§11 copy, and each should appear 2–3 times maximum.
+
+**Tier 1 (must appear in title/short description):** halal, islamic, muslim,
+video, streaming
+**Tier 2 (long description, high intent):** quran, nasheed, lecture, dawah,
+tafsir, seerah, dua, adhkar, dhikr, hadith
+**Tier 3 (long-tail / seasonal):** family safe, kids safe, no ads, halal
+entertainment, islamic learning, ramadan, prayer reminder, offline quran,
+bangla islamic, urdu islamic, indonesian islamic, arabic lectures
 
 ## 4. What's New (release notes for first submission)
 
