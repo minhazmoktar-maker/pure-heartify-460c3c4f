@@ -68,7 +68,8 @@ Deno.serve(async (req) => {
 
   // Cron/admin only.
   const secret = req.headers.get("x-cron-secret") ?? new URL(req.url).searchParams.get("secret");
-  if (CRON_SECRET && secret !== CRON_SECRET) return json({ error: "unauthorized" }, 401);
+  // Fail closed: an unset CRON_SECRET must never allow anonymous fan-out.
+  if (!CRON_SECRET || secret !== CRON_SECRET) return json({ error: "unauthorized" }, 401);
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
   const vapidReady = !!(VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY);
