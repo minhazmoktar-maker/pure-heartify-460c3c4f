@@ -85,13 +85,22 @@ export default function Shorts() {
 
 
   const shorts = useMemo(() => {
+    // Balance each batch *as it arrives* and never re-order earlier batches:
+    // the reel is a scroll-snap container, so re-sorting already-rendered
+    // items would swap the clip playing under the viewer's thumb.
     const seen = new Set<string>();
-    const unique = (data?.pages.flat() ?? []).filter((s) =>
-      seen.has(s.video_id) ? false : (seen.add(s.video_id), true),
-    );
-    // Local-first reel: the viewer's own language leads, and no single other
-    // language may take more than half of the remaining slots.
-    return balanceByLanguage(unique, (s) => s.content_language, primaryLanguage, PAGE);
+    const out: Short[] = [];
+    for (const page of data?.pages ?? []) {
+      const unique = page.filter((s) =>
+        seen.has(s.video_id) ? false : (seen.add(s.video_id), true),
+      );
+      // Local-first reel: the viewer's own language leads within the batch, and
+      // no single other language may take more than half of the batch's slots.
+      out.push(
+        ...balanceByLanguage(unique, (s) => s.content_language, primaryLanguage, PAGE),
+      );
+    }
+    return out;
   }, [data, primaryLanguage]);
 
   // Queue the T+0 benefit label once a short has been on screen long enough
