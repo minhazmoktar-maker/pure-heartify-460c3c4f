@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "TEAMID.app.lovable.6731527d4fb54e95bb9e47de8bea4363"
+        ],
+        "components": [
+          { "/": "/listen/*", "comment": "Deep link to Listen tracks" },
+          { "/": "/video/*", "comment": "Deep link to video detail" },
+          { "/": "/dose/*", "comment": "Deep link to daily dose" },
+          { "/": "/reset-password", "comment": "Password reset landing" },
+          { "/": "/auth/callback", "comment": "OAuth callback" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAMID.app.lovable.6731527d4fb54e95bb9e47de8bea4363"]
+  }
+}

@@ -1,0 +1,37 @@
+User-agent: Googlebot
+Allow: /
+Allow: /watch/
+
+User-agent: Bingbot
+Allow: /
+Allow: /watch/
+
+User-agent: Twitterbot
+Allow: /
+Allow: /watch/
+
+User-agent: facebookexternalhit
+Allow: /
+Allow: /watch/
+
+User-agent: *
+Allow: /
+# /watch/:id is the canonical share + deep-link target (Android App Links and
+# iOS Universal Links open the same path natively), so keep it crawlable.
+Allow: /watch/
+# Private / operational surfaces — never useful in search results.
+Disallow: /admin
+Disallow: /diagnostics
+Disallow: /settings
+Disallow: /onboarding
+# Account-scoped progress surfaces. /certificate/:code (public verification)
+# stays crawlable so shared certificates can be validated.
+Disallow: /digest
+Disallow: /certificates
+
+# Session-scoped query strings on watch links (share attribution, timestamps)
+# create infinite duplicate URLs; the clean /watch/:id form is the indexable one.
+Disallow: /watch/*?
+Disallow: /*?utm_
+
+Sitemap: https://heartifyapp.com/sitemap.xml

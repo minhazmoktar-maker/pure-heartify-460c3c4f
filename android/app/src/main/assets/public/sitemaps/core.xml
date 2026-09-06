@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://heartifyapp.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/search</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/search?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/search?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/search?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/search?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/search?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/search?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/search?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/search"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/channels</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/channels?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/channels?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/channels?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/channels?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/channels?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/channels?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/channels?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/channels"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/quran</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/quran?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/quran?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/quran?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/quran?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/quran?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/quran?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/quran?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/quran"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/hisnul</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/hisnul?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/hisnul?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/hisnul?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/hisnul?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/hisnul?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/hisnul?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/hisnul?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/hisnul"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/names</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/names?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/names?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/names?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/names?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/names?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/names?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/names?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/names"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/kalimahs</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/kalimahs?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/kalimahs?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/kalimahs?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/kalimahs?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/kalimahs?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/kalimahs?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/kalimahs?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/kalimahs"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/pillars</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/pillars?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/pillars?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/pillars?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/pillars?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/pillars?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/pillars?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/pillars?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/pillars"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/aqeedah</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/aqeedah?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/aqeedah?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/aqeedah?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/aqeedah?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/aqeedah?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/aqeedah?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/aqeedah?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/aqeedah"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/prophets</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/prophets?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/prophets?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/prophets?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/prophets?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/prophets?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/prophets?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/prophets?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/prophets"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/sahaba</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/sahaba?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/sahaba?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/sahaba?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/sahaba?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/sahaba?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/sahaba?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/sahaba?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/sahaba"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/seerah</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/seerah?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/seerah?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/seerah?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/seerah?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/seerah?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/seerah?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/seerah?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/seerah"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/battles</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/battles?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/battles?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/battles?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/battles?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/battles?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/battles?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/battles?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/battles"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/miracles</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/miracles?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/miracles?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/miracles?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/miracles?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/miracles?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/miracles?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/miracles?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/miracles"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/scholars</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/scholars?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/scholars?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/scholars?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/scholars?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/scholars?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/scholars?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/scholars?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/scholars"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/madhabs</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/madhabs?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/madhabs?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/madhabs?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/madhabs?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/madhabs?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/madhabs?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/madhabs?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/madhabs"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/asma-ul-husna</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/asma-ul-husna?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/asma-ul-husna?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/asma-ul-husna?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/asma-ul-husna?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/asma-ul-husna?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/asma-ul-husna?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/asma-ul-husna?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/asma-ul-husna"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/adhkar</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/adhkar?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/adhkar?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/adhkar?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/adhkar?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/adhkar?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/adhkar?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/adhkar?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/adhkar"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/sunnah-acts</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/sunnah-acts?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/sunnah-acts?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/sunnah-acts?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/sunnah-acts?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/sunnah-acts?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/sunnah-acts?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/sunnah-acts?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/sunnah-acts"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/signs-of-hour</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/signs-of-hour?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/signs-of-hour?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/signs-of-hour?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/signs-of-hour?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/signs-of-hour?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/signs-of-hour?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/signs-of-hour?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/signs-of-hour"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/hijri-calendar</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/hijri-calendar?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/hijri-calendar?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/hijri-calendar?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/hijri-calendar?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/hijri-calendar?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/hijri-calendar?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/hijri-calendar?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/hijri-calendar"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/islamic-events</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/islamic-events?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/islamic-events?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/islamic-events?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/islamic-events?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/islamic-events?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/islamic-events?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/islamic-events?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/islamic-events"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/sacred-mosques</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/sacred-mosques?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/sacred-mosques?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/sacred-mosques?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/sacred-mosques?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/sacred-mosques?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/sacred-mosques?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/sacred-mosques?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/sacred-mosques"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/fatwa</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/fatwa?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/fatwa?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/fatwa?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/fatwa?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/fatwa?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/fatwa?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/fatwa?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/fatwa"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/digital-purification</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/digital-purification?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/digital-purification?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/digital-purification?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/digital-purification?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/digital-purification?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/digital-purification?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/digital-purification?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/digital-purification"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/guides/omar-suleiman-ramadan-series</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/guides/omar-suleiman-ramadan-series"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/guides/best-islamic-cartoons</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/guides/best-islamic-cartoons?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/guides/best-islamic-cartoons?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/guides/best-islamic-cartoons?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/guides/best-islamic-cartoons?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/guides/best-islamic-cartoons?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/guides/best-islamic-cartoons?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/guides/best-islamic-cartoons?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/guides/best-islamic-cartoons"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/guides/islamic-calendar-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/guides/islamic-calendar-2026?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/guides/islamic-calendar-2026?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/guides/islamic-calendar-2026?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/guides/islamic-calendar-2026?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/guides/islamic-calendar-2026?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/guides/islamic-calendar-2026?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/guides/islamic-calendar-2026?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/guides/islamic-calendar-2026"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/about?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/about?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/about?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/about?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/about?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/about?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/about?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/about"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/contact?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/contact?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/contact?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/contact?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/contact?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/contact?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/contact?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/contact"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/login</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/login?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/login?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/login?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/login?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/login?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/login?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/login?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/login"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/signup</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/signup?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/signup?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/signup?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/signup?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/signup?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/signup?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/signup?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/signup"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/privacy?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/privacy?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/privacy?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/privacy?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/privacy?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/privacy?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/privacy?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/privacy"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/terms?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/terms?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/terms?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/terms?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/terms?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/terms?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/terms?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/terms"/>
+  </url>
+  <url>
+    <loc>https://heartifyapp.com/halal</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://heartifyapp.com/halal?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://heartifyapp.com/halal?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="bn" href="https://heartifyapp.com/halal?lang=bn"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://heartifyapp.com/halal?lang=de"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://heartifyapp.com/halal?lang=fr"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://heartifyapp.com/halal?lang=id"/>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://heartifyapp.com/halal?lang=tr"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://heartifyapp.com/halal"/>
+  </url>
+</urlset>
