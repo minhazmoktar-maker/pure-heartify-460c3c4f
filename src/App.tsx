@@ -38,6 +38,7 @@ const Changelog = lazy(() => import("./pages/Changelog.tsx"));
 const OmarSuleimanRamadanSeries = lazy(() => import("./pages/OmarSuleimanRamadanSeries.tsx"));
 const BestIslamicCartoons = lazy(() => import("./pages/BestIslamicCartoons.tsx"));
 const HijriCalendar2026 = lazy(() => import("./pages/HijriCalendar2026.tsx"));
+const HalalVideoAlternative = lazy(() => import("./pages/HalalVideoAlternative.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
@@ -367,6 +368,8 @@ const App = () => (
                 <Route path="/directory" element={<Directory />} />
                 <Route path="/islamic-learning" element={<KnowledgeHub />} />
                 <Route path="/halal-video" element={<KnowledgeHub />} />
+                <Route path="/halal-alternative-to-youtube" element={<HalalVideoAlternative />} />
+                <Route path="/halal-youtube-alternative" element={<Navigate to="/halal-alternative-to-youtube" replace />} />
                 <Route path="/quran-listening" element={<KnowledgeHub />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
                 <Route path="/guides/best-islamic-cartoons" element={<BestIslamicCartoons />} />
