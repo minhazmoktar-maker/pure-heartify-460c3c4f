@@ -26,12 +26,13 @@ export default function HalalVideoHub() {
   const shorts = useMemo(() => {
     const all = data ?? [];
     const short = all.filter((v) => SHORT_RE.test(v.title));
-    return (short.length >= 4 ? short : all).slice(0, 8);
+    const rest = all.filter((v) => !SHORT_RE.test(v.title));
+    return [...short, ...rest].slice(0, 16);
   }, [data]);
 
   const playlists = useMemo(() => {
     const all = data ?? [];
-    return topics.slice(0, 9).map((t) => {
+    return topics.map((t) => {
       const topic = HALAL_TOPICS[t.slug];
       return {
         slug: t.slug,
@@ -42,6 +43,7 @@ export default function HalalVideoHub() {
       };
     });
   }, [data, topics]);
+
 
   return (
     <div className="min-h-dvh bg-background">
