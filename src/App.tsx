@@ -370,6 +370,7 @@ const App = () => (
                 <Route path="/islamic-learning" element={<KnowledgeHub />} />
                 <Route path="/halal-video" element={<KnowledgeHub />} />
                 <Route path="/halal-alternative-to-youtube" element={<HalalVideoAlternative />} />
+                <Route path="/halal-videos" element={<HalalVideoHub />} />
                 <Route path="/halal-youtube-alternative" element={<Navigate to="/halal-alternative-to-youtube" replace />} />
                 <Route path="/quran-listening" element={<KnowledgeHub />} />
                 <Route path="/guides/omar-suleiman-ramadan-series" element={<OmarSuleimanRamadanSeries />} />
