@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "384561940404",
+    "project_id": "heartify-14414",
+    "storage_bucket": "heartify-14414.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384561940404:android:abf8f23dfe373e2da714e1",
+        "android_client_info": {
+          "package_name": "com.heartifyapp.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl2Io9IXFHvJkwFNvksLmnNiccVyVSFOQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
