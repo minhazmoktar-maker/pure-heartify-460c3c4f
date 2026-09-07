@@ -121,6 +121,7 @@ export const KNOWLEDGE_HUBS: Record<string, KnowledgeHub> = {
           { to: "/kids", label: "Kids mode" },
           { to: "/history", label: "Islamic history" },
           { to: "/guides/best-islamic-cartoons", label: "Family-safe cartoons" },
+          { to: "/halal-alternative-to-youtube", label: "Halal alternative to YouTube" },
         ],
       },
       {
