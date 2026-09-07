@@ -143,6 +143,7 @@ const core: Entry[] = [
   { path: "/islamic-learning", changefreq: "weekly", priority: "0.9" },
   { path: "/halal-video", changefreq: "weekly", priority: "0.9" },
   { path: "/halal-alternative-to-youtube", changefreq: "monthly", priority: "0.9" },
+  { path: "/halal-videos", changefreq: "daily", priority: "0.9" },
   { path: "/quran-listening", changefreq: "weekly", priority: "0.9" },
   { path: "/directory", changefreq: "daily", priority: "0.8" },
   { path: "/verify", changefreq: "weekly", priority: "0.7" },
