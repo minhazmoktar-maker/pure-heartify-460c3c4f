@@ -89,7 +89,7 @@ export default function HalalVideoAlternative() {
         title="Halal Alternative to YouTube — A Reviewed Halal Video Platform"
         description="Looking for a halal alternative to YouTube? Heartify is a halal video platform where every video is reviewed before it appears — no music, no immodest content, no ads, no watch-time algorithm."
         path="/halal-alternative-to-youtube"
-        keywords="halal alternative to youtube, halal youtube alternative, halal video platform, islamic video app, halal streaming, family safe video app, muslim video platform"
+        keywords="halal alternative to youtube, halal, halal videos, islam, islamic videos, quran, quran videos, prayer, salah videos, family, family safe video app, kids, islamic kids videos, halal video platform, muslim video platform"
         breadcrumbs={[
           { name: "Home", path: "/" },
           { name: "Halal video", path: "/halal-video" },
@@ -138,9 +138,18 @@ export default function HalalVideoAlternative() {
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link to="/halal-video">Browse the halal video hub</Link>
+              <Link to="/halal-videos">Browse the halal video hub</Link>
             </Button>
           </div>
+          <p className="mt-4 max-w-3xl text-sm text-muted-foreground">
+            Halal Qur'an recitation and tafsir, prayer and worship guidance, Islamic history and
+            learning, family and parenting talks, and kids shows — all in one reviewed library. Open
+            the{" "}
+            <Link to="/halal-videos" className="text-primary underline-offset-2 hover:underline">
+              halal video hub
+            </Link>{" "}
+            for reviewed Shorts and playlists.
+          </p>
         </header>
 
         <section className="mb-10 rounded-card border border-border bg-card p-5">
