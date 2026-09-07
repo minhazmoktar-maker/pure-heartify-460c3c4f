@@ -39,6 +39,7 @@ const OmarSuleimanRamadanSeries = lazy(() => import("./pages/OmarSuleimanRamadan
 const BestIslamicCartoons = lazy(() => import("./pages/BestIslamicCartoons.tsx"));
 const HijriCalendar2026 = lazy(() => import("./pages/HijriCalendar2026.tsx"));
 const HalalVideoAlternative = lazy(() => import("./pages/HalalVideoAlternative.tsx"));
+const HalalVideoHub = lazy(() => import("./pages/HalalVideoHub.tsx"));
 
 const About = lazy(() => import("./pages/About.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
