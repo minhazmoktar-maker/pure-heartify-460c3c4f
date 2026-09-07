@@ -138,9 +138,18 @@ export default function HalalVideoAlternative() {
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link to="/halal-video">Browse the halal video hub</Link>
+              <Link to="/halal-videos">Browse the halal video hub</Link>
             </Button>
           </div>
+          <p className="mt-4 max-w-3xl text-sm text-muted-foreground">
+            Halal Qur'an recitation and tafsir, prayer and worship guidance, Islamic history and
+            learning, family and parenting talks, and kids shows — all in one reviewed library. Open
+            the{" "}
+            <Link to="/halal-videos" className="text-primary underline-offset-2 hover:underline">
+              halal video hub
+            </Link>{" "}
+            for reviewed Shorts and playlists.
+          </p>
         </header>
 
         <section className="mb-10 rounded-card border border-border bg-card p-5">
