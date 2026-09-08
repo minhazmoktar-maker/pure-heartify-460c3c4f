@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!-- Security headers (meta-supported subset; HSTS/X-Frame-Options must be set at the CDN/hosting layer) -->
     <!-- Note: frame-ancestors, X-Frame-Options, HSTS, sandbox, and report-uri are set at the CDN via public/_headers (they're ignored inside <meta http-equiv>). -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://*.supabase.co https://storage.googleapis.com https://heartifyapp.com https://www.searchtruth.com https://*.everyayah.com https://everyayah.com; media-src 'self' blob: https://*.supabase.co https://download.quranicaudio.com https://*.quranicaudio.com https://server8.mp3quran.net https://*.mp3quran.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.googleapis.com https://ai.gateway.lovable.dev https://connector-gateway.lovable.dev https://api.alquran.cloud https://cdn.jsdelivr.net https://ipapi.co; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://i.ytimg.com https://yt3.ggpht.com https://*.supabase.co https://storage.googleapis.com https://pure-heartify.lovable.app https://heartifyapp.com https://www.searchtruth.com https://*.everyayah.com https://everyayah.com; media-src 'self' blob: https://*.supabase.co https://download.quranicaudio.com https://*.quranicaudio.com https://server8.mp3quran.net https://*.mp3quran.net; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.googleapis.com https://ai.gateway.lovable.dev https://connector-gateway.lovable.dev https://api.alquran.cloud https://cdn.jsdelivr.net https://ipapi.co; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=(), payment=()" />
-    <link rel="icon" href="/favicon.png" type="image/png" />
-    <link rel="apple-touch-icon" href="/app-icon-1024.png" />
+    <!-- Favicon: Google's SERP icon crawler prefers a square icon whose size is a
+         multiple of 48px, served from a stable, crawlable URL. /favicon.ico is the
+         root fallback it checks even when no <link> is present. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192" />
+    <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" />
+    <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
     <!-- Per-route <link rel="canonical"> is emitted by src/components/SEO.tsx via react-helmet-async. -->
     <!-- Do not hardcode a sitewide canonical here — it would duplicate/override subpage canonicals for non-JS crawlers. -->
 
@@ -83,6 +91,7 @@
     <meta name="description" content="Heartify is a clean, Islamic-friendly video and audio app with curated, distraction-free content for focused and mindful viewing." />
     <meta name="author" content="Heartify" />
     <meta name="google-site-verification" content="rmD3CQR8zQrc_bTQjRHub2HVEyxJoPVxdcHE0N18UO8" />
+    <meta name="google-site-verification" content="N0dNzRsyk58k6u0iUAmZnmdRznRl1WAnMHEFT92Bmnk" />
 
     <!-- Sitewide og:* fallback for non-JS social crawlers. Per-route og:title/description/url are overridden by src/components/SEO.tsx (Helmet dedupes by property). og:url is intentionally omitted here so each route emits its own self-referencing og:url via Helmet — a static homepage og:url would misattribute deep-link previews on non-JS crawlers. -->
     <meta property="og:type" content="website" />
@@ -108,16 +117,16 @@
     <script type="application/ld+json">
       {"@context":"https://schema.org","@type":"WebSite","name":"Heartify","url":"https://heartifyapp.com/","potentialAction":{"@type":"SearchAction","target":"https://heartifyapp.com/search?q={search_term_string}","query-input":"required name=search_term_string"}}
     </script>
-    <script type="module" crossorigin src="/assets/index-yV94duvQ.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/react-vendor-CtrwoeSd.js">
-    <link rel="modulepreload" crossorigin href="/assets/query-vendor-BAcq99Oi.js">
-    <link rel="modulepreload" crossorigin href="/assets/ui-vendor-C0LD2Hyi.js">
-    <link rel="modulepreload" crossorigin href="/assets/charts-vendor-Ibn2WeTg.js">
-    <link rel="modulepreload" crossorigin href="/assets/icons-vendor-DxFQbNg7.js">
+    <script type="module" crossorigin src="/assets/index-CyEGGZFs.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-B7rhuJ-5.js">
+    <link rel="modulepreload" crossorigin href="/assets/query-vendor-BAqk_Dzf.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-vendor-CQO0D02K.js">
+    <link rel="modulepreload" crossorigin href="/assets/charts-vendor-4SYwZimd.js">
+    <link rel="modulepreload" crossorigin href="/assets/icons-vendor-DJ6E9tev.js">
     <link rel="modulepreload" crossorigin href="/assets/supabase-vendor-C9wpV_YX.js">
-    <link rel="modulepreload" crossorigin href="/assets/motion-vendor-DrfZAt50.js">
+    <link rel="modulepreload" crossorigin href="/assets/motion-vendor-Dvvkhvm0.js">
     <link rel="modulepreload" crossorigin href="/assets/date-vendor-aDLjEcHe.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-Dy86MP0S.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-BW9JWmSB.css">
   </head>
 
   <body>

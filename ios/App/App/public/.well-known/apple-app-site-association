@@ -4,7 +4,7 @@
     "details": [
       {
         "appIDs": [
-          "TEAMID.app.lovable.6731527d4fb54e95bb9e47de8bea4363"
+          "TEAMID.com.heartifyapp.app"
         ],
         "components": [
           { "/": "/listen/*", "comment": "Deep link to Listen tracks" },
@@ -17,6 +17,6 @@
     ]
   },
   "webcredentials": {
-    "apps": ["TEAMID.app.lovable.6731527d4fb54e95bb9e47de8bea4363"]
+    "apps": ["TEAMID.com.heartifyapp.app"]
   }
 }
