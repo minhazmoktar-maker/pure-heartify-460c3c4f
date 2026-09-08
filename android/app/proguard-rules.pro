@@ -19,3 +19,22 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Capacitor / WebView bridge (required when minifyEnabled is true) ---
+-keep class com.getcapacitor.** { *; }
+-keep @com.getcapacitor.annotation.CapacitorPlugin class * { *; }
+-keep class * extends com.getcapacitor.Plugin { *; }
+-keepclassmembers class * {
+    @com.getcapacitor.PluginMethod <methods>;
+}
+-keep class com.heartifyapp.app.** { *; }
+-keepattributes *Annotation*, JavascriptInterface
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-dontwarn org.apache.cordova.**
+-keep class org.apache.cordova.** { *; }
+
+# --- Firebase Cloud Messaging ---
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**

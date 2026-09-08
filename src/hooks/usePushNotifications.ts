@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { notificationTarget } from "@/lib/notificationRoutes";
+import { setCurrentPushToken } from "@/lib/pushToken";
 
 /**
  * Native (Capacitor) push lifecycle for Android + iOS:
@@ -35,6 +36,7 @@ export function usePushNotifications() {
         await PushNotifications.register();
 
         const r1 = await PushNotifications.addListener("registration", async (t) => {
+          setCurrentPushToken(t.value);
           await (supabase.from as any)("device_tokens").upsert(
             {
               user_id: user.id,
