@@ -1,5 +1,5 @@
 // Generic push fan-out. Sends a title/body to every device_token for a user_id.
-// Requires FCM_SERVER_KEY for actual delivery; without it, records intent only.
+// Delivery goes through FCM HTTP v1 via the Lovable connector gateway.
 //
 // Auth: caller MUST provide a valid JWT. A user may only push to themselves;
 // admins may push to any user. This prevents anonymous attackers from
@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
       ok: true,
       recipients: tokens?.length ?? 0,
       delivered: delivered,
-      fcm_configured: !!FCM_SERVER_KEY,
+      fcm_configured: fcmConfigured(),
       results,
       quota: { sent_last_7d: cap.sent + (delivered > 0 ? 1 : 0), limit: cap.limit },
     });

@@ -5,7 +5,7 @@
  * via user_notifications (kind='streak_risk'). Safe to invoke hourly via
  * pg_cron; only sends when UTC hour >= 20 (covers most timezones' evening).
  *
- * Falls back to in-app notification when FCM_SERVER_KEY isn't configured, so
+ * Falls back to in-app notification when FCM isn't configured, so
  * the retention nudge still surfaces via the NotificationsBell.
  */
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.103.0/cors";
