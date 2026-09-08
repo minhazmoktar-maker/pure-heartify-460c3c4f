@@ -26,7 +26,8 @@
     "cap:ios": "npm run cap:sync && npx cap run ios",
     "cap:android": "npm run cap:sync && npx cap run android",
     "cap:configure": "node scripts/apply-native-config.mjs",
-    "cap:configure:check": "node scripts/apply-native-config.mjs --check"
+    "cap:configure:check": "node scripts/apply-native-config.mjs --check",
+    "release:check": "node scripts/check-release-placeholders.mjs"
   },
   "dependencies": {
     "@capacitor-community/in-app-review": "^8.0.0",
