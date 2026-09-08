@@ -117,6 +117,39 @@ export default function Shorts() {
     [user],
   );
 
+  // Native apps keep a WebView iframe alive after the app is backgrounded,
+  // so YouTube audio would keep playing behind the home screen. Tearing the
+  // iframe down on background stops playback; it is restored on resume.
+  const [backgrounded, setBackgrounded] = useState(false);
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+    const onVisibility = () => setBackgrounded(document.visibilityState === "hidden");
+    document.addEventListener("visibilitychange", onVisibility);
+    (async () => {
+      try {
+        const { Capacitor } = await import("@capacitor/core");
+        if (!Capacitor.isNativePlatform()) return;
+        const { App } = await import("@capacitor/app");
+        const handle = await App.addListener("appStateChange", ({ isActive: appActive }) =>
+          setBackgrounded(!appActive),
+        );
+        if (cancelled) {
+          handle.remove();
+          return;
+        }
+        cleanup = () => handle.remove();
+      } catch {
+        /* web only */
+      }
+    })();
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibility);
+      cleanup?.();
+    };
+  }, []);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -220,7 +253,7 @@ export default function Shorts() {
                   className="relative h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)] snap-start snap-always"
                 >
                   <div className="absolute inset-0 flex items-center justify-center bg-black">
-                    {isActive && isEmbeddable ? (
+                    {isActive && isEmbeddable && !backgrounded ? (
                       <iframe
                         title={s.title}
                         src={`https://www.youtube-nocookie.com/embed/${s.video_id}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&playlist=${s.video_id}&modestbranding=1&rel=0&playsinline=1&controls=0`}
