@@ -24,7 +24,7 @@ export default function AdminRoute({ children }: { children: ReactNode }) {
         role="status"
         aria-label="Verifying access"
         aria-live="polite"
-        className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background"
+        className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background"
       >
         <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />
         <p className="text-sm text-muted-foreground">Verifying access…</p>

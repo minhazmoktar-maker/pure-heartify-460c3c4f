@@ -179,11 +179,11 @@ const AdminChannelPipeline = () => {
     total: rows.length,
   }), [selected, rows]);
 
-  if (roleLoading) return <div className="min-h-screen"><Navbar /><div className="p-8"><Loader2 className="animate-spin" /></div></div>;
-  if (!isAdmin) return <div className="min-h-screen"><Navbar /><div className="p-8">Admin only.</div></div>;
+  if (roleLoading) return <div className="min-h-dvh"><Navbar /><div className="p-8"><Loader2 className="animate-spin" /></div></div>;
+  if (!isAdmin) return <div className="min-h-dvh"><Navbar /><div className="p-8">Admin only.</div></div>;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-dvh">
       <SEO title="Channel Moderation Pipeline · Admin" description="Confidence-tiered channel moderation" path="/admin/channel-pipeline" />
       <Navbar />
       <main className="mx-auto max-w-7xl p-4 sm:p-6 space-y-6">

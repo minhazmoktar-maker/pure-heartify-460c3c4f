@@ -71,7 +71,7 @@ export default function OAuthConsent() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 px-6 py-10">
+    <main className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-4 px-6 py-10">
       {error ? (
         <div className="w-full rounded-card border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
           {error}
