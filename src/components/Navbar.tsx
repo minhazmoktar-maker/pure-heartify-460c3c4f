@@ -30,7 +30,7 @@ const Navbar = () => {
   return (
     <nav
       className={cn(
-        "sticky top-0 z-50 border-b backdrop-blur-xl transition-[height,background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "sticky top-0 z-50 border-b pt-safe backdrop-blur-xl transition-[height,background-color,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
         scrolled
           ? "border-border/60 bg-card/95 shadow-[0_4px_20px_-12px_hsl(var(--foreground)/0.25)]"
           : "border-border/40 bg-card/70",

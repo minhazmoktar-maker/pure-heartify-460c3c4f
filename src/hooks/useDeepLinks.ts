@@ -10,6 +10,10 @@ export function useDeepLinks() {
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
+    // The effect can be torn down while the dynamic imports are still in
+    // flight; without this flag the listener would be registered after the
+    // cleanup already ran and leak across auth/navigation churn.
+    let cancelled = false;
     (async () => {
       try {
         const { Capacitor } = await import("@capacitor/core");
@@ -28,11 +32,18 @@ export function useDeepLinks() {
             console.warn("Deep link parse failed", url, e);
           }
         });
+        if (cancelled) {
+          handle.remove();
+          return;
+        }
         cleanup = () => handle.remove();
       } catch {
         /* web only */
       }
     })();
-    return () => cleanup?.();
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
   }, [navigate]);
 }

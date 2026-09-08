@@ -19,12 +19,18 @@ export function usePushNotifications() {
   useEffect(() => {
     if (!user) return;
     let cleanup: Array<() => void> = [];
+    // Native plugin registration is several async hops long; if the effect is
+    // torn down mid-flight (logout, token refresh) React runs the cleanup
+    // while `cleanup` is still empty, so listeners created afterwards would
+    // leak and fire twice on the next sign-in.
+    let cancelled = false;
     (async () => {
       try {
         const { Capacitor } = await import("@capacitor/core");
         if (!Capacitor.isNativePlatform()) return;
         const { PushNotifications } = await import("@capacitor/push-notifications");
 
+        if (cancelled) return;
         const perm = await PushNotifications.checkPermissions();
         let granted = perm.receive === "granted";
         if (!granted) {
@@ -66,11 +72,19 @@ export function usePushNotifications() {
           window.dispatchEvent(new CustomEvent("heartify:notifications-refresh"));
         });
 
-        cleanup = [() => r1.remove(), () => r2.remove(), () => r3.remove(), () => r4.remove()];
+        const removers = [() => r1.remove(), () => r2.remove(), () => r3.remove(), () => r4.remove()];
+        if (cancelled) {
+          removers.forEach((fn) => fn());
+          return;
+        }
+        cleanup = removers;
       } catch {
         /* not native */
       }
     })();
-    return () => cleanup.forEach((fn) => fn());
+    return () => {
+      cancelled = true;
+      cleanup.forEach((fn) => fn());
+    };
   }, [user, navigate]);
 }

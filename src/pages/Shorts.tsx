@@ -61,7 +61,7 @@ export default function Shorts() {
   const labelled = useRef<Set<string>>(new Set());
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["shorts-feed", locale, contentLanguages.join(","), user?.id ?? "anon"],
     initialPageParam: 0,
     staleTime: 10 * 60 * 1000,
@@ -116,6 +116,39 @@ export default function Shorts() {
     },
     [user],
   );
+
+  // Native apps keep a WebView iframe alive after the app is backgrounded,
+  // so YouTube audio would keep playing behind the home screen. Tearing the
+  // iframe down on background stops playback; it is restored on resume.
+  const [backgrounded, setBackgrounded] = useState(false);
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+    const onVisibility = () => setBackgrounded(document.visibilityState === "hidden");
+    document.addEventListener("visibilitychange", onVisibility);
+    (async () => {
+      try {
+        const { Capacitor } = await import("@capacitor/core");
+        if (!Capacitor.isNativePlatform()) return;
+        const { App } = await import("@capacitor/app");
+        const handle = await App.addListener("appStateChange", ({ isActive: appActive }) =>
+          setBackgrounded(!appActive),
+        );
+        if (cancelled) {
+          handle.remove();
+          return;
+        }
+        cleanup = () => handle.remove();
+      } catch {
+        /* web only */
+      }
+    })();
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisibility);
+      cleanup?.();
+    };
+  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -220,7 +253,7 @@ export default function Shorts() {
                   className="relative h-[calc(100dvh-8rem)] md:h-[calc(100dvh-4rem)] snap-start snap-always"
                 >
                   <div className="absolute inset-0 flex items-center justify-center bg-black">
-                    {isActive && isEmbeddable ? (
+                    {isActive && isEmbeddable && !backgrounded ? (
                       <iframe
                         title={s.title}
                         src={`https://www.youtube-nocookie.com/embed/${s.video_id}?autoplay=1&mute=${muted ? 1 : 0}&loop=1&playlist=${s.video_id}&modestbranding=1&rel=0&playsinline=1&controls=0`}
@@ -305,8 +338,29 @@ export default function Shorts() {
           )}
 
           {shorts.length === 0 && (
-            <div className="flex h-full items-center justify-center px-8 text-center text-sm text-white/60">
-              No shorts have cleared moderation yet. Check back soon.
+            <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center text-white/70">
+              {isError ? (
+                <>
+                  <p className="text-sm">We couldn't load Shorts just now.</p>
+                  <button
+                    type="button"
+                    onClick={() => void refetch()}
+                    className="min-h-11 rounded-pill bg-white/10 px-5 text-sm font-medium text-white backdrop-blur hover:bg-white/20"
+                  >
+                    Try again
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm">No Shorts to show yet.</p>
+                  <Link
+                    to="/"
+                    className="min-h-11 rounded-pill bg-white/10 px-5 py-3 text-sm font-medium text-white backdrop-blur hover:bg-white/20"
+                  >
+                    Browse videos instead
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </div>

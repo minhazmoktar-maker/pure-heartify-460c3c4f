@@ -162,7 +162,7 @@ const YouTubeVideoCard = ({ video, index }: YouTubeVideoCardProps) => {
             onClick={handleBookmark}
             onPointerDown={stopBubble}
             aria-label={liked ? "Remove bookmark" : "Bookmark video"}
-            className="rounded-pill bg-background/80 p-1.5 backdrop-blur-sm transition-colors hover:bg-background"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-pill bg-background/80 backdrop-blur-sm transition-colors hover:bg-background"
             title={liked ? "Remove bookmark" : "Bookmark"}
           >
             <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : "text-foreground"}`} />
