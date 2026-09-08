@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { getCurrentPushToken, setCurrentPushToken } from "@/lib/pushToken";
 
 interface AuthContextType {
   user: User | null;
@@ -44,6 +45,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signOut = useCallback(async () => {
+    // Drop this device's push token so the signed-out account stops receiving
+    // notifications on this phone.
+    try {
+      const token = getCurrentPushToken();
+      if (token && user?.id) {
+        await (supabase.from as any)("device_tokens")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("token", token);
+      }
+      setCurrentPushToken(null);
+    } catch {
+      /* best-effort cleanup */
+    }
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
