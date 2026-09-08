@@ -205,8 +205,9 @@ const InfiniteVideoGrid = ({
         title="Couldn't load videos"
         description={(error as Error).message || "Please check your connection and try again."}
         actionLabel="Retry"
-        onAction={() => window.location.reload()}
+        onAction={() => void refetch()}
       />
+
     );
   }
 
