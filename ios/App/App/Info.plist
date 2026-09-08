@@ -2,12 +2,41 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CAPACITOR_DEBUG</key>
+	<key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>bn</string>
+		<string>bn-IN</string>
+		<string>ur</string>
+		<string>ur-IN</string>
+		<string>ps</string>
+		<string>en</string>
+		<string>en-GB</string>
+		<string>ar</string>
+		<string>fa</string>
+		<string>tr</string>
+		<string>id</string>
+		<string>ms</string>
+		<string>ha</string>
+		<string>sw</string>
+		<string>fr</string>
+		<string>de</string>
+		<string>es</string>
+		<string>es-419</string>
+		<string>pt-PT</string>
+		<string>pt-BR</string>
+		<string>zh-Hans</string>
+		<string>zh-Hant</string>
+		<string>ja</string>
+		<string>ko</string>
+	</array>
 	<key>CFBundleDisplayName</key>
-        <string>heartify</string>
+	<string>Heartify</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -22,6 +51,19 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.heartifyapp.app</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>heartify</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -30,7 +72,7 @@
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
@@ -47,5 +89,38 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+
+	<!-- Permission purpose strings: only the capabilities Heartify actually uses. -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>Heartify sends prayer time reminders, streak nudges, and daily dose notifications you turn on in Settings.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Heartify uses your location only to calculate accurate prayer times and Qibla direction. It is never sold or shared.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Heartify uses the camera when you take a profile photo or attach a screenshot to a moderation report.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Heartify accesses your photos when you pick a profile picture or upload a video thumbnail.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Heartify saves shareable ayah and dhikr images to your photo library when you tap Save.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Heartify uses the microphone only when you record audio for a video you upload.</string>
+
+	<!-- Background Qur'an / lecture audio and silent push for digests. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
+
+	<!-- Standard TLS only: no non-exempt encryption. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+	</dict>
 </dict>
 </plist>

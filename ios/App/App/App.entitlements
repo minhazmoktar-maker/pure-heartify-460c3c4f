@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Push notifications (APNs). Xcode swaps this to `development` for debug builds. -->
+	<key>aps-environment</key>
+	<string>production</string>
+	<!-- Universal Links. Must match public/.well-known/apple-app-site-association. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:heartifyapp.com</string>
+		<string>applinks:www.heartifyapp.com</string>
+		<string>webcredentials:heartifyapp.com</string>
+	</array>
+</dict>
+</plist>
