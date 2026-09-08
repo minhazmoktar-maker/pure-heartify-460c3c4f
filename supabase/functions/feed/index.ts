@@ -559,12 +559,15 @@ Deno.serve(observed("feed", async (req) => {
           ]);
           if (signals) {
             const blockedPatterns = signals.blockedChannelPatterns ?? [];
-            const preFiltered = blockedPatterns.length
-              ? ordered.filter((v) => {
-                  const ch = ((v.channel_title as string) ?? "").toLowerCase();
-                  return !blockedPatterns.some((p) => ch.includes(p));
-                })
-              : ordered;
+            // "Not interested" is an explicit user instruction: hard-filter it
+            // like the recommendations lane does. The old -5.0 score penalty
+            // could still be out-weighed by a strong affinity/freshness sum.
+            const preFiltered = ordered.filter((v) => {
+              if (signals.dismissedVideoIds.has(String(v.video_id ?? ""))) return false;
+              if (!blockedPatterns.length) return true;
+              const ch = ((v.channel_title as string) ?? "").toLowerCase();
+              return !blockedPatterns.some((p) => ch.includes(p));
+            });
 
             const aff = (sort === "recent" ? 0.7 : 1.0) * rankFlags.personalizationMix;
             const freshAnchor = sort === "recent" ? 1.15 : 0.35;
