@@ -19,6 +19,7 @@ import { getRecommendationProvider } from "../_shared/recommendations/providers.
 import { gatherSignals } from "../_shared/recommendations/signals.ts";
 import { fetchCandidates } from "../_shared/recommendations/candidates.ts";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
+import { assessStrict } from "../_shared/halalGuard.ts";
 import { hasActivePremium } from "../_shared/entitlements.ts";
 import { toPgVector } from "../_shared/embed.ts";
 import { readThrough, readThroughShared } from "../_shared/cache.ts";
@@ -248,6 +249,12 @@ async function computeRecommendations(args: ComputeArgs) {
       const premiumSet = new Set((premiumRows ?? []).map((r) => r.video_id));
       filteredRecs = recommendations.filter((r) => !premiumSet.has(r.video.video_id));
     }
+
+    // Last-mile halal guard. The feed and search lanes both run assessStrict
+    // on every served row; this lane must not be the weaker door.
+    filteredRecs = filteredRecs.filter(
+      (r) => assessStrict(r.video as never, true).allowed,
+    );
 
     // 80/20 local-first ordering. Applied after the premium gate so the
     // shipped page — not the raw candidate pool — carries the guaranteed

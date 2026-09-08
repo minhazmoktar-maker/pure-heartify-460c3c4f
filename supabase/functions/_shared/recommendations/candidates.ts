@@ -54,7 +54,7 @@ export async function fetchCandidates(
       .from("curated_videos")
       .select(select)
       .in("moderation_state", ["approved", "auto_approved"])
-        .eq("visual_state", "clean")
+      .eq("visual_state", "clean")
       .eq("is_hidden", false)
       .eq("is_archived", false)
       .match(categoryFilter ? { category: categoryFilter } : {})
