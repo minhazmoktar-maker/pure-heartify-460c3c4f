@@ -26,7 +26,7 @@ const CRON_SECRET = Deno.env.get("CRON_SECRET");
 const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY");
 const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY");
 const VAPID_SUBJECT = Deno.env.get("VAPID_SUBJECT") ?? "mailto:support@heartifyapp.com";
-const FCM_SERVER_KEY = Deno.env.get("FCM_SERVER_KEY");
+import { fcmConfigured, sendFcm, dropStaleToken } from "../_shared/fcm.ts";
 
 /** Deep-link map — kept in sync with src/lib/notificationRoutes.ts. */
 function targetFor(kind: string, data: Record<string, unknown>): string {
@@ -154,31 +154,24 @@ Deno.serve(async (req) => {
       }
     }
 
-    // --- Native (Capacitor Android/iOS) -----------------------------------
-    if (FCM_SERVER_KEY) {
+    // --- Native (Capacitor Android/iOS) via FCM HTTP v1 -------------------
+    if (fcmConfigured()) {
       const { data: tokens } = await admin
         .from("device_tokens")
         .select("token")
         .eq("user_id", row.user_id);
       for (const t of tokens ?? []) {
-        try {
-          const res = await fetch("https://fcm.googleapis.com/fcm/send", {
-            method: "POST",
-            headers: { "content-type": "application/json", Authorization: `key=${FCM_SERVER_KEY}` },
-            body: JSON.stringify({
-              to: t.token,
-              notification: { title: row.title, body: row.body ?? "" },
-              data: { url, kind: row.kind, ...data },
-              priority: "high",
-            }),
-          });
-          if (res.ok) nativeSent++;
-          else console.warn("fcm failed", res.status, await res.text());
-        } catch (e) {
-          console.warn("fcm error", String(e));
-        }
+        const res = await sendFcm({
+          token: t.token,
+          title: row.title,
+          body: row.body ?? "",
+          data: { url, kind: row.kind, ...data },
+        });
+        if (res.ok) nativeSent++;
+        else if (res.stale) await dropStaleToken(admin, t.token);
       }
     }
+
 
     pushedIds.push(row.id);
   }
@@ -200,6 +193,6 @@ Deno.serve(async (req) => {
     native_sent: nativeSent,
     skipped_opt_out: skipped,
     vapid_configured: vapidReady,
-    fcm_configured: !!FCM_SERVER_KEY,
+    fcm_configured: fcmConfigured(),
   });
 });
