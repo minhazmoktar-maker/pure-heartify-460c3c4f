@@ -203,7 +203,7 @@ const InfiniteVideoGrid = ({
         icon={AlertTriangle}
         tone="muted"
         title="Couldn't load videos"
-        description={(error as Error).message || "Please check your connection and try again."}
+        description="Please check your connection and try again."
         actionLabel="Retry"
         onAction={() => void refetch()}
       />
