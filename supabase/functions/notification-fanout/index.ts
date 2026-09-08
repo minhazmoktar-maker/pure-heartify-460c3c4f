@@ -26,7 +26,7 @@ const CRON_SECRET = Deno.env.get("CRON_SECRET");
 const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY");
 const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY");
 const VAPID_SUBJECT = Deno.env.get("VAPID_SUBJECT") ?? "mailto:support@heartifyapp.com";
-const FCM_SERVER_KEY = Deno.env.get("FCM_SERVER_KEY");
+import { fcmConfigured, sendFcm, dropStaleToken } from "../_shared/fcm.ts";
 
 /** Deep-link map — kept in sync with src/lib/notificationRoutes.ts. */
 function targetFor(kind: string, data: Record<string, unknown>): string {
@@ -193,6 +193,6 @@ Deno.serve(async (req) => {
     native_sent: nativeSent,
     skipped_opt_out: skipped,
     vapid_configured: vapidReady,
-    fcm_configured: !!FCM_SERVER_KEY,
+    fcm_configured: fcmConfigured(),
   });
 });
