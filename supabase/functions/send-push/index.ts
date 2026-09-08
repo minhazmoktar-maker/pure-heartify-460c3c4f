@@ -7,6 +7,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { enforceRateLimit, getClientIdentity } from "../_shared/rateLimit.ts";
 import { canSendPush, recordPushSend } from "../_shared/pushCap.ts";
+import { dropStaleToken, fcmConfigured, sendFcm } from "../_shared/fcm.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,7 +15,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const FCM_SERVER_KEY = Deno.env.get("FCM_SERVER_KEY");
+
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -90,21 +91,16 @@ Deno.serve(async (req) => {
 
     const results: unknown[] = [];
     let delivered = 0;
-    if (FCM_SERVER_KEY && tokens?.length) {
+    if (fcmConfigured() && tokens?.length) {
       for (const t of tokens) {
-        const res = await fetch("https://fcm.googleapis.com/fcm/send", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            Authorization: `key=${FCM_SERVER_KEY}`,
-          },
-          body: JSON.stringify({
-            to: t.token,
-            notification: { title, body: body ?? "" },
-            data: data ?? {},
-          }),
+        const res = await sendFcm({
+          token: t.token,
+          title,
+          body: body ?? "",
+          data: (data ?? {}) as Record<string, unknown>,
         });
         if (res.ok) delivered++;
+        else if (res.stale) await dropStaleToken(admin, t.token);
         results.push({ token: t.token.slice(0, 8), status: res.status });
       }
     }

@@ -11,10 +11,10 @@
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.103.0/cors";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.103.0";
 import { canSendPush } from "../_shared/pushCap.ts";
+import { dropStaleToken, fcmConfigured, sendFcm } from "../_shared/fcm.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const FCM_SERVER_KEY = Deno.env.get("FCM_SERVER_KEY");
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
       .select("token")
       .eq("user_id", row.user_id);
 
-    const hasPushSurface = !!tokens?.length && !!FCM_SERVER_KEY;
+    const hasPushSurface = !!tokens?.length && fcmConfigured();
     const cap = hasPushSurface
       ? await canSendPush(supabase, row.user_id)
       : { ok: false, sent: 0, limit: 0 };
@@ -140,35 +140,20 @@ Deno.serve(async (req) => {
     }
 
     for (const t of tokens!) {
-      const res = await fetch("https://fcm.googleapis.com/fcm/send", {
-        method: "POST",
-        headers: {
-          Authorization: `key=${FCM_SERVER_KEY}`,
-          "Content-Type": "application/json",
+      const res = await sendFcm({
+        token: t.token,
+        title,
+        body,
+        data: {
+          kind: "streak_risk",
+          current_streak: String(row.current_streak),
+          cta_label: ctaLabel,
+          cta_url: ctaUrl,
+          url: ctaUrl,
         },
-        body: JSON.stringify({
-          to: t.token,
-          notification: {
-            title,
-            body,
-            click_action: ctaUrl,
-          },
-          data: {
-            kind: "streak_risk",
-            current_streak: String(row.current_streak),
-            cta_label: ctaLabel,
-            cta_url: ctaUrl,
-            url: ctaUrl,
-          },
-          webpush: {
-            fcm_options: { link: ctaUrl },
-            notification: {
-              actions: [{ action: "open_dose", title: ctaLabel }],
-            },
-          },
-        }),
       });
       if (res.ok) sent++;
+      else if (res.stale) await dropStaleToken(supabase, t.token);
     }
   }
 
