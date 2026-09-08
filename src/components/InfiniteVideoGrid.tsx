@@ -35,7 +35,7 @@ const InfiniteVideoGrid = ({
   search,
   limit = 20,
   sort = "fresh",
-  fallbackMessage = "No halal-compliant content found.",
+  fallbackMessage = "Try a different topic or search — new videos are added every day.",
   showLaneToggle = false,
 }: Props) => {
   const { preferences, locale } = useLocale();
@@ -49,6 +49,7 @@ const InfiniteVideoGrid = ({
     hasNextPage,
     fetchNextPage,
     error,
+    refetch,
   } = useInfiniteFeed({
     category,
     sectionId,
