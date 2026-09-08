@@ -61,7 +61,7 @@ export default function Shorts() {
   const labelled = useRef<Set<string>>(new Set());
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["shorts-feed", locale, contentLanguages.join(","), user?.id ?? "anon"],
     initialPageParam: 0,
     staleTime: 10 * 60 * 1000,
@@ -305,8 +305,29 @@ export default function Shorts() {
           )}
 
           {shorts.length === 0 && (
-            <div className="flex h-full items-center justify-center px-8 text-center text-sm text-white/60">
-              No shorts have cleared moderation yet. Check back soon.
+            <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center text-white/70">
+              {isError ? (
+                <>
+                  <p className="text-sm">We couldn't load Shorts just now.</p>
+                  <button
+                    type="button"
+                    onClick={() => void refetch()}
+                    className="min-h-11 rounded-pill bg-white/10 px-5 text-sm font-medium text-white backdrop-blur hover:bg-white/20"
+                  >
+                    Try again
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm">No Shorts to show yet.</p>
+                  <Link
+                    to="/"
+                    className="min-h-11 rounded-pill bg-white/10 px-5 py-3 text-sm font-medium text-white backdrop-blur hover:bg-white/20"
+                  >
+                    Browse videos instead
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </div>
