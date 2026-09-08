@@ -201,7 +201,7 @@ export default function ReviewMagic() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <div className="min-h-dvh flex items-center justify-center p-6 bg-background">
         <Card className="max-w-md w-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
@@ -228,7 +228,7 @@ export default function ReviewMagic() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO title="Channel review" description="Magic-link channel moderation" path="/review" />
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur px-4 py-3 space-y-3">
         <div className="flex items-center justify-between gap-3">

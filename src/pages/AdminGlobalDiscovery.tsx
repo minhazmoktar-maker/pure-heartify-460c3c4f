@@ -41,7 +41,7 @@ export default function AdminGlobalDiscovery() {
 
   if (loading) {
     return (
-      <div className="min-h-screen grid place-items-center">
+      <div className="min-h-dvh grid place-items-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
@@ -50,7 +50,7 @@ export default function AdminGlobalDiscovery() {
   const pct = stats?.pct_complete ?? 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
       <SEO
         title="Global Discovery — Admin"
         description="Progress toward Heartify's goal of 7,000 verified beneficial educational channels worldwide."
